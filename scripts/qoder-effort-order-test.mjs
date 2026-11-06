@@ -1,68 +1,71 @@
 /**
- * Qoder 思考档位**顺序**的回归测试。
+ * Regression test for the **order** of Qoder thinking efforts.
  *
- * 背景：`QODER_CN_FALLBACK_MODELS` 的 `efforts` 记的是目录
- * `thinking_config.enabled.efforts` 的**键序**，而那并不是强度序 ——
- * `dfmodel` 的真实键序是 `high / max / low`，`supportsDisable` 又把 `none`
- * 追加到末尾，于是 DSH 侧拿到的是
- * `高 → 最大 → 低 → 关闭思考`。
+ * Background: the `efforts` in `QODER_CN_FALLBACK_MODELS` record the **key
+ * order** of the catalog's `thinking_config.enabled.efforts`, and that is not
+ * strength order — `dfmodel`'s real key order is `high / max / low`, and
+ * `supportsDisable` appends `none` at the end, so the DSH side got
+ * `high → max → low → thinking off`.
  *
- * 官方客户端不这样渲染：它在 `displayReasoningEfforts()` 里按
+ * The official client does not render it that way: in
+ * `displayReasoningEfforts()` it **stably sorts** by
  * `REASONING_EFFORT_DISPLAY_ORDER = [none, minimal, low, medium, high, xhigh, max]`
- * **稳定排序**（未登记排末尾），`EffortControl` 与设置面板都只渲染这个结果。
- * 取证：CN 0.4.8 asar `out/renderer/assets/index-DDa3WwIe.js`。
+ * (unregistered entries go last), and `EffortControl` and the settings panel
+ * only render that result.
+ * Evidence: CN 0.4.8 asar `out/renderer/assets/index-DDa3WwIe.js`.
  *
- * 不排的后果是「越往右越弱」：依赖「位置 = 强度」的 UI
- * （如 `dsh-codex-effort-slider` 的滑条）会把 `最大` 画在 `高` 左边、
- * 把 `关闭思考` 画到最右并点亮满格能量。
+ * The consequence of not sorting is "the further right, the weaker": UIs that
+ * depend on "position = strength" (such as the `dsh-codex-effort-slider`
+ * slider) would draw `max` to the left of `high`, and draw `thinking off` at
+ * the far right lit up at full strength.
  */
 
 const CASES = [
-  // [说明, 输入模型, 期望的档位序]
-  ['dfmodel 真实键序（high/max/low + 追加 none）',
+  // [description, input model, expected effort order]
+  ['dfmodel real key order (high/max/low + appended none)',
     { efforts: ['high', 'max', 'low'], supportsDisable: true }, ['none', 'low', 'high', 'max']],
-  ['dmodel（high/max + 追加 none）',
+  ['dmodel (high/max + appended none)',
     { efforts: ['high', 'max'], supportsDisable: true }, ['none', 'high', 'max']],
-  ['gmodel（high/low/max，无 disabled）',
+  ['gmodel (high/low/max, no disabled)',
     { efforts: ['high', 'low', 'max'] }, ['low', 'high', 'max']],
-  ['gfmodel（high/max，已经是强度序 → 不变）',
+  ['gfmodel (high/max, already in strength order → unchanged)',
     { efforts: ['high', 'max'] }, ['high', 'max']],
-  ['qwen3.8（xhigh/low/medium + 追加 none）',
+  ['qwen3.8 (xhigh/low/medium + appended none)',
     { efforts: ['xhigh', 'low', 'medium'], supportsDisable: true }, ['none', 'low', 'medium', 'xhigh']],
-  ['qmodel（只有关闭思考）',
+  ['qmodel (thinking off only)',
     { efforts: [], supportsDisable: true }, ['none']],
-  ['无档位且不可关闭 → 空数组',
+  ['no efforts and cannot be disabled → empty array',
     { efforts: [] }, []],
 ]
 
 /**
- * @param {(model: object) => string[]} qoderEffortsFor 被验证的真实实现
- * @param {(efforts: readonly string[]) => string[]} sortEffortsByStrength 真实实现
+ * @param {(model: object) => string[]} qoderEffortsFor the real implementation under test
+ * @param {(efforts: readonly string[]) => string[]} sortEffortsByStrength the real implementation
  */
 export function verifyQoderEffortOrder(qoderEffortsFor, sortEffortsByStrength) {
-  if (typeof qoderEffortsFor !== 'function') throw new TypeError('qoderEffortsFor 未导出')
-  if (typeof sortEffortsByStrength !== 'function') throw new TypeError('sortEffortsByStrength 未导出')
+  if (typeof qoderEffortsFor !== 'function') throw new TypeError('qoderEffortsFor is not exported')
+  if (typeof sortEffortsByStrength !== 'function') throw new TypeError('sortEffortsByStrength is not exported')
 
   const eq = (actual, expected, label) => {
     const a = JSON.stringify(actual)
     const b = JSON.stringify(expected)
-    if (a !== b) throw new Error(`${label}：期望 ${b}，实际 ${a}`)
+    if (a !== b) throw new Error(`${label}: expected ${b}, got ${a}`)
   }
 
-  // ── 1. 逐条真实模型 ───────────────────────────────────────────────────────
+  // ── 1. Each real model, one by one ──────────────────────────────────────────
   for (const [label, model, expected] of CASES) {
     eq(qoderEffortsFor(model), expected, label)
   }
 
-  // ── 2. 「关闭思考」永远在最左（有它的模型）────────────────────────────────
+  // ── 2. "Thinking off" is always leftmost (for models that have it) ──────────
   for (const [label, model, expected] of CASES) {
     const got = qoderEffortsFor(model)
     if (!got.includes('none')) continue
-    if (got[0] !== 'none') throw new Error(`${label}：「关闭思考」必须落在最左，实际位置 ${got.indexOf('none') + 1}/${got.length}`)
-    if (JSON.stringify(got) !== JSON.stringify(expected)) throw new Error(`${label}：与期望不一致`)
+    if (got[0] !== 'none') throw new Error(`${label}: "thinking off" must land at the far left, actual position ${got.indexOf('none') + 1}/${got.length}`)
+    if (JSON.stringify(got) !== JSON.stringify(expected)) throw new Error(`${label}: does not match the expected value`)
   }
 
-  // ── 3. 已知档位的强度必须单调不减（「越往右越强」）────────────────────────
+  // ── 3. Known efforts must be monotonically non-decreasing in strength ───────
   const RANK = { none: 0, minimal: 1, low: 3, medium: 4, high: 5, xhigh: 7, max: 8 }
   for (const [label, model] of CASES) {
     const got = qoderEffortsFor(model)
@@ -70,28 +73,28 @@ export function verifyQoderEffortOrder(qoderEffortsFor, sortEffortsByStrength) {
       const prev = RANK[got[i - 1]]
       const cur = RANK[got[i]]
       if (prev === undefined || cur === undefined) continue
-      if (cur < prev) throw new Error(`${label}：强度序被破坏（位置 ${i} 的 ${got[i]} 弱于前一个 ${got[i - 1]}）`)
+      if (cur < prev) throw new Error(`${label}: strength order broken (${got[i]} at position ${i} is weaker than the previous ${got[i - 1]})`)
     }
   }
 
-  // ── 4. 未登记 id 排末尾、彼此保持原相对顺序 ───────────────────────────────
+  // ── 4. Unregistered ids go last, keeping their original relative order ──────
   eq(sortEffortsByStrength(['max', 'turbo', 'low', 'zen']), ['low', 'max', 'turbo', 'zen'],
-    '未登记 id 排末尾并保持原序')
+    'unregistered ids go last and keep their original order')
   eq(sortEffortsByStrength(['alpha', 'beta', 'gamma']), ['alpha', 'beta', 'gamma'],
-    '全部未登记 → 原序不变（对未知 provider 零行为变化）')
+    'all unregistered → original order unchanged (zero behaviour change for unknown providers)')
 
-  // ── 5. 同排名稳定：off/none 与 high/on ────────────────────────────────────
-  eq(sortEffortsByStrength(['none', 'off', 'low']), ['none', 'off', 'low'], 'off/none 同排名 → 保持原序')
-  eq(sortEffortsByStrength(['on', 'high', 'max']), ['on', 'high', 'max'], 'high/on 同排名 → 保持原序')
+  // ── 5. Same rank is stable: off/none and high/on ────────────────────────────
+  eq(sortEffortsByStrength(['none', 'off', 'low']), ['none', 'off', 'low'], 'off/none have the same rank → keep original order')
+  eq(sortEffortsByStrength(['on', 'high', 'max']), ['on', 'high', 'max'], 'high/on have the same rank → keep original order')
 
-  // ── 6. 幂等 + 不改入参 ────────────────────────────────────────────────────
+  // ── 6. Idempotent + does not mutate its input ───────────────────────────────
   const input = ['high', 'max', 'low', 'none']
   const snapshot = JSON.stringify(input)
   const once = sortEffortsByStrength(input)
-  if (JSON.stringify(input) !== snapshot) throw new Error('sortEffortsByStrength 改动了传入的数组')
-  eq(sortEffortsByStrength(once), once, '排序是幂等的')
+  if (JSON.stringify(input) !== snapshot) throw new Error('sortEffortsByStrength mutated the input array')
+  eq(sortEffortsByStrength(once), once, 'sorting is idempotent')
 
-  // ── 7. 边界 ───────────────────────────────────────────────────────────────
-  eq(sortEffortsByStrength([]), [], '空数组 → 空数组')
-  eq(sortEffortsByStrength(['none']), ['none'], '单档原样返回')
+  // ── 7. Edge cases ───────────────────────────────────────────────────────────
+  eq(sortEffortsByStrength([]), [], 'empty array → empty array')
+  eq(sortEffortsByStrength(['none']), ['none'], 'a single effort is returned as-is')
 }

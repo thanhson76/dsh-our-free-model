@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 
-/** 渠道服务只持有本实例的平台接口，不依赖 Cordis。 */
+/** The channel service holds only this instance's platform interface and does not depend on Cordis. */
 export class Service {
   constructor(platform, name) {
     this.ctx = platform
@@ -8,12 +8,12 @@ export class Service {
   }
 }
 
-/** 各渠道实现完整协议；基类对未实现的接口显式失败。 */
+/** Each channel implements the full protocol; the base class fails explicitly for unimplemented interfaces. */
 export class LlmAdapter {
-  listProviders() { throw new Error('渠道未实现供应商目录') }
-  listModels() { throw new Error('渠道未实现模型目录') }
-  resolveModel() { throw new Error('渠道未实现模型解析') }
-  stream() { throw new Error('渠道未实现流式调用') }
+  listProviders() { throw new Error('The channel does not implement a provider directory') }
+  listModels() { throw new Error('The channel does not implement a model directory') }
+  resolveModel() { throw new Error('The channel does not implement model resolution') }
+  stream() { throw new Error('The channel does not implement streaming calls') }
   async prepareCall(provider, model, signal) {
     return { model: await this.resolveModel(provider, model, signal), stream: options => this.stream(options) }
   }

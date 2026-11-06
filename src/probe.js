@@ -48,13 +48,15 @@ const PING_PROMPT = 'ping'
  */
 export async function probeModel(model, { attributionUserAgent, signal, timeoutMs = 45000 } = {}) {
   const started = Date.now()
-  // 每个模型独立的上游 session。配额按 session 计数，整轮共用一个 session
-  // 会让第一个模型吃掉配额、其余模型全部读作 429（issue #561）。
+  // A separate upstream session per model. Quota is counted per session, so
+  // sharing one session for the whole round would let the first model eat the
+  // quota and every other model read as a 429 (issue #561).
   const session = sessionForConversation('probe:our-free-model:' + model.id)
   const wire = wireFor(model.id)
   const body = buildPing(model.id, wire)
-  // 三条线各有自己的工具形状：Responses 是扁平项，Messages 是 Claude 的
-  // `input_schema`，Chat 是 `{function:{…}}`。传错形状会让注入的指纹工具不合规。
+  // Each of the three wires has its own tool shape: Responses uses flat items,
+  // Messages uses Claude's `input_schema`, Chat uses `{function:{…}}`. Sending
+  // the wrong shape makes the injected fingerprint tool non-compliant.
   applyFingerprint(body, wire === 'responses' ? true : wire === 'messages' ? 'claude' : false)
 
   let firstDelta

@@ -3,6 +3,6 @@ declare module 'ofm-provider-list' {
   export const providers: Provider[]
 }
 declare module 'ofm-shared-client' {
-  // 渠道页面来自未类型化的原插件，通过构建适配导出。
+  // The channel pages come from the untyped original plugin and are exported through the build adapter.
   export const shared: Record<string, any>
 }

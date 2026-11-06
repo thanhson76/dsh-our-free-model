@@ -1,160 +1,158 @@
-# 免密车道的新线缆（2026-10-14 实测）
+# The Keyless Lane's New Wire (measured 2026-10-14)
 
-`/zen/v1` 上的免费车道在 2026-10-13/14 之间对插件全线返回
-`403 {"type":"error","error":{"type":"FreeTierError", …}}`，而官方客户端仍然可用。
-本文件记录实测到的五处变化、判定依据，以及 `src/upstream.js` / `src/http.js` 里对应的修正。
+Between 2026-10-13/14, the free lane on `/zen/v1` returned
+`403 {"type":"error","error":{"type":"FreeTierError", …}}` to the plugin across the board, while the official client still worked.
+This file records the five changes found by measurement, the basis for determining them, and the corresponding fixes in `src/upstream.js` / `src/http.js`.
 
-## 结论：现在的闸门
+## Conclusion: the gate as it now stands
 
-| 项目 | 实测结果 |
+| Item | Measured result |
 | --- | --- |
-| 聊天端点 | **`https://opencode.ai/inference/v1/chat/completions`**。`/zen/v1/chat/completions` 即使其余全对也返回 403 FreeTierError；`/inference/v1/models` 与 `/zen/v1/models` 都仍返回 85 个模型 id |
-| 会话头 | **`x-opencode-session-id` 必须存在**（值与 `x-opencode-session` 相同）。去掉它 → 403 |
-| 会话 id 形状 | `ses_` 后 12 位 hex 必须是**铸造**形状 `~(ms·0x1000+seq)`（低 12 位 ≈ `0xFFE`）。sha256 派生或随机 hex → 403 |
-| 工具指纹 | **`bash` 与 `read` 必须同时声明**，且各自的参数 schema 至少有一个 property。只声明其一 → 403；`properties: {}` → 403；两者齐备 + 任意 property → 200，且可附带你自己的工具 |
-| User-Agent | 含 `deepseek-harness`（大小写不敏感、位置无关）→ 403；`dsh/…`、`opencode/1.18.22` 均 200 |
-| 其余 | `authorization: Bearer public` 必须保留；`x-opencode-request` / `x-opencode-project` / `x-opencode-client` 可省（仍照发）；HTTP/1.1 与 HTTP/2、Node 与 Bun 的 TLS 栈**无差别** |
+| Chat endpoint | **`https://opencode.ai/inference/v1/chat/completions`**. `/zen/v1/chat/completions` returns 403 FreeTierError even when everything else is right; `/inference/v1/models` and `/zen/v1/models` both still return 85 model ids |
+| Session header | **`x-opencode-session-id` must be present** (with the same value as `x-opencode-session`). Removing it → 403 |
+| Session id shape | The 12 hex digits after `ses_` must be of the **minted** shape `~(ms·0x1000+seq)` (the low 12 bits ≈ `0xFFE`). sha256-derived or random hex → 403 |
+| Tool fingerprint | **`bash` and `read` must be declared together**, and each one's parameter schema must have at least one property. Declaring only one of them → 403; `properties: {}` → 403; both present + any property → 200, and you may attach your own tools as well |
+| User-Agent | Containing `deepseek-harness` (case-insensitive, position-independent) → 403; `dsh/…` and `opencode/1.18.22` both 200 |
+| Everything else | `authorization: Bearer public` must be kept; `x-opencode-request` / `x-opencode-project` / `x-opencode-client` may be omitted (still sent as before); HTTP/1.1 vs HTTP/2, and the Node vs Bun TLS stacks, **make no difference** |
 
-## 判定方法
+## How it was determined
 
-1. 在本机跑官方客户端 `opencode-ai@1.19.0`（linux-arm64-musl，Alpine 的 musl loader），确认
-   `opencode run -m opencode/cat-jam-free` 可用 —— 说明闸门是客户端指纹，不是账号或配额。
-2. 用自签 CA 的 TLS 中间人（`NODE_EXTRA_CA_CERTS`）把客户端指到本地，读到它真正发出的请求：
-   路径是 **`/inference/v1/chat/completions`**，并携带 `x-opencode-session-id`。
-3. 用**逐字节重放**做单变量对照（普通 Node `https`，不涉及任何 TLS 技巧）：
-   从真实请求出发，每次只删/改一项，记录 200/403。上表即该对照的结果。
-4. 工具维度另做矩阵：`bash` 单独 → 403、`read` 单独 → 403、`bash`+`read` 空 schema → 403、
-   `bash`+`read` 各带一个 property → 200、`Read`/`BASH` 大小写变体 → 403。
+1. Run the official client `opencode-ai@1.19.0` locally (linux-arm64-musl, Alpine's musl loader) and confirm
+   `opencode run -m opencode/cat-jam-free` works — showing the gate is a client fingerprint, not an account or quota.
+2. Use a TLS man-in-the-middle with a self-signed CA (`NODE_EXTRA_CA_CERTS`) to point the client at a local endpoint and read the requests it actually sends:
+   the path is **`/inference/v1/chat/completions`**, and it carries `x-opencode-session-id`.
+3. Use **byte-for-byte replay** for single-variable comparisons (ordinary Node `https`, involving no TLS tricks):
+   starting from the real request, delete/change one item at a time and record 200/403. The table above is the result of that comparison.
+4. Run a separate matrix for the tool dimension: `bash` alone → 403, `read` alone → 403, `bash`+`read` with empty schemas → 403,
+   `bash`+`read` each with one property → 200, the `Read`/`BASH` case variants → 403.
 
-## 修正
+## Fixes
 
-- `endpointFor()` / `wireFor()`：三条路径移到 `/inference/v1`；清单地址同步移动，
-  测试用的 stand-in 网关（`scripts/lib/fake-kernel.mjs` 等）跟着改。
-- `gatewayHeaders()`：补 `x-opencode-session-id`，`x-opencode-client` 报 `cli`。
-- `sessionForConversation()`：改用 `mintSessionId()` 铸造并按会话缓存（保留
-  「一个会话一个 session」的配额语义，同时满足形状校验）。
-- `applyFingerprint()`：诱饵与调用者自带的 `bash`/`read` 都补齐至少一个 property；
-  只补 schema，不改名字、不改描述、不复制工具。
-- `http.js` 的 `userAgentWith()`：归属 UA 里的 `deepseek-harness` 改写为 `dsh`，
-  并去掉重复该 token 的括号 URL；其余归属信息保留。
+- `endpointFor()` / `wireFor()`: the three paths move to `/inference/v1`; the list address moves with them,
+  and the stand-in gateways used by tests (`scripts/lib/fake-kernel.mjs` etc.) follow.
+- `gatewayHeaders()`: add `x-opencode-session-id`, and `x-opencode-client` reports `cli`.
+- `sessionForConversation()`: switch to minting with `mintSessionId()` and caching per conversation (keeping
+  the "one session per conversation" quota semantics while satisfying the shape check).
+- `applyFingerprint()`: both the decoys and the caller's own `bash`/`read` are completed with at least one property;
+  only the schema is completed — names are not changed, descriptions are not changed, and tools are not copied.
+- `userAgentWith()` in `http.js`: the `deepseek-harness` in the attribution UA is rewritten to `dsh`,
+  and the parenthesised URL repeating that token is removed; the rest of the attribution information is kept.
 
-回归测试：`scripts/fingerprint-test.mjs`（工具指纹）与新增的
-`scripts/free-lane-wire-test.mjs`（路径、会话头、会话形状、UA 净化，含一次走 stand-in 网关的
-端到端断言）。两者都在 `npm run test:contributor` 内。
-
----
-
-# v2 客户端指纹（2026-10-16）
-
-上游在 2026-10-14 前后把免费车道换成了 **OpenCode v2 客户端**的形状，v1 的四项特征
-逐一失效 —— 每一项单独出现都是 `403 FreeTierError`（"free tier can only be used from
-within OpenCode"）。本插件在 2026-10-16 按 v2 重做，两侧实现（`src/upstream.js` 与
-vendored 的 `vendor/channel-pack/src/opencode*.ts`）保持同一套形状。
-
-## 结论：v1 → v2 的四处变化
-
-| 项目 | v1（旧） | v2（现在） |
-| --- | --- | --- |
-| User-Agent | `opencode/1.18.31` | **`opencode/latest/2.0.26/cli`**（`opencode/<channel>/<version>/<client>`，major ≥ 2；整串匹配，任何前后缀都不再算 v2 客户端） |
-| 请求头 | 带 `x-opencode-request` | **不带**（v1 专用头，带了即 403）；改带 `x-session-affinity` / `x-session-id`，与 `x-opencode-session` / `x-opencode-session-id` 四个同值 |
-| 工具闸门 | `bash`/`glob`/`grep`/`read` 四个名字，各带至少一个 property | **`read` 与 `shell` 两个名字，且 description 与参数 schema 必须与官方客户端逐字一致** |
-| `tool_choice` | 无工具时补 `none` 压住诱饵 | **`none` 即 403**，绝不下发；只有 Responses 线补官方的 `auto` |
-
-会话 id 的形状不变（`ses_` + 12 位铸造 hex + 14 位 base62），但多了一条**计数器约束**：
-上游会解码那 12 位 hex，里面的 seq 必须很小（实测 0–16 通过、≥100 拒绝），
-`mintSessionId()` 每毫秒归零的写法正好满足。
-
-## 判定方法（依据）
-
-- 本仓库的 v1 判定来自 2026-10-14 的 TLS 中间人 + 逐字节重放（见上一节）。
-- v2 的形状取自 **9router v0.5.104**（`open-sse/executors/opencode.js` 与
-  `open-sse/utils/opencodeFingerprint.js`，2026-10-15 提交
-  `5bdcd5e`「move free tier to /inference/v1 with the v2 client fingerprint」）——
-  该项目对同一上游做了逐项实测，并写明 v1 UA 与 `x-opencode-request` 都被 403。
-- 2026-10-16 本机复核：`GET /inference/v1/models` 与 `/zen/v1/models` 均 200
-  （88 条，12 条免费）；**对话请求当次被 `429 FreeUsageLimitError` 挡住**
-  （retry-after ≈ 12h），故 v2 的逐项对照以 9router 的实测为准，本机未重测。
-  出口恢复后应补一次直连验证：一条 200 即证明 v2 形状被接受。
-
-## 修正
-
-- `CLIENT_UA` → v2 串；`http.js` 的 `userAgentWith()` 不再拼接归属 UA
-  （v2 整串匹配，拼接串不再是 v2 客户端）。归属仍保留在其余车道。
-- `gatewayHeaders()`：去掉 `x-opencode-request`，补 `x-session-affinity` / `x-session-id`。
-- `applyFingerprint()`：重写为 v2 —— 注入官方 `read`/`shell` 定义（逐字），调用方
-  同名但定义不同的工具改名成 `<name>_client[N]` 并在响应侧还原，历史里的同名调用
-  一起改名，注入后补一句「别调它们」的系统提示，并兜底清除 `tool_choice: 'none'`。
-  v1 的「把调用方的 shell 提升进 `bash` 槽位」与「空 schema 补占位 property」都已删除
-  （v2 比对定义，两者都会 403）。
-- 续写回合不再下发 `tool_choice: 'none'`：压制手段回到续写指令正文里本来就有的
-  「Do not call tools」。
-- channel pack（`opencode*.ts`）：同一套改动，另加 `resolveOpencodeEffort()` 把请求档位
-  就近收敛到模型声明过的档位（9router 的 `normalizeOpenAILevel` 同义，改用本仓库
-  自己的强度序实现）。
-
-回归测试：`scripts/fingerprint-test.mjs`（v2 工具闸门，含别名/重复/三种线形状）、
-`scripts/free-lane-wire-test.mjs`（四条会话头、UA、无 v1 头）、新增
-`scripts/opencode-parity-test.mjs`（`src/` 与 channel pack 两侧的指纹一致性 ——
-名字、定义逐字、UA、头集、别名、`tool_choice`、档位收敛）。三者都在
-`npm run test:contributor` 内。
+Regression tests: `scripts/fingerprint-test.mjs` (tool fingerprint) and the new
+`scripts/free-lane-wire-test.mjs` (paths, session header, session shape, UA sanitisation, including one end-to-end assertion through a stand-in gateway
+). Both are in `npm run test:contributor`.
 
 ---
 
-# 对齐参考网关 opencode2api v1.4.6（2026-10-31）
+# The v2 client fingerprint (2026-10-16)
 
-10 月下旬的几次 429/403 复发把三件新事实钉死（每次都有单变量实测）：
+Around 2026-10-14 upstream switched the free lane to the shape of the **OpenCode v2 client**, and the v1's four characteristics
+failed one by one — each one appearing on its own is a `403 FreeTierError` ("free tier can only be used from
+within OpenCode"). On 2026-10-16 this plugin was redone following v2, and the two implementations (`src/upstream.js` and
+the vendored `vendor/channel-pack/src/opencode*.ts`) keep the same shape.
 
-1. **词汇闸门**：请求体里只要还带另一个客户端的工具词汇——Claude Code 的
-   `ReportFindings` + `ScheduleWakeup` 同时出现即可——上游就 429
-   （2026-10-30 实测；当时只给 DSH 的两个工具建了别名表，是同一发现的特例）。
-2. **官方提示闸门**：工具与请求头全对、IP 干净，缺官方 CLI 系统提示仍 429；
-   补上 base prompt + `<env>` + skills 即 200（2026-10-28 实测，先用裸 env 块
-   压住；完整提示是参考实现的形状）。
-3. **时间戳合理性**：会话 id 形状/编码全对但内嵌日期不可信（纯哈希落到 1970）
-   → 429；真实近日期 → 200（2026-10-28 A/B）。
+## Conclusion: the four changes from v1 to v2
 
-这三条正是 [opencode2api](https://github.com/jasonxu114514/opencode2api)
-（本仓库自 2026-10-17 起跟随的参考实现）在其 v1.4.x 里逐项解决的事实。因此
-2026-10-31 起匿名道的请求整形层整体换成它的 **v1.4.6** 移植：`src/o2a/`
-（文件对照、七条有意偏差、升级手册见 `src/o2a/SYNC.md`）。`src/upstream.js`
-保留为适配层，公开导出不变。
-
-## 本次的线上形状（v1.4.6）
-
-| 项目 | 之前（2026-10-28 形状） | 现在（v1.4.6 移植） |
+| Item | v1 (old) | v2 (now) |
 | --- | --- | --- |
-| 客户工具 | 原名保留（两个已知坏名进别名表） | **全部改名**为 `clint_<sha256[:12]>`，`tool_choice`/历史/`input` 调用行同步改名，响应侧折叠还原 |
-| 官方工具集 | `read` + `shell` 两个逐字定义 | **13 个官方工具全量**（捕获自 2.1 CLI 的 `opencode_tools.json`；chat 线带 `strict:false`，Windows 主机 shell 描述写 powershell） |
-| 系统提示 | 裸 `<env>` 块 | **官方 CLI 提示全量**：base prompt + `<env>`（模型/目录/平台/日期）+ 内置 skills；已带 marker 的请求体跳过 |
-| `x-opencode-project` | 恒 `global`（共享配额桶） | **每请求一个 40-hex**（调用方给的 `global`/git commit 直通，其余哈希成 40-hex） |
-| 端点 | `/inference/v1/…` | **族路径** `/inference/openai/v1/…`、`/inference/anthropic/v1/messages?beta=true`（2.1 客户端形状；旧扁平路径仍可用） |
-| UA | `opencode/latest/2.0.26/cli` | `opencode/latest/2.1.1/cli`（跟随参考实现的 `v2ClientVersion`） |
-| Chat 体 | — | 流式补 `stream_options.include_usage:true`；无上限时补 `max_completion_tokens:32000` |
-| 会话铸造 | 真时间戳铸造 + 持久化 | 慢钟铸造（今日 UTC 零点 − ≤30 天哈希偏移，降序编码，进程盐）；持久化保留，日期离窗（±400 天）的旧 id 重铸 |
+| User-Agent | `opencode/1.18.31` | **`opencode/latest/2.0.26/cli`** (`opencode/<channel>/<version>/<client>`, major ≥ 2; the whole string is matched, and any prefix or suffix no longer counts as a v2 client) |
+| Request headers | Carried `x-opencode-request` | **Not carried** (a v1-only header; carrying it gives 403); instead carries `x-session-affinity` / `x-session-id`, with the same value as `x-opencode-session` / `x-opencode-session-id` — four headers, one value |
+| Tool gate | The four names `bash`/`glob`/`grep`/`read`, each with at least one property | **`read` and `shell` — two names, and the description and parameter schema must match the official client word for word** |
+| `tool_choice` | With no tools, add `none` to suppress the decoys | **`none` itself is a 403** — never send it; only the Responses wire adds the official `auto` |
 
-Anthropic 线新增 `anthropic-beta: interleaved-thinking-2025-05-14` 头。保留的
-插件侧偏差（占位提示、`tool_choice:'none'` 兜底清除、幂等整形、块对象保留、
-非流式不强制、跨重启会话、copy-on-write）逐条列在 `src/o2a/SYNC.md` 第 2 节。
+The session id's shape is unchanged (`ses_` + 12 digits of minted hex + 14 base62 digits), but a **counter constraint** was added:
+upstream decodes those 12 hex digits, and the seq inside must be small (measured: 0–16 pass, ≥100 are refused);
+`mintSessionId()`'s approach of resetting every millisecond happens to satisfy this.
 
-## 依据
+## How it was determined (basis)
 
-- 参考实现 v1.4.6 源码（release 2026-10-29，commit `58f5667`）逐文件对照；
-  它对本车道上游做过同样的单变量实测，其 release 说明与本文件第 1–3 条事实一致。
-- **线字节对照（同日）**：让 v1.4.6 网关把整形后的请求发给本机明文 echo 服务
-  器，抓到它的最终 outbound（头集、24868B body、13 工具、9579B 系统提示），
-  与本移植逐字段 diff：键集、工具集、系统提示、UA/project/会话形状全部一致；
-  唯一差异是它**不发 `accept` 头** —— 本移植已对齐（默认不发，显式覆盖才发）。
-- **重放判定无效（同日）**：同出口同刻，v1.4.6 自己的字节经 Go 客户端 200、
-  经 curl/python 转发 429（同为 `FreeUsageLimitError`）—— 上游对 TLS/HTTP 客
-  户端指纹敏感，且 429 报文不区分「IP 配额烧尽」与「非官方客户端」。用 curl
-  重放本车道做 200/429 结论（包括本文件早年的手写对照）须以「客户端指纹相同」
-  为前提；跨客户端的对照一律无效。判定只能用本车道自己的客户端（插件 =
-  Node/Bun）或参考网关本体。
+- This repository's v1 determination comes from the 2026-10-14 TLS man-in-the-middle + byte-for-byte replay (see the previous section).
+- The v2 shape is taken from **9router v0.5.104** (`open-sse/executors/opencode.js` and
+  `open-sse/utils/opencodeFingerprint.js`, committed 2026-10-15 as
+  `5bdcd5e` "move free tier to /inference/v1 with the v2 client fingerprint") —
+  that project measured the same upstream item by item, and states in writing that both the v1 UA and `x-opencode-request` get a 403.
+- Local re-check on 2026-10-16: `GET /inference/v1/models` and `/zen/v1/models` both 200
+  (88 entries, 12 free); **the conversation request that time was blocked by a `429 FreeUsageLimitError`**
+  (retry-after ≈ 12h), so the v2 item-by-item comparison relies on 9router's measurements and was not re-measured locally.
+  Once the egress recovers, one direct verification should be added: a single 200 proves the v2 shape is accepted.
 
-回归测试：`scripts/fingerprint-test.mjs`（不透明改名 + 13 工具集 + 幂等）、
-`scripts/free-lane-wire-test.mjs`（族路径、40-hex project id、UA、四会话头、
-无 accept 头）、`scripts/opencode-parity-test.mjs`（lane 与 channel pack 的重叠契约）、
-`scripts/wire-tool-alias-test.mjs`（改名 → 流式还原 → 宿主分发）、
-`scripts/free-lane-compat-test.mjs`（三线提示注入 + 传输层）。全部在 `npm test` 内。
+## Fixes
 
+- `CLIENT_UA` → the v2 string; `userAgentWith()` in `http.js` no longer concatenates an attribution UA
+  (v2 matches the whole string, so a concatenated string is no longer a v2 client). Attribution is still kept on the other lanes.
+- `gatewayHeaders()`: remove `x-opencode-request`, add `x-session-affinity` / `x-session-id`.
+- `applyFingerprint()`: rewritten for v2 — inject the official `read`/`shell` definitions (word for word); caller
+  tools with the same name but a different definition are renamed to `<name>_client[N]` and restored on the response side, with same-name calls in the history
+  renamed along with them; after injection, a system prompt line "do not call them" is added, and any `tool_choice: 'none'` is cleared as a backstop.
+  v1's "promote the caller's shell into the `bash` slot" and "complete an empty schema with a placeholder property" are both deleted
+  (v2 compares definitions, and both would get a 403).
+- Continuation turns no longer send `tool_choice: 'none'`: the suppression means returns to the
+  "Do not call tools" that was already in the continuation instruction body.
+- The channel pack (`opencode*.ts`): the same set of changes, plus `resolveOpencodeEffort()`, which converges a requested level
+  to the nearest level the model has declared (the same meaning as 9router's `normalizeOpenAILevel`, implemented using this repository's
+  own intensity ordering).
 
+Regression tests: `scripts/fingerprint-test.mjs` (the v2 tool gate, including aliases/duplicates/three wire shapes),
+`scripts/free-lane-wire-test.mjs` (the four session headers, the UA, no v1 headers), and the new
+`scripts/opencode-parity-test.mjs` (fingerprint consistency between the `src/` and channel-pack sides —
+names, word-for-word definitions, UA, header set, aliases, `tool_choice`, level convergence). All three are
+in `npm run test:contributor`.
+
+---
+
+# Alignment with the reference gateway opencode2api v1.4.6 (2026-10-31)
+
+Several 429/403 recurrences in late October pinned down three new facts (each with a single-variable measurement):
+
+1. **The vocabulary gate**: if the request body still carries another client's tool vocabulary — Claude Code's
+   `ReportFindings` and `ScheduleWakeup` appearing together is enough — upstream returns 429
+   (measured 2026-10-30; at the time an alias table was built for only DSH's two tools, a special case of the same finding).
+2. **The official prompt gate**: with tools and request headers all correct and a clean IP, missing the official CLI system prompt still gives 429;
+   adding the base prompt + `<env>` + skills gives 200 (measured 2026-10-28, first held down with a bare env block;
+   the full prompt is the reference implementation's shape).
+3. **Timestamp plausibility**: the session id's shape/encoding are all correct but the embedded date is untrustworthy (a pure hash landing in 1970)
+   → 429; a real, recent date → 200 (2026-10-28 A/B).
+
+These three are exactly what [opencode2api](https://github.com/jasonxu114514/opencode2api)
+(the reference implementation this repository has followed since 2026-10-17) solved item by item in its v1.4.x. Therefore,
+from 2026-10-31, the anonymous lane's request-shaping layer was replaced wholesale with a port of its **v1.4.6**: `src/o2a/`
+(for the file mapping, the seven intentional deviations and the upgrade manual, see `src/o2a/SYNC.md`). `src/upstream.js`
+is retained as the adapter layer, with its public exports unchanged.
+
+## This round's online shape (v1.4.6)
+
+| Item | Before (the 2026-10-28 shape) | Now (the v1.4.6 port) |
+| --- | --- | --- |
+| Client tools | Original names kept (two known bad names in the alias table) | **All renamed** to `clint_<sha256[:12]>`; `tool_choice`/history/`input` call lines are renamed in sync, and folded back on the response side |
+| Official tool set | Two word-for-word definitions, `read` + `shell` | **All 13 official tools** (captured from the 2.1 CLI's `opencode_tools.json`; the chat wire carries `strict:false`, and on Windows hosts the shell description says powershell) |
+| System prompt | A bare `<env>` block | **The full official CLI prompt**: base prompt + `<env>` (model/directory/platform/date) + built-in skills; request bodies already carrying the marker are skipped |
+| `x-opencode-project` | Always `global` (a shared quota bucket) | **One 40-hex per request** (a caller-given `global`/git commit passes through directly; everything else is hashed to 40-hex) |
+| Endpoint | `/inference/v1/…` | **Family paths** `/inference/openai/v1/…`, `/inference/anthropic/v1/messages?beta=true` (the 2.1 client shape; the old flat paths still work) |
+| UA | `opencode/latest/2.0.26/cli` | `opencode/latest/2.1.1/cli` (following the reference implementation's `v2ClientVersion`) |
+| Chat body | — | Streaming adds `stream_options.include_usage:true`; with no cap, adds `max_completion_tokens:32000` |
+| Session minting | Real-timestamp minting + persistence | Slow-clock minting (today's UTC midnight − a ≤30-day hash offset, descending encoding, a process salt); persistence is retained, and old ids whose date is outside the window (±400 days) are re-minted |
+
+The Anthropic wire adds the `anthropic-beta: interleaved-thinking-2025-05-14` header. The retained
+plugin-side deviations (placeholder prompts, the `tool_choice:'none'` backstop clearing, idempotent shaping, block-object preservation,
+not forcing non-streaming, sessions across restarts, copy-on-write) are listed item by item in section 2 of `src/o2a/SYNC.md`.
+
+## Basis
+
+- The reference implementation v1.4.6's sources (released 2026-10-29, commit `58f5667`), compared file by file;
+  it performed the same single-variable measurements against this lane's upstream, and its release notes agree with facts 1–3 in this file.
+- **Wire-byte comparison (same day)**: have the v1.4.6 gateway send its shaped request to a local plaintext echo server,
+  capture its final outbound (header set, a 24868B body, 13 tools, a 9579B system prompt),
+  and diff it against this port field by field: the key set, tool set, system prompt, UA/project/session shapes all match;
+  the only difference is that it **does not send an `accept` header** — this port is now aligned (not sent by default, sent only on an explicit override).
+- **Replay determinations are invalid (same day)**: at the same egress and moment, v1.4.6's own bytes get a 200 through a Go client and a
+  429 through curl/python forwarding (both `FreeUsageLimitError`) — upstream is sensitive to the TLS/HTTP client
+  fingerprint, and the 429 message does not distinguish "IP quota exhausted" from "unofficial client". Using curl
+  to replay this lane for a 200/429 conclusion (including this file's early hand-written comparisons) requires "the same client fingerprint"
+  as a premise; comparisons across clients are all invalid. A determination can only use this lane's own client (the plugin =
+  Node/Bun) or the reference gateway itself.
+
+Regression tests: `scripts/fingerprint-test.mjs` (opaque renaming + the 13-tool set + idempotency),
+`scripts/free-lane-wire-test.mjs` (family paths, the 40-hex project id, the UA, the four session headers,
+no accept header), `scripts/opencode-parity-test.mjs` (the overlapping contract of the lane and the channel pack),
+`scripts/wire-tool-alias-test.mjs` (renaming → streaming restoration → host dispatch),
+`scripts/free-lane-compat-test.mjs` (prompt injection on three wires + the transport layer). All are in `npm test`.

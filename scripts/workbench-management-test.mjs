@@ -81,7 +81,7 @@ try {
     const copy = JSON.stringify(first.body)
     assert.match(copy, /WorkBuddy/i, 'WorkBuddy is named')
     assert.match(copy, /Huawei/i, 'Huawei Cloud is named')
-    assert.match(copy, /与我们无关|与本项目作者及团队无关/, 'the team is stated as not responsible')
+    assert.match(copy, /unrelated to the authors and team of this project/, 'the team is stated as not responsible')
     assert.equal((await api('/disclaimer/ack', {})).status, 200)
     const second = await api('/disclaimer')
     assert.equal(second.body.acknowledged, true, 'the acknowledgement persists')

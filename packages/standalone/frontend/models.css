@@ -1,11 +1,11 @@
 /* ============================================
-   模型清单页面样式 — 纸面数据表（昼）+ 深海数据仪表（夜）
-   昼：暖纸底 + 清晰行线 + 数字对齐，长清单像一张摊平的明细纸。
-   夜：深海底色 + 微光边线 + 仪器分栏，长清单像一块常驻的数据面板。
-   动画只使用 transform / opacity；数字一律 tabular-nums。
+   Model list page styles — paper data sheet (day) + deep-sea data instrument (night)
+   Day: warm paper background + clear row lines + aligned numbers; a long list like a flattened statement sheet.
+   Night: deep-sea background + faint glowing edges + instrument columns; a long list like an always-on data panel.
+   Animations use only transform / opacity; numbers always use tabular-nums.
    ============================================ */
 
-/* ---- 昼主题变量（对齐全站暖纸工作台：纸底 / 暖灰 / 蓝墨） ---- */
+/* ---- Day theme variables (aligned with the site-wide warm-paper workbench: paper background / warm gray / blue ink) ---- */
 :root {
   --md-surface: #fffdfa;
   --md-surface-raised: #f9f5ee;
@@ -42,7 +42,7 @@
   --md-duration-slow: 380ms;
 }
 
-/* ---- 夜主题变量（原两个 dark 变量块合并，逐项取各自生效值） ---- */
+/* ---- Night theme variables (the two original dark variable blocks merged, taking each effective value) ---- */
 [data-theme="dark"] {
   --md-surface: #11161f;
   --md-surface-raised: #151b26;
@@ -75,11 +75,11 @@
   --md-shadow-inset: inset 0 1px 3px rgba(0, 0, 0, 0.34);
 }
 
-/* ---- 页面容器 ---- */
+/* ---- Page container ---- */
 .model-browser { min-width: 0; }
 .model-browser .actions .ui-button { white-space: nowrap; }
 
-/* ---- 顶部摘要条 ---- */
+/* ---- Top summary bar ---- */
 .model-summary {
   display: flex; flex-wrap: wrap; align-items: center; gap: 10px 25px;
   padding: 0 0 21px; margin-bottom: 22px;
@@ -94,7 +94,7 @@
 .model-summary > span:nth-child(2) { font-variant-numeric: tabular-nums; }
 .model-summary > span:last-child { margin-left: auto; color: var(--md-ink-muted); }
 
-/* ---- 筛选工具栏 ---- */
+/* ---- Filter toolbar ---- */
 .model-filters {
   display: grid; grid-template-columns: minmax(200px, 1fr) repeat(3, minmax(120px, 175px));
   gap: 10px;
@@ -139,7 +139,7 @@
 }
 .model-search input::placeholder { color: var(--md-ink-muted); opacity: 1; }
 
-/* ---- 工具栏（筛选 chip + 结果计数 + 清空） ---- */
+/* ---- Toolbar (filter chips + result count + clear) ---- */
 .model-list-toolbar {
   min-height: 64px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
   padding: 13px 0;
@@ -162,7 +162,7 @@
 .model-browser .model-list-toolbar .ui-button-ghost { color: var(--md-ink-secondary); }
 .model-browser .model-list-toolbar .ui-button-ghost:hover { background: var(--md-accent-tint); color: var(--md-accent); }
 
-/* ---- 表格容器：一张有边界的明细纸 ---- */
+/* ---- Table container: a bounded statement sheet ---- */
 .model-table {
   border: 1px solid var(--md-line);
   background: var(--md-surface); border-radius: 8px; overflow: hidden;
@@ -170,7 +170,7 @@
 }
 :root:not([data-theme="dark"]) .model-table { border-radius: 12px; }
 
-/* ---- 表头 ---- */
+/* ---- Table header ---- */
 .model-table-header, .model-table-row {
   display: grid;
   grid-template-columns: minmax(160px, 2.3fr) minmax(115px, 1.25fr) minmax(105px, 1fr) minmax(100px, 1fr) 158px;
@@ -183,11 +183,11 @@
   position: sticky; top: 0; z-index: 3;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
-/* 滚动区常驻 6px 滚动条槽，表头补等宽内边距，五列才与数据行严格对齐。 */
+/* The scroll area always reserves a 6px scrollbar gutter; the header gets equal extra padding so the five columns align exactly with data rows. */
 .model-table-header { padding-right: calc(16px + 6px); }
 .model-table-header > span:last-child { text-align: right; }
 
-/* ---- 滚动区 ---- */
+/* ---- Scroll area ---- */
 .model-scroll {
   height: clamp(320px, 60vh, 680px); overflow: auto;
   overscroll-behavior: contain; scrollbar-gutter: stable;
@@ -200,7 +200,7 @@
 .model-scroll:focus-visible { outline: 2px solid var(--md-accent); outline-offset: -2px; }
 .model-virtual-content { position: relative; width: 100%; }
 
-/* ---- 表格行 ---- */
+/* ---- Table rows ---- */
 .model-table-row {
   position: absolute; top: 0; left: 0; width: 100%;
   border-bottom: 1px solid var(--md-line-soft);
@@ -208,7 +208,7 @@
   font-variant-numeric: tabular-nums;
   transition: background-color var(--md-duration-normal) var(--md-ease-out);
 }
-/* 行底色单独声明并提升一档作用域：既压过 app.css 的旧深色行底色，又让 hover（同特异性、更靠后）仍然生效。 */
+/* Row background declared separately with one level higher scope: it overrides app.css's old dark row background while still letting hover (same specificity, later in the file) take effect. */
 .model-browser .model-table-row { background-color: var(--md-surface); }
 .model-table-row:last-child { border-bottom: 0; }
 .model-table-row:hover, .model-table-row:focus-within {
@@ -216,7 +216,7 @@
   box-shadow: inset 2px 0 0 var(--md-row-edge);
 }
 
-/* ---- 单元格 ---- */
+/* ---- Cells ---- */
 .model-identity, .model-source, .model-limits, .model-state { min-width: 0; }
 .model-identity strong {
   display: block; font-size: 14px; font-weight: 600; color: var(--md-ink);
@@ -244,7 +244,7 @@
 }
 .model-state > small { font-size: 11px; color: var(--md-ink-muted); line-height: 1.4; overflow-wrap: anywhere; }
 
-/* ---- 行内操作按钮 ---- */
+/* ---- Row action buttons ---- */
 .model-row-actions { display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
 .model-row-actions .ui-button { min-height: 33px; padding: 7px 9px; gap: 5px; }
 .model-browser .model-row-actions .ui-button-ghost { width: 33px; padding: 0; flex-shrink: 0; }
@@ -258,7 +258,7 @@
   border-color: var(--md-accent-border); background: var(--md-accent-soft); color: var(--md-accent);
 }
 
-/* 复制成功态：一次性微弹 + 绿意反馈 */
+/* Copy-success state: one-time micro pop + green feedback */
 .model-row-actions .md-copy-done {
   color: var(--md-success) !important;
   background: var(--md-success-soft) !important;
@@ -272,12 +272,12 @@
   to { transform: scale(1); }
 }
 
-/* 测试中态 */
+/* Testing state */
 .model-row-actions .md-testing {
   opacity: 0.75; pointer-events: none; cursor: progress;
 }
 
-/* ---- 反馈消息（与错误提示同一套提示语言） ---- */
+/* ---- Feedback message (same notice language as error messages) ---- */
 .model-feedback {
   display: flex; align-items: center; gap: 7px; margin-bottom: 14px;
   padding: 8px 12px; border: 1px solid var(--md-success-border); border-radius: 8px;
@@ -286,7 +286,7 @@
 }
 .model-feedback > svg { flex-shrink: 0; }
 
-/* ---- 渠道错误（页面作用域，避免影响其它页面的 .channel-error） ---- */
+/* ---- Channel error (page-scoped, to avoid affecting .channel-error on other pages) ---- */
 .model-browser .channel-error {
   padding: 10px 12px; margin-bottom: 14px; border-radius: 8px;
   border: 1px solid var(--md-error-border);
@@ -297,7 +297,7 @@
 .model-browser .channel-error .ui-button-ghost { color: inherit; opacity: 0.75; padding: 4px; min-height: 26px; }
 .model-browser .channel-error .ui-button-ghost:hover { opacity: 1; background: rgba(178, 59, 75, 0.09); }
 
-/* ---- 测试结果面板：用状态底色区分，不再用 3px 左边线 ---- */
+/* ---- Test result panel: distinguished by status background color, no longer by a 3px left border ---- */
 .model-test-result {
   margin: 0 0 18px; padding: 15px 16px;
   border: 1px solid var(--md-line); border-radius: 8px;
@@ -321,7 +321,7 @@
 }
 .model-test-result > p { margin-top: 9px; font-size: 12px; overflow-wrap: anywhere; line-height: 1.6; }
 
-/* 测试状态色：面板底色 + 边框 + 标题色三重表达 */
+/* Test status colors: expressed three ways — panel background + border + heading color */
 .model-test-pending { border-color: var(--md-accent-border); background: var(--md-accent-soft); }
 .model-test-pending strong { color: var(--md-accent); }
 .model-test-success { border-color: var(--md-success-border); background: var(--md-success-soft); }
@@ -331,7 +331,7 @@
 .model-test-cancelled { border-color: var(--md-line-strong); background: var(--md-surface-raised); }
 .model-test-cancelled strong { color: var(--md-ink-tertiary); }
 
-/* ---- 空态 ---- */
+/* ---- Empty state ---- */
 .model-empty {
   padding: 65px 15px; border-top: 1px solid var(--md-line); text-align: center;
   background: radial-gradient(420px 160px at 50% 28%, rgba(217, 119, 6, 0.07), transparent 72%);
@@ -340,7 +340,7 @@
 .model-empty h2 { font-size: 16px; font-weight: 600; color: var(--md-ink); }
 .model-empty p { margin: 8px 0 18px; font-size: 13px; color: var(--md-ink-tertiary); text-wrap: pretty; }
 
-/* ---- 入场动画 ---- */
+/* ---- Entrance animation ---- */
 @keyframes md-fade-in-up {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
@@ -352,7 +352,7 @@
 .model-list-toolbar { animation-delay: 40ms; }
 .model-table, .model-empty { animation-delay: 80ms; }
 
-/* ---- 响应式 ---- */
+/* ---- Responsive ---- */
 @media (max-width: 1050px) {
   .model-filters { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .model-search { grid-column: 1 / -1; }
@@ -381,7 +381,7 @@
   .model-test-result { padding: 13px 12px; }
 }
 
-/* ---- 减少动画 ---- */
+/* ---- Reduced motion ---- */
 @media (prefers-reduced-motion: reduce) {
   .model-filters, .model-list-toolbar, .model-table, .model-empty,
   .model-table-row, .model-search input, .model-filters select,
@@ -392,11 +392,11 @@
 }
 
 /* ==========================================================================
-   夜主题精修 · 深海数据仪表（redesign-night）
-   范围：仅新增 [data-theme="dark"] 覆盖；不改动浅色与既有选择器。
+   Night theme refinement · deep-sea data instrument (redesign-night)
+   Scope: only adds [data-theme="dark"] overrides; does not change the light theme or existing selectors.
    ========================================================================== */
 
-/* ---------- 摘要条：数字与说明拉开层级 ---------- */
+/* ---------- Summary bar: separate numbers and descriptions into clear levels ---------- */
 [data-theme="dark"] .model-summary {
   border-bottom-color: rgba(255, 255, 255, 0.07);
   color: var(--md-ink-tertiary);
@@ -405,7 +405,7 @@
   color: var(--md-ink-muted);
 }
 
-/* ---------- 筛选器：深色输入槽 + 箭头不被背景覆盖 ---------- */
+/* ---------- Filters: dark input slots + arrow not covered by the background ---------- */
 [data-theme="dark"] .model-filters select {
   background-color: #0c1119;
   background-image:
@@ -456,7 +456,7 @@
   color: var(--md-ink-muted);
 }
 
-/* ---------- 工具栏：筛选 chip 与结果计数 ---------- */
+/* ---------- Toolbar: filter chips and result count ---------- */
 [data-theme="dark"] .model-list-toolbar > span {
   color: var(--md-ink-tertiary);
 }
@@ -474,7 +474,7 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 2px 8px -6px rgba(0, 0, 0, 0.9);
 }
 
-/* ---------- 表格外壳：仪器面板槽与边缘折射 ---------- */
+/* ---------- Table shell: instrument panel slot and edge refraction ---------- */
 [data-theme="dark"] .model-table {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.018), transparent 24%),
@@ -502,7 +502,7 @@
   box-shadow: inset 2px 0 0 var(--md-row-edge), inset 0 1px 0 rgba(255, 255, 255, 0.03), inset 0 -1px 0 rgba(255, 255, 255, 0.02);
 }
 
-/* ---------- 行内数据与操作按钮 ---------- */
+/* ---------- Row data and action buttons ---------- */
 [data-theme="dark"] .model-identity code {
   color: var(--md-ink-tertiary);
 }
@@ -534,7 +534,7 @@
   box-shadow: inset 0 0 0 1px rgba(62, 207, 160, 0.22);
 }
 
-/* ---------- 反馈、错误与测试结果 ---------- */
+/* ---------- Feedback, errors and test results ---------- */
 [data-theme="dark"] .model-feedback {
   background: rgba(62, 207, 160, 0.1);
   border-color: rgba(62, 207, 160, 0.22);
@@ -571,7 +571,7 @@
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.012);
 }
 
-/* ---------- 空态：弱光环境里的可读引导 ---------- */
+/* ---------- Empty state: readable guidance in a dim environment ---------- */
 [data-theme="dark"] .model-empty {
   color: var(--md-ink-tertiary);
   background: radial-gradient(420px 160px at 50% 30%, rgba(0, 208, 192, 0.055), transparent 70%);
@@ -585,7 +585,7 @@
   filter: drop-shadow(0 0 12px rgba(0, 208, 192, 0.16));
 }
 
-/* ---------- 滚动区：让长列表的滚动位置在暗底上可见 ---------- */
+/* ---------- Scroll area: make the scroll position of a long list visible on a dark background ---------- */
 [data-theme="dark"] .model-scroll {
   scrollbar-color: rgba(140, 153, 172, 0.34) transparent;
 }
@@ -598,25 +598,25 @@
 }
 
 /* ==========================================================================
-   质感彩蛋层 · 昼 + 夜成对（redesign-eggs）
+   Texture easter-egg layer · day + night pairs (redesign-eggs)
    --------------------------------------------------------------------------
-   本章约定（自检口径）：
-   1) 只新增规则与关键帧：所有既有 class / id / data-testid / ARIA / DOM 契约不动；
-      既有 md-copy-pop、md-fade-in-up 两个关键帧原样保留、不改名。
-   2) 新增关键帧全部 md- 前缀、全新名字，且只动 transform / opacity。
-   3) 表格行内部绝不出现 transform：顺滑只交给 background-color / box-shadow
-      过渡（虚拟滚动每帧给行写 transform，行上再加 transform 过渡必抖）。
+   Conventions of this section (self-check criteria):
+   1) Only add rules and keyframes: all existing class / id / data-testid / ARIA / DOM contracts stay unchanged;
+      The existing md-copy-pop and md-fade-in-up keyframes are kept as-is, not renamed.
+   2) New keyframes all use the md- prefix with brand-new names, and only animate transform / opacity.
+   3) Never use transform inside table rows: smoothness is left to background-color / box-shadow
+      transitions (virtual scrolling writes transform to rows every frame; adding a transform transition on rows would definitely jitter).
    ========================================================================== */
 
-/* ---- 新增令牌（两主题通用，不改任何旧令牌） ---- */
+/* ---- New tokens (shared by both themes, no old tokens changed) ---- */
 :root {
   --md-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --md-ease-breathe: cubic-bezier(0.37, 0, 0.63, 1);
 }
 
-/* ---- ① 复制成功 ·「对勾落章 + 柔光描边」（记忆点 1） ----
-   落章：图标先被按下去一点、微微过冲、再落定，像盖了一枚章。
-   描边：一圈细线从按钮内侧扩散退场，把成功态往外推一点点。 */
+/* ---- ① Copy success · "checkmark stamp + soft glow outline" (memorable moment 1) ----
+   Stamp: the icon is pressed down slightly, overshoots a little, then settles, like stamping a seal.
+   Outline: a thin ring spreads out from inside the button and fades, pushing the success state outward slightly. */
 .model-row-actions .md-copy-done > svg {
   animation: md-check-stamp 320ms var(--md-ease-out) both;
 }
@@ -636,7 +636,7 @@
   62% { opacity: 0.3; }
   100% { transform: scale(1.14); opacity: 0; }
 }
-/* 原 md-copy-done 只给颜色声明了过渡，这里补上按压与阴影两条，hover / 按下更连贯。 */
+/* The original md-copy-done only transitioned colors; this adds press and shadow transitions so hover / press feel more coherent. */
 .model-row-actions .md-copy-done {
   transition: color var(--md-duration-fast) var(--md-ease-out),
     background-color var(--md-duration-fast) var(--md-ease-out),
@@ -645,9 +645,9 @@
     transform var(--md-duration-fast) var(--md-ease-out);
 }
 
-/* ---- ② 测试中 ·「正在探测」的呼吸（记忆点 2） ----
-   旋转弧沿用 app.css 的匀速 spin（匀速旋转最丝滑，不做加减速曲线），
-   按钮整体做一次很浅的明暗呼吸，表示探测仍在进行。 */
+/* ---- ② Testing · the breathing of "probing in progress" (memorable moment 2) ----
+   The rotating arc reuses app.css's constant-speed spin (constant rotation is smoothest, no easing curves),
+   and the whole button does a very shallow light-dark breathing to show probing is still in progress. */
 .model-row-actions .md-testing {
   animation: md-test-breathe 1.6s var(--md-ease-breathe) infinite;
 }
@@ -656,7 +656,7 @@
   50% { opacity: 0.96; }
 }
 
-/* ---- ③ 渠道筛选 chip · 悬停浮起、选中落座 ---- */
+/* ---- ③ Channel filter chips · lift on hover, settle when selected ---- */
 .model-list-toolbar .channel-filters button {
   transition: background-color var(--md-duration-fast) var(--md-ease-out),
     color var(--md-duration-fast) var(--md-ease-out),
@@ -672,16 +672,16 @@
   to { transform: scale(1); }
 }
 
-/* ---- ④ 搜索框 · 放大镜「靠近」 ----
-   聚焦时镜头轻微放大并转成强调色，和输入框描边同一拍节奏。 */
+/* ---- ④ Search box · magnifier "moves closer" ----
+   On focus the lens enlarges slightly and turns to the accent color, in the same beat as the input border. */
 .model-search > svg {
   transition: color var(--md-duration-fast) var(--md-ease-out),
     transform var(--md-duration-normal) var(--md-ease-out);
 }
 .model-search:focus-within > svg { transform: translateY(-50%) scale(1.12); }
 
-/* ---- ⑤ 下拉框 / 搜索框 · 悬停时控件轻轻「抬」起一层 ----
-   用 :hover:not(:focus) 把焦点态让出来，聚焦环永不被悬停覆盖。 */
+/* ---- ⑤ Select / search box · the control "lifts" slightly on hover ----
+   Use :hover:not(:focus) to yield to the focus state,so the focus ring is never covered by hover. */
 .model-filters select {
   transition: border-color var(--md-duration-fast) var(--md-ease-out),
     box-shadow var(--md-duration-fast) var(--md-ease-out),
@@ -701,22 +701,22 @@
     0 1px 2px rgba(0, 0, 0, 0.45), 0 10px 22px -14px rgba(0, 0, 0, 0.9);
 }
 
-/* ---- ⑥ 表格行 · 左侧定位边「生长」进来（行内绝不加 transform） ----
-   背景色原本就有过渡，这里把 box-shadow 也纳入同一时长：定位边从零宽淡入，
-   离开时同速退场，不再瞬切。 */
+/* ---- ⑥ Table rows · the left positioning edge "grows" in (never add transform inside rows) ----
+   The background color already had a transition; this adds box-shadow with the same duration: the positioning edge fades in from zero width,
+   and fades out at the same speed on leave, instead of snapping. */
 .model-browser .model-table-row {
   transition: background-color var(--md-duration-normal) var(--md-ease-out),
     box-shadow var(--md-duration-normal) var(--md-ease-out);
 }
 
-/* ---- ⑦ 空态 · 图标安静地浮动（6.2s 一个来回，近似呼吸） ---- */
+/* ---- ⑦ Empty state · the icon floats quietly (6.2s round trip, like breathing) ---- */
 .model-empty > svg { animation: md-empty-drift 6.2s var(--md-ease-breathe) infinite; }
 @keyframes md-empty-drift {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
 }
 
-/* ---- ⑧ 反馈条 / 错误条 / 测试结果面板 · 落位 ---- */
+/* ---- ⑧ Feedback bar / error bar / test result panel · settling into place ---- */
 .model-feedback,
 .model-browser .channel-error,
 .model-test-result {
@@ -727,12 +727,12 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ---- ⑨ 夜主题配对：成功描边在暗底上提亮一档 ---- */
+/* ---- ⑨ Night theme pair: the success outline is brightened one level on a dark background ---- */
 [data-theme="dark"] .model-row-actions .md-copy-done::after {
   box-shadow: inset 0 0 0 1.5px rgba(62, 207, 160, 0.45);
 }
 
-/* ---- ⑩ 减弱动画：保留状态含义，去掉位移与循环 ---- */
+/* ---- ⑩ Reduced motion: keep the state meaning, remove movement and looping ---- */
 @media (prefers-reduced-motion: reduce) {
   .model-row-actions .md-copy-done > svg,
   .model-row-actions .md-copy-done::after,
@@ -751,20 +751,20 @@
 
 
 /* ==========================================================================
-   ===== 世界观注入 · models =====
+   ===== Worldview injection · models =====
    --------------------------------------------------------------------------
-   同一张清单，两套物理身份：
-     · 夜 = 终端芯片板：斜切角外壳 / 四角 L 刻度 / 扫描底纹 / 等宽琥珀读数 / 故障反馈
-     · 昼 = 稿纸明细表：纸面凸起 / 暖棕定向影 / 黄铜数据 / 琥珀墨反馈
-   红线：只增不删；不动 class / data-testid / ARIA / DOM 结构；
-        动画只动 transform / opacity / clip-path，绝不动 width / height / top / left；
-        虚拟滚动行 .model-table-row 自身永不参与 transform 动画（内联 translateY 每帧被写）。
+   The same list, two physical identities:
+     · Night = terminal chip board: bevel-cut shell / L-shaped corner ticks / scanline texture / monospace amber readings / glitch feedback
+     · Day = manuscript statement sheet: raised paper surface / warm-brown directional shadow / brass data / amber-ink feedback
+   Red line: only add, never remove; do not touch class / data-testid / ARIA / DOM structure;
+        Animations only animate transform / opacity / clip-path, never width / height / top / left;
+        The virtual-scroll row .model-table-row itself never participates in transform animations (its inline translateY is written every frame).
    ========================================================================== */
 
-/* ---------- 通用 · 行内按钮不折行（两主题都成立，故不加主题前缀） ---------- */
+/* ---------- Common · row buttons do not wrap (true for both themes, so no theme prefix) ---------- */
 .model-browser .model-row-actions .ui-button { white-space: nowrap; }
 
-/* ---------- N-01 夜 · 刻度令牌：聚焦四角准星 / 芯片板四角 L 刻度 ---------- */
+/* ---------- N-01 Night · tick tokens: focus corner reticle / chip board L-shaped corner ticks ---------- */
 [data-theme="dark"] {
   --md-reticle:
     linear-gradient(var(--cp-cyan) 0 0) 0 0 / 9px 1px no-repeat,
@@ -786,7 +786,7 @@
     linear-gradient(var(--cp-cyan) 0 0) 100% 100% / 2px 13px no-repeat;
 }
 
-/* ---------- N-02 夜 · 摘要条：终端读数 ---------- */
+/* ---------- N-02 Night · summary bar: terminal readings ---------- */
 [data-theme="dark"] .model-summary {
   border-bottom-color: var(--cp-cyan-line);
   font-family: Consolas, "Cascadia Mono", "JetBrains Mono", monospace;
@@ -799,7 +799,7 @@
 }
 [data-theme="dark"] .model-summary > span:last-child { color: #6f8b89; }
 
-/* ---------- N-03 夜 · 筛选控件：等宽字 + 青光标 + 聚焦四角瞄准刻度 ---------- */
+/* ---------- N-03 Night · filter controls: monospace type + cyan caret + focus corner aiming ticks ---------- */
 [data-theme="dark"] .model-filters select,
 [data-theme="dark"] .model-search input {
   border-radius: 0;
@@ -823,7 +823,7 @@
   background-color: #0d141f;
 }
 
-/* ---------- N-04 夜 · 芯片板外壳：斜切两角 + 四角 L 刻度 + 上沿流光 ---------- */
+/* ---------- N-04 Night · chip board shell: two bevel-cut corners + L-shaped corner ticks + light flowing along the top edge ---------- */
 [data-theme="dark"] .model-table {
   position: relative;
   border-radius: 0;
@@ -856,7 +856,7 @@
 [data-theme="dark"] .model-table:hover { border-color: rgba(0, 208, 192, 0.5); }
 [data-theme="dark"] .model-table:hover::after { opacity: 0.85; }
 
-/* ---------- N-05 夜 · 表头：终端分栏标签 ---------- */
+/* ---------- N-05 Night · table header: terminal column labels ---------- */
 [data-theme="dark"] .model-table-header {
   background: rgba(11, 15, 21, 0.94);
   color: #7fd9d0;
@@ -865,7 +865,7 @@
   font-size: 10px; letter-spacing: 0.2em;
 }
 
-/* ---------- N-06 夜 · 行与读数：扫描底纹 + 等宽琥珀 + 右对齐 ---------- */
+/* ---------- N-06 Night · rows and readings: scanline texture + monospace amber + right-aligned ---------- */
 [data-theme="dark"] .model-browser .model-table-row {
   background-image: repeating-linear-gradient(0deg, var(--cp-scan) 0 1px, transparent 1px 3px);
 }
@@ -893,7 +893,7 @@
   [data-theme="dark"] .model-limits { align-items: flex-end; text-align: right; }
 }
 
-/* ---------- N-07 夜 · 渠道筛选 chip：终端标签 ---------- */
+/* ---------- N-07 Night · channel filter chips: terminal labels ---------- */
 [data-theme="dark"] .model-list-toolbar .channel-filters {
   border-radius: 0;
   box-shadow: inset 0 0 0 1px rgba(0, 208, 192, 0.14), inset 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -909,7 +909,7 @@
   box-shadow: inset 0 0 0 1px var(--cp-cyan-line), 0 0 14px -8px var(--cp-glow);
 }
 
-/* ---------- N-08 夜 · 图标按钮（收藏 / 星标位）：微旋转 + 扫描青微光 ---------- */
+/* ---------- N-08 Night · icon buttons (favorite / star slot): slight rotation + scan-cyan glow ---------- */
 [data-theme="dark"] .model-browser .model-row-actions .ui-button-ghost {
   border-radius: 2px;
   transition: color 160ms var(--md-ease-out), background-color 160ms var(--md-ease-out),
@@ -927,7 +927,7 @@
 
 [data-theme="dark"] .model-browser .model-row-actions .ui-button-outline { border-radius: 2px; }
 
-/* ---------- N-09 夜 · 测试按钮：呼吸待机 ---------- */
+/* ---------- N-09 Night · test button: breathing standby ---------- */
 [data-theme="dark"] .model-browser .model-row-actions .ui-button-outline:not(:disabled):not(.md-testing) {
   animation: md-standby-breathe 3.8s var(--md-ease-breathe) infinite;
 }
@@ -938,7 +938,7 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 20px -8px var(--cp-glow);
 }
 
-/* ---------- N-10 夜 · 复制成功：对勾盖章 + 边框短促色差 ---------- */
+/* ---------- N-10 Night · copy success: checkmark stamp + brief border color glitch ---------- */
 [data-theme="dark"] .model-row-actions .md-copy-done {
   position: relative;
   color: var(--cp-cyan) !important;
@@ -958,7 +958,7 @@
   animation: md-stamp-lock 420ms var(--md-ease-out) both;
 }
 
-/* ---------- N-11 夜 · 反馈 / 错误 / 测试面板：终端回执 ---------- */
+/* ---------- N-11 Night · feedback / error / test panel: terminal receipt ---------- */
 [data-theme="dark"] .model-feedback,
 [data-theme="dark"] .model-browser .channel-error,
 [data-theme="dark"] .model-test-result {
@@ -986,7 +986,7 @@
   color: #a9c8c5;
 }
 
-/* ---------- N-12 夜 · 空态：[ NO SIGNAL ] 方括号框 + 闪烁方块光标 ---------- */
+/* ---------- N-12 Night · empty state: [ NO SIGNAL ] bracket box + blinking block cursor ---------- */
 [data-theme="dark"] .model-empty {
   position: relative;
   border: 1px solid var(--cp-cyan-line);
@@ -1012,7 +1012,7 @@
   animation: md-cursor-blink 1.05s steps(1, end) infinite;
 }
 
-/* ---------- N-13 夜 · 页面内滚动条：青系 ---------- */
+/* ---------- N-13 Night · in-page scrollbar: cyan family ---------- */
 [data-theme="dark"] .model-scroll { scrollbar-color: rgba(0, 208, 192, 0.30) transparent; }
 [data-theme="dark"] .model-scroll::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, rgba(0, 208, 192, 0.42), rgba(0, 208, 192, 0.18));
@@ -1021,7 +1021,7 @@
 }
 [data-theme="dark"] .model-scroll::-webkit-scrollbar-thumb:hover { background: rgba(0, 208, 192, 0.6); }
 
-/* ---------- D-01 昼 · 纸面明细表：暖棕定向影（投向右下）+ 迎光上浮 ---------- */
+/* ---------- D-01 Day · paper statement sheet: warm-brown directional shadow (cast to the lower right) + lifts toward the light ---------- */
 :root:not([data-theme="dark"]) .model-summary { border-bottom-color: var(--amber-line); }
 :root:not([data-theme="dark"]) .model-summary > span:nth-child(2) { color: var(--amber-ink); }
 :root:not([data-theme="dark"]) .model-table {
@@ -1042,7 +1042,7 @@
   box-shadow: 1px 4px 0 rgba(var(--warm-shadow), 0.07), 0 16px 32px -16px rgba(var(--warm-shadow), 0.30);
 }
 
-/* ---------- D-02 昼 · 数据黄铜：读数 / 时间戳 / 纸白输入槽 ---------- */
+/* ---------- D-02 Day · data brass: readings / timestamps / paper-white input slots ---------- */
 :root:not([data-theme="dark"]) .model-limits > span { color: var(--amber-ink); }
 :root:not([data-theme="dark"]) .model-identity code { color: #7d6b53; }
 :root:not([data-theme="dark"]) .model-filters select,
@@ -1053,7 +1053,7 @@
   box-shadow: 0 0 0 3px var(--amber-glow), 0 6px 16px -10px rgba(var(--warm-shadow), 0.45);
 }
 
-/* ---------- D-03 昼 · 图标按钮：黄铜徽章泛暖光 ---------- */
+/* ---------- D-03 Day · icon buttons: brass badge with a warm glow ---------- */
 :root:not([data-theme="dark"]) .model-browser .model-row-actions .ui-button-ghost {
   border-radius: 50%;
   transition: color 160ms var(--md-ease-out), background-color 160ms var(--md-ease-out),
@@ -1069,7 +1069,7 @@
   transform: rotate(0deg) scale(0.93);
 }
 
-/* ---------- D-04 昼 · 测试按钮：纸面凸起，按下按进纸里 ---------- */
+/* ---------- D-04 Day · test button: raised on the paper, presses into the paper ---------- */
 :root:not([data-theme="dark"]) .model-browser .model-row-actions .ui-button-outline {
   border-radius: 8px;
   background: linear-gradient(180deg, #fffefb 0%, #f8f3ea 100%);
@@ -1090,7 +1090,7 @@
   box-shadow: inset 0 2px 3px rgba(var(--warm-shadow), 0.18), 1px 1px 0 rgba(var(--warm-shadow), 0.06);
 }
 
-/* ---------- D-05 昼 · 复制成功：对勾像琥珀墨洇开 + 暖光泛起 ---------- */
+/* ---------- D-05 Day · copy success: the checkmark spreads like amber ink + warm glow rises ---------- */
 :root:not([data-theme="dark"]) .model-row-actions .md-copy-done {
   position: relative;
   color: var(--amber-ink) !important;
@@ -1109,7 +1109,7 @@
   animation: md-ink-bloom 560ms var(--md-ease-out) both;
 }
 
-/* ---------- D-06 昼 · 空态：稿纸 + 琥珀墨 ---------- */
+/* ---------- D-06 Day · empty state: manuscript paper + amber ink ---------- */
 :root:not([data-theme="dark"]) .model-empty {
   border-top: 1px solid var(--amber-line);
   background:
@@ -1118,7 +1118,7 @@
     #fffcf6;
 }
 :root:not([data-theme="dark"]) .model-empty::before {
-  content: "此页尚无记录";
+  content: "No records on this page yet";
   display: block; margin: 0 auto 16px;
   font-size: 11px; letter-spacing: 0.26em; text-indent: 0.26em;
   color: var(--amber-ink); opacity: 0.75;
@@ -1127,14 +1127,14 @@
 :root:not([data-theme="dark"]) .model-empty h2 { color: var(--amber-ink); }
 :root:not([data-theme="dark"]) .model-empty > svg { color: #c98a3c; opacity: 0.7; }
 
-/* ---------- D-07 昼 · 渠道筛选 chip：纸标签琥珀油墨 ---------- */
+/* ---------- D-07 Day · channel filter chips: paper labels in amber ink ---------- */
 :root:not([data-theme="dark"]) .model-list-toolbar .channel-filters button[aria-pressed="true"] {
   background: linear-gradient(180deg, #fffdf8, #f7efe0);
   color: var(--amber-ink);
   box-shadow: 1px 2px 0 rgba(var(--warm-shadow), 0.10), inset 0 0 0 1px var(--amber-line);
 }
 
-/* ---------- D-08 昼 · 反馈条 / 滚动条：暖系 ---------- */
+/* ---------- D-08 Day · feedback bar / scrollbar: warm family ---------- */
 :root:not([data-theme="dark"]) .model-feedback {
   border-color: var(--amber-line);
   background: var(--amber-soft);
@@ -1145,47 +1145,47 @@
 :root:not([data-theme="dark"]) .model-scroll::-webkit-scrollbar-thumb { background: rgba(var(--warm-shadow), 0.26); }
 :root:not([data-theme="dark"]) .model-scroll::-webkit-scrollbar-thumb:hover { background: rgba(var(--warm-shadow), 0.42); }
 
-/* ---------- 新关键帧：md- 前缀 / 全新名字 / 只动 transform · opacity · clip-path ---------- */
-/* 夜 · 测试按钮待机呼吸（只呼吸明暗，不移动） */
+/* ---------- New keyframes: md- prefix / brand-new names / only animate transform · opacity · clip-path ---------- */
+/* Night · test button standby breathing (only light/dark, no movement) */
 @keyframes md-standby-breathe {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.86; }
 }
-/* 夜 · 对勾盖章：四角刻度从左向右压印，落定后保持 */
+/* Night · checkmark stamp: corner ticks press in from left to right, then hold */
 @keyframes md-stamp-lock {
   0% { opacity: 0; transform: scale(1.18); clip-path: inset(0 100% 0 0); }
   45% { opacity: 1; transform: scale(1.02); clip-path: inset(0 0 0 0); }
   100% { opacity: 1; transform: scale(1); clip-path: inset(0 0 0 0); }
 }
-/* 昼 · 琥珀墨洇开：对勾从一小滴墨摊开成完整勾 */
+/* Day · amber ink spreads: the checkmark spreads from a small drop of ink into a full check */
 @keyframes md-copy-ink {
   0% { opacity: 0; transform: scale(0.7); clip-path: circle(14% at 50% 50%); }
   60% { opacity: 1; transform: scale(1.06); clip-path: circle(80% at 50% 50%); }
   100% { opacity: 1; transform: scale(1); clip-path: circle(150% at 50% 50%); }
 }
-/* 昼 · 暖光泛起：一圈琥珀晕从按钮里浮出来又散掉 */
+/* Day · warm glow rises: a ring of amber halo floats out of the button and dissipates */
 @keyframes md-ink-bloom {
   0% { opacity: 0; transform: scale(0.72); }
   35% { opacity: 0.85; }
   100% { opacity: 0; transform: scale(1.32); }
 }
-/* 夜 · 空态方块光标闪烁 */
+/* Night · empty-state block cursor blinking */
 @keyframes md-cursor-blink {
   0%, 49% { opacity: 1; }
   50%, 100% { opacity: 0; }
 }
-/* 夜 · [ NO SIGNAL ] 标签的低频呼吸 */
+/* Night · low-frequency breathing of the [ NO SIGNAL ] label */
 @keyframes md-nosignal-pulse {
   0%, 100% { opacity: 0.42; }
   50% { opacity: 0.78; }
 }
-/* 昼 · 稿纸呼吸：纸面轻轻浮起一点 */
+/* Day · manuscript breathing: the paper surface lifts slightly */
 @keyframes md-sheet-breathe {
   0%, 100% { opacity: 0.62; transform: translateY(0); }
   50% { opacity: 0.9; transform: translateY(-2px); }
 }
 
-/* ---------- 减弱动画：保留状态含义，去掉循环与位移 ---------- */
+/* ---------- Reduced motion: keep the state meaning, remove looping and movement ---------- */
 @media (prefers-reduced-motion: reduce) {
   [data-theme="dark"] .model-table::before,
   [data-theme="dark"] .model-browser .model-row-actions .ui-button-outline,

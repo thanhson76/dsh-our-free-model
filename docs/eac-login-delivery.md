@@ -1,54 +1,54 @@
-# EAC 登录领取恢复
+# EAC Login Claim Recovery
 
-## 范围与证据
+## Scope and evidence
 
-修复浏览器授权成功后 Desktop 仍等待登录的领取链路。现场领取请求出现 HTTP 520，之后返回 pending；尚无远端日志，不能确定 520 来源或令牌是否因此丢失。客户端吞掉轮询错误、旧网关在返回响应前删除待领取令牌是已确认的代码行为。
+Fix the claim path where Desktop still waits for login after browser authorisation succeeds. An on-site claim request returned HTTP 520 and then returned pending afterwards; there are no remote logs yet, so the source of the 520, or whether the token was lost because of it, cannot be determined. The client swallowing polling errors, and the old gateway deleting the pending-claim token before returning the response, are confirmed code behaviours.
 
-## 决策
+## Decisions
 
-- 采用兼容的 `retain=1` 领取加 `POST /auth/ack?link=...` 确认：新版插件先原子写入并回读本地令牌，再用 `x-ofm-user` 确认。服务端验证关联码与令牌匹配后删除；同步上游更新后，旧插件继续幂等领取，新插件兼容没有 ACK 的网关。
-- 仅延长超时不能修复响应丢失；持久化服务端明文令牌会扩大凭据存储范围。同步上游的加密待领取存储后，令牌保存在 users.json 中，沿用 15 分钟 TTL；同一存储路径与密钥下可以跨单实例重启恢复。
-- Host 合并同关联码并发领取，短期保存成功收据用于本地响应丢失后的重试；退出登录或卸载使在途领取失效。
-- 浏览器串行轮询，每次完成后等待 2.5 秒，错误展示安全分类并自动重试。sessionStorage 只保存关联码、授权入口和开始时间，保留原 10 分钟窗口，允许取消后重新发起。
-- 状态接口失败时不将未知强制策略显示为兼容期。
+- Adopt the compatible `retain=1` claim plus a `POST /auth/ack?link=...` confirmation: the new plugin first atomically writes and reads back the local token, then confirms with `x-ofm-user`. The server deletes it after verifying that the link code matches the token; after syncing the upstream update, old plugins keep claiming idempotently, and new plugins stay compatible with gateways that have no ACK.
+- Merely extending the timeout cannot fix a lost response; persisting the server-side plaintext token would widen the credential storage scope. After syncing upstream's encrypted pending-claim storage, the token is kept in users.json with the existing 15-minute TTL; under the same storage path and key it can be recovered across a single-instance restart.
+- The Host merges concurrent claims for the same link code and briefly keeps a success receipt for retries after a local response is lost; signing out or unloading invalidates an in-flight claim.
+- The browser polls serially, waiting 2.5 seconds after each completion; errors display a safe classification and retry automatically. sessionStorage keeps only the link code, the authorisation entry point and the start time, retaining the original 10-minute window, and allows re-initiating after cancellation.
+- When the status endpoint fails, an unknown mandatory policy is not displayed as a compatibility period.
 
-## 约束与验收
+## Constraints and acceptance
 
-不调整 GitHub/Star 要求、强制开关、签名信任根或用户数据位置。令牌不进入前端、日志或错误正文。假设维持已有单实例部署与限流；不引入分布式会话存储。测试覆盖旧协议、新协议重领和确认、错误/撤销令牌、保存失败、并发、退出竞态、错误提示及页面重开恢复。远端部署由服务器维护者执行；端到端验收需本人完成 GitHub 授权。本地测试不能证明远端 520 已解决。
+Do not adjust the GitHub/Star requirements, the mandatory switch, the signing trust root or user data locations. The token must not enter the frontend, logs or error bodies. The assumption is that the existing single-instance deployment and rate limiting are maintained; no distributed session storage is introduced. Tests cover the old protocol, the new protocol's re-claim and confirmation, error/revoked tokens, save failures, concurrency, sign-out races, error prompts and recovery when the page is reopened. Remote deployment is performed by the server maintainer; end-to-end acceptance requires the user to complete GitHub authorisation in person. Local tests cannot prove the remote 520 is resolved.
 
-## 历史验证记录（2026-10-06，更新前）
+## Historical verification record (2026-10-06, before the update)
 
-- `node scripts/test-all.mjs --mode contributor`：27/27 套通过，含新增 `eac-login` 与扩展 `eac-auth`。最后的登录按钮禁用调整再次通过 `eac-login-test.mjs`、`client-lint.mjs`。
-- `tsc --noEmit -p tsconfig.json`：通过；仅覆盖既有 adapter 类型检查范围。
-- `node --check` 检查 client、index、auth-github 与新增 eac-login；`git diff --check`：通过。
-- 本机 Desktop 已替换 index、client 和新增 eac-login，三个文件 SHA 与最终源码一致；先备份旧插件，再安装，真实界面确认热重载与“授权策略未确认”文案。
-- 真实 UI 可发起登录并显示取消按钮；客户端更新导致页面重载后，重开设置仍显示同次待登录状态，所有登录按钮禁用。尚未完成本人 GitHub 授权与最终令牌落盘验收。
-- 通过安装版传输核验远端 `/auth/status`：HTTP 200，约 1844ms，configured=true、required=false、authorized=false；本机尚无用户令牌。
-- 未部署远端网关，未定位 520 的服务器日志根因，未执行发布签名验证。待领取记录仍无法跨服务器重启或多实例恢复。
+- `node scripts/test-all.mjs --mode contributor`: 27/27 suites pass, including the new `eac-login` and the extended `eac-auth`. The final login-button disabling adjustment again passed `eac-login-test.mjs` and `client-lint.mjs`.
+- `tsc --noEmit -p tsconfig.json`: passes; covers only the existing adapter type-checking scope.
+- `node --check` checked client, index, auth-github and the new eac-login; `git diff --check`: passes.
+- The local Desktop had index, client and the new eac-login replaced, with the three files' SHAs matching the final sources; the old plugin was backed up first, then installed, and the real UI confirmed the hot reload and the "authorisation policy unconfirmed" wording.
+- The real UI can start a login and shows a cancel button; after a client update reloaded the page, reopening the settings still showed the same pending login state, with all login buttons disabled. The user's own GitHub authorisation and final token persistence acceptance were not yet completed.
+- The remote `/auth/status` was verified through the installed transport: HTTP 200, about 1844ms, configured=true, required=false, authorized=false; there is no user token on this machine yet.
+- The remote gateway was not deployed, the server-log root cause of the 520 was not located, and no release signature verification was performed. Pending-claim records still cannot be recovered across a server restart or multiple instances.
 
-### 用户再次授权后的排查
+### Investigation after the user authorised again
 
-- 用户反馈再次完成授权后仍未登录。对当前 UI 显示的关联码实际领取：HTTP 200，2626ms，status=pending；领取前后本机均无令牌。没有将关联码、OAuth 参数或令牌记录在本文中。
-- 远端 start 返回 302，redirect_uri 与插件网关使用相同 origin 和 `/eac/auth/github/callback` 路径，签发 state 对应请求的关联码；无效 state 回调返回预期 400。
-- 对随机不存在的关联码调用 ACK、不携带令牌：远端返回 HTTP 404、not found。修复版对此应返回 401，因此远端尚未提供本次新增的确认协议。
-- 本机 index/client/eac-login 摘要仍与修复源码一致。尚未取得本次成功页面截图或服务器日志，不能判定 pending 来自关联码不一致、旧协议提前消费、重启或多实例状态丢失。
+- The user reported that after authorising again they were still not logged in. An actual claim for the link code shown in the current UI: HTTP 200, 2626ms, status=pending; there was no token on this machine before or after the claim. The link code, OAuth parameters and token are not recorded in this document.
+- The remote start returned 302, with a redirect_uri using the same origin and the `/eac/auth/github/callback` path as the plugin gateway, and the issued state corresponding to the requested link code; a callback with an invalid state returned the expected 400.
+- An ACK for a random, non-existent link code, carrying no token: the remote returned HTTP 404, not found. The fixed version should return 401 for this, so the remote does not yet provide the confirmation protocol added this time.
+- The local index/client/eac-login digests still match the fixed sources. No screenshot of this successful page or server logs have been obtained yet, so it cannot be determined whether the pending came from a mismatched link code, the old protocol consuming early, a restart, or multi-instance state loss.
 
-## 客户端收尾
+## Client wrap-up
 
-按用户要求，客户端工作已完成，远端部署由服务器维护者按交接文档处理：
+As requested by the user, the client work is complete, and remote deployment is handled by the server maintainer following the handover document:
 
-- `retain=1` 领取、原子保存与回读、保存后 ACK、新旧网关兼容已实现。
-- 同关联码并发合并、退出后的迟到响应保护、失败提示与串行重试、等待状态恢复和取消已实现。
-- 最终源码的三个客户端运行文件与 Desktop 安装文件 SHA 一致，原安装备份仍保留；本轮只增加验证，没有再次替换运行文件。
-- 已新增完整回环联调：真实 Host 领取模块 + Node HTTP 传输 + 临时目录中的真实用户文件 + 实际网关，验证保存早于 ACK、ACK=200、保存令牌可被网关授权、确认后移除待领取记录，以及本地成功响应丢失后的重试。GitHub 使用桩，不访问远端服务器，不修改真实用户授权文件。
-- 新增联调后的 `node scripts/test-all.mjs --mode contributor` 重新执行，27/27 套通过；adapter 类型检查、相关语法检查及 `git diff --check` 再次通过。
-- 本机具备与修复版网关联调的条件。远端部署完成后需重新发起一轮登录，最终真实授权验收仍待进行，不能把本地联调通过表述为远端问题已解决。
+- `retain=1` claiming, atomic saving and read-back, ACK after saving, and compatibility with old and new gateways are implemented.
+- Merging concurrent claims for the same link code, protection against late responses after sign-out, failure prompts and serial retries, waiting-state recovery and cancellation are implemented.
+- The three client runtime files of the final sources match the SHAs of the Desktop installed files, and the original installation backup is still retained; this round only added verification and did not replace the runtime files again.
+- A complete loopback integration test was added: the real Host claim module + Node HTTP transport + a real user file in a temporary directory + the actual gateway, verifying that saving happens before ACK, ACK=200, the saved token can be authorised by the gateway, the pending-claim record is removed after confirmation, and retry after a lost local success response. GitHub uses a stub, no remote server is accessed, and no real user authorisation file is modified.
+- After the new integration test, `node scripts/test-all.mjs --mode contributor` was run again: 27/27 suites pass; the adapter type check, the relevant syntax checks and `git diff --check` pass again.
+- This machine has what is needed for integration testing with the fixed gateway. After remote deployment completes, a fresh login round must be started; the final real-authorisation acceptance is still pending, and a passing local integration test must not be described as the remote problem being resolved.
 
-## PR 更新与当前验证状态（2026-10-07）
+## PR update and current verification state (2026-10-07)
 
-- 用户已确认真实 GitHub 登录验证通过；该结论来自用户反馈，未据此推断远端强制策略、模块版本或 520 根因。
-- 更新 PR #107 时同步目标分支至 `8f4f89e`，保留上游 `cce8e30` 的待领取令牌加密落盘、重复领取与过期判定，并保留最新升级恢复修复。
-- 在加密存储之上增加可选 ACK：客户端保存并回读后确认，服务端同时持久化删除待领取记录。保留上游旧客户端幂等领取行为，不恢复一次领取语义。
-- Host 和真实客户端 hook 均处理服务端 `expired`，结束等待并提示重新发起；合并测试覆盖保留领取跨重启、确认删除跨重启和过期等待清理。
-- 需要强制 GitHub 登录与 Star 时，由维护者设置实际生效的 `REQUIRE_USER_TOKEN=1`，同步进程管理器环境并重启；状态应返回 `required:true`。已授权调用成功，无用户令牌但签名有效的 EAC 请求被拒绝。匿名免费通道保持原行为。
-- 未复核远端强制策略，未重签正式发布清单。最终集成代码的 `node scripts/test-all.mjs --mode contributor`：28/28 套通过；adapter 类型检查、相关语法检查、文档模块 SHA 与 bash 示例检查、`git diff --check` 通过。历史本地测试不能替代此次集成验证。
+- The user has confirmed that a real GitHub login verification passed; that conclusion comes from the user's feedback, and the remote mandatory policy, module versions or the 520 root cause are not inferred from it.
+- When updating PR #107, the target branch was synced to `8f4f89e`, keeping upstream `cce8e30`'s encrypted persistence of pending-claim tokens, repeated claims and expiry determination, and keeping the latest upgrade-recovery fixes.
+- An optional ACK was added on top of the encrypted storage: the client confirms after saving and reading back, and the server persistently deletes the pending-claim record at the same time. Upstream's idempotent claim behaviour for old clients is retained; one-time claim semantics are not restored.
+- Both the Host and the real client hook handle the server's `expired`, ending the wait and prompting to re-initiate; the merged tests cover retained claims across restarts, confirmation-deletion across restarts, and expiry-wait cleanup.
+- When GitHub login and Star must be mandatory, the maintainer sets the actually effective `REQUIRE_USER_TOKEN=1`, syncs the process manager environment and restarts; the status should return `required:true`. Authorised calls succeed, and EAC requests with no user token but a valid signature are rejected. The anonymous free lane keeps its original behaviour.
+- The remote mandatory policy was not re-checked, and the production release manifest was not re-signed. For the final integrated code, `node scripts/test-all.mjs --mode contributor`: 28/28 suites pass; the adapter type check, relevant syntax checks, document module SHAs and bash example checks, and `git diff --check` pass. Historical local tests are no substitute for this integration verification.

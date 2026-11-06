@@ -4,7 +4,7 @@ const forbidden = [
   new URL('../../vendor/channel-pack/pack.js', import.meta.url).href,
 ]
 
-/** 独立入口的进程级验证：触及插件入口或宿主模块就立即失败。 */
+/** Process-level verification of the standalone entry: touching the plugin entry or a host module fails immediately. */
 export async function resolve(specifier, context, nextResolve) {
   if (specifier.startsWith('@deepseek-ai/')) throw new Error(`standalone imported a DSH dependency: ${specifier}`)
   const result = await nextResolve(specifier, context)

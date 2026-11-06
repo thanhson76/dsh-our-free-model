@@ -1,47 +1,47 @@
-# 独立端服务设置页迁移
+# Standalone service settings page migration
 
-## 已确认范围与基线
+## Confirmed scope and baseline
 
-用户已确认先迁移服务设置页。沿用已提出的方案：迁入现有 React 组件，
-保留六项设置、管理 API、输入校验、未保存提示和保存反馈，验证后台轮询不覆盖编辑。
-用量统计 PR #169 已合并，本批基于最新主线 `af7eaaa` 单独开分支。
-继续分多个中文 commit 提 PR，不提升版本、打安装包或发布 Release。
+The user has confirmed migrating the service settings page first. Following the proposed approach: move in the existing React components,
+keep the six settings, the management API, input validation, the unsaved-changes prompt and the save feedback, and verify that background polling does not overwrite edits.
+The usage statistics PR #169 has been merged, and this batch branches separately from the latest mainline `af7eaaa`.
+Continue submitting PRs split across multiple commits in Chinese, with no version bump, installer build or Release publication.
 
-## 方案与页面
+## Approach and page
 
-采用按需加载 React 页面，复用现有 Card、Button、Input 与导航。
-仅调整旧 DOM/CSS 虽省迁移成本，但保留两套状态管理；新增表单库对六项设置没有必要。
-本批不新增 npm 依赖，不改插件、渠道、EAC 或后端设置规则。
+Use an on-demand-loaded React page, reusing the existing Card, Button, Input and navigation.
+Only adjusting the old DOM/CSS would save migration cost but keep two sets of state management; adding a form library is unnecessary for six settings.
+This batch adds no npm dependencies and does not change the plugin, channels, EAC or backend settings rules.
 
-页面分为“推理与模型”“模型刷新”，保留启用推理、地区受限模型、
-断流恢复、单次最大输出 Token、刷新间隔和自动探测。
-数字字段保持字符串草稿，允许编辑时为空；提交前校验整数及服务端已有范围
-512–131072、1–1440，显示中文字段错误，不把空字符串转成零。
-保留暂停推理仍可管理、自动探测会发请求、`--no-refresh` 暂停自动任务的原说明。
+The page is divided into "Inference and models" and "Model refresh", keeping enable inference, region-limited models,
+stream-break recovery, the maximum output Tokens per call, the refresh interval and automatic probing.
+Numeric fields keep string drafts and may be empty while editing; before submission, integers and the server's existing ranges
+512–131072 and 1–1440 are validated, field errors are shown in Chinese, and an empty string is not converted to zero.
+The original notes — management stays available while inference is paused, automatic probing sends requests, and `--no-refresh` pauses automatic tasks — are retained.
 
-## 数据流与生命周期
+## Data flow and lifecycle
 
-首次进入按需导入；隐藏时不挂载表单但保留草稿，退出管理卸载并重置状态。
-没有修改时同步后台设置；有草稿或正在保存时，轮询只更新已保存基线，不覆盖输入。
-未保存提示由草稿与基线比较得出，改回原值后清除。提供“撤销修改”恢复最新基线。
+The page is imported on demand on first entry; when hidden, the form is not mounted but the draft is kept, and leaving management unmounts it and resets state.
+With no modifications, background settings are synced; when there is a draft or a save is in progress, polling only updates the saved baseline and does not overwrite input.
+The unsaved-changes prompt comes from comparing draft against baseline, and clears when the value is changed back to the original. An "Undo changes" action restores the latest baseline.
 
-保存通过已有同源管理请求执行，保持鉴权、超时及会话变化检查。
-保存期间禁用表单和重复提交；使用 `/settings` 返回的实际值作为新基线。
-保存失败保留草稿并允许重试；保存成功与后续状态刷新失败分开说明。
-切页或退出使旧反馈失效，不让迟到回调恢复旧会话表单。
-已保存结果可在切页后同步；请求期间不开放第二次保存，避免本页并发写入。
-保存前启动的摘要轮询不得用旧设置覆盖已确认保存结果。
+Saving runs through the existing same-origin management request, keeping authentication, timeout and session-change checks.
+During saving, the form and repeat submission are disabled; the actual values returned by `/settings` are used as the new baseline.
+A failed save keeps the draft and allows a retry; a successful save and a subsequent failed status refresh are explained separately.
+Switching pages or signing out invalidates old feedback, so late callbacks cannot restore a previous session's form.
+Saved results can be synced after switching pages; a second save is not opened while a request is in flight, avoiding concurrent writes from this page.
+A summary poll started before saving must not overwrite a confirmed save result with older settings.
 
-## 实施与验收
+## Implementation and acceptance
 
-1. 记录设计、基线及改版前资源体积。
-2. 补齐设置类型和保存 Host 接口，迁入 React 页面与按需承载，移除旧表单逻辑。
-3. 专项覆盖数字边界、空值、小数、字段白名单、草稿同步及保存状态。
-4. 浏览器在隔离目录验证六项回显、编辑/轮询、保存、撤销、切页和退出，
-   验证暂停后管理可用、重启持久化、失败保留草稿、桌面及窄屏。
-5. 类型检查、构建与产物一致性、管理专项、贡献者和发布校验，
-   记录实际截图、体积、未验证范围。
-6. 分多个 commit，推送并开中文六章节 PR。
+1. Record the design, the baseline and the pre-redesign asset sizes.
+2. Fill in the settings types and the save Host interface, move in the React page and on-demand hosting, and remove the old form logic.
+3. Special coverage of numeric boundaries, empty values, decimals, the field allowlist, draft syncing and save states.
+4. In the browser, in an isolated directory, verify the six echoed values, editing/polling, saving, undoing, page switching and signing out,
+   and verify that management is available while paused, persistence across restart, drafts kept on failure, and desktop and narrow screens.
+5. Type checking, build and artefact consistency, management special tests, and contributor and release checks,
+   recording the actual screenshots, sizes and unverified scope.
+6. Split across multiple commits, push, and open a six-section PR in Chinese.
 
-真实服务配置不用于保存测试；隔离测试目录不提交，正式入口不生成测试设置。
-无配置或数据迁移。回退本批前端源码及对应 `web/` 产物并重启即可。
+Real service configuration is not used for save tests; isolated test directories are not committed, and the production entry point generates no test settings.
+There is no configuration or data migration. Rolling back is just reverting this batch's front-end sources and the corresponding `web/` artefacts and restarting.

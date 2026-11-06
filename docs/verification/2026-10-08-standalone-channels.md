@@ -1,96 +1,95 @@
-# 独立应用渠道补齐验收
+# Standalone Application Channel Completion Verification
 
-## 范围与环境
+## Scope and Environment
 
-2026-10-08，Windows、Node.js 24.18.1。复用原十三个渠道业务与 EAC 授权流程，
-独立账号、配置和账本写入明确的数据目录；原插件渠道包、页面与宿主判定保留。
-本次是完整仓库源码运行版本，尚未制作独立安装包或发布 Release。
+2026-10-08, Windows, Node.js 24.18.1. The original thirteen channels' business logic and EAC authorization flow were reused, with standalone accounts, configuration, and ledgers written to an explicit data directory; the original plugin channel package, pages, and host determination were retained.
+This is a full-repository source-code running version; no standalone installer has been made yet and no Release has been published.
 
-## 自动验证
+## Automated Verification
 
-| 命令 | 实际结果 |
+| Command | Actual result |
 | --- | --- |
-| `npm run test:contributor` | 32/32 套通过，包含独立服务 20/20、管理 13/13、渠道 11/11 及原插件回归 |
-| `npm run test:standalone-channels` | 11/11 通过，运行真实适配器；网络仅请求本机 HTTP 替身 |
-| `npm run typecheck` | 通过；范围是原 adapter seam，并非全部新增 JavaScript |
-| `node --check <文件>` | 15 个独立入口、渠道、网页与生成器文件通过 |
-| `node scripts/build-standalone-channels.mjs --check` | 通过，生成业务与原包及转换规则一致 |
-| `node scripts/build-standalone-ui.mjs --check` | 通过，共享页面转换与生成脚本一致 |
-| `git diff --check` | 通过 |
-| `npm run test:release` | 未通过：修改后的发布文件与已有签名清单不一致，需维护者准备并签署新清单 |
+| `npm run test:contributor` | 32/32 suites passed, including standalone service 20/20, management 13/13, channels 11/11, and the original plugin regression |
+| `npm run test:standalone-channels` | 11/11 passed, running real adapters; the network only requested a local HTTP stub |
+| `npm run typecheck` | Passed; the scope is the original adapter seam, not all newly added JavaScript |
+| `node --check <file>` | 15 standalone entry, channel, web page, and generator files passed |
+| `node scripts/build-standalone-channels.mjs --check` | Passed; the generated business logic is consistent with the original package and the conversion rules |
+| `node scripts/build-standalone-ui.mjs --check` | Passed; the shared page conversion is consistent with the generation script |
+| `git diff --check` | Passed |
+| `npm run test:release` | Not passed: the modified release files are inconsistent with the existing signed manifest; the maintainer needs to prepare and sign a new manifest |
 
-渠道专项覆盖真实十三个适配器注册、模型容量与思考档位、Chat/Responses、
-流式与工具调用、内联图片、账号管理和备份、多实例隔离、重启持久化、
-模型/供应商禁用、永久积分锁定、两层用量、网络取消和停止后禁止迟到凭据写入。
-EAC 覆盖原 GitHub prepare/poll/ACK、签名、独立用户 token、模型清单、
-资源池、退出、迟到状态隔离及取消。测试没有访问外部真实推理或登录上游。
+The channel-specific coverage includes real registration of the thirteen adapters, model capacity and thinking levels, Chat/Responses,
+streaming and tool calls, inline images, account management and backup, multi-instance isolation, restart persistence,
+model/provider disabling, permanent credits locking, two-layer usage, network cancellation, and prohibiting late credential writes after stopping.
+The EAC coverage includes the original GitHub prepare/poll/ACK, signatures, standalone user tokens, the model manifest,
+the resource pool, exit, late state isolation, and cancellation. The tests did not access any external real inference or login upstream.
 
-## 网页实际操作
+## Actual Web Page Operations
 
-使用内置浏览器访问 `http://127.0.0.1:18888/`，数据位于忽略目录
-`.verify/channels-preview-data`，只有本机替身账号。观察并验证：
+Using the built-in browser to visit `http://127.0.0.1:18888/`, with data located in the ignored directory
+`.verify/channels-preview-data` and only local stub accounts. The following were observed and verified:
 
-- 供应商与备份页：保存昵称、勾选永久积分锁定、关闭后重新启用供应商，页面显示保存成功。
-- 重启后昵称、积分锁定与账号保留；模型清单显示中文供应商名称及实际容量，未知容量不显示为零。
-- 请求日志记录该调用成功、输入 11、输出 7、共 18 Token；渠道用量和日志页面正常加载。
-- EAC 页面显示未授权、GitHub 登录入口及本机替身资源池（并发 3、24 小时活跃 5、容量 100）。
-  没有点击第三方授权或代用户登录。
-- 设置 390×844 的临时浏览器视口，渠道卡切换为单列。此浏览器工具上报的 CSS 视口宽度为 506，
-  文档 clientWidth/scrollWidth 均为 487，没有文档横向溢出；这不等同于真实手机测试。
-  验收结束后恢复视口。
-- 当前验收标签的控制台 error/warn 记录为空。
+- Provider and backup page: saved a nickname, checked permanent credits locking, disabled and then re-enabled a provider, and the page showed that saving succeeded.
+- After a restart, the nickname, credits locking, and account were retained; the model manifest showed Chinese provider names and the actual capacity, and unknown capacity was not shown as zero.
+- The request log recorded that call as successful, with input 11, output 7, and 18 Tokens in total; the channel usage and log pages loaded normally.
+- The EAC page showed unauthorized status, a GitHub login entry, and a local stub resource pool (concurrency 3, 24-hour active 5, capacity 100).
+  No third-party authorization was clicked and no login was performed on behalf of the user.
+- A temporary browser viewport of 390×844 was set, and the channel cards switched to a single column. The CSS viewport width reported by this browser tool was 506,
+  and the document clientWidth/scrollWidth were both 487, with no document horizontal overflow; this is not equivalent to real phone testing.
+  The viewport was restored after verification ended.
+- The console error/warn records for the current verification tab were empty.
 
-### 截图
+### Screenshots
 
-以下为本机替身数据，不代表服务商实时额度或可用性。
+The following use local stub data and do not represent a provider's real-time quota or availability.
 
-![十三个账号渠道](images/standalone-channels-desktop.png)
+![Thirteen account channels](images/standalone-channels-desktop.png)
 
-![供应商与备份操作](images/standalone-channel-tools.png)
+![Provider and backup operations](images/standalone-channel-tools.png)
 
-![EAC 授权与替身资源池](images/standalone-eac-desktop.png)
+![EAC authorization and stub resource pool](images/standalone-eac-desktop.png)
 
-![窄视口渠道卡](images/standalone-channels-mobile.png)
+![Narrow viewport channel cards](images/standalone-channels-mobile.png)
 
-## 未验证与发布限制
+## Unverified Items and Release Restrictions
 
-未逐家使用真实外部账号完成登录、验证码、OAuth、签到、续期或额度调用；
-上游改动及当前可用性仍需用户实际账号验证。本机替身通过不保证所有服务商在线。
-没有创建独立安装制品、进行实际 DSH 桌面视觉验收或发布 Release。
-已检查原插件回归和数据隔离，未读取或迁移用户 DSH 凭据。
-发布清单签署属于维护者发布流程，本次不替换信任根、不伪造签名。
+Real external accounts were not used vendor by vendor to complete login, verification codes, OAuth, check-in, renewal, or quota calls;
+upstream changes and current availability still require verification with the user's actual accounts. A local stub passing does not guarantee that all providers are online.
+No standalone installation artifact was created, no actual DSH desktop visual verification was performed, and no Release was published.
+The original plugin regression and data isolation were checked, and the user's DSH credentials were not read or migrated.
+Release manifest signing belongs to the maintainer's release process; this round does not replace the trust root or forge a signature.
 
-## 登录失败反馈的定位与修正
+## Locating and Fixing the Login Failure Feedback
 
-MiniMax 设备码响应无法解析。核对 18888 的实际监听进程，确认仍为
-`.verify/channels-preview.mjs`。该进程装载测试 preload，将外部 HTTPS 请求
-全部重定向到本机替身；替身对这些授权路径返回通用对象，产生反馈中的字段错误。
-这属于交付预览时没有区分测试与真实运行的错误。
+The MiniMax device code response could not be parsed. The actual listening process on 18888 was checked and confirmed to still be
+`.verify/channels-preview.mjs`. That process loads a test preload that redirects all external HTTPS requests
+to a local stub; the stub returns a generic object for these authorization paths, producing the field errors in the feedback.
+This was an error in delivering the preview without distinguishing test from real running.
 
-已停止 18888 替身，换成使用默认独立目录 `~/.our-free-model` 的真实服务。
-测试账号、凭据、模型回答与模拟额度没有迁入真实目录。
-管理摘要增加 `networkMode`，加载渠道替身时标记 `fixture`，
-网页显示醒目的测试提示；正常独立入口标记 `live`。
+The 18888 stub was stopped and replaced with a real service using the default standalone directory `~/.our-free-model`.
+Test accounts, credentials, model answers, and simulated quotas were not migrated into the real directory.
+The management summary adds `networkMode`, marks `fixture` when a channel stub is loaded,
+and the web page shows a prominent test notice; the normal standalone entry is marked `live`.
 
-### 真实上游验证
+### Real Upstream Verification
 
-在与用户安装隔离的诊断目录运行真实 Worker，没有导入任何测试 preload。
-仅执行四次 `account.create` 授权初始化，不打开第三方页面，不完成授权，不读取用户凭据。
-以下均返回 `ok: true`、有效 accountId 和 HTTPS 登录地址：
+A real Worker was run in a diagnostic directory isolated from the user's installation, without importing any test preload.
+Only four `account.create` authorization initializations were executed; no third-party page was opened, no authorization was completed, and no user credentials were read.
+All of the following returned `ok: true`, a valid accountId, and an HTTPS login address:
 
-| 渠道 | 返回授权页面的域名 |
+| Channel | Domain of the returned authorization page |
 | --- | --- |
 | Cline | `authkit.cline.bot` |
 | MiniMax Code | `account.minimax.cn` |
 
-诊断结束关闭 Worker，停止这些未完成登录的后台轮询。
-这证明当前真实授权初始化可用，不等同于完成真实账号登录或验证登录后的推理。
-再次执行管理 13/13、渠道 11/11、完整贡献者回归 32/32，均通过。
-同步最新主线的签名清单后执行 `npm run test:release`，3/3 套通过。
+At the end of the diagnosis, the Worker was closed and the background polling for these incomplete logins was stopped.
+This proves that the current real authorization initialization is usable; it is not equivalent to completing a real account login or verifying inference after login.
+Management 13/13, channels 11/11, and the full contributor regression 32/32 were run again, and all passed.
+After synchronizing the signed manifest from the latest mainline, `npm run test:release` was run and 3/3 suites passed.
 
-浏览器已重新登录 18888 的真实服务，页面显示 0/13 个已接入账号。
-另外在 18889 的临时替身上确认测试提示可见，截图后关闭临时标签。
+The browser has re-logged in to the real service on 18888, and the page shows 0/13 accounts connected.
+In addition, the test notice was confirmed visible on a temporary stub on 18889, and the temporary tab was closed after a screenshot.
 
-![真实独立服务的渠道页面](images/standalone-live-channels.png)
+![Channel page of the real standalone service](images/standalone-live-channels.png)
 
-![替身测试模式提示](images/standalone-fixture-warning.png)
+![Stub test mode notice](images/standalone-fixture-warning.png)

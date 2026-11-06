@@ -3,329 +3,329 @@
   "announcements": [
     {
       "id": "2026-11-01-v2.8.0-plugin-release",
-      "title": "v2.8.0：免费道整形层对齐参考网关 v1.4.6，引擎一键跟进",
+      "title": "v2.8.0: Free-lane shaping layer aligned with reference gateway v1.4.6, one-click engine follow-up",
       "level": "update",
       "pinned": true,
       "createdAt": "2026-11-01T04:00:00Z",
       "link": {
         "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/tag/v2.8.0",
-        "label": "查看插件更新说明"
+        "label": "View plugin release notes"
       },
-      "html": "<p><b>2.8.0 把匿名免费道的请求整形整体换成参考网关 opencode2api v1.4.6 的逐文件移植。</b>所有客户工具改名成不透明线名再上线（外来客户端的工具词汇一概不发），补齐官方 2.1 CLI 的 13 个逐字工具定义与全量官方系统提示；每个请求带一个全新的 40-hex 项目 id，配额不再挤在共享的 global 桶里；端点换成 2.1 客户端的族路径；会话铸造走慢钟，日期永远落在上游接受窗口内。此前几轮「形状全对仍 429」的复发都源于这三类门禁，移植后一并解决。</p><p>自带 Magpie 引擎跟进到上游 2026-10-31 的 6a900e0d，构建改用上游 release 同款裁剪旗标，gzip 载荷从 45.3 MB 降到 27.2 MB——发布包 77 个文件，重回旧版升级器的 80 文件上限之内。新增 <code>update:magpie</code> 命令：以后引擎跟进是一条命令，失败自动回滚。引擎设置页一处窄面板下数字输入被裁一半的问题同版修复。npm test 新增发布 bundle 新鲜度守卫，改源码不重打包会在测试里当场红。</p><p>本次仅发布插件包，桌面应用版本与安装包不随本次升级更新。npm 渠道同步发布 <b>@ebony-vinyl/dsh-our-free-model@2.8.0</b>；npm 上那个裸名的 dsh-our-free-model 仍是第三方打包，请勿安装。</p>"
+      "html": "<p><b>2.8.0 replaces the anonymous free lane's request shaping wholesale with a file-by-file port of the reference gateway opencode2api v1.4.6.</b> All client tools are renamed to opaque wire names before going upstream (no foreign client's tool vocabulary is ever sent), the official 2.1 CLI's 13 verbatim tool definitions and the full official system prompt are included; every request carries a brand-new 40-hex project id, so quota no longer crowds into the shared global bucket; endpoints move to the 2.1 client's family paths; session minting uses a slow clock, so dates always fall inside the window the upstream accepts. The previous rounds of \"shape all correct, still 429\" recurrences all stemmed from these three classes of gate, and the port resolves them together.</p><p>The bundled Magpie engine follows upstream's 6a900e0d of 2026-10-31, the build now uses the same trimming flags as upstream releases, and the gzip payload drops from 45.3 MB to 27.2 MB — the release package is 77 files, back within the old upgrader's 80-file limit. A new <code>update:magpie</code> command: from now on an engine follow-up is a single command, with automatic rollback on failure. A problem on the engine settings page where a numeric input in a narrow panel was cut in half is fixed in the same release. npm test gains a release-bundle freshness guard: change the source without re-bundling and the test goes red on the spot.</p><p>This release publishes only the plugin package; the desktop app version and installers are not updated with it. The npm channel simultaneously publishes <b>@ebony-vinyl/dsh-our-free-model@2.8.0</b>; the bare-named dsh-our-free-model on npm is still a third-party package — do not install it.</p>"
     },
     {
       "id": "2026-10-31-v2.7.4-plugin-release",
-      "title": "v2.7.4：社区修复合并与稳定性大扫除",
+      "title": "v2.7.4: Community fixes merged and a stability sweep",
       "level": "update",
       "pinned": true,
       "createdAt": "2026-10-31T04:00:00Z",
       "link": {
         "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/tag/v2.7.4",
-        "label": "查看插件更新说明"
+        "label": "View plugin release notes"
       },
-      "html": "<p><b>2.7.4 合并了 19 个社区修复 PR 与 8 项本地修复，覆盖转发、渠道、工作台与升级链路。</b>流式工具调用帧补齐 id/name 与连续 index，Responses 流补 sequence_number；上游 5xx 空响应体时会说明是哪一层失败并提示请求带了图片；keepalive 注释帧不再无限续命空闲死线；瞬时网络失败带上 code，可正常重试。</p><p>并发会话不再共享全局会话；-vl 视觉模型不再被标成纯文本；Gemini 工具 schema 的空串 enum 成员会被剔除。渠道端修复 trae 缓存命中率恒为 0、渠道账号「测试」恒失败、渠道模型隐藏后会话选择器不刷新等问题；EAC 登录支持 Windows 系统代理。</p><p>工作台修复 Windows 保留端口段导致的「启动失败」与展开瞬间丢失收起按钮；Windows 上私有文件 0600 权限经 icacls 实际生效；pnpm 托管的安装会拒绝应用内升级并交还原安装方式。本次仅发布插件包，桌面应用版本与安装包不随本次升级更新。</p><p><b>新增 npm 渠道：</b>本仓库现发布带 scope 的 <b>@ebony-vinyl/dsh-our-free-model</b>，与 Release 的 tarball 同源同版本，可用 <code>dsh plugin --profile web add @ebony-vinyl/dsh-our-free-model@2.7.4</code> 安装。npm 上那个裸名的 dsh-our-free-model 仍是第三方打包，请勿安装。</p>"
+      "html": "<p><b>2.7.4 merges 19 community fix PRs and 8 local fixes, covering forwarding, channels, the workbench and the upgrade chain.</b> Streaming tool-call frames now include id/name and consecutive index values, Responses streams include sequence_number; when an upstream 5xx has an empty response body it now says which layer failed and notes that the request contained images; keepalive comment frames no longer keep an idle dead line alive indefinitely; transient network failures carry a code and can be retried normally.</p><p>Concurrent sessions no longer share a global session; -vl vision models are no longer labelled as plain text; empty-string enum members in Gemini tool schemas are stripped. On the channel side, fixes for the trae cache hit rate being constantly 0, channel account \"Test\" constantly failing, and the session picker not refreshing after a channel model is hidden; EAC sign-in supports the Windows system proxy.</p><p>The workbench fixes \"startup failed\" caused by Windows reserved port ranges and losing the collapse button at the moment of expanding; 0600 permissions on private files on Windows actually take effect via icacls; pnpm-managed installs refuse in-app upgrades and hand them back to the original installation method. This release publishes only the plugin package; the desktop app version and installers are not updated with it.</p><p><b>New npm channel:</b> this repository now publishes the scoped <b>@ebony-vinyl/dsh-our-free-model</b>, from the same source and version as the Release tarball, installable with <code>dsh plugin --profile web add @ebony-vinyl/dsh-our-free-model@2.7.4</code>. The bare-named dsh-our-free-model on npm is still a third-party package — do not install it.</p>"
     },
     {
       "id": "2026-10-30-v2.7.3-plugin-release",
-      "title": "v2.7.3：免费车道兼容、账号排队换号与安全升级",
+      "title": "v2.7.3: Free-lane compatibility, account queue account-switching and security upgrades",
       "level": "update",
       "pinned": true,
       "createdAt": "2026-10-30T06:49:33Z",
       "link": {
         "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/tag/v2.7.3",
-        "label": "查看插件更新说明"
+        "label": "View plugin release notes"
       },
-      "html": "<p><b>2.7.3 更新 DSH 插件端。</b>免费车道接入 Bun 传输、补全环境信息并迁移旧会话映射；针对真实 DSH 工具集增加可逆工具别名，保留工具描述、参数与宿主执行能力。账号渠道支持对明确排队响应进行同渠道、同模型换号，并修复匿名槽轮换、账号归属和认证续期预算。</p><p>客户端取消或断连时及时释放上游连接与并发槽；代理握手中的取消也会立即清理。宿主无法安全热重载时，升级文件安装后提示重启生效，托管安装继续由宿主管理。中英文 README 同步交流群12。</p><p><b>使用前提：</b>默认 OpenCode 免费推理需要用户自行安装原生 Bun，插件不会自动下载；可用 OUR_FREE_MODEL_BUN 指定路径。本次仅发布插件包，桌面应用版本与安装包不随本次升级更新。兼容修复不解除上游实际额度、地区或账号限制。</p>"
+      "html": "<p><b>2.7.3 updates the DSH plugin side.</b> The free lane adopts the Bun transport, completes environment information and migrates old session mappings; reversible tool aliases are added for the real DSH toolset, preserving tool descriptions, parameters and host execution ability. Account channels support switching accounts within the same channel and model for explicit queueing responses, and fix anonymous-slot rotation, account ownership and the auth-renewal budget.</p><p>When the client cancels or disconnects, upstream connections and concurrency slots are released promptly; a cancellation during a proxy handshake is also cleaned up immediately. When the host cannot hot-reload safely, the upgrade files prompt for a restart to take effect after installation, and managed installs remain managed by the host. The English and Chinese READMEs are synced to community group 12.</p><p><b>Prerequisite:</b> the default OpenCode free inference requires the user to install native Bun themselves; the plugin does not download it automatically; use OUR_FREE_MODEL_BUN to specify a path. This release publishes only the plugin package; the desktop app version and installers are not updated with it. Compatibility fixes do not lift the upstream's actual quota, region or account limits.</p>"
     },
     {
       "id": "2026-10-25-v2.7.1-channel-exclusion",
-      "title": "v2.7.1：彻底移除 WorkBuddy 国内版/国际版与华为云渠道",
+      "title": "v2.7.1: WorkBuddy China edition / international edition and Huawei Cloud channels fully removed",
       "level": "update",
       "pinned": true,
       "createdAt": "2026-10-25T10:00:00Z",
       "link": {
         "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/tag/v2.7.1",
-        "label": "查看插件更新说明"
+        "label": "View plugin release notes"
       },
-      "html": "<p><b>2.7.1 收紧了渠道排除。</b>WorkBuddy 国内版（workbuddy，亦称 CodeBuddy）、国际版（workbuddy-ai）与华为云 Huawei Cloud MaaS（huaweicloud，含 Token Plan）以及华为云 CodeArts（码道）在插件端与桌面端均无法添加、登录或通过插件市场安装。本次补齐了 CodeBuddy 与 CodeArts 两个此前未覆盖的别名，并新增一份使用须知与免责声明，明确本插件为个人学习项目、不提供这些渠道、第三方渠道的使用与本团队无关。</p>"
+      "html": "<p><b>2.7.1 tightens the channel exclusion.</b> WorkBuddy China edition (workbuddy, also known as CodeBuddy), international edition (workbuddy-ai), Huawei Cloud MaaS (huaweicloud, including Token Plan) and Huawei Cloud CodeArts cannot be added, signed in to, or installed via the plugin marketplace on either the plugin side or the desktop side. This release covers the two previously uncovered aliases CodeBuddy and CodeArts, and adds a usage notice and disclaimer making clear that this plugin is a personal learning project, does not provide these channels, and that use of third-party channels is unrelated to this team.</p>"
     },
     {
       "id": "2026-10-25-v2.7.0-desktop-workspace",
-      "title": "v2.7.0：桌面端接入同款模型工作台",
+      "title": "v2.7.0: The desktop side gains the same model workbench",
       "level": "update",
       "createdAt": "2026-10-25T08:00:00Z",
       "link": {
         "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/tag/v2.7.0",
-        "label": "查看插件更新说明"
+        "label": "View plugin release notes"
       },
-      "html": "<p><b>2.7.0 让桌面端也拥有同款模型工作台。</b>桌面控制台新增「模型工作台」页，内嵌与插件端相同的 magpie 引擎：同一套渠道与账号管理、同一份模型清单、同一主题跟随与全屏。工作台启动后其模型会并入聚合清单，与订阅车道一起出现在模型选择器里；渠道排除策略（WorkBuddy 与华为云 Huawei Cloud）在两端一致。桌面安装包已内置该引擎二进制。</p>"
+      "html": "<p><b>2.7.0 gives the desktop side the same model workbench too.</b> The desktop console adds a \"Model Workbench\" page, embedding the same magpie engine as the plugin side: the same channel and account management, the same model list, the same theme following and full screen. Once the workbench starts, its models merge into the aggregate list and appear in the model picker alongside the subscription lanes; the channel exclusion policy (WorkBuddy and Huawei Cloud) is consistent on both sides. The desktop installer bundles this engine binary.</p>"
     },
     {
       "id": "2026-10-25-v2.6.0-plugin-release",
-      "title": "v2.6.0：模型工作台、订阅车道与原生 Gemini 接入，移除 WorkBuddy 与华为云渠道",
+      "title": "v2.6.0: Model workbench, subscription lanes and native Gemini access; WorkBuddy and Huawei Cloud channels removed",
       "level": "update",
       "createdAt": "2026-10-25T00:00:00Z",
       "link": {
         "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/tag/v2.6.0",
-        "label": "查看插件更新说明"
+        "label": "View plugin release notes"
       },
-      "html": "<p><b>2.6.0 更新 DSH 插件端。</b>新增模型工作台（内嵌引擎、主题跟随、品牌化）、订阅车道（Codex/Claude/Gemini/API 导入与本机发现、额度查询与刷新轮换，凭据 0600 落盘且输出脱敏）、三种智能路由策略与嵌套路由组、原生 Gemini generateContent/streamGenerateContent/countTokens 端点、Anthropic tool_choice 透传，以及交互式客户端启动器；桌面端新增客户端与订阅、资源库、路由组、聚合渠道四个管理页。</p><p><b>本版本不提供 WorkBuddy 与华为云 Huawei Cloud MaaS 渠道</b>，插件端与桌面端一致；首次打开会在设置页/控制台显示一次使用须知与免责声明，之后可从页脚或侧栏重新查看。同时修复了组合链路经由订阅模型时的回合重复计数，以及随源码重建发布清单。</p>"
+      "html": "<p><b>2.6.0 updates the DSH plugin side.</b> Adds the model workbench (embedded engine, theme following, branding), subscription lanes (Codex/Claude/Gemini/API import and local-machine discovery, quota queries and refresh rotation, credentials written to disk at 0600 with redacted output), three smart routing strategies and nested routing groups, native Gemini generateContent/streamGenerateContent/countTokens endpoints, Anthropic tool_choice pass-through, and an interactive client launcher; the desktop side adds four management pages for clients and subscriptions, the resource library, routing groups and aggregate channels.</p><p><b>This version does not provide WorkBuddy or Huawei Cloud MaaS channels</b>, consistently on the plugin and desktop sides; the first open shows a usage notice and disclaimer once on the settings page / console, after which it can be viewed again from the footer or sidebar. Also fixes turn double-counting when a composite chain goes through a subscription model, and the release manifest being rebuilt alongside the source.</p>"
     },
     {
       "id": "2026-10-22-v2.5.9-plugin-release",
-      "title": "v2.5.9：精简账号渠道、清理遗留资源并同步交流群信息",
+      "title": "v2.5.9: Account channels streamlined, legacy resources cleaned up and community group info synced",
       "level": "update",
       "createdAt": "2026-10-22T02:12:12Z",
       "link": {
         "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/tag/v2.5.9",
-        "label": "查看插件更新说明"
+        "label": "View plugin release notes"
       },
-      "html": "<p><b>2.5.9 更新 DSH 插件端。</b>清理不再提供的账号渠道及其登录、请求、页面入口、依赖和文档，保留 10 个账号渠道、匿名免费通道与 EAC。同步桌面端渠道资源并删除遗留前端文件；共享存储和备份保留历史格式兼容。README 更新交流群 5 的二维码及群号。</p>"
+      "html": "<p><b>2.5.9 updates the DSH plugin side.</b> Cleans up account channels that are no longer provided, along with their sign-in, request, page entry, dependency and documentation, keeping 10 account channels, the anonymous free channel and EAC. Syncs the desktop side's channel resources and deletes legacy frontend files; shared storage and backups keep historical-format compatibility. The README updates community group 5's QR code and group number.</p>"
     },
     {
       "id": "2026-10-21-v2.5.8-plugin-release",
-      "title": "v2.5.8：修复更新重试、Qoder 思考档位与工具轮次推理回传",
+      "title": "v2.5.8: Update retry, Qoder thinking levels and tool-turn reasoning return fixed",
       "level": "update",
       "createdAt": "2026-10-21T06:28:09Z",
       "link": {
         "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/tag/v2.5.8",
-        "label": "查看插件更新说明"
+        "label": "View plugin release notes"
       },
-      "html": "<p><b>2.5.8 更新 DSH 插件端。</b>修复 Windows 更新备份重命名重试，并复用已校验的下载暂存；Qoder 思考档位按强度排序；Chat 工具轮次保留客户端回传的推理内容。EAC DeepSeek Flash 显示名称增加 1017 标识。</p>"
+      "html": "<p><b>2.5.8 updates the DSH plugin side.</b> Fixes the Windows update backup rename retry and reuses verified download staging; Qoder thinking levels are sorted by intensity; Chat tool turns preserve the reasoning content returned by the client. The EAC DeepSeek Flash display name gains the 1017 marker.</p>"
     },
     {
       "id": "2026-10-20-v2.5.6-plugin-release",
-      "title": "v2.5.6：插件赞助卡片精简，免费模型与 EAC 页面统一展示",
+      "title": "v2.5.6: Plugin sponsor card streamlined, free models and EAC page shown uniformly",
       "level": "update",
       "createdAt": "2026-10-19T16:24:31Z",
       "link": {
         "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/tag/v2.5.6",
-        "label": "查看插件更新说明"
+        "label": "View plugin release notes"
       },
-      "html": "<p><b>2.5.6 更新 DSH 插件端。</b>免费模型与 EAC 模型页面上方统一展示紧凑的北辰 API 赞助卡片，文案更新为“邀请可获百分之十的返现”。移除“来自赞助商的广告”导航和详情路由，保留卡片及其查看链接；同时修复部分路径下热重载依赖未刷新导致的旧模块继续运行问题。</p>"
+      "html": "<p><b>2.5.6 updates the DSH plugin side.</b> A compact Beichen API sponsor card is shown uniformly at the top of the free-model and EAC model pages, with copy updated to \"invites earn a ten percent cashback\". Removes the \"Ads from sponsors\" navigation and detail route, keeping the card and its view link; also fixes old modules continuing to run because hot-reload dependencies were not refreshed on some paths.</p>"
     },
     {
       "id": "2026-10-19-v2.5.5-plugin-release",
-      "title": "v2.5.5：插件端移除交流群区块与开屏赞助广告",
+      "title": "v2.5.5: Community group block and splash sponsor ad removed on the plugin side",
       "level": "update",
       "createdAt": "2026-10-19T16:00:00Z",
       "link": {
         "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/tag/v2.5.5",
-        "label": "查看插件更新说明"
+        "label": "View plugin release notes"
       },
-      "html": "<p><b>2.5.5 只更新 DSH 插件端。</b>已删除赞助说明中的交流群、群号和复制按钮，并关闭 desktop 插件启动时自动弹出的赞助开屏广告。赞助页面入口和邀请码功能保留；独立服务与桌面壳不随本版本更新。</p>"
+      "html": "<p><b>2.5.5 updates only the DSH plugin side.</b> The community group, group number and copy button in the sponsor notes have been deleted, and the sponsor splash ad that popped up automatically when the desktop plugin started is turned off. The sponsor page entry and invite-code feature are kept; the standalone service and desktop shell are not updated with this version.</p>"
     },
     {
       "id": "2026-10-19-v2.5.4-release",
-      "title": "v2.5.4：优化新桌面端，优化插件端 UI 和广告",
+      "title": "v2.5.4: New desktop side optimized, plugin-side UI and ads optimized",
       "level": "update",
       "createdAt": "2026-10-19T04:30:00Z",
       "link": {
         "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/tag/v2.5.4",
-        "label": "查看更新说明与下载"
+        "label": "View release notes and downloads"
       },
-      "html": "<p><b>2.5.4 优化新桌面端和插件端 UI，并完善广告展示。</b></p><ul><li>桌面端完善赞助入口、浅色与深色主题及窄窗口显示。</li><li>插件端增加「来自赞助商的广告」菜单，完整说明和附图可随时查看。</li><li>每日公告按本地日期展示一次，可随时收起；修复宿主设置弹窗中无法展示公告的问题，Esc 只收起公告并将焦点返回菜单。</li></ul><p>插件、独立服务和 Windows 桌面端统一更新至 <b>2.5.4</b>。托管安装请更新可信 tarball；Windows 用户请先退出托盘中的旧程序，再安装新版。</p>"
+      "html": "<p><b>2.5.4 optimizes the new desktop side and the plugin-side UI, and improves ad display.</b></p><ul><li>The desktop side improves the sponsor entry, light and dark themes and narrow-window display.</li><li>The plugin side adds an \"Ads from sponsors\" menu; the full notes and attached images can be viewed at any time.</li><li>The daily announcement is shown once per local date and can be collapsed at any time; fixes announcements not displaying in the host settings dialog, with Esc collapsing only the announcement and returning focus to the menu.</li></ul><p>The plugin, standalone service and Windows desktop side are all updated to <b>2.5.4</b>. For managed installs, update the trusted tarball; Windows users should first quit the old program in the tray, then install the new version.</p>"
     },
     {
       "id": "2026-10-18-v2.5.3-eac-wait",
-      "title": "v2.5.3 紧急修复：移除 EAC 60 秒无输出截止",
+      "title": "v2.5.3 urgent fix: EAC 60-second no-output cutoff removed",
       "level": "update",
       "createdAt": "2026-10-18T00:30:00Z",
       "link": {
         "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/tag/v2.5.3",
-        "label": "查看修复说明与下载"
+        "label": "View fix notes and downloads"
       },
-      "html": "<p><b>2.5.3 移除了 2.5.2 新增的 EAC 60 秒无有效输出截止。</b>排队、静默思考和只有心跳的等待不再因该规则被提前终止。旧配置中的 <code>progressTimeoutMs</code> 不再生效；用户取消和既有传输断线检测仍然有效。</p><p>本次没有修改 OpenCode 指纹或准入逻辑，匿名渠道的 <code>403 / LANE_LOCKED</code> 仍须与 EAC 等待问题分别排查。</p>"
+      "html": "<p><b>2.5.3 removes the EAC 60-second no-valid-output cutoff added in 2.5.2.</b> Queueing, silent thinking and heartbeat-only waits are no longer terminated early by that rule. The <code>progressTimeoutMs</code> in old configurations no longer takes effect; user cancellation and the existing transport disconnect detection remain in effect.</p><p>This release did not change the OpenCode fingerprint or admission logic; the anonymous channel's <code>403 / LANE_LOCKED</code> still needs to be investigated separately from EAC wait issues.</p>"
     },
     {
       "id": "2026-10-18-v2.5.2-release",
-      "title": "v2.5.2：升级、账号登录与流式错误修复；Windows 安装包更新",
+      "title": "v2.5.2: Upgrade, account sign-in and streaming error fixes; Windows installer updated",
       "level": "update",
       "createdAt": "2026-10-17T16:30:00Z",
       "link": {
         "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/tag/v2.5.2",
-        "label": "查看版本说明与下载产物"
+        "label": "View release notes and download artifacts"
       },
-      "html": "<p><b>2.5.2 已发布插件 tarball 与 Windows x64 完整安装包。</b>修复 GitHub API 限流导致的更新失败、旧模块缓存、公告反复通知、桌面账号登录与请求误冷却；补齐系统提示词、空白响应和流式错误处理。</p><p>新增模型隐藏、链路能力交集显示和独立服务 LAN 推理中继。包管理器安装请使用 <code>distribution: managed</code> 并更新可信 tarball 路径。</p><p><b>匿名渠道的上游 403 / LANE_LOCKED 并未被宣称修复。</b>真实可用性仍取决于上游准入、配额和网络；EAC 60 秒无有效输出会明确失败，不自动重试。请查看完整发布说明。</p>"
+      "html": "<p><b>2.5.2 has released the plugin tarball and the Windows x64 full installer.</b> Fixes update failures caused by GitHub API rate limiting, old module caches, repeated announcement notifications, desktop account sign-in and erroneous request cooldowns; completes system prompt, blank response and streaming error handling.</p><p>Adds model hiding, chain capability intersection display and a standalone-service LAN inference relay. For package-manager installs, use <code>distribution: managed</code> and update the trusted tarball path.</p><p><b>The anonymous channel's upstream 403 / LANE_LOCKED is not claimed to be fixed.</b> Real availability still depends on upstream admission, quota and the network; an EAC 60-second no-valid-output fails explicitly and does not retry automatically. Please see the full release notes.</p>"
     },
     {
       "id": "2026-10-17-v2.5.1-release",
-      "title": "v2.5.1：修复升级失败（新增国内可达镜像源）；EAC 卡片不再显示 org 前缀",
+      "title": "v2.5.1: Upgrade failures fixed (new China-reachable mirror source added); EAC cards no longer show the org prefix",
       "level": "update",
       "createdAt": "2026-10-17T18:00:00Z",
       "link": {
         "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/tag/v2.5.1",
-        "label": "查看完整说明"
+        "label": "View full notes"
       },
-      "html": "<p><b>修复「检查更新」失败。</b>部分网络下 <code>raw.githubusercontent.com</code> 与 <code>cdn.jsdelivr.net</code> 很慢或间歇不可达，升级检查会报 <code>no manifest source answered</code>。本版为升级清单与公告订阅都新增一个 <b>raw.githubusercontent.com 代理镜像</b>（实测约 1.3 秒返回同样字节，而直连源单次可要 16 秒并超时）。</p><p>镜像<b>不从可变分支取件</b>：与直连源一样先解析成完整 commit SHA，再按 SHA 取清单与每个文件；签名与逐文件 SHA-256 校验照常执行。</p><p><b>EAC 卡片小字不再显示 <code>org/</code> 前缀</b>（如 <code>deepseek-v4.1-flash-free</code>）；名称行仍显示 <code>EAC DeepSeek V4.1 Flash Free</code>。同时服务端 EAC 渠道的对外模型名已改回前缀形式，<b>置顶 / NEW / 爆 / 高速</b> 标签与 1M 上下文、思考档位现已全部生效。</p><p>请在设置 → 插件升级中检查更新到 <b>2.5.1</b>。</p>"
+      "html": "<p><b>Fixed \"check for updates\" failing.</b> On some networks <code>raw.githubusercontent.com</code> and <code>cdn.jsdelivr.net</code> are slow or intermittently unreachable, and the upgrade check would report <code>no manifest source answered</code>. This version adds a <b>raw.githubusercontent.com proxy mirror</b> for both the upgrade manifest and the announcement feed (measured at about 1.3 seconds returning the same bytes, while a single direct fetch from the source could take 16 seconds and time out).</p><p>The mirror <b>does not fetch from a mutable branch</b>: like the direct source, it first resolves to a full commit SHA, then fetches the manifest and each file by SHA; signature and per-file SHA-256 verification run as usual.</p><p><b>The small print on EAC cards no longer shows the <code>org/</code> prefix</b> (e.g. <code>deepseek-v4.1-flash-free</code>); the name line still shows <code>EAC DeepSeek V4.1 Flash Free</code>. At the same time, the server-side EAC channel's external model names have been changed back to the prefixed form, and the <b>Pinned / NEW / Hot / High-speed</b> tags, 1M context and thinking levels are now all in effect.</p><p>Please check for updates to <b>2.5.1</b> in Settings → Plugin Upgrade.</p>"
     },
     {
       "id": "2026-10-17-v2.5.0-release",
-      "title": "v2.5.0：免费车道 403 修复（会话 ID 编码校验）；推荐项目新增 EAC-design-world",
+      "title": "v2.5.0: Free-lane 403 fixed (session ID encoding validation); recommended projects add EAC-design-world",
       "level": "update",
       "createdAt": "2026-10-17T16:00:00Z",
       "link": {
         "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/tag/v2.5.0",
-        "label": "查看完整说明"
+        "label": "View full notes"
       },
-      "html": "<p><b>免费车道 403 已修复。</b>上游 2026-10-17 起对会话 ID 追加<b>编码校验</b>：十二位十六进制必须是官方客户端的<b>降序时间戳</b>（<code>~(毫秒 &lt;&lt; 12 | 计数器)</code>，计数器 1–63，低十二位落在 <code>0xfc0–0xfff</code>）。升序写法或哈希摘要一律 <code>403 FreeTierError</code>。</p><p>插件现在按编码校验会话 ID，并把调用方传来的非降序 ID <b>确定性地重编码</b>成合规形状，而不是原样透传——同一段对话仍对应同一个上游会话。实测同 IP 下：原始升序 ID 403，重编码后 200。</p><p><b>推荐项目页新增第三个项目：EAC-design-world</b>——DeepSeek Harness 的本地视频制作与设计插件：多轨剪辑、模板与设计体系、原生预览画布、真实文件导出，全程在本机完成。用得上就顺手点个 Star。</p><p>插件、独立本地服务与 Windows 桌面壳统一升级到 <b>2.5.0</b>。请在设置 → 插件升级中检查更新。</p>"
+      "html": "<p><b>The free-lane 403 is fixed.</b> From 2026-10-17 the upstream added <b>encoding validation</b> for session IDs: the twelve hex digits must be the official client's <b>descending timestamp</b> (<code>~(milliseconds &lt;&lt; 12 | counter)</code>, counter 1–63, the low twelve bits landing in <code>0xfc0–0xfff</code>). Ascending forms or hash digests all get <code>403 FreeTierError</code>.</p><p>The plugin now validates session IDs by encoding, and <b>deterministically re-encodes</b> a non-descending ID passed in by the caller into the compliant shape instead of passing it through as-is — the same conversation still corresponds to the same upstream session. Measured on the same IP: the original ascending ID got 403, the re-encoded one got 200.</p><p><b>The recommended projects page adds a third project: EAC-design-world</b> — a local video production and design plugin for DeepSeek Harness: multi-track editing, templates and design systems, a native preview canvas, real file export, all done on the local machine. If it is useful to you, give it a Star while you are there.</p><p>The plugin, standalone local service and Windows desktop shell are all upgraded to <b>2.5.0</b>. Please check for updates in Settings → Plugin Upgrade.</p>"
     },
     {
       "id": "2026-10-17-session-encoding-gate-fix",
-      "title": "免费车道 403 已修复：会话 ID 编码校验；EAC 免费模型改走服务器 IP 池",
+      "title": "Free-lane 403 fixed: session ID encoding validation; EAC free models move to the server IP pool",
       "level": "update",
       "createdAt": "2026-10-17T14:30:00Z",
       "expiresAt": "2026-12-31T00:00:00Z",
-      "html": "<p><b>免费车道恢复可用。</b>上游 2026-10-17 起对会话 ID 追加了<b>编码校验</b>，不再只看 <code>ses_</code> 形状：十二位十六进制必须是<b>降序时间戳</b>（<code>~(毫秒 &lt;&lt; 12 | 计数器)</code>，计数器 1–63，低十二位落在 <code>0xfc0–0xfff</code>）。升序写法或哈希摘要一律 403 FreeTierError。</p><p><b>插件已修：</b>会话 ID 现在按编码校验，调用方传来的非降序 ID 会被确定性地重编码成合规形状，而不是原样透传——同一段对话仍然对应同一个上游会话。实测同 IP 下：原始升序 ID 403，重编码后 200。</p><p><b>EAC 免费模型改走服务器侧 IP 池：</b>服务器上部署了匿名车道网关，出口经<b>免费代理池</b>轮换（每 30 分钟自动刷新存活节点），单 IP 限流不再影响可用性；EAC 渠道的 <code>deepseek-v4.1-flash-free</code> 与 <code>glm-5.3-flash-free</code> 已切到这条链路，20 次连续请求全部成功。</p><p>请升级插件后使用。</p>"
+      "html": "<p><b>The free lane is usable again.</b> From 2026-10-17 the upstream added <b>encoding validation</b> for session IDs, no longer looking only at the <code>ses_</code> shape: the twelve hex digits must be a <b>descending timestamp</b> (<code>~(milliseconds &lt;&lt; 12 | counter)</code>, counter 1–63, the low twelve bits landing in <code>0xfc0–0xfff</code>). Ascending forms or hash digests all get 403 FreeTierError.</p><p><b>Fixed in the plugin:</b> session IDs are now validated by encoding, and a non-descending ID passed in by the caller is deterministically re-encoded into the compliant shape instead of being passed through as-is — the same conversation still corresponds to the same upstream session. Measured on the same IP: the original ascending ID got 403, the re-encoded one got 200.</p><p><b>EAC free models move to a server-side IP pool:</b> an anonymous-lane gateway is deployed on the server, egress rotates through a <b>free proxy pool</b> (live nodes auto-refreshed every 30 minutes), so per-IP rate limits no longer affect availability; the EAC channel's <code>deepseek-v4.1-flash-free</code> and <code>glm-5.3-flash-free</code> have been switched to this chain, with all 20 consecutive requests succeeding.</p><p>Please upgrade the plugin and use it.</p>"
     },
     {
       "id": "2026-10-17-eac-opencode-free-models",
-      "title": "EAC 渠道新上两个 OpenCode 免费模型：DeepSeek V4.1 Flash Free 与 GLM 5.3 Flash Free",
+      "title": "Two new OpenCode free models on the EAC channel: DeepSeek V4.1 Flash Free and GLM 5.3 Flash Free",
       "level": "update",
       "createdAt": "2026-10-17T13:00:00Z",
       "expiresAt": "2026-12-31T00:00:00Z",
-      "html": "<p><b>两个新模型已通过 EAC 渠道上线</b>，由 <b>OpenCode 免费车道</b>转发，在 EAC 模型页<b>排在最前面</b>，带红色 <b>NEW</b> / <b>爆</b> 徽标与「<b>高速</b>」标签：</p><p><b>DeepSeek V4.1 Flash Free</b>（<code>opencode/deepseek-v4.1-flash-free</code>）<br/>支持图片输入；思考档位为<b>关闭 / 低 / 高 / 最大</b>——「关闭」真实生效（推理 token 归零），四档直接下发到上游。</p><p><b>GLM 5.3 Flash Free</b>（<code>opencode/glm-5.3-flash-free</code>）<br/>原生多模态（图片 / 视频 / PDF）；思考档位为<b>低 / 高 / 最大</b>三档，同样真实下发。</p><p>两个模型都经服务器侧 EAC 网关签名转发，与免费车道互不影响；使用前需按 EAC 渠道要求完成 GitHub 授权并 star 仓库。</p>"
+      "html": "<p><b>Two new models are now live via the EAC channel</b>, forwarded by the <b>OpenCode free lane</b>, <b>ranked at the very front</b> of the EAC model page, with red <b>NEW</b> / <b>Hot</b> badges and a \"<b>High-speed</b>\" tag:</p><p><b>DeepSeek V4.1 Flash Free</b> (<code>opencode/deepseek-v4.1-flash-free</code>)<br/>Supports image input; thinking levels are <b>Off / Low / High / Max</b> — \"Off\" genuinely takes effect (reasoning tokens go to zero), and all four levels are sent directly upstream.</p><p><b>GLM 5.3 Flash Free</b> (<code>opencode/glm-5.3-flash-free</code>)<br/>Natively multimodal (image / video / PDF); thinking levels are the three <b>Low / High / Max</b>, likewise genuinely sent.</p><p>Both models are forwarded with signatures through the server-side EAC gateway and do not affect the free lane; before use, complete the GitHub authorization and star the repository as the EAC channel requires.</p>"
     },
     {
       "id": "2026-10-17-v2.4.0-release",
-      "title": "v2.4.0：免费车道对齐 OpenCode v2 客户端指纹；推荐项目页；聚合渠道行修正",
+      "title": "v2.4.0: Free lane aligned with the OpenCode v2 client fingerprint; recommended projects page; aggregate channel row corrected",
       "level": "update",
       "createdAt": "2026-10-17T12:00:00Z",
       "link": {
         "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/tag/v2.4.0",
-        "label": "查看完整说明"
+        "label": "View full notes"
       },
-      "html": "<p><b>免费车道</b>：按上游 2026-10-14 起的 <b>v2 客户端</b>重做指纹——User-Agent 换成 <code>opencode/latest/2.0.26/cli</code>，会话头补齐四个同值镜像并去掉 v1 专用的 <code>x-opencode-request</code>，工具闸门改为 <code>read</code>/<code>shell</code> 两个名字且定义逐字对齐官方客户端，<code>tool_choice: none</code> 不再下发。调用方若正好用了这两个名字，会改名成 <code>_client</code> 并在响应侧还原。</p><p><b>推荐项目页</b>：设置页新增「推荐项目」页，两张卡片分别指向 EAC-Desktop 与 EAC-Pack，Star / Fork / 最近提交数实时取自 GitHub，取不到就整块不显示，绝不用占位数字。</p><p><b>聚合渠道</b>：移除 OpenCode 免密池这一行——它要求每请求的会话指纹，聚合车道的通用传输承载不了；这 10 个模型本来就在免费车道里原生提供。注册表现为 75 家。</p><p>插件、独立本地服务和 Windows 桌面壳统一升级到 <b>2.4.0</b>。请在设置 → 插件升级中检查更新。</p>"
+      "html": "<p><b>Free lane</b>: the fingerprint is redone to the upstream's <b>v2 client</b> in effect from 2026-10-14 — the User-Agent becomes <code>opencode/latest/2.0.26/cli</code>, the session headers gain four same-valued mirrors and drop the v1-only <code>x-opencode-request</code>, the tool gate becomes the two names <code>read</code>/<code>shell</code> with definitions aligned verbatim with the official client, and <code>tool_choice: none</code> is no longer sent. If the caller happens to use these two names, they are renamed to <code>_client</code> and restored on the response side.</p><p><b>Recommended projects page</b>: the settings page adds a \"Recommended Projects\" page, with two cards pointing to EAC-Desktop and EAC-Pack; Star / Fork / recent commit counts are fetched live from GitHub, and if they cannot be fetched the whole block is not shown — placeholder numbers are never used.</p><p><b>Aggregate channels</b>: the OpenCode password-free pool row is removed — it requires a per-request session fingerprint, which the aggregate lane's generic transport cannot carry; these 10 models are natively provided in the free lane anyway. The registry now shows 75 providers.</p><p>The plugin, standalone local service and Windows desktop shell are all upgraded to <b>2.4.0</b>. Please check for updates in Settings → Plugin Upgrade.</p>"
     },
     {
       "id": "2026-10-16-picks-page",
-      "title": "推荐项目页上线：EAC-Desktop、EAC-Pack 与 EAC-design-world——用得上，就顺手点个 Star",
+      "title": "Recommended projects page is live: EAC-Desktop, EAC-Pack and EAC-design-world — if they are useful, give them a Star",
       "level": "update",
       "createdAt": "2026-10-16T12:00:00Z",
       "expiresAt": "2026-11-30T00:00:00Z",
-      "html": "<p><b>设置页新增「推荐项目」页</b>：三个与本插件同源的开源项目——它们把 Agent 装进原生桌面、让上百个插件和谐共存、把视频与设计留在这台机器上，也是 EAC 协付渠道背后的桌面工作台。用得上，就顺手点个 Star。</p><p><b>EAC-Desktop · 桌面工作台</b><br/>基于 DeepSeek Harness 的 Tauri 原生桌面：随包 Node 运行时，双击即进入工作；项目文件、会话变更、插件市场与皮肤都在一处，Windows / Linux / macOS 均有安装包。<br/><a href=\"https://github.com/Ebony-Vinyl/EAC-Desktop\">github.com/Ebony-Vinyl/EAC-Desktop</a> · <a href=\"https://github.com/Ebony-Vinyl/EAC-Desktop/releases\">下载安装</a></p><p><b>EAC-Pack · 插件整合包</b><br/>DSH Desktop 的插件目录与批量安装、更新管理：内置 72 个基线子插件、皮肤预览与 Prompt 合集，固定摘要清单逐字节校验，装出来的环境完整可信。<br/><a href=\"https://github.com/Ebony-Vinyl/EAC-Pack\">github.com/Ebony-Vinyl/EAC-Pack</a></p><p><b>EAC-design-world · 设计工作台</b><br/>DSH 的本地视频制作与设计插件：多轨剪辑、模板与设计体系、原生预览画布，导出的是真实文件；素材与工程全程留在自己硬盘上。<br/><a href=\"https://github.com/Ebony-Vinyl/EAC-design-world\">github.com/Ebony-Vinyl/EAC-design-world</a></p><p>三个项目都免费、开源、无广告。Star 是它们唯一的「工资条」——每多一个 Star，作者就多一分把项目做下去的理由。</p>"
+      "html": "<p><b>The settings page adds a \"Recommended Projects\" page</b>: three open-source projects from the same origin as this plugin — they put the Agent into a native desktop, let a hundred-plus plugins coexist in harmony, and keep video and design on this machine; they are also the desktop workbench behind the EAC co-paid channel. If they are useful to you, give them a Star while you are there.</p><p><b>EAC-Desktop · Desktop workbench</b><br/>A Tauri native desktop based on DeepSeek Harness: bundled Node runtime, double-click to start working; project files, session changes, the plugin marketplace and skins all in one place, with installers for Windows / Linux / macOS.<br/><a href=\"https://github.com/Ebony-Vinyl/EAC-Desktop\">github.com/Ebony-Vinyl/EAC-Desktop</a> · <a href=\"https://github.com/Ebony-Vinyl/EAC-Desktop/releases\">Download and install</a></p><p><b>EAC-Pack · Plugin integration pack</b><br/>DSH Desktop's plugin catalogue and batch install / update management: 72 built-in baseline sub-plugins, skin previews and a Prompt collection, with a pinned digest manifest verified byte-by-byte, so the installed environment is complete and trustworthy.<br/><a href=\"https://github.com/Ebony-Vinyl/EAC-Pack\">github.com/Ebony-Vinyl/EAC-Pack</a></p><p><b>EAC-design-world · Design workbench</b><br/>DSH's local video production and design plugin: multi-track editing, templates and design systems, a native preview canvas, and exports that are real files; materials and projects stay on your own hard drive throughout.<br/><a href=\"https://github.com/Ebony-Vinyl/EAC-design-world\">github.com/Ebony-Vinyl/EAC-design-world</a></p><p>All three projects are free, open-source and ad-free. A Star is their only \"pay slip\" — every additional Star gives the author one more reason to keep the project going.</p>"
     },
     {
       "id": "2026-10-15-v2.3.0-release",
-      "title": "v2.3.0：免费车道迁移与插件升级页独立化",
+      "title": "v2.3.0: Free-lane migration and the plugin upgrade page made independent",
       "level": "update",
       "createdAt": "2026-10-15T12:00:00Z",
       "link": {
         "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/tag/v2.3.0",
-        "label": "查看完整说明"
+        "label": "View full notes"
       },
-      "html": "<p><b>免费车道</b>：请求迁移到新的 <code>/inference/v1</code> 路径，补齐会话标识、工具指纹和客户端归属处理；会话映射持久化，服务重启后不再丢失。上游 <code>FreeTierError</code> 会明确显示为线路锁定，不再误导重复登录。</p><p><b>插件升级</b>：升级功能独立为导航页，集中展示版本、进度和失败原因，设置页不再重复显示升级面板。</p><p>插件、独立本地服务和 Windows 桌面壳统一升级到 <b>2.3.0</b>。请在设置 → 插件升级中检查更新，独立服务和桌面端用户请使用完整新版程序。</p>"
+      "html": "<p><b>Free lane</b>: requests migrate to the new <code>/inference/v1</code> path, with session identifiers, tool fingerprints and client attribution completed; session mappings are persisted and no longer lost when the service restarts. An upstream <code>FreeTierError</code> is now shown explicitly as a lane lock, instead of misleading users into signing in repeatedly.</p><p><b>Plugin upgrade</b>: the upgrade feature becomes an independent navigation page, centrally showing version, progress and failure reasons; the settings page no longer shows the upgrade panel redundantly.</p><p>The plugin, standalone local service and Windows desktop shell are all upgraded to <b>2.3.0</b>. Please check for updates in Settings → Plugin Upgrade; standalone-service and desktop users should use the full new program.</p>"
     },
     {
       "id": "2026-10-10-v2.1.0-release",
-      "title": "v2.1.0：聚合 API——自带 Key 接入 76 家服务商；省 Token（工具输出压缩实测省 90%）；自动降级链路；原生 /v1/messages",
+      "title": "v2.1.0: Aggregate API — bring your own Key to access 76 providers; Token savers (tool output compression measured to save 90%); automatic fallback chain; native /v1/messages",
       "level": "update",
       "createdAt": "2026-10-10T12:00:00Z",
       "expiresAt": "2026-11-10T00:00:00Z",
       "link": {
         "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/tag/v2.1.0",
-        "label": "查看完整说明"
+        "label": "View full notes"
       },
-      "html": "<p><b>聚合 API</b>：设置页新增「聚合渠道」——填入自己的 Key 即可把 76 家服务商（NVIDIA NIM、OpenRouter、Groq、Cerebras、Gemini、DeepSeek、Ollama 本地等）并入同一个模型清单，和免费车道一起经本地网关对外服务。Key 只存在 0600 的本地文件里，界面只回显末四位。</p><p><b>省 Token</b>：新增「省 Token」页。工具输出压缩把 git diff / grep / ls / 构建日志等重写成同样信息量的短文本——实测一份 40 KB 的 diff 省下 90% 字节；另有克制的提示词档位（简答 / 极简）与五个「不调用模型直接回答」的本地应答（配额探测、命令前缀、标题、建议、文件路径），并给出累计节省面板。</p><p><b>自动降级链路</b>：新增「路由」页，把若干模型编成一条链（订阅 → 便宜 → 免费）。链上第一个能出字的模型即为答案，中途被限流、拒答或 5xx 时自动换下一个，且换模型发生在任何内容交付之前，对话里看不出接缝。</p><p><b>本地网关</b>：新增原生 Anthropic <code>/v1/messages</code> 与 <code>/v1/messages/count_tokens</code>，Claude Code 与 Anthropic SDK 可直连，无需 OpenAI 转译层；设置页「接入」区按实际端口与 Key 生成 Claude Code、Codex、OpenAI SDK、Anthropic SDK 与 curl 的配置片段。</p>"
+      "html": "<p><b>Aggregate API</b>: the settings page adds \"Aggregate Channels\" — enter your own Key to merge 76 providers (NVIDIA NIM, OpenRouter, Groq, Cerebras, Gemini, DeepSeek, local Ollama, etc.) into the same model list, served externally through the local gateway together with the free lanes. Keys exist only in a local file at 0600, and the UI echoes only the last four digits.</p><p><b>Token savers</b>: adds a \"Token Savers\" page. Tool output compression rewrites git diff / grep / ls / build logs and the like into shorter text with the same information content — measured to save 90% of the bytes on a 40 KB diff; there are also restrained prompt levels (concise / ultra-concise) and five local replies that \"answer without calling a model\" (quota probes, command prefixes, titles, suggestions, file paths), with a cumulative savings panel.</p><p><b>Automatic fallback chain</b>: adds a \"Routing\" page, arranging several models into a chain (subscription → cheap → free). The first model in the chain that produces text is the answer; when it is rate-limited, refuses, or 5xxes midway, it automatically switches to the next, and the switch happens before any content is delivered, so no seam is visible in the conversation.</p><p><b>Local gateway</b>: adds native Anthropic <code>/v1/messages</code> and <code>/v1/messages/count_tokens</code>; Claude Code and the Anthropic SDK can connect directly, without an OpenAI translation layer; the \"Access\" section of the settings page generates configuration snippets for Claude Code, Codex, the OpenAI SDK, the Anthropic SDK and curl from the actual port and Key.</p>"
     },
     {
       "id": "2026-10-06-v2.0.0-release",
-      "title": "v2.0.0：免费渠道大升级——Kilo 车道上线；EAC 接入 GitHub 授权（登录 + Star）；登录链路加固",
+      "title": "v2.0.0: Big upgrade to the free channels — Kilo lane live; EAC adopts GitHub authorization (sign-in + Star); sign-in chain hardened",
       "level": "update",
       "createdAt": "2026-10-06T15:10:00Z",
       "expiresAt": "2026-10-27T00:00:00Z",
       "link": {
         "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/tag/v2.0.0",
-        "label": "查看完整说明"
+        "label": "View full notes"
       },
-      "html": "<p><b>免费渠道</b>：一次性接入十三个账号渠道，新增 <b>Kilo 车道</b>；渠道列表换成真实 logo，每账号实时余额、自动签到，号池英雄区恢复。</p><p><b>EAC 协付渠道</b>：现在需要 <b>GitHub 登录并 star 仓库</b>后才能使用（设置页一键授权，浏览器自动回传）；取消 star 定期复查后失效；免费车道完全不受影响。登录链路已加固：领取令牌幂等、网关重启不再吞掉已完成的登录、失败会明说而不是一直转圈。</p><p><b>修复</b>：自更新激活/回滚/恢复状态（#93）；无名称工具调用投毒（#92）与旧内核回退（#89）；EAC 开放 web 端（#58/#59）；长对话不再被前置 WAF 拦截（#63）；号池饱和时长回合不再被砍（#69/#70）。<b>EAC 授权强制已开启</b>：即日起未登录并 star 仓库将无法使用 EAC 模型，升级后到设置页完成 GitHub 登录即可。</p>"
+      "html": "<p><b>Free channels</b>: thirteen account channels adopted at once, a new <b>Kilo lane</b>; the channel list switches to real logos, with a live balance per account, automatic check-in, and the account-pool hero section restored.</p><p><b>EAC co-paid channel</b>: now requires <b>GitHub sign-in and starring the repository</b> to use (one-click authorization on the settings page, the browser returns it automatically); removing the star invalidates it at the periodic recheck; the free lanes are completely unaffected. The sign-in chain is hardened: token claiming is idempotent, a gateway restart no longer swallows a completed sign-in, and failures say so plainly instead of spinning forever.</p><p><b>Fixes</b>: self-update activation/rollback/recovery state (#93); nameless tool-call poisoning (#92) and old-kernel fallback (#89); EAC open to the web side (#58/#59); long conversations no longer intercepted by the front WAF (#63); long turns no longer cut when the account pool is saturated (#69/#70). <b>EAC authorization enforcement is on</b>: from now on, without signing in and starring the repository you will not be able to use EAC models; after upgrading, complete GitHub sign-in on the settings page.</p>"
     },
     {
       "id": "2026-10-05-v1.5.0-release",
-      "title": "v1.5.0：EAC 渠道接入 GitHub 授权（登录 + Star 后才能使用）；免费车道不受影响",
+      "title": "v1.5.0: EAC channel adopts GitHub authorization (sign-in + Star required to use); free lanes unaffected",
       "level": "update",
       "createdAt": "2026-10-05T15:30:00Z",
-      "html": "<p><strong>Our Free Model v1.5.0</strong> 给 EAC 协付渠道加上一道按人计的授权闸门：<strong>用 GitHub 登录、并给仓库点一个 Star</strong>，才能使用 EAC 模型。</p><ul><li><strong>为什么</strong>——EAC 是一条协付通道，容量跟着本仓库的 Star 数走（每 1 个 Star，号池 +1.5）。把使用权与 Star 绑定，是让「用的人」与「撑住容量的人」对上。</li><li><strong>怎么用</strong>——设置 → Our Free Model → <strong>EAC 渠道授权</strong> → 「使用 GitHub 登录」：浏览器自动打开授权页，登录并 Star 后回到应用即可，<strong>无需复制粘贴任何东西</strong>，插件自动完成领取；未 Star 时授权页会给出「我已 star，重新检查」，不必重新登录。</li><li><strong>取消 Star 会失效</strong>——服务器每 12 小时复查一次 Star；取消后授权会在复查窗口内失效。GitHub 侧故障或限流时保留既有授权，不会误伤。</li><li><strong>免费车道完全不受影响</strong>——opencode 车道的模型不经过服务器，无需登录、无需 Star，照常使用。</li><li><strong>过渡期</strong>——本版本先处于兼容期（未登录仍可用 EAC），正式强制前会另行公告；建议提前完成登录，避免届时中断。</li><li><strong>隐私</strong>——只申请 <code>read:user</code> 最小权限，仅用于 Star 校验；授权只存在你的机器与服务器上，设置页可随时退出登录（服务器侧立即吊销）。</li></ul><p>全部离线套件（含新增的授权闸门套件）通过，清单逐字节重签。请前往 <strong>设置 → 插件升级</strong> 一键升级。</p>"
+      "html": "<p><strong>Our Free Model v1.5.0</strong> adds a per-person authorization gate to the EAC co-paid channel: <strong>sign in with GitHub and give the repository a Star</strong> to use EAC models.</p><ul><li><strong>Why</strong> — EAC is a co-paid lane whose capacity follows this repository's Star count (per 1 Star, account pool +1.5). Binding usage rights to Stars aligns \"the people who use it\" with \"the people who sustain the capacity\".</li><li><strong>How to use it</strong> — Settings → Our Free Model → <strong>EAC Channel Authorization</strong> → \"Sign in with GitHub\": the browser automatically opens the authorization page; after signing in and starring, return to the app and you are done, <strong>with no copy-pasting of anything</strong> — the plugin completes claiming automatically; if you have not starred yet, the authorization page offers \"I have starred it, recheck\", with no need to sign in again.</li><li><strong>Removing the Star invalidates it</strong> — the server rechecks the Star every 12 hours; after removal, authorization expires within the recheck window. A GitHub-side failure or rate limit keeps the existing authorization and causes no false harm.</li><li><strong>The free lanes are completely unaffected</strong> — the opencode lane's models do not go through the server, need no sign-in and no Star, and work as usual.</li><li><strong>Transition period</strong> — this version is first in a compatibility window (EAC remains usable without sign-in); a separate announcement will precede formal enforcement; we recommend completing sign-in early to avoid interruption when the time comes.</li><li><strong>Privacy</strong> — only the minimal <code>read:user</code> scope is requested, used only for Star verification; authorization exists only on your machine and the server, and you can sign out at any time on the settings page (revoked immediately on the server side).</li></ul><p>All offline suites (including the new authorization gate suite) pass, and the manifest is re-signed byte-by-byte. Please go to <strong>Settings → Plugin Upgrade</strong> for the one-click upgrade.</p>"
     },
     {
       "id": "2026-10-05-v1.4.7-release",
-      "title": "v1.4.7：长回合时限放宽——号池饱和时不再砍掉正常的长思考回合（#69/#70）",
+      "title": "v1.4.7: Long-turn time limits relaxed — normal long-thinking turns no longer cut when the account pool is saturated (#69/#70)",
       "level": "update",
       "pinned": false,
       "createdAt": "2026-10-05T12:14:15Z",
-      "html": "<p><strong>Our Free Model v1.4.7</strong> 修复 #69/#70 报告的问题：长思考回合在 8 分钟整被 <code>STREAM_CUT</code> 截断。</p><ul><li><strong>整轮时限 480→900 秒，恢复段 180→300 秒</strong>——此前 8 分钟的墙钟上限在号池饱和时（实测 1923 容量 / 2451 并发、首字 34–220 秒、深度思考 6 分钟以上）会稳定砍掉正常的长回合：现场里「深度求索中，用时 6 分 16 秒」后随即报 <code>reached its 480s time limit</code>。放宽后这类回合可以正常跑完。</li><li><strong>防挂死语义不变</strong>——传输层对「完全没有字节」另有 300 秒空闲截止（每个数据块都会重置），墙钟只兜底「持续出帧、整体很慢」的回合；数值仍只允许向下调整，整轮仍最多两次物理请求。</li></ul><p>长回合的实际速度仍取决于上游共享号池的排队情况，低思考档位可以显著缩短等待。请前往 <strong>设置 → 插件升级</strong> 一键升级。</p>"
+      "html": "<p><strong>Our Free Model v1.4.7</strong> fixes the problem reported in #69/#70: long-thinking turns truncated by <code>STREAM_CUT</code> at exactly 8 minutes.</p><ul><li><strong>Whole-turn limit 480→900 seconds, recovery segment 180→300 seconds</strong> — the previous 8-minute wall-clock cap would reliably cut normal long turns when the account pool was saturated (measured 1923 capacity / 2451 concurrency, first token 34–220 seconds, deep thinking over 6 minutes): in the field, \"deep in thought, 6 min 16 sec elapsed\" was immediately followed by <code>reached its 480s time limit</code>. With the relaxation, such turns can run to completion normally.</li><li><strong>The anti-hang semantics are unchanged</strong> — the transport layer has a separate 300-second idle cutoff for \"no bytes at all\" (reset by every data chunk), and the wall clock only backstops turns that \"keep producing frames but are overall very slow\"; values may still only be adjusted downwards, and a whole turn still makes at most two physical requests.</li></ul><p>The actual speed of long turns still depends on queueing in the upstream shared account pool; a low thinking level can significantly shorten the wait. Please go to <strong>Settings → Plugin Upgrade</strong> for the one-click upgrade.</p>"
     },
     {
       "id": "2026-10-05-v1.4.6-release",
-      "title": "v1.4.6：EAC 协付渠道开放 web 端（#58/#59）；长对话不再被前置 WAF 拦截（#63）；错误分类不再误导重登",
+      "title": "v1.4.6: EAC co-paid channel open to the web side (#58/#59); long conversations no longer intercepted by the front WAF (#63); error classification no longer misleads into re-signing in",
       "level": "update",
       "pinned": false,
       "createdAt": "2026-10-05T10:30:00Z",
-      "html": "<p><strong>Our Free Model v1.4.6</strong> 一轮针对 issue 追踪单的集中处理：</p><ul><li><strong>EAC 协付渠道开放 web 端（#58/#59/#61）</strong>——宿主闸门新增内核声明的 web 档案（<code>web</code> / <code>web-desktop</code>）：使用 <code>web-desktop</code> 档案的「Deepseek Harness EAC」桌面壳与 <code>dsh web</code> 组合现在能看到六个 EAC 模型；渠道凭据的密封与签名机制原样保留。完全无法识别的宿主仍保持隐藏，但设置页的模型清单会显示一句明确的说明，不再是无声的缺席（#60）。</li><li><strong>长对话不再被前置 WAF 拦截（#63）</strong>——服务器侧已把 <code>/eac/v1/</code> 加入前置 WAF 的 URL 白名单：此前长对话请求体超过 20 万字符会被「Nginx 缓冲区溢出」页拦下（高峰期一天 370 次），现在这些请求直达签名网关。插件侧同步加固：前置代理（WAF / CDN）返回的 HTML 错误页统一化简为一行可读文案并指明真正原因；WAF 的 403 页不再被误诊为「凭据失效」引导你反复重登；200 状态下的 HTML 折叠路径改为不可重试，不再对同一个超长请求自动撞三次。</li><li><strong>首字延迟的结论与一处补充（#66）</strong>——实测与服务器日志共同证明：签名车道、SSE keepalive、并发闸门全程正常，34–221 秒的首字等待来自中继上游共享号池的排队（上游约 800 条通道平均响应 32.5 秒，慢通道超过 2 分钟）。插件侧补上 <code>thinking</code> 拼写的思考帧透传，落在慢通道上的回合一旦开始出帧，思考内容不会再丢。对慢通道的等待本身请用低思考档位缓解。</li><li><strong>升级信任链补课（#64）</strong>——1.4.5 清单因仓库改名提交产生 4 个文件各 1 字节漂移、导致旧版本「一键升级」全部失败的问题，已在 1.4.5 清单重签时修复；本轮发布照常通过清单一致性校验与真实清单全链路升级测试。</li></ul><p>全部离线套件通过，清单逐字节重签；WAF 白名单变更已用真实签名请求实测验证（64KB 与 300KB 请求体均直达网关），同机其它站点不受影响。请前往 <strong>设置 → 插件升级</strong> 一键升级。</p>"
+      "html": "<p><strong>Our Free Model v1.4.6</strong>, a focused round on the issue tracker:</p><ul><li><strong>EAC co-paid channel open to the web side (#58/#59/#61)</strong> — the host gate adds kernel-declared web profiles (<code>web</code> / <code>web-desktop</code>): the \"Deepseek Harness EAC\" desktop shell using the <code>web-desktop</code> profile and the <code>dsh web</code> combination can now see the six EAC models; the channel credentials' sealing and signing mechanism is preserved as-is. A completely unrecognizable host remains hidden, but the model list on the settings page now shows an explicit note instead of a silent absence (#60).</li><li><strong>Long conversations no longer intercepted by the front WAF (#63)</strong> — the server side has added <code>/eac/v1/</code> to the front WAF's URL allowlist: previously a long-conversation request body over 200,000 characters would be stopped by an \"Nginx buffer overflow\" page (370 times in one day at peak), and now these requests go straight to the signing gateway. The plugin side is hardened in sync: HTML error pages returned by front proxies (WAF / CDN) are uniformly simplified to one readable line of copy naming the real cause; a WAF 403 page is no longer misdiagnosed as \"credentials invalid\", leading you to sign in repeatedly; the HTML folding path under a 200 status becomes non-retryable, no longer automatically hammering the same over-long request three times.</li><li><strong>A conclusion on first-token latency and one addition (#66)</strong> — measurements and server logs together prove: the signing lane, SSE keepalive and concurrency gates are all normal throughout, and the 34–221-second first-token wait comes from queueing in the relay upstream's shared account pool (the upstream's roughly 800 channels average a 32.5-second response, with slow channels over 2 minutes). On the plugin side, pass-through of thinking frames spelled <code>thinking</code> is added: once a turn on a slow channel starts producing frames, the thinking content is no longer lost. For the wait on slow channels themselves, please use a low thinking level to mitigate it.</li><li><strong>Upgrade trust chain catch-up (#64)</strong> — the problem where the 1.4.5 manifest drifted by 1 byte in each of 4 files due to a repository-rename commit, causing all \"one-click upgrades\" from old versions to fail, was fixed when the 1.4.5 manifest was re-signed; this release passes the manifest consistency check and the full-chain upgrade test against the real manifest as usual.</li></ul><p>All offline suites pass, the manifest is re-signed byte-by-byte; the WAF allowlist change was verified with real signed requests (both 64KB and 300KB request bodies reached the gateway directly), and other sites on the same machine are unaffected. Please go to <strong>Settings → Plugin Upgrade</strong> for the one-click upgrade.</p>"
     },
     {
       "id": "2026-10-05-v1.4.5-release",
-      "title": "v1.4.5：出口代理上线（订阅/单代理）——EAC 签名车道加固、截断自动续写、设置页子路径修复",
+      "title": "v1.4.5: Egress proxy live (subscription / single proxy) — EAC signing lane hardened, truncated answers auto-continued, settings page sub-path fixed",
       "level": "update",
       "pinned": false,
       "createdAt": "2026-10-05T05:30:00Z",
-      "html": "<p><strong>Our Free Model v1.4.5</strong> 一次维护整合：地区受限与线路不稳的朋友等来了<strong>出口代理</strong>，同时修掉了一批报告集中的实际故障。</p><ul><li><strong>出口代理（订阅 / 单代理）</strong>——插件的上游请求现在可以走你自己的出口：机场订阅（自动拉起本机 mihomo、测速选最佳节点、踢除 429 节点）或单个 HTTP/SOCKS5 代理。设置页显示当前最佳节点与访问耗时；订阅地址按凭据对待，只在点「显示」时读取。升级/公告/EAC 车道不经出口，故障域隔离。</li><li><strong>EAC 签名车道加固</strong>——签名后的请求体改走 Node 核心 http(s) 模块直发，<code>billion-context</code> 等改写 <code>fetch</code> 的本地插件不再碰得到签名字节；此前网关报「request signature rejected」被误诊为凭据失效，现在会明确提示是本地代理改写（#50）。</li><li><strong>设置页连不上后端</strong>——挂在反向代理子路径下的部署不再丢前缀；桌面端 <code>dsh-app://</code> 中继请求的准入兼容合并自社区 PR，准入异常转为 503 并输出固定字段诊断日志（#49/#54）。</li><li><strong>截断自动续写</strong>——回答撞到输出上限被截断时，插件会把已出正文回灌并自动续写一次，不再要你手动发「继续」（#28）。</li><li><strong>看板</strong>——新增号池负载面板（容量、24h 活跃、进行中并发，畅通/繁忙/过载判定由网关进程实时给出，数字全部真实）与「最近一回合」一行摘要（#26）。</li><li><strong>网关默认单 IP 并发 20→5</strong>——一条 LLM 流会占住上游连接几十秒到几分钟，旧默认让单个用户就能打满共享车道、拖垮整机（#55 现场之一）。</li></ul><p>全部离线套件通过，清单逐字节重签；本地网关与实机自检（对话/工具/视觉/更新链路）全绿。请前往 <strong>设置 → 插件升级</strong> 一键升级。</p>"
+      "html": "<p><strong>Our Free Model v1.4.5</strong>, a maintenance consolidation: friends in restricted regions or on unstable routes get an <strong>egress proxy</strong>, and a batch of concentrated real-world failures is fixed at the same time.</p><ul><li><strong>Egress proxy (subscription / single proxy)</strong> — the plugin's upstream requests can now go through your own egress: an airport subscription (automatically starts a local mihomo, speed-tests and picks the best node, kicks out 429 nodes) or a single HTTP/SOCKS5 proxy. The settings page shows the current best node and its access latency; subscription addresses are treated as credentials and read only when you click \"Show\". Upgrades / announcements / the EAC lane do not go through the egress, isolating the fault domain.</li><li><strong>EAC signing lane hardened</strong> — the signed request body is now sent directly via Node's core http(s) module, so local plugins that rewrite <code>fetch</code>, such as <code>billion-context</code>, can no longer touch the signed bytes; previously a gateway report of \"request signature rejected\" was misdiagnosed as invalid credentials, and now it clearly indicates a local proxy rewrite (#50).</li><li><strong>Settings page cannot reach the backend</strong> — deployments mounted under a reverse-proxy sub-path no longer lose the prefix; the desktop side's <code>dsh-app://</code> relay request admission compatibility is merged from a community PR, with admission anomalies converted to 503 and fixed-field diagnostic logs emitted (#49/#54).</li><li><strong>Truncated answers auto-continued</strong> — when an answer hits the output cap and is truncated, the plugin feeds the already-produced body back in and auto-continues once, so you no longer need to send \"continue\" manually (#28).</li><li><strong>Dashboard</strong> — adds an account-pool load panel (capacity, 24h active, in-flight concurrency; the smooth/busy/overloaded verdict is given in real time by the gateway process, all numbers real) and a one-line summary of \"the most recent turn\" (#26).</li><li><strong>Gateway default per-IP concurrency 20→5</strong> — one LLM stream holds an upstream connection for tens of seconds to minutes, and the old default let a single user fill the shared lane and drag down the whole machine (one of the #55 field cases).</li></ul><p>All offline suites pass, the manifest is re-signed byte-by-byte; the local gateway and real-machine self-checks (chat / tools / vision / update chain) are all green. Please go to <strong>Settings → Plugin Upgrade</strong> for the one-click upgrade.</p>"
     },
     {
       "id": "2026-10-04-v1.4.4-release",
-      "title": "v1.4.4：剥除 DeepSeek 泄漏的 DSML 控制标记——思考结束后不再显示 <｜DSML｜ calls>",
+      "title": "v1.4.4: DeepSeek's leaked DSML control markers stripped — <｜DSML｜ calls> no longer shown after thinking ends",
       "level": "update",
       "pinned": false,
       "createdAt": "2026-10-04T11:20:00Z",
-      "html": "<p><strong>Our Free Model v1.4.4</strong> 修一个 DeepSeek V4 系模型的显示缺陷：有的回合里，模型在<strong>思考结束、准备调用工具</strong>的那一刻，会把内部的控制标记 <code>&lt;｜DSML｜ calls&gt;</code> 当成正文漏出来（服务端那次采样没有拦住这个特殊 token），用户就会在回答开头看到这串乱码。</p><ul><li><strong>流式剥除</strong>——插件的流解析器现在会实时把 <code>&lt;｜DSML｜…&gt;</code> 控制片段从可见正文里剥掉（半个标记会缓存到能判定为止再吐），正式的工具调用帧不受影响，工具照常执行。</li><li><strong>两条车道同时生效</strong>——免费道与 EAC 渠道走同一个解析器；EAC 渠道的六个 DeepSeek/Kimi/GLM 模型同样受保护。</li><li>1.4.3 的升级下载三次重试原样保留。</li></ul><p>全部 21 个离线套件通过，清单逐字节 Ed25519 重签。请前往 <strong>设置 → 插件升级</strong> 一键升级。</p>"
+      "html": "<p><strong>Our Free Model v1.4.4</strong> fixes a display defect of the DeepSeek V4-series models: in some turns, at the moment the model <strong>finishes thinking and is about to call a tool</strong>, it leaks its internal control marker <code>&lt;｜DSML｜ calls&gt;</code> as body text (that server-side sample did not intercept this special token), so users would see this garbled string at the start of the answer.</p><ul><li><strong>Streaming stripping</strong> — the plugin's stream parser now strips <code>&lt;｜DSML｜…&gt;</code> control fragments from the visible body in real time (a half marker is buffered until it can be judged before being emitted); genuine tool-call frames are unaffected and tools execute as usual.</li><li><strong>Both lanes take effect together</strong> — the free lane and the EAC channel use the same parser; the EAC channel's six DeepSeek/Kimi/GLM models are likewise protected.</li><li>The three-retry upgrade download from 1.4.3 is kept as-is.</li></ul><p>All 21 offline suites pass, and the manifest is Ed25519-re-signed byte-by-byte. Please go to <strong>Settings → Plugin Upgrade</strong> for the one-click upgrade.</p>"
     },
     {
       "id": "2026-10-04-v1.4.3-release",
-      "title": "v1.4.3：升级下载逐文件三次重试——瞬时断流不再让整包升级失败",
+      "title": "v1.4.3: Upgrade downloads retry three times per file — a transient break no longer fails the whole package upgrade",
       "level": "update",
       "pinned": false,
       "createdAt": "2026-10-04T10:30:00Z",
-      "html": "<p><strong>Our Free Model v1.4.3</strong> 修的是升级链路自己：<strong>升级下载逐文件三次重试</strong>。有用户在 1.3.1 → 1.4.2 升级时遇到 <code>staging failed: …: fetch failed</code>——国内出口到 CDN 的连接会瞬间抖动，而 staging 此前每个文件只有一次机会，抖一下整包失败。现在传输类失败（连接被断、超时、5xx/429）自动退避重试两次；<strong>完整性失败（大小/SHA-256 不符）依旧一次拒绝</strong>——那是信任链在拒绝，不给侥幸。全部 21 个离线套件通过，清单逐字节 Ed25519 重签。遇到升级失败请直接再点一次「立即升级」，1.4.3 起会自己扛住瞬时抖动。</p>"
+      "html": "<p><strong>Our Free Model v1.4.3</strong> fixes the upgrade chain itself: <strong>upgrade downloads retry three times per file</strong>. A user upgrading from 1.3.1 → 1.4.2 hit <code>staging failed: …: fetch failed</code> — connections from domestic egress to the CDN jitter momentarily, and staging previously gave each file only one chance, so one jitter failed the whole package. Now transport failures (connection cut, timeout, 5xx/429) automatically back off and retry twice; <strong>integrity failures (size / SHA-256 mismatch) are still refused on the first try</strong> — that is the trust chain refusing, leaving nothing to luck. All 21 offline suites pass, and the manifest is Ed25519-re-signed byte-by-byte. If an upgrade fails, just click \"Upgrade now\" again; from 1.4.3 it withstands transient jitter itself.</p>"
     },
     {
       "id": "2026-10-04-v1.4.2-release",
-      "title": "v1.4.2：EAC 协付渠道上线（六个旗舰 · 1M 上下文 · 视觉）；签名网关与七闸实测；思考档位；贡献者 8 PR 合并",
+      "title": "v1.4.2: EAC co-paid channel live (six flagships · 1M context · vision); signing gateway and seven gates measured; thinking levels; contributor 8 PRs merged",
       "level": "update",
       "pinned": false,
       "createdAt": "2026-10-04T09:00:00Z",
-      "html": "<p><strong>Our Free Model v1.4.2</strong> 把 9 月发布后的全部积累一次带到：一条新的 <strong>EAC 协付渠道</strong>、它背后的签名网关与防滥用闸门，以及贡献者的 8 个 PR。</p><ul><li><strong>EAC 协付渠道（桌面端专属）</strong>——新增六个旗舰模型：DeepSeek V4.1 Flash（1M 上下文 · 视觉 · 思考关/低/高/极 · 384K 输出）、Kimi K3（1M · 视觉 · 强推理 · Agentic）、Kimi K2.6（262K · 视觉）、GLM-5.3 / GLM-5.3 Flash（1M · 深度思考）、GPT-OSS 20B（开源权重）。渠道凭据以 AES-256-GCM 三分片密封在插件内，运行时 HKDF 派生；宿主闸门确认桌面端才解锁（web 档案 EAC 模型行数为 0），锁死时 LANE_LOCKED 一次失败、不重试风暴。</li><li><strong>签名网关：密钥不出服务器</strong>——中继真 key 只活在网关环境；插件请求带 HMAC-SHA256 签名（重放窗口 ±600s、恒时比较、多密钥并存轮换、仅放行两条路由）。<strong>SSE 预冲刷</strong>：验签一过就回 200 + 流头 + keepalive 心跳，推理模型 20–140s 的首字等待不再被 nginx 60s / Cloudflare 100s 掐断（实测 124 秒的 GLM-5.3 完整走完）；上游拒绝改走流内错误帧，分类照旧。</li><li><strong>防滥用七闸实测</strong>——无签名 / 伪造 / 重放 401、白名单外 403、超 8MB 413、未知路由 404、61 次/分 429，每一道都真发请求验收；再加 20 并发/IP + 模型白名单 + Cloudflare 边缘；网关看板按盐值哈希 IP 记账，New API 面板侧边栏自动挂「EAC 看板」入口。</li><li><strong>思考控制</strong>——档位菜单照搬 ZCode 的模型声明（DeepSeek 关/低/高/极，Kimi 低/高/极，GLM 低/高/极，GPT-OSS 低/中/高），默认档必须在自己的菜单内；EAC 请求带防过度思考系统提示，静默回合自动续写兜底。</li><li><strong>贡献者 PR 合并</strong>——#23/#24/#25/#27/#35/#36/#37/#38/#39：转发 LAN 中继、同步双启动竞态、端口顺延提示、refusal/pause_turn 续写等。</li><li><strong>体验细节</strong>——前置代理的 HTML 错误页化简为一行可读文案；免费道限流徽章改「暂不可用」（它本来就是上游公共池的波动，不是你的额度）。</li></ul><p>全部 21 个离线套件通过，清单逐字节 Ed25519 重签。EAC 渠道仅 dsh 桌面端可见；请前往 <strong>设置 → 插件升级</strong> 一键升级。</p>"
+      "html": "<p><strong>Our Free Model v1.4.2</strong> brings all the accumulation since the September release in one go: a new <strong>EAC co-paid channel</strong>, the signing gateway and anti-abuse gates behind it, and contributors' 8 PRs.</p><ul><li><strong>EAC co-paid channel (desktop only)</strong> — adds six flagship models: DeepSeek V4.1 Flash (1M context · vision · thinking Off/Low/High/Extreme · 384K output), Kimi K3 (1M · vision · strong reasoning · Agentic), Kimi K2.6 (262K · vision), GLM-5.3 / GLM-5.3 Flash (1M · deep thinking), GPT-OSS 20B (open weights). Channel credentials are sealed in the plugin in three shards with AES-256-GCM, derived at runtime via HKDF; the host gate confirms the desktop side before unlocking (the web profile has 0 EAC model rows), and when locked, LANE_LOCKED fails once with no retry storm.</li><li><strong>Signing gateway: keys never leave the server</strong> — the relay's real key lives only in the gateway environment; plugin requests carry an HMAC-SHA256 signature (replay window ±600s, constant-time comparison, multi-key rotation in parallel, only two routes allowed). <strong>SSE prelude</strong>: as soon as signature verification passes it returns 200 + stream head + keepalive heartbeat, so a reasoning model's 20–140s first-token wait is no longer cut by nginx 60s / Cloudflare 100s (a measured 124-second GLM-5.3 completed in full); upstream refusals travel as in-stream error frames, classified as before.</li><li><strong>Seven anti-abuse gates measured</strong> — no signature / forged / replay 401, outside-allowlist 403, over 8MB 413, unknown route 404, 61 requests/minute 429, every gate verified with real requests; plus 20 concurrency/IP + model allowlist + Cloudflare edge; the gateway dashboard accounts IPs by salted hash, and the New API panel sidebar automatically mounts an \"EAC Dashboard\" entry.</li><li><strong>Thinking control</strong> — the level menu copies ZCode's model declarations (DeepSeek Off/Low/High/Extreme, Kimi Low/High/Extreme, GLM Low/High/Extreme, GPT-OSS Low/Medium/High), and the default level must be inside its own menu; EAC requests carry an anti-overthinking system prompt, with silent turns auto-continued as a backstop.</li><li><strong>Contributor PRs merged</strong> — #23/#24/#25/#27/#35/#36/#37/#38/#39: forwarding LAN relay, sync dual-start race, port step-up notices, refusal/pause_turn continuation, etc.</li><li><strong>Experience details</strong> — front-proxy HTML error pages are simplified to one readable line of copy; the free lane's rate-limit badge becomes \"Temporarily unavailable\" (it was always fluctuation in the upstream public pool, not your quota).</li></ul><p>All 21 offline suites pass, and the manifest is Ed25519-re-signed byte-by-byte. The EAC channel is visible only on the dsh desktop side; please go to <strong>Settings → Plugin Upgrade</strong> for the one-click upgrade.</p>"
     },
     {
       "id": "2026-10-02-v1.3.2-release",
-      "title": "v1.3.2：自更新信任链加签名（#19）；转发端口工具调用修复（#20/#21）；限额退避（#13）；热力图贴合并（#11）",
+      "title": "v1.3.2: Self-update trust chain signed (#19); forwarding-port tool calls fixed (#20/#21); quota backoff (#13); heatmap tiles merged (#11)",
       "level": "update",
       "pinned": false,
       "createdAt": "2026-10-02T12:00:00Z",
-      "html": "<p><strong>Our Free Model v1.3.2</strong> 处理了 issue 追踪单上的五条：</p><ul><li><strong>自更新信任链换根（#19）</strong>——此前升级清单就是一份 HTTPS 拉下来的裸 JSON，文件哈希写在清单里，伪造清单的人连哈希一起伪造；jsDelivr 这个第三方 CDN 也在信任链上。现在每份清单必须带发布私钥的 <strong>Ed25519 签名</strong>，公钥 pin 在插件内，私钥不入仓：镜像（含 jsDelivr）被投毒只会导致升级失败，不再可能变成代码执行。<code>feedUrl</code> 设置与更新源彻底解耦（只重定向公告）；清单 <code>base</code> 只允许相对路径；插件 API 请求体加 1MB 上限；转发监听改按 DNS 解析绑定、要求全回环，hosts 文件把 localhost 指到可路由接口不再能漏配额。</li><li><strong>转发端口下工具调用修复（#20/#21）</strong>——流式 <code>tool_calls[].index</code> 此前与 reasoning 块共用计数器，首个工具调用常以 index 2+ 到达，按 index 累积的客户端拿到带洞数组、参数被并丢；现在按调用重编从 0 起。模型去调 <code>bash</code>/<code>read</code>/<code>grep</code> 这些为过指纹门而追加的诱饵工具（#21 报的 <code>Unknown tool 'bash'</code> 正是它们）时，调用在转发口被按块抑制，不再把客户端没注册的工具递过去。被输出上限截断的工具参数回合，流式也如实回 <code>length</code>。<code>/v1/responses</code> 支持 <code>instructions</code>/<code>max_output_tokens</code>/流式，流式 output_index 不再碰撞。</li><li><strong>达到限额的体验（#13）</strong>——车道的 429 自带递增的 retry-after，插件此前还会自动重试两次，把一面墙撞成三面；现在 429 当场上报。可用性探测整轮全 429 后按 30→120 分钟指数退避（手动 reprobe、出口变化、启动轮不受限），探测不再和你的回合抢同一个按 IP 计额的池子。测速按钮改用默认档并放宽前端超时，不再几乎必失败还烧配额。</li><li><strong>热力图贴合并（#11）</strong>——格子 gap 归零、圆角收小，GitHub contribution graph 式连贯观感。</li><li><strong>其它</strong>——前端按路由放宽超时（测速 240s、升级 600s）；公告推送断连后按 30s→5min 退避重连，不再永久失效；升级完成会清掉旧错误横幅；store 落盘失败会在日志说一次。</li></ul><p>全部 20 个离线套件与 <code>tsc --noEmit</code> 通过，并在真实 dsh 宿主上完成安装与升级链路验收。请前往 <strong>设置 → 插件升级</strong> 一键升级。</p>"
+      "html": "<p><strong>Our Free Model v1.3.2</strong> handles five items from the issue tracker:</p><ul><li><strong>Self-update trust chain re-rooted (#19)</strong> — previously the upgrade manifest was just a bare JSON pulled over HTTPS, with file hashes written in the manifest, so whoever forged the manifest forged the hashes along with it; jsDelivr, a third-party CDN, was also in the trust chain. Now every manifest must carry an <strong>Ed25519 signature</strong> from the release private key, with the public key pinned in the plugin and the private key not in the repository: a poisoned mirror (including jsDelivr) can only cause the upgrade to fail, no longer to become code execution. The <code>feedUrl</code> setting is fully decoupled from update sources (it only redirects announcements); the manifest <code>base</code> allows only relative paths; plugin API request bodies gain a 1MB cap; the forwarding listener now binds by DNS resolution and requires full loopback, so a hosts file pointing localhost at a routable interface can no longer leak quota.</li><li><strong>Tool calls under the forwarding port fixed (#20/#21)</strong> — streaming <code>tool_calls[].index</code> previously shared a counter with reasoning blocks, so the first tool call often arrived at index 2+, and clients accumulating by index got a holed array with parameters merged and lost; now calls are renumbered from 0. When the model calls the decoy tools <code>bash</code>/<code>read</code>/<code>grep</code> appended to pass the fingerprint gate (the <code>Unknown tool 'bash'</code> reported in #21 is exactly them), the call is suppressed block-by-block at the forwarding port, no longer handing the client a tool it never registered. A tool-argument turn truncated by the output cap also truthfully returns <code>length</code> in streaming. <code>/v1/responses</code> supports <code>instructions</code>/<code>max_output_tokens</code>/streaming, and streaming output_index no longer collides.</li><li><strong>The at-quota experience (#13)</strong> — the lane's 429 carries an increasing retry-after, and the plugin previously also auto-retried twice, turning one wall into three; now a 429 is reported on the spot. After a whole round of availability probing returns all 429s, it backs off exponentially from 30→120 minutes (manual reprobe, egress changes and startup rounds are unlimited), so probing no longer fights your turns for the same per-IP-counted pool. The speed-test button uses the default level and relaxes the frontend timeout, no longer almost certain to fail while also burning quota.</li><li><strong>Heatmap tiles merged (#11)</strong> — cell gap zeroed, corner radius shrunk, for a coherent GitHub contribution-graph feel.</li><li><strong>Other</strong> — the frontend relaxes timeouts by route (speed test 240s, upgrade 600s); after an announcement push disconnects it reconnects with 30s→5min backoff instead of failing permanently; a completed upgrade clears the old error banner; a store write failure is said once in the log.</li></ul><p>All 20 offline suites and <code>tsc --noEmit</code> pass, with installation and upgrade-chain acceptance completed on a real dsh host. Please go to <strong>Settings → Plugin Upgrade</strong> for the one-click upgrade.</p>"
     },
     {
       "id": "2026-09-27-v1.3.1-release",
-      "title": "v1.3.1：工具结果终于送达模型（#9）；被掐断的长思考不再算成功（#10）；上游来源写进 README（#8）",
+      "title": "v1.3.1: Tool results finally delivered to the model (#9); cut-off long thinking no longer counts as success (#10); upstream sources written into the README (#8)",
       "level": "update",
       "pinned": false,
       "createdAt": "2026-09-27T04:00:00Z",
-      "html": "<p><strong>Our Free Model v1.3.1</strong> 处理了 issue 追踪单上的三条：</p><ul><li><strong>工具调用与工具结果没有送给模型（#9）</strong>——dsh 在两个世代里用了两种消息形状记录工具结果：V4 之前是<strong>带 <code>tool-result</code> 内容块的 user 消息</strong>，V4 起才是 <code>role:'tool'</code> 消息。插件只认后者，于是在 <code>dsh</code> 0.1.5 / AIO 6.9.3 这一代内核上，免费车道的每一个 agent 任务都发不出工具结果：模型反复发出同一个调用、坚持说「图片读取未返回内容」，直到你手动停止。现在两种形状都会被识别并投影到三条线格式上，嵌在工具结果里的图像也不再被丢掉。同一轮里还有一个附带修复：为了过免费层指纹门而追加的 <code>bash</code> 诱饵工具会被模型真的去调用（一次会话里 24 次全部 unknown tool），现在改为把内核真实的 shell 工具（Windows 上这一代叫 <code>pwsh</code>）提升去占那个名字，调用回来时再还原成真实工具名，因此是可执行的。</li><li><strong>流被上游提前关闭时被当成正常说完（#10）</strong>——网关在既没发 finish token 也没发 usage 帧的情况下直接关闭 SSE 流时，插件会落到兜底的 <code>stop</code>，于是「模型思考了五分钟然后没了动静」这一轮被标记为完成，统计里还是 <code>ok:true / 0 tokens</code>。现在这会当场判为失败：界面上写出「本轮运行失败」和截断发生在第几秒，统计行留下 <code>truncated</code> 与 <code>noUsage</code> 以便审计。重发只留给「一个 token 都没出来」那种截断——在一次真实 <code>dsh</code> web 会话里实测过：这条车道稳定在 304 秒掐断纯思考轮次，而当时代码可重试，harness 就把同一个五分钟的回答重发两遍（<code>llm/retry</code> 落在 304s 与 608s，<code>turn/end</code> 在 912s），三次同样的失败、十五分钟，最后仍然没有回答。上限是这轮长度带来的，不是网络抖动，重发拦不住它。</li><li><strong>上游来源写进 README（#8）</strong>——新增「上游是哪些源」一节：只有一个，OpenCode 的 Zen 网关（<code>https://opencode.ai</code>），用其公开免密额度，不经任何第三方中转或号池；会出网的目标一共四类，逐项列出。</li></ul><p>已在 <code>dsh</code> 0.1.5 与 0.1.7 两代内核的真实会话记录上交叉验证。请前往 <strong>设置 → 插件升级</strong> 一键升级。</p>"
+      "html": "<p><strong>Our Free Model v1.3.1</strong> handles three items from the issue tracker:</p><ul><li><strong>Tool calls and tool results were not sent to the model (#9)</strong> — dsh used two message shapes across two generations to record tool results: before V4 it was a <strong>user message with a <code>tool-result</code> content block</strong>, and from V4 it is a <code>role:'tool'</code> message. The plugin recognized only the latter, so on the <code>dsh</code> 0.1.5 / AIO 6.9.3 generation of kernels, every agent task on the free lane could not send out tool results: the model repeatedly issued the same call, insisting \"the image read returned no content\", until you stopped it manually. Now both shapes are recognized and projected onto the three wire formats, and images embedded in tool results are no longer dropped. The same round carries an accompanying fix: the <code>bash</code> decoy tool appended to pass the free-tier fingerprint gate would really be called by the model (24 times in one session, all unknown tool), and now the kernel's real shell tool (called <code>pwsh</code> on Windows in this generation) is promoted to occupy that name, and restored to the real tool name when the call returns, so it is executable.</li><li><strong>A stream closed early by the upstream was treated as finishing normally (#10)</strong> — when the gateway closed the SSE stream having sent neither a finish token nor a usage frame, the plugin fell back to <code>stop</code>, so a turn where \"the model thought for five minutes and then went silent\" was marked complete, with statistics still showing <code>ok:true / 0 tokens</code>. Now this is judged a failure on the spot: the UI writes \"this turn's run failed\" and at which second the truncation happened, and the statistics row leaves <code>truncated</code> and <code>noUsage</code> for audit. A resend is reserved only for truncations where \"not a single token came out\" — measured in a real <code>dsh</code> web session: this lane reliably cuts pure-thinking turns at 304 seconds, and with the code then retryable, the harness resent the same five-minute answer twice (<code>llm/retry</code> landing at 304s and 608s, <code>turn/end</code> at 912s), three identical failures, fifteen minutes, and still no answer in the end. The cap is brought by this turn's length, not network jitter, and resending cannot stop it.</li><li><strong>Upstream sources written into the README (#8)</strong> — adds an \"Which sources are upstream\" section: there is only one, OpenCode's Zen gateway (<code>https://opencode.ai</code>), using its public password-free quota, with no third-party relay or account pool; there are four classes of egress targets in total, listed item by item.</li></ul><p>Cross-validated on real session records from both the <code>dsh</code> 0.1.5 and 0.1.7 kernel generations. Please go to <strong>Settings → Plugin Upgrade</strong> for the one-click upgrade.</p>"
     },
     {
       "id": "2026-09-26-v1.3.0-release",
-      "title": "v1.3.0：新增托管安装模式，适配生态整合包；修复转发端口重复重启",
+      "title": "v1.3.0: New managed installation mode, adapting to the ecosystem integration pack; forwarding port repeated restarts fixed",
       "level": "update",
       "pinned": false,
       "createdAt": "2026-09-26T12:00:00Z",
-      "html": "<p><strong>Our Free Model v1.3.0</strong> 为进入 EAC 生态整合包做准备：</p><ul><li><strong>托管安装模式（distribution=managed）</strong>——插件被整合包/包管理器接管时，应用内自升级、公告源与热重载全部停机（相应接口返回 409），发布字节与更新时机交给托管方；设置接口无法反转托管状态。自行安装的用户完全不受影响。</li><li><strong>上游内核依赖收敛到 adapter/</strong>——全包唯一允许 import <code>@deepseek-ai/*</code> 的位置是 <code>adapter/kernel.js</code>，其余模块一律经 seam 引用，由测试门禁固化，防止上游耦合重新扩散。</li><li><strong>修复转发端口重复重启</strong>——此前设置页每次保存都会把已满足 host:port 的本地转发服务重启一次，客户端拷出的 Bearer 也会随之失效；现在期望已满足时直接复用现有服务。</li><li><strong>目录与完整性记录</strong>——新增 manifest 0.15 目录记录（catalog/dsh-plugin.json）、provenance 与 integrity 清单，全部 SHA-256 由构建脚本按 LF 归一化后的实际字节生成，无任何占位或捏造值。</li></ul><p>自行安装的用户请前往 <strong>设置 → 插件升级</strong> 一键升级；托管安装用户的更新节奏由整合包安排。</p>"
+      "html": "<p><strong>Our Free Model v1.3.0</strong> prepares for entry into the EAC ecosystem integration pack:</p><ul><li><strong>Managed installation mode (distribution=managed)</strong> — when the plugin is taken over by an integration pack / package manager, in-app self-upgrade, the announcement source and hot reload all shut down (the corresponding endpoints return 409), and release bytes and update timing are handed to the managing party; the settings interface cannot reverse the managed state. Self-installed users are completely unaffected.</li><li><strong>Upstream kernel dependency converged to adapter/</strong> — the only place in the whole package allowed to import <code>@deepseek-ai/*</code> is <code>adapter/kernel.js</code>; every other module references it through the seam, solidified by a test gate, preventing upstream coupling from spreading again.</li><li><strong>Forwarding port repeated restarts fixed</strong> — previously every save on the settings page restarted a local forwarding service whose host:port was already satisfied once, and the Bearer copied out by clients would expire with it; now, when the expectation is already satisfied, the existing service is reused directly.</li><li><strong>Catalogue and integrity records</strong> — adds manifest 0.15 catalogue records (catalog/dsh-plugin.json), provenance and integrity manifests, all SHA-256 generated by the build script from the actual bytes after LF normalization, with no placeholder or fabricated values.</li></ul><p>Self-installed users, please go to <strong>Settings → Plugin Upgrade</strong> for the one-click upgrade; managed-install users' update cadence is arranged by the integration pack.</p>"
     },
     {
       "id": "2026-09-26-v1.2.2-release",
-      "title": "v1.2.2：一键升级已修复；思考档位按模型抬高；不可用模型不再进选择器",
+      "title": "v1.2.2: One-click upgrade fixed; thinking levels raised per model; unavailable models no longer enter the picker",
       "level": "update",
       "pinned": false,
       "createdAt": "2026-09-26T02:00:00Z",
-      "html": "<p><strong>Our Free Model v1.2.2</strong> 逐条处理了 issue 追踪单上的问题：</p><ul><li><strong>应用内升级恢复可用（#1）</strong>——1.2.1 的发布清单与实际文件不一致，任何旧版本点「一键升级」都会在校验阶段失败。清单已随版本重新生成，并新增 <code>build-manifest.mjs --check</code>：清单与实物不一致就非零退出，已接进 <code>npm test</code> 与 CI。</li><li><strong>思考关不掉的模型不再被频繁截断（#2）</strong>——MiMo V2.6 这类模型的思考与正文共用同一份额度，三档整体抬高为 4 096 / 16 384 / 模型上限；设置页每张模型卡与思考档位的说明文字都改为按真实下发的数字生成，不再出现「界面写 8K、实际发 16K」。</li><li><strong>探测判定不可用的模型不再进选择器（#3）</strong>——只有网关明确点名「这个 id 不路由」才移出下拉框，并在设置页保留拒因；5xx、限流、超时断网都不再被当作对模型的判定，全新安装里还没探测完的模型照常可选。</li><li><strong>无浏览器界面的 composition 也能装（#4）</strong>——插件只把模型车道当作硬依赖；设置页半身挂在它自己的 fiber 上，等 web 服务出现再挂载，所以在没有 web server 的环境里模型照样出得来。（真实 dsh-tui 环境尚未实机验证。）</li><li><strong>流式响应认出 body 而不是 header（#6）</strong>——网关高负载下会用 <code>application/json</code> 的 content-type 回一整套 SSE 帧；现在按响应体形状判定，已嗅探的字节会重新喂回流里，既不会整轮报错，也不会把能用的模型误判成不可用。</li></ul><p>旧版本用户请前往 <strong>设置 → 插件升级</strong> 一键升级；新安装用户无需任何操作。（#5 提出的多出口节点轮询不在实现范围内。）</p>"
+      "html": "<p><strong>Our Free Model v1.2.2</strong> handles the issues on the tracker one by one:</p><ul><li><strong>In-app upgrade usable again (#1)</strong> — the 1.2.1 release manifest did not match the actual files, so any old version clicking \"One-click upgrade\" would fail at the verification stage. The manifest has been regenerated with the version, and a new <code>build-manifest.mjs --check</code> is added: if the manifest does not match the real files it exits non-zero, already wired into <code>npm test</code> and CI.</li><li><strong>Models whose thinking cannot be turned off are no longer truncated frequently (#2)</strong> — models like MiMo V2.6 share one quota between thinking and body text, so the three levels are raised overall to 4 096 / 16 384 / the model cap; the explanatory text on every model card and thinking level on the settings page is now generated from the numbers actually sent, so \"the UI says 8K, it actually sends 16K\" no longer occurs.</li><li><strong>Models probed as unavailable no longer enter the picker (#3)</strong> — only when the gateway explicitly names \"this id is not routed\" is it removed from the dropdown, with the refusal reason kept on the settings page; 5xx, rate limits, timeouts and network cuts are no longer treated as a verdict on the model, and models not yet probed on a fresh install remain selectable as usual.</li><li><strong>A composition without a browser UI can also install (#4)</strong> — the plugin treats only the model lanes as a hard dependency; the settings page's other half hangs on its own fiber and mounts when the web service appears, so models come out fine in an environment with no web server. (Not yet verified on a real dsh-tui environment.)</li><li><strong>Streaming responses recognized by body, not header (#6)</strong> — under high load the gateway will reply with a whole set of SSE frames under an <code>application/json</code> content-type; now this is judged by the response body's shape, sniffed bytes are fed back into the stream, so it neither errors out the whole turn nor misjudges a usable model as unavailable.</li></ul><p>Old-version users, please go to <strong>Settings → Plugin Upgrade</strong> for the one-click upgrade; new-install users need do nothing. (The multi-egress node polling proposed in #5 is out of scope.)</p>"
     }
   ]
 }

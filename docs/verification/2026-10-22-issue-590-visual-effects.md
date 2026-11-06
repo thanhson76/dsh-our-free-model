@@ -1,63 +1,63 @@
-# Issue 590：视觉特效开关与本机性能对照
+# Issue 590: Visual Effects Toggle and Local Performance Comparison
 
-## 环境和方法
+## Environment and method
 
-- 本机 macOS 15.0、Apple M1 Pro（14 核 GPU）、Retina 屏幕；不是 issue 报告者的 Windows Iris Xe 环境。
-- 用户打开原生 DSH 设置窗口后，已在实际安装插件页面完成对照；本机安装包记录为 2.5.8，仅替换前端文件并通过插件内置热重载加载，未升级后端。
-- 在本机 Chrome 使用同一窗口、同一 1200×711 CSS 像素视口、同一个真实 React 19.1.1 预览壳与本地替身后端。原版使用本机已安装 2.5.8 的真实 `client.js`；其 CSS 与 2.5.9 完全相同。候选使用工作区真实前端文件。
-- 每组静置采样 30 秒，每秒通过 IOAccelerator 的 `Device Utilization %` 读取整机 GPU；通过进程累计 CPU 时间差统计 Chrome 全进程组 CPU，同时记录 RSS 和 WindowServer。CPU 百分比以单核为 100%，并非整机 CPU 百分比。
-- GPU 包含其他后台应用，不能直接归因成插件独占值；通过同一候选前端的开、关重复测试检查因果方向。各组保持其他应用状态，不运行生成请求作为测量负载。
+- Local machine: macOS 15.0, Apple M1 Pro (14-core GPU), Retina screen; not the issue reporter's Windows Iris Xe environment.
+- After the user opened the native DSH settings window, the comparison was carried out on the actually installed plugin page; the local installer package is recorded as 2.5.8, only the frontend files were replaced and loaded through the plugin's built-in hot reload, and the backend was not upgraded.
+- In local Chrome, the same window, the same 1200×711 CSS pixel viewport, the same real React 19.1.1 preview shell and a local stand-in backend were used. The original used the real `client.js` of the locally installed 2.5.8; its CSS is identical to 2.5.9. The candidate used the real frontend files from the workspace.
+- Each group was sampled at rest for 30 seconds, reading whole-machine GPU once per second via IOAccelerator's `Device Utilization %`; Chrome's whole process-group CPU was counted from the difference in cumulative process CPU time, while RSS and WindowServer were also recorded. CPU percentages take a single core as 100%; they are not whole-machine CPU percentages.
+- The GPU includes other background applications and cannot be attributed directly as a plugin-only value; the causal direction was checked by repeated on/off tests with the same candidate frontend. Each group kept the state of other applications unchanged and did not run generation requests as the measurement load.
 
-## 浏览器隔离对照
+## Isolated browser comparison
 
-| 状态 | GPU 均值 | GPU 中位数 | Chrome 进程组 CPU 均值 | Chrome RSS 均值 |
+| State | GPU mean | GPU median | Chrome process-group CPU mean | Chrome RSS mean |
 | --- | ---: | ---: | ---: | ---: |
-| 原版页面 | 71.50% | 72% | 65.45% | 773.21 MiB |
-| 候选：特效关闭 | 28.27% | 27% | 51.29% | 784.86 MiB |
-| 候选：特效开启 | 71.77% | 72% | 67.04% | 807.95 MiB |
-| 候选：再次关闭 | 27.77% | 27% | 52.17% | 791.13 MiB |
+| Original page | 71.50% | 72% | 65.45% | 773.21 MiB |
+| Candidate: effects off | 28.27% | 27% | 51.29% | 784.86 MiB |
+| Candidate: effects on | 71.77% | 72% | 67.04% | 807.95 MiB |
+| Candidate: off again | 27.77% | 27% | 52.17% | 791.13 MiB |
 
-重复关闭组较原版 GPU 均值降低约 61.2%；开启可恢复高负载，关闭可再次降低。没有观察到 RSS 改善，不能把本次修复描述为内存优化。此结果验证本机浏览器中前端视觉开关的效果；原生 DSH 结果单独记录如下，不代表 Windows Iris Xe 验收。
+Compared with the original, the repeated-off group lowered the GPU mean by about 61.2%; turning effects on restored the high load, and turning them off lowered it again. No RSS improvement was observed, so this fix must not be described as a memory optimization. This result verifies the effect of the frontend visual toggle in the local browser; the native DSH results are recorded separately below and do not represent acceptance on Windows Iris Xe.
 
-另有 20 秒 DSH 后台参考样本：DSH 进程组 CPU 平均 0.61%，整机 GPU 平均 15.6%。该样本没有可见 OFM 页面，仅作背景参考，未用于计算修复收益。
+There was also a 20-second DSH background reference sample: the DSH process group averaged 0.61% CPU and the whole-machine GPU averaged 15.6%. That sample had no visible OFM page; it serves only as background reference and was not used to compute the benefit of the fix.
 
-## 原生 DSH 同机对照
+## Same-machine comparison in native DSH
 
-免费模型页实际可用度为 0%，空鱼缸仍保留。每组 30 秒，通用设置页参考为 20 秒；原生组统计 DSH 全进程组，不含 WindowServer。
+The Free models page's actual availability was 0%, and the empty aquarium was retained. Each group lasted 30 seconds; the general settings page reference lasted 20 seconds; the native groups count the whole DSH process group, excluding WindowServer.
 
-| 状态 | 整机 GPU 均值 | DSH CPU 均值 | DSH RSS 均值 |
+| State | Whole-machine GPU mean | DSH CPU mean | DSH RSS mean |
 | --- | ---: | ---: | ---: |
-| 初版关闭（尚未暂停空缸） | 99.90% | 53.79% | 536.75 MiB |
-| 最终候选关闭 | 74.87% | 0.47% | 627.35 MiB |
-| 最终候选开启 | 99.60% | 41.72% | 612.72 MiB |
-| 最终候选再次关闭 | 76.83% | 0.63% | 613.18 MiB |
-| 通用设置页参考（20 秒） | 71.75% | 0.57% | 505.04 MiB |
+| First version off (empty tank not yet paused) | 99.90% | 53.79% | 536.75 MiB |
+| Final candidate off | 74.87% | 0.47% | 627.35 MiB |
+| Final candidate on | 99.60% | 41.72% | 612.72 MiB |
+| Final candidate off again | 76.83% | 0.63% | 613.18 MiB |
+| General settings page reference (20 seconds) | 71.75% | 0.57% | 505.04 MiB |
 
-初版仅关闭装饰特效时，空缸不可见动画仍使页面持续合成，GPU 约 100%。最终候选补充暂停空缸和视口外鱼缸动画后，两次关闭的 DSH CPU 均低于 1%，GPU 回到约 75%～77%；重新开启装饰特效恢复到约 100%，验证开关效果可重复。RSS 没有改善，热重载前后的 RSS 不构成内存收益证据。
+In the first version, when only the decorative effects were turned off, the invisible animation in the empty tank still kept the page compositing continuously, with the GPU at about 100%. After the final candidate also paused the empty tank and off-viewport aquarium animations, DSH CPU was below 1% in both off runs and the GPU returned to about 75%–77%; turning the decorative effects back on restored it to about 100%, verifying that the toggle's effect is repeatable. RSS did not improve, and RSS before and after hot reload is not evidence of a memory benefit.
 
-通用设置页在没有 OFM 页面时整机 GPU 仍约 72%，因此剩余负载不能归为 OFM 独占。另查到本机已安装壁纸引擎，其代码对整个设置窗口应用毛玻璃，默认模糊值为 60；这是可能的宿主合成成本来源，尚未通过禁用对照确认。本轮未修改壁纸引擎或其他插件设置。
+On the general settings page, with no OFM page present, the whole-machine GPU was still about 72%, so the remaining load cannot be attributed to OFM alone. The locally installed wallpaper engine was also found to apply frosted glass to the entire settings window in its code, with a default blur value of 60; this is a possible source of host compositing cost and has not yet been confirmed by a disable-and-compare test. This round did not change the wallpaper engine or other plugin settings.
 
-原生截图和原始采样只保存在本机，未公开上传；有水时的鱼群、波浪在前述隔离预览中验证，最终候选另有空缸、离开视口及恢复的回归检查。
+Native screenshots and raw samples are kept only on the local machine and were not uploaded publicly; the fish and waves when there is water were verified in the isolated preview described above, and the final candidate also has regression checks for the empty tank, leaving the viewport, and resuming.
 
-## 功能验证
+## Functional verification
 
-- 默认关闭装饰特效；关闭时无全屏光斑节点，主面板计算样式 `backdrop-filter: none`。
-- 鱼缸的水位、无障碍标签和可用度保留；有水且可见时，关闭装饰特效仍有 3 条鱼、5 个气泡、2 层波浪和缸内光线动画。
-- 原生实测暴露空缸仍运行不可见动画的问题，已补充空缸及鱼缸离开视口时暂停、恢复可见且有水时继续的处理；回归覆盖观察器释放。
-- 开启后恢复光斑节点与 `blur(18px)` 毛玻璃样式；再次关闭即时生效，重载后开关保持关闭。
-- 系统减少动态效果模拟下，鱼缸内容和 100% 可用度标签保留，鱼的计算样式为 `animation-name: none`；检查后已取消模拟。
-- 360px 窄屏检查：文档宽度 360px，无横向溢出，开关在可视区域内；检查后已恢复真实视口。
-- 新增回归覆盖默认关闭、切换、重挂载、存储拒绝、文档可见性、鱼缸结构以及关闭数字滚动时不创建动画帧。
+- Decorative effects are off by default; when off, there are no full-screen light-spot nodes, and the main panel's computed style is `backdrop-filter: none`.
+- The aquarium's water level, accessibility labels and availability are retained; when there is water and it is visible, turning decorative effects off still leaves 3 fish, 5 bubbles, 2 wave layers and the in-tank light animation.
+- Native testing exposed the problem that an empty tank still ran invisible animation; handling was added to pause when the tank is empty or the aquarium leaves the viewport, and to continue when it becomes visible again and has water; the regressions cover observer release.
+- Turning effects on restores the light-spot nodes and the `blur(18px)` frosted-glass style; turning them off again takes effect immediately, and the toggle stays off after a reload.
+- Under a simulated system reduced-motion setting, the aquarium content and the 100% availability label are retained, and the fish's computed style is `animation-name: none`; the simulation was cancelled after the check.
+- 360px narrow-screen check: document width 360px, no horizontal overflow, and the toggle was within the visible area; the real viewport was restored after the check.
+- New regressions cover off-by-default, toggling, remounting, storage refusal, document visibility, aquarium structure, and not creating animation frames when number scrolling is off.
 
-## 执行结果
+## Execution results
 
-- `npm run test:contributor`：78/78 套件通过。
-- `node scripts/plugin-bench-ui-test.mjs`：9 项通过。
-- `node scripts/picks-ui-test.mjs`、`node scripts/client-lint.mjs`：通过。
-- `npm run typecheck`（adapter）、`npm run typecheck:standalone`：通过。
-- 独立前端已重新构建，`node scripts/build-standalone-ui.mjs --check`、`node scripts/build-standalone-channels.mjs --check`：通过。
-- `node --check client.js`、`git diff --check`：通过。
+- `npm run test:contributor`: 78/78 suites passed.
+- `node scripts/plugin-bench-ui-test.mjs`: 9 items passed.
+- `node scripts/picks-ui-test.mjs`, `node scripts/client-lint.mjs`: passed.
+- `npm run typecheck` (adapter), `npm run typecheck:standalone`: passed.
+- The standalone frontend was rebuilt; `node scripts/build-standalone-ui.mjs --check`, `node scripts/build-standalone-channels.mjs --check`: passed.
+- `node --check client.js`, `git diff --check`: passed.
 
-## 本机同步与限制
+## Local synchronization and limitations
 
-本机原插件包记录为 2.5.8，本轮仅备份并原子替换其 `client.js`，候选文件 SHA-256 与工作区一致；未修改账号、凭据、网关配置或后端实现。备份与原始采样、截图留在本机，不提交真实用户数据。已用插件内置热重载加载最终候选，完成原生页面开启、关闭、再次关闭对照，最终保留关闭状态。本轮未发布新版本，未验证 Windows/macOS 安装器或真实上游账号调用。
+The original local plugin package is recorded as 2.5.8; this round only backed up and atomically replaced its `client.js`, and the candidate file's SHA-256 matches the workspace; no accounts, credentials, gateway configuration or backend implementation were changed. The backup, raw samples and screenshots stay on the local machine, and no real user data was committed. The final candidate was loaded with the plugin's built-in hot reload, the native-page on, off and off-again comparison was completed, and the off state was kept at the end. No new version was released in this round, and no Windows/macOS installer or real upstream account call was verified.

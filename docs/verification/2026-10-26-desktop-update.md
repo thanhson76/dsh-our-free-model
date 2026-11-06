@@ -1,35 +1,35 @@
-# 桌面内置更新验证
+# Desktop Built-in Update Verification
 
-## 交付范围
+## Delivery Scope
 
-左侧管理区新增「应用更新」，沿用现有侧栏、Card、Badge、Button、设置卡片与浅深色主题。展示原生桌面版本、最新桌面版本、检查时间、更新说明、下载进度、校验与安装状态。检查与下载在本机管理服务中执行，安装交接仅由绑定当前管理窗口的 Tauri IPC 执行。
+An "App Update" section was added to the management area on the left, reusing the existing sidebar, Card, Badge, Button, settings cards, and light/dark themes. It shows the native desktop version, the latest desktop version, the check time, the release notes, download progress, and verification and installation status. Checking and downloading are performed in the local management service; the installation handover is performed only by the Tauri IPC bound to the current management window.
 
-本轮未提升产品版本、未公开发布桌面包、未替换用户现有安装。此前未内置更新栏目的桌面版需要先安装一次带此功能的新版，之后才能在应用内更新。
+In this round, the product version was not bumped, no desktop package was publicly released, and the user's existing installation was not replaced. Desktop versions from before the built-in update section existed must first install a new version with this feature once, after which they can update within the app.
 
-## 已执行验证
+## Verification Performed
 
-- `node scripts/test-all.mjs --mode contributor`：99/99 套件通过。
-- `node scripts/desktop-update-test.mjs`：9/9 通过。覆盖版本选择、插件专用 Release 排除、架构匹配、固定来源、重定向限制、SHA256SUMS、损坏与超限下载、缓存重验、并发、恢复及真实管理接口权限。
-- `cargo +1.96.1-x86_64-pc-windows-msvc test --manifest-path packages/desktop/src-tauri/Cargo.toml --release --lib`：6/6 原生测试通过。包括安装记录限制、固定路径、摘要复核、防降级、参数注入拒绝、交接等待顺序与 Windows 路径引用。
-- Playwright Chromium 渲染当前真实构建资源：7/7 页面交互检查通过，未出现页面异常。覆盖新栏目、版本与说明、下载进度、校验失败、浅深主题、固定原生安装命令及浏览器禁用安装。
-- `npm run typecheck`、`npm run typecheck:standalone`：通过。
-- `node scripts/build-standalone-ui.mjs --check`、`node scripts/build-manifest.mjs --check`、`git diff --check`：通过。已发布插件的 79 项运行时内容和签名清单保持一致。
-- 实际访问官方 GitHub Releases 的只读检查：运行桌面版本 2.7.1 时，最新桌面仍识别为 2.7.1，未把插件专用的 2.7.2 误认为桌面更新；未下载或执行安装器。
+- `node scripts/test-all.mjs --mode contributor`: 99/99 suites passed.
+- `node scripts/desktop-update-test.mjs`: 9/9 passed. Covers version selection, exclusion of plugin-only Releases, architecture matching, fixed sources, redirect limits, SHA256SUMS, corrupted and oversized downloads, cache re-verification, concurrency, recovery, and real management API permissions.
+- `cargo +1.96.1-x86_64-pc-windows-msvc test --manifest-path packages/desktop/src-tauri/Cargo.toml --release --lib`: 6/6 native tests passed. Includes installation record limits, fixed paths, digest re-checking, downgrade prevention, rejection of argument injection, handover wait ordering, and Windows path quoting.
+- Playwright Chromium rendering the current real build assets: 7/7 page interaction checks passed, with no page errors. Covers the new section, version and notes, download progress, verification failure, light and dark themes, the fixed native install command, and installation being disabled in the browser.
+- `npm run typecheck`, `npm run typecheck:standalone`: passed.
+- `node scripts/build-standalone-ui.mjs --check`, `node scripts/build-manifest.mjs --check`, `git diff --check`: passed. The published plugin's 79 runtime contents and signed manifest remain consistent.
+- A read-only check against the official GitHub Releases: with the running desktop version at 2.7.1, the latest desktop was still identified as 2.7.1, and the plugin-only 2.7.2 was not mistaken for a desktop update; no installer was downloaded or executed.
 
-首次原生编译使用机器默认 GNU 工具链时，环境缺少 dlltool 的 PATH 配置。已改用机器上现有的 MSVC 1.96.1 工具链，编译与测试通过；不将首次失败算作通过。
+When the native build was first compiled with the machine's default GNU toolchain, the environment was missing the dlltool PATH configuration. The existing MSVC 1.96.1 toolchain on the machine was used instead, and compilation and tests passed; the first failure is not counted as a pass.
 
-## 视觉证据
+## Visual Evidence
 
-以下使用真实前端与样式，版本 2.7.3 和更新说明为测试夹具，并在页面顶部明确标记测试模式；并非宣称已经发布该桌面版本。安装 IPC 使用替身，只记录固定命令，不退出真实应用。
+The following use the real frontend and styles; version 2.7.3 and the release notes are test fixtures, clearly marked as test mode at the top of the page; this does not claim that desktop version has been released. The installation IPC uses a stand-in that only records the fixed command and does not exit the real app.
 
-![浅色主题下发现桌面更新](images/desktop-update-available.png)
+![Desktop update found, light theme](images/desktop-update-available.png)
 
-![深色主题下等待安装](images/desktop-update-ready-dark.png)
+![Waiting to install, dark theme](images/desktop-update-ready-dark.png)
 
-## 安装与信任边界
+## Installation and Trust Boundaries
 
-下载仅限本仓库正式 GitHub Release 的匹配 Windows x64 安装包与同版本 SHA256SUMS，HTTPS 跳转只允许 GitHub 的资源域名。SHA 用于一致性校验，不声称它是独立数字签名。插件的 Ed25519 升级机制不受影响。
+Downloads are limited to the matching Windows x64 installer from this repository's official GitHub Releases and the SHA256SUMS for the same version; HTTPS redirects are allowed only to GitHub's asset domains. The SHA is used for consistency checking and is not claimed to be an independent digital signature. The plugin's Ed25519 upgrade mechanism is unaffected.
 
-前端不能传递安装 URL、路径或参数。原生端验证私有缓存凭据、较新稳定版本、长度、目录和 SHA 后，停止自有后台，启动隐藏交接进程；交接确认就绪后才退出应用。交接进程等待旧 PID 退出，再次核对 SHA，并使用 Tauri NSIS 支持的 `/S /R /UPDATE` 参数安装和重启。启动交接失败会尝试恢复后台，安装失败会记录错误并尝试重新打开原程序。
+The frontend cannot pass an installation URL, path, or arguments. After the native side verifies the private cache credentials, a newer stable version, the length, the directory, and the SHA, it stops its own background process and starts the hidden handover process; only after the handover confirms it is ready does it exit the app. The handover process waits for the old PID to exit, checks the SHA again, and installs and restarts using the `/S /R /UPDATE` arguments supported by Tauri NSIS. If starting the handover fails, it attempts to restore the background process; if installation fails, it records the error and attempts to reopen the original program.
 
-未实际执行会覆盖用户安装的 NSIS 安装器，也未声称已经完成真实安装器端到端验收。此项需在后续桌面发布的隔离安装环境中执行。
+The NSIS installer, which would overwrite the user's installation, was not actually executed, and no completed real-installer end-to-end verification is claimed. This item needs to be performed in an isolated installation environment for a subsequent desktop release.

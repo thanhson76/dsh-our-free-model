@@ -3,7 +3,7 @@
  *
  * Issue #3: a model the gateway names in `/inference/v1/models` but refuses to route
  * at all still appeared in the picker, so picking it spent a turn on a
- * guaranteed failure. The probe already knew — the settings page said 暂不可用 —
+ * guaranteed failure. The probe already knew — the settings page said Unavailable —
  * but `computeMembership` only ever separated the region-gated ones and left
  * every other verdict on the main route.
  *

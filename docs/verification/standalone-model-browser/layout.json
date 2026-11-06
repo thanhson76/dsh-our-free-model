@@ -1,5 +1,5 @@
 {
-  "method": "浏览器 DOM 实测；工具视口尺寸受宿主缩放影响，记录 innerWidth 与文档 scrollWidth",
+  "method": "Measured in the browser DOM; the tool viewport size is affected by host scaling; innerWidth and the document's scrollWidth were recorded",
   "layouts": [
     {
       "height": 935,

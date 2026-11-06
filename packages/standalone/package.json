@@ -3,7 +3,7 @@
   "version": "2.7.1",
   "private": true,
   "type": "module",
-  "description": "Our Free Model 独立本地服务，无需安装 DSH",
+  "description": "Our Free Model standalone local service, no DSH installation required",
   "main": "./service.mjs",
   "exports": {
     ".": "./service.mjs"

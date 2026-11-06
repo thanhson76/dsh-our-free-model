@@ -7,7 +7,7 @@ const source = fs.readFileSync(new URL('../packages/standalone/frontend/componen
 const start = source.indexOf('  const connected =')
 const end = source.indexOf('  return <>', start)
 const label = /onClick=\{\(\) => setFilter\(id\)\}>\{label\}<span>\{(.+?)\}<\/span>/.exec(source)?.[1]
-assert.ok(start >= 0 && end > start && label, '渠道筛选和实际计数标签必须可定位')
+assert.ok(start >= 0 && end > start && label, 'The channel filter and actual count labels must be locatable')
 const calculation = stripTypeScriptTypes(source.slice(start, end))
 function filterChannels(statuses, filter, search = '') {
   return vm.runInNewContext(calculation + `\n;({
@@ -15,10 +15,10 @@ function filterChannels(statuses, filter, search = '') {
   })`, {
     statuses, filter, search, selected: undefined,
     providers: [
-      { id: 'connected', name: '已接入渠道', org: '测试' },
-      { id: 'pending', name: '待接入渠道', org: '测试' },
-      { id: 'closed', name: '关闭渠道', org: '测试' },
-      { id: 'unknown', name: '未读取渠道', org: '测试' },
+      { id: 'connected', name: 'Connected channel', org: 'Test' },
+      { id: 'pending', name: 'Pending channel', org: 'Test' },
+      { id: 'closed', name: 'Closed channel', org: 'Test' },
+      { id: 'unknown', name: 'Unread channel', org: 'Test' },
     ],
   })
 }
@@ -30,13 +30,13 @@ export function verifyChannelFilters() {
   }
   for (const [filter, expectedRows] of [['all', 4], ['connected', 1], ['pending', 3]]) {
     const view = filterChannels(statuses, filter)
-    assert.deepEqual(Array.from(view.labels), [4, 1, 3], '分类数量不得随选中的筛选项变化')
+    assert.deepEqual(Array.from(view.labels), [4, 1, 3], 'Category counts must not change with the selected filter')
     assert.equal(view.rows.length, expectedRows)
   }
-  const searched = filterChannels(statuses, 'pending', '关闭')
+  const searched = filterChannels(statuses, 'pending', 'Closed')
   assert.equal(searched.rows.length, 1)
   assert.equal(searched.rows[0].id, 'closed')
-  assert.deepEqual(Array.from(searched.labels), [4, 1, 3], '分类标签显示全量统计，搜索结果数由结果栏展示')
-  assert.deepEqual(Array.from(filterChannels({}, 'all').labels), [4, 0, 4], '没有账号状态的渠道也显示为未连接')
-  assert.deepEqual(Array.from(filterChannels(undefined, 'all').labels), [4, '—', '—'], '状态加载前不显示虚构的分类数量')
+  assert.deepEqual(Array.from(searched.labels), [4, 1, 3], 'Category labels show full counts; the result count is shown by the results bar')
+  assert.deepEqual(Array.from(filterChannels({}, 'all').labels), [4, 0, 4], 'Channels with no account status are also shown as not connected')
+  assert.deepEqual(Array.from(filterChannels(undefined, 'all').labels), [4, '—', '—'], 'No invented category counts are shown before the status loads')
 }

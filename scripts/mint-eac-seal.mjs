@@ -56,7 +56,7 @@ export async function generateFiles(input, output) {
   const banner = '// Generated offline. Review and install this pair together.\n'
   await fs.writeFile(dataFile, `${banner}export const LANE_SHARDS = ${JSON.stringify(rows.slice(0, 2))}\nexport const LANE_SEAL = ${JSON.stringify(seal)}\n`, { flag: 'wx', mode: 0o600 })
   await fs.writeFile(anchorFile, `${banner}export const LANE_ANCHOR = ${JSON.stringify(rows[2])}\n`, { flag: 'wx', mode: 0o600 })
-  // 从实际落盘字节构建显式 ESM，避免继承输出目录上级的 CommonJS 类型。
+  // Build an explicit ESM from the actual bytes on disk, avoiding inheriting the CommonJS type of an output-directory parent.
   const readModule = async file => import(`data:text/javascript;base64,${(await fs.readFile(file)).toString('base64')}`)
   const data = await readModule(dataFile)
   const anchor = await readModule(anchorFile)

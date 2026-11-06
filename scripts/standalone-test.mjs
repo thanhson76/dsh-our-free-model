@@ -40,9 +40,9 @@ const upstream = http.createServer((req, res) => {
     // (/inference/openai/v1/...), so the fingerprint mock matches the origin prefix.
     if (req.url.startsWith('/inference/')) {
       anonymousRequests.push({ method: req.method, headers: req.headers })
-      // v2 指纹：上游只认 `opencode/<channel>/<version>/<client>` 这一整串。
-      // 旧实现模拟的是「按名字拒掉独立服务的归属 UA」，那条规则属于 v1；
-      // v2 反过来 —— 拼接了归属的串不再是 v2 客户端，同样被拒。
+      // v2 fingerprint: upstream only accepts the whole `opencode/<channel>/<version>/<client>` string.
+      // The old implementation simulated "reject the standalone service's attribution UA by name"; that rule belonged to v1.
+      // v2 is the reverse — a string with the attribution spliced in is no longer a v2 client and is likewise rejected.
       if (req.method === 'POST' && !/^opencode\/[a-z0-9-]+\/\d+\.\d+\.\d+\/[a-z0-9-]+$/i.test(req.headers['user-agent'] ?? '')) {
         res.writeHead(403, { 'content-type': 'application/json' })
         res.end(JSON.stringify({ error: { name: 'FreeTierError', message: 'OpenCode free tier client rejected' } }))
@@ -136,7 +136,7 @@ try {
     await assert.rejects(startStandalone({ dataDir: invalidDir, port: 65536 }), /port/)
     assert.equal(fs.existsSync(invalidDir), false)
   })
-  await check('退出时保留已被替换的其他锁，不清理无法确认归属的文件', async () => {
+  await check('on exit, other locks that were replaced are kept, and files whose ownership cannot be confirmed are not cleaned up', async () => {
     const directory = path.join(scratch, 'replaced-lock')
     const isolated = await startStandalone({ dataDir: directory, port: 0, refresh: false, logger: { warn() {} } })
     const lockFile = path.join(directory, 'service.lock')
@@ -146,7 +146,7 @@ try {
     await isolated.close()
     assert.equal(fs.readFileSync(lockFile, 'utf8'), replacement)
   })
-  await check('启动中途失败会同时释放文件锁与进程互斥端点，修复配置后可重启', async () => {
+  await check('a mid-startup failure releases both the file lock and the process mutex endpoint, and fixing the configuration allows a restart', async () => {
     const directory = path.join(scratch, 'failed-boot')
     const settingsFile = path.join(directory, 'settings.json')
     fs.mkdirSync(settingsFile, { recursive: true })
@@ -157,7 +157,7 @@ try {
     await recovered.close()
   })
   if (process.platform === 'win32' || process.platform === 'linux') {
-    await check('没有权限检查进程时保留锁，不把 EPERM 当成进程退出', async () => {
+    await check('when the process cannot be checked for lack of permission, the lock is kept and EPERM is not treated as process exit', async () => {
       const directory = path.join(scratch, 'permission-lock')
       const lockFile = path.join(directory, 'service.lock')
       fs.mkdirSync(directory)
@@ -259,7 +259,7 @@ try {
     assert.equal(kilo.status, 200)
     assert.equal((await kilo.json()).choices[0].message.content, 'kilo-ok')
   })
-  await check('独立服务的目录、探测和推理都带 v2 客户端指纹', () => {
+  await check('the standalone service catalog, probing and inference all carry the v2 client fingerprint', () => {
     assert.ok(anonymousRequests.some(req => req.method === 'GET'))
     assert.ok(anonymousRequests.filter(req => req.method === 'POST').length >= 4)
     for (const req of anonymousRequests) {
@@ -307,7 +307,7 @@ try {
     const pending = service.runtime.refreshCatalog()
     await listingStarted
     await service.close()
-    // 正常退出会刷出上一轮尚未落盘的缓存；只检查退出后没有迟到写入。
+    // A normal exit flushes the previous round's cache that has not landed yet; only check that there are no late writes after exit.
     const catalogBefore = fs.readFileSync(path.join(dataDir, 'catalog.json'), 'utf8')
     unhold()
     holdListing = undefined
@@ -318,7 +318,7 @@ try {
     await service.runtime.refreshCatalog()
     assert.equal(listingCalls, calls)
   })
-  await check('自动探测已禁用：--probe 与周期刷新都不发探测，手动探测仍可用', async () => {
+  await check('automatic probing is disabled: --probe and periodic refresh send no probes, while manual probing still works', async () => {
     const nativeTimeout = globalThis.setTimeout
     const nativeNow = Date.now
     const started = nativeNow()
@@ -327,7 +327,7 @@ try {
     let onScheduled
     let probeService
     const warnings = []
-    // 捕获真实周期任务并推进时钟，避免测试等待数十分钟。
+    // Capture the real periodic task and advance the clock, so the test does not wait tens of minutes.
     globalThis.setTimeout = (callback, ms, ...args) => {
       const handle = nativeTimeout(callback, ms, ...args)
       if (ms === 15 * 60_000) {
@@ -339,13 +339,13 @@ try {
     Date.now = () => started + elapsed
     throttleTurns = true
     const runPeriod = async () => {
-      assert.ok(periodic, '服务应安排下一轮周期任务')
+      assert.ok(periodic, 'the service should schedule the next periodic task')
       elapsed += 15 * 60_000
       clearTimeout(periodic.handle)
       let deadline
       const scheduled = new Promise((resolve, reject) => {
         onScheduled = resolve
-        deadline = nativeTimeout(() => reject(new Error('周期刷新未完成')), 5000)
+        deadline = nativeTimeout(() => reject(new Error('Periodic refresh did not complete')), 5000)
       })
       periodic.callback(...periodic.args)
       try { await scheduled } finally { clearTimeout(deadline); onScheduled = undefined }
@@ -357,15 +357,15 @@ try {
         logger: { warn: message => warnings.push(message) },
       })
       await probeService.ready
-      assert.equal(turns.length, before, '启动不得探测匿名模型')
+      assert.equal(turns.length, before, 'startup must not probe anonymous models')
       const listingsBefore = listingCalls
       await runPeriod()
-      assert.equal(listingCalls, listingsBefore + 1, '周期刷新仍更新模型清单')
-      assert.equal(turns.length, before, '周期刷新不得探测')
+      assert.equal(listingCalls, listingsBefore + 1, 'periodic refresh still updates the model catalog')
+      assert.equal(turns.length, before, 'periodic refresh must not probe')
       await probeService.runtime.refreshCatalog({ probe: true, force: true })
-      assert.equal(turns.length, before + 1, '显式手动探测仍可用')
+      assert.equal(turns.length, before + 1, 'explicit manual probing still works')
       await runPeriod()
-      assert.equal(turns.length, before + 1, '下一轮周期仍不得探测')
+      assert.equal(turns.length, before + 1, 'the next periodic round still must not probe')
     } finally {
       await probeService?.close()
       globalThis.setTimeout = nativeTimeout

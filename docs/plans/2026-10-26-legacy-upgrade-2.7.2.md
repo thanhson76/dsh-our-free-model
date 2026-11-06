@@ -1,10 +1,10 @@
-# 2.7.2 实施与验证计划
+# 2.7.2 Implementation and Verification Plan
 
-依据用户确认的直接升级设计，按以下顺序执行；不使用额外 Agent 或独立聊天。
+Execute in the following order, following the direct-upgrade design the user confirmed; do not use extra agents or separate chats.
 
-1. 建立可复现的省 Token 运行时打包与引擎压缩分片构建，明确插件发布文件列表；只提升插件版本至 2.7.2，保留桌面与独立产品版本。
-2. 实现本地分片校验与引擎原子还原，覆盖完整引擎兼容、损坏、缺片、输出边界和缓存恢复。
-3. 将原版旧升级器固定为回归夹具，验证当前真实发布文件的安装、激活、数据保留、失败回滚和再次升级；加入贡献者及发布门禁。
-4. 运行针对性检查、完整贡献者测试、类型和生成资源检查。修复实际失败，不放宽旧版约束或跳过签名。
-5. 分批中文提交，生成可审查 PR；使用现有受信任发布准备工作流取得生产签名，验证并合并。保护规则阻塞时提供可合并的具体 PR 供用户处理。
-6. 从固定发布提交构建插件包，验证产物和旧版升级路径，生成校验与来源记录，发布 v2.7.2 并核对下载资源。用户明确排除桌面端，本次不构建或发布桌面安装包。
+1. Establish a reproducible Token-saver runtime packaging and engine compression-shard build, with an explicit plugin release file list; bump only the plugin version to 2.7.2, keeping the desktop and standalone product versions unchanged.
+2. Implement local shard verification and atomic engine restoration, covering full-engine compatibility, corruption, missing shards, output boundaries and cache recovery.
+3. Pin the original legacy upgrader as a regression fixture, and verify installation, activation, data retention, failure rollback and re-upgrading against the current real release files; add contributor and release gates.
+4. Run targeted checks, the full contributor tests, and the type and generated-asset checks. Fix actual failures; do not loosen legacy constraints or skip signing.
+5. Commit in batches, in Chinese, and produce a reviewable PR; obtain a production signature through the existing trusted release-preparation workflow, verify and merge. If branch protection blocks this, provide the concrete mergeable PR for the user to handle.
+6. Build the plugin package from the pinned release commit, verify the artefacts and the legacy upgrade path, produce verification and provenance records, release v2.7.2 and check the download assets. The user explicitly excluded the desktop build, so no desktop installer is built or released this time.

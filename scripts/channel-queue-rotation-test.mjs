@@ -40,7 +40,7 @@ export async function verifyChannelQueueRotation() {
   assert.equal(await checkQueuedResponse(ordinary), ordinary)
   assert.equal(ordinary.bodyUsed, false)
 
-  // 错标为 JSON 的 SSE 必须在连接关闭前交付首块，不能预读整个响应。
+  // SSE mislabeled as JSON must deliver its first chunk before the connection closes; the whole response must not be pre-read.
   {
     let source
     const first = new TextEncoder().encode('data: {"choices":[{"delta":{"content":"first"}}]}\n\n')
@@ -53,7 +53,7 @@ export async function verifyChannelQueueRotation() {
         checkQueuedResponse(response).then(value => value.body.getReader().read()),
         new Promise(resolve => { timer = setTimeout(() => resolve('blocked'), 200) }),
       ])
-      assert.notEqual(received, 'blocked', '首块不能等待上游 close')
+      assert.notEqual(received, 'blocked', 'the first chunk cannot wait for the upstream close')
       assert.deepEqual(received.value, first)
     } finally { clearTimeout(timer); source.close() }
   }
@@ -67,7 +67,7 @@ export async function verifyChannelQueueRotation() {
     await assert.rejects(collect(consumeOpenAiSse(checked, {}, {
       label: 'fixture', firstTokenTimeoutMs: 20, chunkTimeoutMs: 20,
     })), error => error.code === 'TIMEOUT')
-    assert.equal(canceled, true, '无数据流仍由原解析器超时并取消上游')
+    assert.equal(canceled, true, 'a stream with no data is still timed out by the original parser, which cancels upstream')
   }
 
   for (const prepared of [false, true]) {
@@ -125,10 +125,10 @@ export async function verifyChannelQueueRotation() {
       const result = collect(adapter.stream({ model: 'model' }))
       if (backup) {
         assert.equal((await result)[0].text, 'ok')
-        assert.deepEqual(sent, ['a', 'b'], `${change}: 失效账号不能继续发送，备用号仍按模型过滤`)
+        assert.deepEqual(sent, ['a', 'b'], `${change}: an invalidated account cannot keep sending, and backups are still filtered by model`)
       } else {
         await assert.rejects(result, error => error.code === 'QUEUE')
-        assert.deepEqual(sent, ['a'], `${change}: 没有合规备用号时停止`)
+        assert.deepEqual(sent, ['a'], `${change}: stop when there is no compliant backup account`)
       }
     }
   }
@@ -256,7 +256,7 @@ export async function verifyChannelQueueRotation() {
       const upstream = async (_url, init) => {
         if (init?.method !== 'POST') return Response.json({ data: [] })
         const open = transport.startsWith('open-sse') || transport.includes('-async-')
-        if (open) assert.equal(pending, false, `${provider}: 新请求发出前必须等待旧响应取消完成`)
+        if (open) assert.equal(pending, false, `${provider}: a new request must wait until the old response cancellation completes before being sent`)
         const headers = [...new Headers(init?.headers).values()].join(' ')
         const id = headers.includes('fixture-a') ? 'a' : headers.includes('fixture-b') ? 'b' : undefined
         assert.ok(id, `${provider}: actual request carries account credential`)
@@ -323,14 +323,14 @@ export async function verifyChannelQueueRotation() {
             assert.ok(chunks.some(chunk => chunk.text === 'partial'))
           }
           assert.deepEqual(sent, ['a'])
-          assert.deepEqual(canceled, ['a'], '输出后也要取消旧响应，但不得重发')
-          assert.equal(pending, false, '提前退出或抛错也必须等待原始上游取消完成')
+          assert.deepEqual(canceled, ['a'], 'the old response must be cancelled even after output, but the request must not be resent')
+          assert.equal(pending, false, 'an early exit or error must also wait for the original upstream cancellation to complete')
           continue
         }
         const chunks = await collect(call.stream({ model, messages: [{ role: 'user', content: [{ type: 'text', text: 'hello' }] }] }))
         assert.deepEqual(sent, ['a', 'a', 'a', 'b'], `${provider} ${transport}: rotates before output`)
         assert.ok(chunks.some(chunk => chunk.text === 'ok' || chunk.delta === 'ok'), `${provider} ${transport}: returns answer`)
-        if (transport === 'open-sse' || transport.includes('-async-')) assert.deepEqual(canceled, ['a', 'a', 'a'], `${provider}: 所有排队响应均已完成取消`)
+        if (transport === 'open-sse' || transport.includes('-async-')) assert.deepEqual(canceled, ['a', 'a', 'a'], `${provider}: all queued responses have completed cancellation`)
       } finally { globalThis.fetch = fetchBefore }
     }
     console.log(`ok  channel queue registered ${provider}: HTTP + SSE + fragmented JSON 200 + mislabeled SSE`)
@@ -371,9 +371,9 @@ export async function verifyChannelQueueRotation() {
     const model = adapter.listAllModels()[0].id
     const call = await mounted.prepareCall(provider, model)
     await collect(call.stream({ model, messages: [{ role: 'user', content: [{ type: 'text', text: 'hello' }] }] }))
-    assert.deepEqual(sent, quotaFirst ? ['a', 'b', 'b', 'b', 'c'] : locked ? ['a', 'a', 'a', 'a'] : ['a', 'a', 'a', 'b'], `${provider}: 保留积分锁定及真实换号状态`)
+    assert.deepEqual(sent, quotaFirst ? ['a', 'b', 'b', 'b', 'c'] : locked ? ['a', 'a', 'a', 'a'] : ['a', 'a', 'a', 'b'], `${provider}: preserve the credits lock and the real account-rotation state`)
     assert.deepEqual(marked, quotaFirst ? ['a'] : [])
-    assert.ok(nextCalls > 0, '排队换号必须沿用渠道选号策略')
+    assert.ok(nextCalls > 0, 'queue rotation must follow the channel account-selection strategy')
     console.log(`ok  channel queue ${provider}: ${quotaFirst ? 'quota → queue keeps actual account' : locked ? 'permanent credits locked' : 'permanent credits allowed'}`)
   }
   const { LoomyAdapter } = await import('../vendor/channel-pack/src/loomy-adapter.ts')
@@ -402,7 +402,7 @@ export async function verifyChannelQueueRotation() {
     const adapter = withQueueAccountRotation('loomy', {
       credentialRef: 'fixture', accountPool: pool,
       resolveCredential: async model => (await select(model))?.credential,
-      refresh: async () => { throw new Error('余额策略失败不能触发认证续期') }, nextAccount: select,
+      refresh: async () => { throw new Error('a balance policy failure must not trigger an auth refresh') }, nextAccount: select,
       fetchImpl: async (_url, init) => {
         const id = new Headers(init.headers).get('authorization').slice(7)
         sent.push(id)
@@ -416,12 +416,12 @@ export async function verifyChannelQueueRotation() {
     const stream = collect(adapter.stream({ model, messages: [{ role: 'user', content: [{ type: 'text', text: 'hello' }] }] }))
     if (locked && !addBackup) {
       await assert.rejects(stream, error => error.code === 'QUEUE')
-      assert.deepEqual(sent, Array(6).fill('a'), '每日额度耗尽后不能发出第七次请求')
+      assert.deepEqual(sent, Array(6).fill('a'), 'after the daily quota is exhausted, a seventh request must not be sent')
     } else {
       await stream
       assert.deepEqual(sent, [...Array(6).fill('a'), addBackup ? 'b' : 'a'])
     }
-    assert.ok(checked.some(([id, time]) => id === 'a' && time >= 60_000), '沿用真实余额缓存，并在过期后重查')
+    assert.ok(checked.some(([id, time]) => id === 'a' && time >= 60_000), 'reuse the real balance cache and re-check after it expires')
     console.log(`ok  Loomy queue after balance TTL: locked=${locked}, backup=${addBackup}, unknown=${unknown}`)
   }
   const { verifyChannelQueuePolicies } = await import('./channel-queue-policy-test.mjs')

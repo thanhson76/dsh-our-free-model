@@ -38,7 +38,7 @@ const frames = (text, tool = false) => {
 const token = domain => ({
   access_token: `fixture-${domain}`, refresh_token: 'fixture-refresh', domain,
   expires_at: String(Date.now() + 86400000), refresh_expires_at: String(Date.now() + 7 * 86400000),
-  user_id: 'fixture-user', nickname: '替身账号', account_type: 'personal',
+  user_id: 'fixture-user', nickname: 'Fixture account', account_type: 'personal',
 })
 const upstream = http.createServer(async (req, res) => {
   const chunks = []
@@ -75,7 +75,7 @@ const upstream = http.createServer(async (req, res) => {
     assert.equal(body.refreshToken, 'fixture-workos-refresh')
     json(res, { success: true, data: { accessToken: 'fixture-new', refreshToken: 'fixture-refresh', expiresAt: new Date(Date.now() + 86400000).toISOString(), userInfo: { clineUserId: 'fixture-user', email: 'fixture@example.invalid' } } })
   } else if (pathname.endsWith('/recommended-models')) {
-    json(res, { free: [{ id: 'cline-free/mimo-v2.6-flash', name: '本机 Cline 模型' }], recommended: [], clinePass: [] })
+    json(res, { free: [{ id: 'cline-free/mimo-v2.6-flash', name: 'Local Cline model' }], recommended: [], clinePass: [] })
   } else if (pathname.endsWith('/api.json')) {
     json(res, {})
   } else if (pathname.endsWith('/points/records')) {
@@ -85,7 +85,7 @@ const upstream = http.createServer(async (req, res) => {
     else if (req.headers['x-ofm-fixture-host'] === 'api.cline.bot') json(res, { data: [{ id: 'cline-free/mimo-v2.6-flash' }] })
     else if (req.headers['x-ofm-fixture-host'] === 'loomyad.xunfei.cn') {
       assert.equal(req.headers.token, 'fixture-loomy')
-      json(res, { data: [{ id: 'fixture-free', name: '本机 Loomy 模型', type: 'chat', context_length: 128000, capabilities: { input_modalities: ['text', 'image'], reasoning: true }, reasoning_efforts: ['low', 'high'], default_reasoning_effort: 'high' }] })
+      json(res, { data: [{ id: 'fixture-free', name: 'Local Loomy model', type: 'chat', context_length: 128000, capabilities: { input_modalities: ['text', 'image'], reasoning: true }, reasoning_efforts: ['low', 'high'], default_reasoning_effort: 'high' }] })
     } else json(res, { data: [] })
   } else if (pathname.endsWith('/chat/completions')) {
     if (req.headers['x-ofm-fixture-host'] === 'api.cline.bot') {
@@ -125,11 +125,11 @@ const { startStandalone } = await import('../packages/standalone/service.mjs')
 fs.mkdirSync(path.join(dataDir, 'channel-pack'), { recursive: true })
 const unsupportedProviders = ['unsupported-alpha', 'unsupported-beta']
 const unsupportedAccounts = unsupportedProviders.map(provider => ({
-  id: `${provider}-fixture`, provider, nickname: '历史账号保留', enabled: true, refreshable: false,
+  id: `${provider}-fixture`, provider, nickname: 'Preserved historical account', enabled: true, refreshable: false,
   createdAt: Date.now(), expiresAt: Date.now() + 86400000, credentialRef: `${provider.toUpperCase()}_ACCOUNT_FIXTURE`,
 }))
 const activeAccounts = ['cline', 'loomy'].map(provider => ({
-  id: `${provider}-fixture`, provider, nickname: '本机替身账号', enabled: true, refreshable: false,
+  id: `${provider}-fixture`, provider, nickname: 'Local fixture account', enabled: true, refreshable: false,
   createdAt: Date.now(), expiresAt: Date.now() + 86400000, credentialRef: `${provider.toUpperCase()}_ACCOUNT_FIXTURE`,
 }))
 fs.writeFileSync(path.join(dataDir, 'channel-pack', 'state.json'), JSON.stringify({
@@ -166,7 +166,7 @@ const rpc = async (method, payload = {}) => {
   return value.value
 }
 try {
-  await check('独立业务产物的 Chat / Responses 保留工具调用关联与结果', async () => {
+  await check('Standalone business output Chat / Responses preserves tool-call associations and results', async () => {
     const { toGenerateOptions, toResponsesGenerateOptions } = await import('../packages/standalone/channels/business.mjs')
     const signal = new AbortController().signal
     const chat = await toGenerateOptions({ model: 'fixture/model', messages: [
@@ -190,7 +190,7 @@ try {
   service = await startStandalone({ dataDir, port: 0, refresh: false, logger: { warn: message => warnings.push(message), info() {} } })
   await service.ready
   key = JSON.parse(fs.readFileSync(service.keyFile)).forwardKey
-  await check('十个真实渠道注册，独立目录、统一模型目录和机读能力可用', async () => {
+  await check('Ten real channels registered; standalone directory, unified model catalog and machine-readable capabilities available', async () => {
     assert.equal(service.channels.providers.length, 10)
     assert.equal(service.channels.providers.includes('opencode'), false)
     assert.equal((await rpc('account.list', { provider: 'cline' })).accounts.length, 1)
@@ -209,7 +209,7 @@ try {
     assert.equal(fs.existsSync(path.join(dshHome, 'channel-pack')), false)
     assert.equal((await api('/api/management/eac/status')).value.local, false)
   })
-  await check('未知渠道保留历史账号与凭据，但不注册、不列模型、不允许旧 RPC 或网关请求', async () => {
+  await check('Unknown channels preserve historical accounts and credentials, but are not registered, list no models, and allow no legacy RPC or gateway requests', async () => {
     assertUnsupportedDataPreserved()
     const models = (await api('/v1/models')).value.data
     for (const provider of unsupportedProviders) {
@@ -223,7 +223,7 @@ try {
         ['account.list', { provider }], ['account.create', { provider }],
         ['model.list', { provider }], ['provider.setEnabled', { provider, enabled: false }],
         ['credits.permanentLock', { provider, locked: true }],
-        ['login.poll', { accountId }], ['account.update', { accountId, patch: { nickname: '不得修改' } }],
+        ['login.poll', { accountId }], ['account.update', { accountId, patch: { nickname: 'Must not change' } }],
         ['account.delete', { accountId }], ['account.test', { accountId }], ['account.reset', { accountId }],
       ]) {
         const reply = await api('/api/management/channels/rpc', { method, payload })
@@ -237,10 +237,10 @@ try {
         ['/v1/messages', { max_tokens: 16, messages: [{ role: 'user', content: 'unsupported fixture' }] }],
       ]) assert.equal((await api(endpoint, { model: `${provider}/fixture-free`, ...payload })).response.status, 404)
     }
-    assert.equal(requests.length, before, '未知渠道请求不得触达任何上游端点')
+    assert.equal(requests.length, before, 'Unknown-channel requests must not reach any upstream endpoint')
     assertUnsupportedDataPreserved()
   })
-  await check('同源鉴权覆盖渠道与 EAC 操作，跨域和无密钥访问失败', async () => {
+  await check('Same-origin authentication covers channel and EAC operations; cross-origin and keyless access fail', async () => {
     for (const endpoint of ['/api/management/eac/status', '/api/management/channels/rpc']) {
       const noAuth = await fetch(service.url + endpoint, { method: endpoint.endsWith('rpc') ? 'POST' : 'GET', headers: { 'content-type': 'application/json' }, ...endpoint.endsWith('rpc') ? { body: '{}' } : {} })
       assert.equal(noAuth.status, 401)
@@ -248,7 +248,7 @@ try {
     assert.equal((await api('/api/management/channels/rpc', { method: 'account.list', payload: { provider: 'cline' } }, { origin: 'http://evil.invalid' })).response.status, 403)
     assert.equal((await api('/api/management/channels/rpc', { method: 'gateway.getEnabled', payload: {} })).value.value.apiKey.value, key)
   })
-  await check('真实 Cline / Loomy 适配器非流式、SSE、Responses、工具及用量链路', async () => {
+  await check('Real Cline / Loomy adapters: non-streaming, SSE, Responses, tools and usage flows', async () => {
     const body = { model: 'cline/cline-free/mimo-v2.6-flash', messages: [{ role: 'user', content: 'hi' }], tools: [{ type: 'function', function: { name: 'lookup', parameters: { type: 'object' } } }] }
     const reply = await api('/v1/chat/completions', body)
     assert.equal(reply.response.status, 200)
@@ -268,7 +268,7 @@ try {
     assert.ok(JSON.stringify(ledger).includes('cline-free/mimo-v2.6-flash'))
     assert.ok(JSON.stringify(ledger).includes('fixture-free'))
   })
-  await check('Anthropic Messages 经真实渠道适配器保留消息、系统提示、工具与生成参数', async () => {
+  await check('Anthropic Messages preserves messages, system prompt, tools and generation parameters through the real channel adapter', async () => {
     const before = requests.length
     const body = {
       model: 'cline/cline-free/mimo-v2.6-flash',
@@ -292,7 +292,7 @@ try {
     assert.ok(text.includes('hi anthropic'), text)
     assert.equal(sent.body.tools[0].function.name, 'lookup')
   })
-  await check('内联图片真实传到渠道，远程 URL 与伪造图片被拒绝', async () => {
+  await check('Inline images really reach the channel; remote URLs and fake images are rejected', async () => {
     const png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLbtAAAAABJRU5ErkJggg=='
     const reply = await api('/v1/chat/completions', { model: 'cline/cline-free/mimo-v2.6-flash', messages: [{ role: 'user', content: [{ type: 'text', text: 'what' }, { type: 'image_url', image_url: { url: `data:image/png;base64,${png}` } }] }] })
     assert.equal(reply.response.status, 200)
@@ -300,17 +300,17 @@ try {
     const before = requests.length
     const remote = await api('/v1/chat/completions', { model: 'cline/cline-free/mimo-v2.6-flash', messages: [{ role: 'user', content: [{ type: 'image_url', image_url: { url: 'http://127.0.0.1/private' } }] }] })
     assert.equal(remote.response.status, 400)
-    assert.equal(requests.length, before, '远程图片不得触发抓取或推理请求')
+    assert.equal(requests.length, before, 'Remote images must not trigger a fetch or inference request')
     await assert.rejects(attachments.saveImage({ data: Buffer.from('not-an-image'), mediaType: 'image/png' }))
   })
-  await check('模型开关、供应商开关与永久积分锁定保留业务且立即阻止调用', async () => {
+  await check('Model toggle, provider toggle and permanent-credit lock preserve the business data and immediately block calls', async () => {
     await rpc('credits.permanentLock', { provider: 'loomy', locked: true })
     assert.equal((await rpc('credits.permanentLock', { provider: 'loomy' })).locked, true)
     const loomyBefore = requests.filter(row => row.pathname.endsWith('/chat/completions')).length
     const locked = await api('/v1/chat/completions', { model: 'loomy/fixture-free', messages: [{ role: 'user', content: 'permanent-only fixture' }] })
     assert.ok(locked.response.status >= 400, JSON.stringify(locked.value))
     assert.match(JSON.stringify(locked.value), /锁定永久积分/)
-    assert.equal(requests.filter(row => row.pathname.endsWith('/chat/completions')).length, loomyBefore, '锁定必须阻止仅有永久积分的账号发起推理')
+    assert.equal(requests.filter(row => row.pathname.endsWith('/chat/completions')).length, loomyBefore, 'The lock must stop an account with only permanent credits from starting inference')
     await rpc('credits.permanentLock', { provider: 'loomy', locked: false })
     const unlocked = await api('/v1/chat/completions', { model: 'loomy/fixture-free', messages: [{ role: 'user', content: 'unlocked fixture' }] })
     assert.equal(unlocked.response.status, 200, JSON.stringify(unlocked.value))
@@ -325,7 +325,7 @@ try {
     assert.equal((await rpc('account.list', { provider: 'cline' })).accounts[0].enabled, true)
     assert.equal((await rpc('credits.permanentLock', { provider: 'loomy' })).locked, true)
   })
-  await check('批量模型开关仅作用于当前渠道，目录更新且关闭状态落盘', async () => {
+  await check('Bulk model toggles apply only to the current channel; the catalog updates and the off state is persisted', async () => {
     await rpc('model.setAllDisabled', { provider: 'cline', disabled: false })
     const listed = (await rpc('model.list', { provider: 'cline' })).models
     assert.ok(listed.length > 0 && listed.every(model => model.disabled === false))
@@ -333,7 +333,7 @@ try {
     await rpc('model.setAllDisabled', { provider: 'cline', disabled: true })
     assert.ok((await rpc('model.list', { provider: 'cline' })).models.every(model => model.disabled === true))
     const stored = JSON.parse(fs.readFileSync(path.join(dataDir, 'channel-pack/state.json'), 'utf8'))
-    assert.ok(Object.keys(stored.disabledModels.cline).length > 0, '批量关闭必须持久化')
+    assert.ok(Object.keys(stored.disabledModels.cline).length > 0, 'Bulk disabling must be persisted')
     assert.deepEqual((await rpc('model.list', { provider: 'loomy' })).models, otherBefore)
     await service.channels.refresh()
     assert.ok(!(await api('/v1/models')).value.data.some(model => model.id.startsWith('cline/')))
@@ -345,7 +345,7 @@ try {
     assert.equal(Object.keys(restored.disabledModels.cline ?? {}).length, 0)
     assert.equal((await rpc('credits.permanentLock', { provider: 'loomy' })).locked, true)
   })
-  await check('EAC 原 GitHub 登录、签名、用户 token、清单及退出链路可用', async () => {
+  await check('EAC original GitHub login, signing, user token, catalog and logout flow works', async () => {
     const start = await api('/api/management/eac/login/start', {})
     assert.equal(start.response.status, 200)
     assert.match(start.value.link, /^[\w-]{32}$/)
@@ -367,7 +367,7 @@ try {
     assert.equal(fs.existsSync(path.join(dataDir, 'eac-user.json')), false)
     assert.equal(JSON.parse(fs.readFileSync(path.join(dshHome, 'our-free-model/eac-user.json'))).token, 'dsh-sentinel')
   })
-  await check('账号轮询完成后凭据只在后端落盘，可修改、备份和删除', async () => {
+  await check('After account polling completes, credentials are persisted only on the backend and can be edited, backed up and deleted', async () => {
     const started = await rpc('account.create', { provider: 'cline' })
     assert.ok(started.accountId && started.loginUrl)
     assert.equal(new URL(started.loginUrl).origin, fixture)
@@ -385,7 +385,7 @@ try {
     const loggedIn = (await rpc('account.list', { provider: 'cline' })).accounts.find(row => row.id === started.accountId)
     const credentials = JSON.parse(fs.readFileSync(path.join(dataDir, 'channel-credentials.json'), 'utf8'))
     assert.equal(JSON.parse(credentials[loggedIn.credentialRef]).access_token, 'workos:fixture-new')
-    await rpc('account.update', { accountId: started.accountId, patch: { nickname: '新昵称', enabled: false } })
+    await rpc('account.update', { accountId: started.accountId, patch: { nickname: 'New nickname', enabled: false } })
     await rpc('account.reorder', { provider: 'cline', orderedIds: [started.accountId, 'cline-fixture'] })
     const backup = await rpc('backup.export')
     assert.ok(Object.keys(backup.payload.credentials).length > 0)
@@ -393,10 +393,10 @@ try {
     assert.equal(JSON.parse(fs.readFileSync(path.join(dataDir, 'channel-credentials.json'), 'utf8'))[loggedIn.credentialRef], undefined)
     assert.equal((await rpc('account.list', { provider: 'cline' })).accounts.length, 1)
     await rpc('backup.import', { payload: backup.payload })
-    assert.equal((await rpc('account.list', { provider: 'cline' })).accounts[0].nickname, '新昵称')
+    assert.equal((await rpc('account.list', { provider: 'cline' })).accounts[0].nickname, 'New nickname')
     assertUnsupportedDataPreserved()
   })
-  await check('并行独立实例不共享账号、目录、授权或账本，重启保存设置', async () => {
+  await check('Parallel standalone instances share no accounts, catalog, authorization or ledger; settings survive a restart', async () => {
     other = await startStandalone({ dataDir: otherDir, port: 0, refresh: false, logger: { warn() {}, info() {} } })
     await other.ready
     assert.equal((await other.channels.rpc({ method: 'account.list', payload: { provider: 'cline' } })).value.accounts.length, 0)
@@ -405,18 +405,18 @@ try {
     service = await startStandalone({ dataDir, port: 0, refresh: false, logger: { warn() {}, info() {} } })
     await service.ready
     key = JSON.parse(fs.readFileSync(service.keyFile)).forwardKey
-    assert.equal((await rpc('account.list', { provider: 'cline' })).accounts[0].nickname, '新昵称')
+    assert.equal((await rpc('account.list', { provider: 'cline' })).accounts[0].nickname, 'New nickname')
     assert.equal((await rpc('credits.permanentLock', { provider: 'loomy' })).locked, true)
     assertUnsupportedDataPreserved()
     assert.equal(service.channels.providers.some(provider => unsupportedProviders.includes(provider)), false)
     assert.equal((await api('/v1/models')).value.data.some(row => unsupportedProviders.some(provider => row.id.startsWith(`${provider}/`))), false)
   })
-  await check('客户端取消传播到真实渠道网络请求，服务关闭不会迟到写入凭据', async () => {
+  await check('Client cancellation propagates to the real channel network request; closing the service does not write credentials late', async () => {
     const controller = new AbortController()
     const started = new Promise(resolve => { hold = resolve })
     const request = service.runtime.complete({ model: 'cline/cline-free/mimo-v2.6-flash', signal: controller.signal, openAi: { messages: [{ role: 'user', content: 'cancel-fixture' }] } })
     request.catch(() => {})
-    await Promise.race([started, new Promise((_, reject) => { const timer = setTimeout(() => reject(new Error('取消测试未收到上游请求')), 10000); timer.unref() })])
+    await Promise.race([started, new Promise((_, reject) => { const timer = setTimeout(() => reject(new Error('The cancellation test did not receive an upstream request')), 10000); timer.unref() })])
     controller.abort()
     await assert.rejects(request)
     loginReady = false
@@ -429,7 +429,7 @@ try {
     assert.equal(fs.readFileSync(path.join(dataDir, 'channel-credentials.json'), 'utf8'), before)
     assert.equal(fs.existsSync(path.join(dataDir, 'service.lock')), false)
   })
-  await check('EAC 退出后迟到的状态响应不能恢复页面授权状态', async () => {
+  await check('A late status response after EAC logout cannot restore the page authorization state', async () => {
     const dir = path.join(scratch, 'status-eac')
     fs.mkdirSync(dir)
     fs.writeFileSync(path.join(dir, 'eac-user.json'), JSON.stringify({ token: 'fixture-old', login: 'fixture-old-user' }))
@@ -448,7 +448,7 @@ try {
     assert.equal(eac.credential(), null)
     eac.dispose()
   })
-  await check('EAC 取消会中断正在 prepare 的网络，不保存迟到授权', async () => {
+  await check('Cancelling EAC interrupts a network prepare in progress and does not save a late authorization', async () => {
     let resolveStarted
     const began = new Promise(resolve => { resolveStarted = resolve })
     let stored = false

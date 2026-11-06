@@ -139,7 +139,7 @@ function escapeHtml(text) {
 
 function htmlPage(title, body) {
   return `<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8">
+<html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${title}</title>
 <style>
@@ -591,11 +591,11 @@ export function createAuthGate(env = {}, options = {}) {
 
     if (req.method === 'GET' && route === '/auth/github/start') {
       if (!configured || !keyReady) {
-        return page(res, 503, 'EAC 渠道 · GitHub 登录未就绪',
-          `<p>服务器尚未配置 GitHub OAuth（GITHUB_CLIENT_ID / GITHUB_CLIENT_SECRET），请稍后再试或联系维护者。</p>`), true
+        return page(res, 503, 'EAC Channel · GitHub sign-in not ready',
+          `<p>The server has not configured GitHub OAuth (GITHUB_CLIENT_ID / GITHUB_CLIENT_SECRET) yet. Please try again later or contact the maintainer.</p>`), true
       }
       const link = url.searchParams.get('link') ?? ''
-      if (!LINK_PATTERN.test(link)) return page(res, 400, '链接无效', '<p>登录链接缺少或格式不正确，请回到插件设置页重新发起登录。</p>'), true
+      if (!LINK_PATTERN.test(link)) return page(res, 400, 'Invalid link', '<p>The sign-in link is missing or malformed. Please go back to the plugin settings page and start sign-in again.</p>'), true
       // Open the collectable window now: the plugin polls from the moment it
       // opens the browser, and an unknown link must be distinguishable from
       // "callback not there yet".
@@ -616,34 +616,34 @@ export function createAuthGate(env = {}, options = {}) {
       const state = verifyState(url.searchParams.get('state'))
       const code = url.searchParams.get('code') ?? ''
       if (state === null || code === '') {
-        return page(res, 400, '授权已过期', '<p>这次登录请求已过期或校验失败，请回到插件设置页重新发起登录。</p>'), true
+        return page(res, 400, 'Authorization expired', '<p>This sign-in request has expired or failed validation. Please go back to the plugin settings page and start sign-in again.</p>'), true
       }
       const link = String(state.link ?? '')
-      if (!LINK_PATTERN.test(link)) return page(res, 400, '链接无效', '<p>登录链接格式不正确，请重新发起登录。</p>'), true
+      if (!LINK_PATTERN.test(link)) return page(res, 400, 'Invalid link', '<p>The sign-in link is malformed. Please start sign-in again.</p>'), true
       return void (async () => {
         try {
           const ghToken = await exchangeCode(code, callbackUrl(req))
           const githubUser = await fetchGithubUser(ghToken)
           const verdict = await checkStar(ghToken)
           if (verdict.error !== undefined && verdict.fatal !== true) {
-            return page(res, 502, 'GitHub 暂时不可用', `<p>无法确认 star 状态（${escapeHtml(verdict.error)}），请稍后重试。</p>`)
+            return page(res, 502, 'GitHub temporarily unavailable', `<p>Could not confirm star status (${escapeHtml(verdict.error)}). Please retry later.</p>`)
           }
           if (verdict.starred !== true) {
             const ticket = crypto.randomBytes(24).toString('base64url')
             tickets.set(ticket, { link, login: githubUser.login, gh: ghToken, githubId: githubUser.id, avatar: githubUser.avatar, exp: now() + TICKET_TTL_MS })
             rememberPending(link, { status: 'unstarred', login: githubUser.login })
-            return page(res, 200, '还差一步：给仓库点个 Star',
-              `<p>已用 GitHub 账号 <code>${escapeHtml(githubUser.login)}</code> 登录成功，但还没有 star 仓库。</p>
-               <p>请先点下面的按钮去 star，然后回来点「我已 star，重新检查」——不需要重新登录。</p>
-               <a class="btn" href="${starLink()}" target="_blank" rel="noreferrer">⭐ 去 Star</a>
-               <a class="btn alt" href="${prefix}/auth/github/recheck?t=${ticket}">我已 star，重新检查</a>`)
+            return page(res, 200, 'One more step: star the repository',
+              `<p>Signed in successfully with GitHub account <code>${escapeHtml(githubUser.login)}</code>, but you have not starred the repository yet.</p>
+               <p>Please click the button below to star it first, then come back and click "I have starred it, recheck" — no need to sign in again.</p>
+               <a class="btn" href="${starLink()}" target="_blank" rel="noreferrer">⭐ Star it</a>
+               <a class="btn alt" href="${prefix}/auth/github/recheck?t=${ticket}">I have starred it, recheck</a>`)
           }
           grant(link, githubUser, ghToken)
-          return page(res, 200, '✅ 授权成功，请返回应用',
-            `<p>GitHub 账号 <code>${escapeHtml(githubUser.login)}</code> 已登录，且已 star 仓库。</p>
-             <p>插件会在几秒内自动完成授权，现在可以关闭这个页面并回到应用。</p>`)
+          return page(res, 200, '✅ Authorization succeeded, please return to the app',
+            `<p>GitHub account <code>${escapeHtml(githubUser.login)}</code> is signed in and has starred the repository.</p>
+             <p>The plugin will complete authorization automatically within a few seconds. You can now close this page and return to the app.</p>`)
         } catch (error) {
-          return page(res, 502, '授权失败', `<p>${escapeHtml(String(error?.message ?? error).slice(0, 200))}</p><p>请回到插件设置页重新发起登录。</p>`)
+          return page(res, 502, 'Authorization failed', `<p>${escapeHtml(String(error?.message ?? error).slice(0, 200))}</p><p>Please go back to the plugin settings page and start sign-in again.</p>`)
         }
       })(), true
     }
@@ -651,23 +651,23 @@ export function createAuthGate(env = {}, options = {}) {
     if (req.method === 'GET' && route === '/auth/github/recheck') {
       const ticket = tickets.get(url.searchParams.get('t') ?? '')
       if (ticket === undefined || ticket.exp < now()) {
-        return page(res, 400, '检查链接已过期', '<p>请回到插件设置页重新发起登录。</p>'), true
+        return page(res, 400, 'Recheck link expired', '<p>Please go back to the plugin settings page and start sign-in again.</p>'), true
       }
       return void (async () => {
         const verdict = await checkStar(ticket.gh)
         if (verdict.error !== undefined && verdict.fatal !== true) {
-          return page(res, 502, 'GitHub 暂时不可用', `<p>无法确认 star 状态（${escapeHtml(verdict.error)}），请稍后再试。</p>`)
+          return page(res, 502, 'GitHub temporarily unavailable', `<p>Could not confirm star status (${escapeHtml(verdict.error)}). Please try again later.</p>`)
         }
         if (verdict.starred !== true) {
-          return page(res, 200, '还没有检测到 Star',
-            `<p>账号 <code>${escapeHtml(ticket.login)}</code> 的 star 还没生效（GitHub 侧偶尔有几秒延迟）。</p>
-             <a class="btn" href="${starLink()}" target="_blank" rel="noreferrer">⭐ 去 Star</a>
-             <a class="btn alt" href="${prefix}/auth/github/recheck?t=${url.searchParams.get('t')}">再检查一次</a>`)
+          return page(res, 200, 'Star not detected yet',
+            `<p>The star for account <code>${escapeHtml(ticket.login)}</code> has not taken effect yet (GitHub occasionally has a delay of a few seconds).</p>
+             <a class="btn" href="${starLink()}" target="_blank" rel="noreferrer">⭐ Star it</a>
+             <a class="btn alt" href="${prefix}/auth/github/recheck?t=${url.searchParams.get('t')}">Check again</a>`)
         }
         tickets.delete(url.searchParams.get('t'))
         grant(ticket.link, { id: ticket.githubId, login: ticket.login, avatar: ticket.avatar }, ticket.gh)
-        return page(res, 200, '✅ 已确认 Star，授权成功',
-          `<p>账号 <code>${escapeHtml(ticket.login)}</code> 已 star 仓库，插件会在几秒内自动完成授权，可以关闭这个页面了。</p>`)
+        return page(res, 200, '✅ Star confirmed, authorization succeeded',
+          `<p>Account <code>${escapeHtml(ticket.login)}</code> has starred the repository. The plugin will complete authorization automatically within a few seconds, and you can close this page.</p>`)
       })(), true
     }
 

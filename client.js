@@ -1604,9 +1604,9 @@ window.__ModuleLoader__.load({
     const CSS = `
 /* ═══════════════════════════════════════════════════════════════════════
    Our Free Model — visual system
-   统一令牌：所有色值取自宿主 --dsw-alias-* 变量，昼夜由宿主切换。
-   层级约定：layer-3 凹槽/页面底 · layer-2 面板 · layer-1 浮起元素。
-   动效约定：transform/opacity 优先；常规 150–300ms、覆盖层 300–400ms。
+   Unified tokens: every colour value comes from the host's --dsw-alias-* variables; day/night is switched by the host.
+   Layering convention: layer-3 groove / page base · layer-2 panel · layer-1 floating elements.
+   Motion convention: prefer transform/opacity; typically 150-300ms, overlays 300-400ms.
    ═══════════════════════════════════════════════════════════════════════ */
 .ofm_root{--ease-instrument:cubic-bezier(.16,1,.3,1);--ease-settle:cubic-bezier(.34,1.4,.4,1);--gap:14px;display:flex;flex-direction:column;gap:calc(var(--gap)*1.4);max-width:1080px;font-size:13px;line-height:1.55;color:var(--dsw-alias-label-primary);-webkit-font-smoothing:antialiased}
 .ofm_root::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.022;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")}
@@ -1619,9 +1619,9 @@ window.__ModuleLoader__.load({
 .ofm_root{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--dsw-alias-label-tertiary) 32%,transparent) transparent}
 
 .ofm_root ::selection{background:color-mix(in srgb,var(--dsw-alias-state-business-primary) 24%,transparent)}
-/* ── 键盘可达性：只给键盘聚焦画聚焦环，鼠标点击不出现 ─────────────────── */
+/* ── Keyboard accessibility: draw the focus ring only for keyboard focus, not for mouse clicks ─────── */
 .ofm_root :focus-visible{outline:2px solid color-mix(in srgb,var(--dsw-alias-state-business-primary) 78%,transparent);outline-offset:2px;box-shadow:0 0 0 4px color-mix(in srgb,var(--dsw-alias-state-business-primary) 13%,transparent)}
-/* ══ 页头 hero ═════════════════════════════════════════════════════════ */
+/* ══ Page header hero ════════════════════════════════════════════════════════ */
 .ofm_hero{position:relative;display:flex;flex-direction:column;gap:14px;padding:22px 24px;border-radius:20px;border:1px solid color-mix(in srgb,var(--dsw-alias-border-l2) 78%,transparent);background:linear-gradient(165deg,color-mix(in srgb,var(--dsw-alias-bg-layer-3) 88%,transparent),color-mix(in srgb,var(--dsw-alias-bg-layer-1) 82%,transparent));overflow:hidden}
 .ofm_hero::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 150% at 12% -20%,color-mix(in srgb,var(--dsw-alias-state-business-primary) 13%,transparent),transparent 58%),radial-gradient(90% 120% at 88% 130%,color-mix(in srgb,var(--dsw-alias-state-success-primary) 7%,transparent),transparent 60%)}
 .ofm_hero>*{position:relative}
@@ -1638,13 +1638,13 @@ window.__ModuleLoader__.load({
 .ofm_dot.ok{background:var(--dsw-alias-state-success-primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--dsw-alias-state-success-primary) 18%,transparent);animation:ofm-dot-breathe 2.6s ease-in-out infinite}
 .ofm_dot.warn{background:var(--dsw-alias-state-warning-primary,#f0a441);box-shadow:0 0 0 3px color-mix(in srgb,var(--dsw-alias-state-warning-primary,#f0a441) 18%,transparent)}
 .ofm_dot.err{background:var(--dsw-alias-state-error-primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--dsw-alias-state-error-primary) 18%,transparent)}
-/* ══ 区块与分节 ════════════════════════════════════════════════════════ */
+/* ══ Blocks and sections ═══════════════════════════════════════════════════════ */
 .ofm_sec{display:flex;flex-direction:column;gap:10px}
 .ofm_sechead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding-bottom:6px;border-bottom:1px solid var(--dsw-alias-border-l1)}
 .ofm_sec_title{font-size:14px;font-weight:680;letter-spacing:-.2px}
 .ofm_sec_hint{font-size:11.5px;color:var(--dsw-alias-label-tertiary);margin-left:auto}
 .ofm_grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(252px,1fr));gap:10px}
-/* ══ 卡片（双层 bezel：hairline 边框 + 顶部内高光 + 柔和外阴影） ═══════ */
+/* ══ Cards (double bezel: hairline border + inner highlight at the top + soft outer shadow) ═══ */
 .ofm_card{position:relative;display:flex;flex-direction:column;gap:8px;padding:12px 13px;border-radius:13px;border:1px solid var(--dsw-alias-border-l2);background:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 80%,transparent);box-shadow:inset 0 1px 0 rgb(255 255 255 / 6%),0 1px 2px color-mix(in srgb,var(--dsw-alias-state-business-primary) 7%,transparent),0 3px 10px color-mix(in srgb,var(--dsw-alias-state-business-primary) 4%,transparent);transition:transform .2s cubic-bezier(.32,.72,0,1),box-shadow .24s ease,border-color .18s ease}
 .ofm_card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--dsw-alias-state-business-primary) 66%,var(--dsw-alias-border-l2));box-shadow:inset 0 1px 0 rgb(255 255 255 / 9%),0 16px 34px color-mix(in srgb,var(--dsw-alias-state-business-primary) 12%,transparent)}
 .ofm_card.dim{opacity:.68}
@@ -1659,7 +1659,7 @@ window.__ModuleLoader__.load({
 .ofm_tags{display:flex;gap:5px;flex-wrap:wrap}
 .ofm_tag{font-size:10.5px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb,var(--dsw-alias-bg-layer-1) 70%,transparent);border:1px solid var(--dsw-alias-border-l1);color:var(--dsw-alias-label-secondary)}
 .ofm_chantag{font-size:10px;font-weight:650;padding:2px 8px;border-radius:999px;border:1px solid color-mix(in srgb,var(--dsw-alias-state-business-primary) 50%,transparent);background:color-mix(in srgb,var(--dsw-alias-state-business-primary) 9%,transparent);color:var(--dsw-alias-state-business-primary);white-space:nowrap}
-/* ══ 新品/热门徽标与高速标签（置顶的 opencode 免费模型） ═════════════════ */
+/* ══ New / hot badges and fast tags (pinned opencode free models) ════════════════ */
 .ofm_newtag{flex:none;font-size:9.5px;font-weight:750;letter-spacing:.4px;padding:2px 7px;border-radius:999px;color:#fff;background:var(--dsw-alias-state-error-primary);box-shadow:0 1px 4px color-mix(in srgb,var(--dsw-alias-state-error-primary) 45%,transparent);white-space:nowrap;text-transform:uppercase}
 .ofm_hottag{flex:none;font-size:10px;font-weight:700;line-height:1;padding:2px 6px;border-radius:999px;color:#fff;background:var(--dsw-alias-state-error-primary);box-shadow:0 1px 4px color-mix(in srgb,var(--dsw-alias-state-error-primary) 45%,transparent);white-space:nowrap}
 .ofm_tag.fast{color:var(--dsw-alias-state-success-primary);border-color:color-mix(in srgb,var(--dsw-alias-state-success-primary) 45%,transparent);background:color-mix(in srgb,var(--dsw-alias-state-success-primary) 10%,transparent);font-weight:650}
@@ -1668,12 +1668,12 @@ window.__ModuleLoader__.load({
 .ofm_metrics{display:flex;gap:12px;font-size:11px;color:var(--dsw-alias-label-tertiary);flex-wrap:wrap}
 .ofm_metrics b{color:var(--dsw-alias-label-secondary);font-weight:600;font-variant-numeric:tabular-nums}
 .ofm_note{font-size:11px;color:var(--dsw-alias-label-tertiary);line-height:1.5}
-/* ══ 面板 ══════════════════════════════════════════════════════════════ */
+/* ══ Panels ═════════════════════════════════════════════════════════════════ */
 .ofm_panel{padding:16px;border-radius:16px;border:1px solid var(--dsw-alias-border-l2);background:color-mix(in srgb,var(--dsw-alias-bg-layer-2) 82%,transparent);box-shadow:inset 0 1px 0 rgb(255 255 255 / 5%),0 2px 6px rgb(0 0 0 / 4%);display:flex;flex-direction:column;gap:12px}
 .ofm_paneltitle{font-size:12px;font-weight:680;letter-spacing:.2px;color:var(--dsw-alias-label-secondary);display:flex;align-items:center;gap:8px}
 .ofm_paneltitle .ofm_sec_hint{font-weight:400;letter-spacing:0}
 .ofm_row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-/* ══ 请求热度图 ════════════════════════════════════════════════════════ */
+/* ══ Request heatmap ══════════════════════════════════════════════════════════ */
 .ofm_heat{display:grid;grid-auto-flow:column;grid-auto-columns:12px;grid-template-rows:repeat(7,12px);justify-content:start;gap:2px;overflow-x:auto;padding:2px 0 6px}
 .ofm_cell{width:12px;height:12px;border-radius:3.5px;background:var(--dsw-alias-bg-layer-1);outline:1px solid var(--dsw-alias-border-l1);outline-offset:-1px;transition:transform .14s ease,background .3s ease}
 .ofm_cell:hover{transform:scale(1.25)}
@@ -1683,19 +1683,19 @@ window.__ModuleLoader__.load({
 .ofm_cell.l4{background:var(--dsw-alias-state-business-primary);outline-color:transparent}
 .ofm_scale{display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--dsw-alias-label-tertiary);margin-left:auto}
 .ofm_scale .ofm_cell{width:10px;height:10px}
-/* ══ 分段选择器 ════════════════════════════════════════════════════════ */
+/* ══ Segmented picker ═════════════════════════════════════════════════════════ */
 .ofm_seg{display:inline-flex;padding:3px;border-radius:10px;border:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-layer-1);gap:2px;box-shadow:inset 0 1px 2px rgb(0 0 0 / 5%)}
 .ofm_seg button{border:0;background:transparent;color:var(--dsw-alias-label-secondary);font:inherit;font-size:11.5px;font-weight:550;padding:3px 11px;border-radius:8px;cursor:pointer;transition:color .16s ease,background .16s ease,box-shadow .16s ease}
 .ofm_seg button:hover{color:var(--dsw-alias-label-primary)}
 .ofm_seg button[aria-pressed="true"]{background:var(--dsw-alias-bg-layer-3);color:var(--dsw-alias-label-primary);box-shadow:0 1px 3px rgb(0 0 0 / 12%),inset 0 1px 0 rgb(255 255 255 / 6%)}
 .ofm_svg{display:block;width:100%;height:auto;overflow:visible}
-/* ══ 筛选 chips ════════════════════════════════════════════════════════ */
+/* ══ Filter chips ════════════════════════════════════════════════════════════ */
 .ofm_chips{display:flex;gap:6px;flex-wrap:wrap}
 .ofm_chip{display:inline-flex;align-items:center;gap:6px;font-size:11px;padding:3px 10px;border-radius:999px;border:1px solid var(--dsw-alias-border-l1);background:color-mix(in srgb,var(--dsw-alias-bg-layer-1) 72%,transparent);cursor:pointer;color:var(--dsw-alias-label-secondary);transition:border-color .16s ease,color .16s ease,background .16s ease}
 .ofm_chip:hover{color:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-border-l2)}
 .ofm_chip[aria-pressed="true"]{border-color:color-mix(in srgb,currentColor 55%,transparent);background:color-mix(in srgb,var(--dsw-alias-bg-layer-2) 70%,transparent)}
 .ofm_swatch{width:8px;height:8px;border-radius:3px;flex:none}
-/* ══ 数据表格 ══════════════════════════════════════════════════════════ */
+/* ══ Data tables ═════════════════════════════════════════════════════════════ */
 .ofm_table{width:100%;min-width:760px;border-collapse:collapse;font-size:11.5px}
 .ofm_tablewrap{overflow-x:auto;max-width:100%}
 .ofm_table th{text-align:left;font-weight:560;font-size:10.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--dsw-alias-label-tertiary);padding:0 10px 8px;border-bottom:1px solid var(--dsw-alias-border-l1);white-space:nowrap}
@@ -1705,7 +1705,7 @@ window.__ModuleLoader__.load({
 .ofm_table tbody tr:hover td{background:color-mix(in srgb,var(--dsw-alias-state-business-primary) 5%,transparent)}
 .ofm_table tr:last-child td{border-bottom:0}
 .ofm_num{text-align:right}
-/* ══ 按钮（分层状态） ══════════════════════════════════════════════════ */
+/* ══ Buttons (layered states) ══════════════════════════════════════════════════ */
 .ofm_btn{font:inherit;font-size:12px;font-weight:580;padding:6px 14px;border-radius:9px;border:1px solid var(--dsw-alias-border-l2);background:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 84%,transparent);box-shadow:inset 0 1px 0 rgb(255 255 255 / 5%),0 1px 2px rgb(0 0 0 / 6%);color:var(--dsw-alias-label-primary);cursor:pointer;transition:transform .18s var(--ease-instrument),border-color .2s var(--ease-instrument),background .2s var(--ease-instrument),box-shadow .22s var(--ease-instrument),opacity .16s ease}
 .ofm_btn:hover:not(:disabled){border-color:color-mix(in srgb,var(--dsw-alias-state-business-primary) 62%,var(--dsw-alias-border-l2));background:color-mix(in srgb,var(--dsw-alias-state-business-primary) 7%,var(--dsw-alias-bg-layer-3));transform:translateY(-1px);box-shadow:inset 0 1px 0 rgb(255 255 255 / 7%),0 3px 8px rgb(0 0 0 / 9%)}
 .ofm_btn:active:not(:disabled){transform:scale(.985);transition-duration:.1s;box-shadow:inset 0 1px 0 rgb(255 255 255 / 4%)}
@@ -1719,14 +1719,14 @@ window.__ModuleLoader__.load({
 .ofm_minibtn:active:not(:disabled){transform:scale(.96)}
 .ofm_minibtn:disabled{opacity:.45;cursor:default;transform:none}
 .ofm_minibtn.danger:hover:not(:disabled){border-color:color-mix(in srgb,var(--dsw-alias-state-error-primary) 60%,transparent);color:var(--dsw-alias-state-error-primary);background:color-mix(in srgb,var(--dsw-alias-state-error-primary) 7%,transparent)}
-/* ══ 表单 ══════════════════════════════════════════════════════════════ */
+/* ══ Forms ═════════════════════════════════════════════════════════════════ */
 .ofm_field{display:flex;flex-direction:column;gap:4px;min-width:120px}
 .ofm_field>span{font-size:11px;color:var(--dsw-alias-label-tertiary)}
 .ofm_input{font:inherit;font-size:12px;padding:6px 10px;border-radius:9px;border:1px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-layer-1);box-shadow:inset 0 1px 2px rgb(0 0 0 / 5%);color:var(--dsw-alias-label-primary);min-width:0;width:100%;transition:border-color .16s ease,box-shadow .16s ease}
 .ofm_input::placeholder{color:var(--dsw-alias-label-tertiary)}
 .ofm_input:hover{border-color:color-mix(in srgb,var(--dsw-alias-border-l2) 60%,var(--dsw-alias-label-tertiary))}
 .ofm_input:focus{outline:none;border-color:var(--dsw-alias-state-business-primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--dsw-alias-state-business-primary) 20%,transparent)}
-/* ══ 开关（spring 滑块） ═══════════════════════════════════════════════ */
+/* ══ Switches (spring thumb) ═══════════════════════════════════════════════════ */
 .ofm_switch{display:inline-flex;align-items:center;gap:9px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;appearance:none;background:transparent;border:0;padding:0;font:inherit;color:inherit}
 .ofm_switch i{width:36px;height:20px;border-radius:999px;background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-l2);box-shadow:inset 0 1px 3px rgb(0 0 0 / 8%);position:relative;transition:background .2s ease,border-color .2s ease,box-shadow .2s ease;flex:none}
 .ofm_switch:hover i{filter:brightness(1.05)}
@@ -1738,15 +1738,15 @@ window.__ModuleLoader__.load({
 .ofm_switch[aria-checked="true"]:active i::after{transform:translateX(13px)}
 .ofm_switch:focus-visible i{box-shadow:0 0 0 3px color-mix(in srgb,var(--dsw-alias-state-business-primary) 22%,transparent)}
 .ofm_mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;padding:7px 10px;border-radius:9px;background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-l1);overflow-x:auto;white-space:pre;color:var(--dsw-alias-label-secondary)}
-/* ══ 提示条 ════════════════════════════════════════════════════════════ */
+/* ══ Notice bars ═════════════════════════════════════════════════════════════ */
 .ofm_callout{display:flex;gap:9px;padding:10px 12px;border-radius:11px;border:1px solid color-mix(in srgb,var(--dsw-alias-state-warning-primary,#f0a441) 45%,transparent);background:color-mix(in srgb,var(--dsw-alias-state-warning-primary,#f0a441) 9%,transparent);font-size:11.5px;line-height:1.5;color:var(--dsw-alias-label-primary)}
 .ofm_error{border-color:color-mix(in srgb,var(--dsw-alias-state-error-primary) 45%,transparent);background:color-mix(in srgb,var(--dsw-alias-state-error-primary) 9%,transparent)}
-/* ══ 小组件统计 ════════════════════════════════════════════════════════ */
+/* ══ Widget stats ════════════════════════════════════════════════════════════ */
 .ofm_stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:8px}
 .ofm_stat{padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--dsw-alias-bg-layer-1) 78%,transparent);border:1px solid var(--dsw-alias-border-l1);box-shadow:inset 0 1px 0 rgb(255 255 255 / 4%)}
 .ofm_stat b{display:block;font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.3px}
 .ofm_stat span{font-size:10.5px;color:var(--dsw-alias-label-tertiary)}
-/* ══ 公告（首次引导） ══════════════════════════════════════════════════ */
+/* ══ Announcements (first-run onboarding) ════════════════════════════════════════ */
     /* The onboarding slot is mounted inside the shell, but Announcement portals its
        scrim into document.body so third-party sidebar stacking contexts cannot trap
        the fixed overlay. Mask colour, blur and z-index mirror the Modal layer of the
@@ -1779,7 +1779,7 @@ window.__ModuleLoader__.load({
 .ofm_kvc b{font-size:12.5px;font-variant-numeric:tabular-nums}
 .ofm_kvc span{font-size:10.5px;color:var(--dsw-alias-label-tertiary)}
 .ofm_two{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
-/* ══ 公告中心 ══════════════════════════════════════════════════════════ */
+/* ══ Announcement center ═══════════════════════════════════════════════════════ */
 .ofm_news{display:flex;flex-direction:column;gap:10px}
 .ofm_newsitem{display:flex;flex-direction:column;gap:7px;padding:13px 15px;border-radius:13px;border:1px solid var(--dsw-alias-border-l2);background:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 80%,transparent);box-shadow:inset 0 1px 0 rgb(255 255 255 / 4%);position:relative;transition:border-color .18s ease,transform .2s cubic-bezier(.32,.72,0,1),box-shadow .22s ease}
 .ofm_newsitem:hover{transform:translateY(-1px);box-shadow:inset 0 1px 0 rgb(255 255 255 / 7%),0 8px 22px rgb(0 0 0 / 10%)}
@@ -1811,14 +1811,14 @@ window.__ModuleLoader__.load({
 .ofm_newsbody mark{background:color-mix(in srgb,var(--dsw-alias-state-warning-primary,#f0a441) 30%,transparent);border-radius:2px;padding:0 2px}
 .ofm_upgradecards{display:flex;gap:8px;flex-wrap:wrap}
 .ofm_upnotes{max-height:220px;overflow:auto;padding:10px 12px;border-radius:10px;border:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-layer-1)}
-/* ══ 进度条 ════════════════════════════════════════════════════════════ */
+/* ══ Progress bars ════════════════════════════════════════════════════════════ */
 .ofm_prog{height:4px;border-radius:99px;background:var(--dsw-alias-bg-layer-1);box-shadow:inset 0 1px 2px rgb(0 0 0 / 6%);overflow:hidden}
 .ofm_prog i{display:block;height:100%;width:40%;border-radius:99px;background:linear-gradient(90deg,color-mix(in srgb,var(--dsw-alias-state-business-primary) 55%,transparent),var(--dsw-alias-state-business-primary));animation:ofm-prog-slide 1.1s ease-in-out infinite}
 .ofm_prog i{position:relative;overflow:hidden}
 .ofm_prog i::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,color-mix(in srgb,var(--dsw-alias-bg-layer-1) 60%,transparent) 50%,transparent 70%);transform:translateX(-100%);animation:ofm-prog-shine 1.6s ease-in-out infinite}
 @keyframes ofm-prog-shine{0%{transform:translateX(-100%)}60%,100%{transform:translateX(100%)}}
 @keyframes ofm-prog-slide{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}
-/* ══ Toast（fixed 到视口，浮在所有层之上） ════════════════════════════ */
+/* ══ Toast (fixed to the viewport, floating above every layer) ════════════════════ */
 .ofm_toasts{position:fixed;right:18px;bottom:18px;z-index:1200;display:flex;flex-direction:column;gap:10px;max-width:min(380px,calc(100vw - 36px));font-family:inherit}
 .ofm_toast{position:relative;display:flex;flex-direction:column;gap:6px;padding:12px 14px 12px 16px;border-radius:13px;border:1px solid var(--dsw-alias-border-l2);background:color-mix(in srgb,var(--dsw-alias-bg-layer-2) 94%,transparent);backdrop-filter:blur(14px) saturate(150%);-webkit-backdrop-filter:blur(14px) saturate(150%);box-shadow:inset 0 1px 0 rgb(255 255 255 / 7%),0 14px 40px rgb(0 0 0 / 26%);font-size:12.5px;line-height:1.5;color:var(--dsw-alias-label-primary);animation:ofm-toast-rise .32s cubic-bezier(.16,1,.3,1);overflow:hidden}
 .ofm_toast{transform-origin:bottom right;will-change:transform}
@@ -1836,14 +1836,14 @@ window.__ModuleLoader__.load({
 .ofm_toastclose{margin-left:auto;background:transparent;border:0;color:var(--dsw-alias-label-tertiary);cursor:pointer;font:inherit;font-size:13px;padding:0 2px;transition:color .14s ease}
 .ofm_toastclose:hover{color:var(--dsw-alias-label-primary)}
 @keyframes ofm-toast-rise{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
-/* ══ 模态 ══════════════════════════════════════════════════════════════ */
+/* ══ Modals ═════════════════════════════════════════════════════════════════ */
 .ofm_modal{width:min(520px,92vw);max-height:min(80vh,600px);border-radius:18px;border:1px solid var(--dsw-alias-border-l2);background:color-mix(in srgb,var(--dsw-alias-bg-layer-2) 95%,transparent);box-shadow:inset 0 1px 0 rgb(255 255 255 / 8%),0 28px 80px rgb(0 0 0 / 42%);display:flex;flex-direction:column;overflow:hidden;animation:ofm-popin .34s cubic-bezier(.16,1,.3,1)}
 .ofm_modalhead{padding:17px 20px 11px;display:flex;align-items:center;gap:10px;font-size:15px;font-weight:720;letter-spacing:-.2px}
 .ofm_modalbody{padding:4px 20px 16px;overflow:auto;font-size:12.5px;line-height:1.7;color:var(--dsw-alias-label-secondary)}
 .ofm_modalbody p{margin:0 0 6px}
 .ofm_modalfoot{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid var(--dsw-alias-border-l1);background:color-mix(in srgb,var(--dsw-alias-bg-layer-1) 72%,transparent)}
 @media (max-width:720px){.ofm_sec_hint{margin-left:0;width:100%}.ofm_pills{margin-left:0;width:100%}}
-/* ══ 北辰 API 赞助横幅：免费模型页首屏入口，与桌面端保持独立 ═══════ */
+/* ══ Beichen API sponsor banner: entry at the top of the Free models page, kept independent from the desktop app ══ */
 .ofm_sponsor_banner{position:relative;display:grid;grid-template-columns:56px minmax(0,1fr) auto;align-items:center;gap:14px;padding:13px 16px;border:1px solid rgb(121 151 204 / 42%);border-radius:14px;overflow:hidden;background:linear-gradient(115deg,#0b1425 0%,#17253d 54%,#263654 100%);color:#f3f7ff;box-shadow:0 9px 20px rgb(12 24 49 / 20%),inset 0 1px 0 rgb(255 255 255 / 13%)}
 .ofm_sponsor_banner::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.36;background-image:linear-gradient(rgb(126 164 225 / 15%) 1px,transparent 1px),linear-gradient(90deg,rgb(126 164 225 / 15%) 1px,transparent 1px);background-size:32px 32px;mask-image:linear-gradient(90deg,black,transparent 85%)}
 .ofm_sponsor_banner::after{content:"";position:absolute;inset:auto -12% -80% 35%;height:180%;pointer-events:none;background:radial-gradient(ellipse,rgb(96 137 222 / 22%),transparent 68%);transform:rotate(-7deg)}
@@ -1858,7 +1858,7 @@ window.__ModuleLoader__.load({
 .ofm_sponsor_cta{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:92px;padding:8px 12px;border:1px solid rgb(255 255 255 / 72%);border-radius:10px;background:linear-gradient(180deg,#f9fbff,#dfe8f7);box-shadow:0 4px 10px rgb(0 0 0 / 18%),inset 0 1px 0 #fff;color:#253651;font-size:11px;font-weight:750;text-decoration:none;white-space:nowrap;transition:transform .18s var(--ease-instrument),box-shadow .18s ease,filter .18s ease}
 .ofm_sponsor_cta:hover{transform:translateY(-2px);filter:brightness(1.04);box-shadow:0 9px 20px rgb(0 0 0 / 24%),inset 0 1px 0 #fff}
 .ofm_sponsor_cta:active{transform:translateY(0)}
-/* ══ GitHub star 按钮 ══════════════════════════════════════════════════ */
+/* ══ GitHub star button ════════════════════════════════════════════════════════ */
 .ofm_starbtn{position:relative;display:inline-flex;gap:7px;align-items:center;padding:7px 15px;border-radius:999px;border:1px solid color-mix(in srgb,var(--dsw-alias-state-business-primary) 55%,transparent);background:linear-gradient(140deg,color-mix(in srgb,var(--dsw-alias-state-business-primary) 16%,transparent),transparent 70%);color:var(--dsw-alias-state-business-primary);text-decoration:none;font-weight:650;font-size:12.5px;transition:transform .18s ease,box-shadow .22s ease,color .22s ease,background .22s ease;white-space:nowrap;overflow:hidden}
 .ofm_starbtn svg{transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
 .ofm_starbtn:hover svg{transform:rotate(72deg) scale(1.12)}
@@ -1871,7 +1871,7 @@ window.__ModuleLoader__.load({
 .ofm_starbtn::after{content:"";position:absolute;top:0;bottom:0;width:38%;left:-45%;background:linear-gradient(100deg,transparent,rgb(255 255 255 / 34%),transparent);transform:skewX(-18deg);transition:left .55s ease}
 .ofm_starbtn:hover::after{left:112%}
 .ofm_starlink{display:inline-flex;align-items:center;gap:6px;text-decoration:none}
-/* ══ 鱼缸（品牌装饰：玻璃缸 + 水位 + 波光 + 鱼群） ════════════════════ */
+/* ══ Aquarium (brand decoration: glass tank + water level + light ripples + school of fish) ═══════ */
 .ofm_tank{position:relative;width:206px;height:128px;border-radius:16px;overflow:hidden;flex:none;background:linear-gradient(180deg,rgba(127,166,255,.10),rgba(127,166,255,.03));box-shadow:inset 0 0 0 1px var(--dsw-alias-border-l1)}
 .ofm_tankwater{position:absolute;left:0;right:0;bottom:0;height:var(--lvl,0%);transition:height 1.4s cubic-bezier(.22,.61,.36,1)}
 .ofm_tank.ok .ofm_tankwater{background:linear-gradient(180deg,color-mix(in srgb,var(--dsw-alias-state-business-primary) 72%,transparent),var(--dsw-alias-state-business-primary))}
@@ -1901,7 +1901,7 @@ window.__ModuleLoader__.load({
 @keyframes ofmrays{from{transform:translateX(-14px) rotate(-.4deg)}to{transform:translateX(14px) rotate(.4deg)}}
 .ofm_tankshine{position:absolute;inset:0;pointer-events:none;background:linear-gradient(196deg,rgb(255 255 255 / 13%) 0%,transparent 32%)}
 @media (prefers-reduced-motion:reduce){.ofm_wave,.ofm_bubble,.ofm_fish,.ofm_tankrays{animation:none}}
-/* ══ 三页外壳：极光底 · 毛玻璃导航 · 页过渡 ═════════════════════════════
+/* ══ Three-page shell: aurora base · frosted-glass navigation · page transitions ════════════════
    The aurora is a fixed layer *inside* our root: a flat shell background gives
    backdrop-filter nothing to sample, so every glass surface would read as a
    plain translucent box. It sits at z-index:-1 with isolation:isolate on the
@@ -1924,15 +1924,15 @@ window.__ModuleLoader__.load({
 .ofm_nav .ofm_starbtn{grid-column:2;grid-row:1;justify-self:end}
 .ofm_page{display:flex;flex-direction:column;gap:20px;animation:ofmpagein .4s cubic-bezier(.16,1,.3,1)}
 @keyframes ofmpagein{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-/* ── 毛玻璃表面：只给大块面用 backdrop-filter，小卡片用半透明叠层，滚动更顺 */
+/* ── Frosted-glass surfaces: backdrop-filter only on large surfaces; small cards use translucent overlays, so scrolling stays smoother */
 .ofm_glass{background:color-mix(in srgb,var(--dsw-alias-bg-layer-2) 68%,transparent);backdrop-filter:blur(16px) saturate(150%);-webkit-backdrop-filter:blur(16px) saturate(150%);border:1px solid color-mix(in srgb,var(--dsw-alias-border-l2) 78%,transparent);box-shadow:inset 0 1px 0 rgb(255 255 255 / 6%),0 12px 34px rgb(0 0 0 / 9%)}
 .ofm_root .ofm_hero,.ofm_root .ofm_panel,.ofm_root .ofm_ann,.ofm_root .ofm_modal{background:color-mix(in srgb,var(--dsw-alias-bg-layer-2) 70%,transparent);backdrop-filter:blur(18px) saturate(155%);-webkit-backdrop-filter:blur(18px) saturate(155%);box-shadow:inset 0 1px 0 rgb(255 255 255 / 7%),0 14px 40px rgb(0 0 0 / 10%)}
-/* ══ 鱼缸加大版（页头） ════════════════════════════════════════════════ */
+/* ══ Aquarium, large version (page header) ════════════════════════════════════════ */
 .ofm_tankrow{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
 .ofm_tankside{flex:1;min-width:236px;display:flex;flex-direction:column;gap:11px;justify-content:center}
 .ofm_tank.xl{width:264px;height:148px;border-radius:20px;box-shadow:inset 0 0 0 1px rgb(255 255 255 / 12%),0 16px 40px rgb(0 0 0 / 14%)}
 .ofm_tank.xl .ofm_tankglass{border-radius:20px}
-/* ══ 渠道接入页 ════════════════════════════════════════════════════════ */
+/* ══ Channel access page ═══════════════════════════════════════════════════════ */
 .ofm_chanwrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
 .ofm_chan{position:relative;display:flex;flex-direction:column;gap:12px;padding:16px 17px 15px;border-radius:16px;border:1px solid var(--dsw-alias-border-l2);background:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 78%,transparent);box-shadow:inset 0 1px 0 rgb(255 255 255 / 5%),0 1px 2px rgb(0 0 0 / 5%);overflow:hidden;transition:transform .22s cubic-bezier(.32,.72,0,1),box-shadow .24s ease,border-color .2s ease}
 .ofm_chan::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,var(--chan-accent,var(--dsw-alias-state-business-primary)),transparent 78%);opacity:.95}
@@ -2018,20 +2018,20 @@ window.__ModuleLoader__.load({
 .ofm_submodels li{max-width:100%;overflow-wrap:anywhere}
 .ofm_submodels li+li::before{content:"/";padding-right:5px;color:var(--dsw-alias-label-tertiary)}
 .ofm_subcandidates{padding:10px 0;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid var(--dsw-alias-border-l1)}
-/* ══ 骨架屏 ════════════════════════════════════════════════════════════ */
+/* ══ Skeleton screens ══════════════════════════════════════════════════════════ */
 .ofm_skel{position:relative;overflow:hidden;border-radius:12px;background:color-mix(in srgb,var(--dsw-alias-bg-layer-2) 60%,transparent);border:1px solid color-mix(in srgb,var(--dsw-alias-border-l1) 60%,transparent);min-height:96px;animation:ofmpulse 1.8s ease-in-out infinite}
 .ofm_skel::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,transparent 30%,color-mix(in srgb,var(--dsw-alias-bg-layer-1) 55%,transparent) 50%,transparent 70%);transform:translateX(-100%);animation:ofm-skel-shine 1.8s ease-in-out infinite}
 @keyframes ofm-skel-shine{0%{transform:translateX(-100%)}60%,100%{transform:translateX(100%)}}
 .ofm_skel::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent,rgb(255 255 255 / 8%) 42%,transparent 74%);animation:ofmshine 1.5s ease-in-out infinite}
 @keyframes ofmshine{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
 @keyframes ofmpulse{0%,100%{opacity:1}50%{opacity:.55}}
-/* ══ 登录引导 ══════════════════════════════════════════════════════════ */
+/* ══ Login onboarding ═════════════════════════════════════════════════════════ */
 .ofm_loginbody{display:flex;flex-direction:column;gap:14px}
 .ofm_loginstep{display:flex;gap:11px;align-items:flex-start;font-size:12.5px;line-height:1.6;color:var(--dsw-alias-label-secondary)}
 .ofm_loginstep b{flex:none;width:21px;height:21px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:650;background:color-mix(in srgb,var(--dsw-alias-state-business-primary) 14%,transparent);border:1px solid color-mix(in srgb,var(--dsw-alias-state-business-primary) 35%,transparent);color:var(--dsw-alias-state-business-primary)}
 .ofm_scanline{animation:ofmscan 2.2s ease-in-out infinite}
 @keyframes ofmscan{0%,100%{opacity:.35}50%{opacity:.85}}
-/* ══ 数据看板 KPI ══════════════════════════════════════════════════════ */
+/* ══ Usage dashboard KPI ═══════════════════════════════════════════════════════ */
 .ofm_kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
 .ofm_kpi{display:flex;flex-direction:column;gap:6px;padding:15px 17px;border-radius:16px;border:1px solid var(--dsw-alias-border-l2);background:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 78%,transparent);box-shadow:inset 0 1px 0 rgb(255 255 255 / 5%),0 1px 2px rgb(0 0 0 / 5%);transition:transform .22s cubic-bezier(.32,.72,0,1),box-shadow .24s ease,border-color .2s ease}
 .ofm_kpi:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--dsw-alias-state-business-primary) 45%,var(--dsw-alias-border-l2));box-shadow:inset 0 1px 0 rgb(255 255 255 / 8%),0 16px 36px rgb(0 0 0 / 13%)}
@@ -2042,13 +2042,13 @@ window.__ModuleLoader__.load({
 .ofm_kpisub{font-size:11px;color:var(--dsw-alias-label-tertiary);font-variant-numeric:tabular-nums}
 .ofm_kpi.warn .ofm_kpivalue{-webkit-text-fill-color:var(--dsw-alias-state-warning-primary,#f0a441);background:none}
 .ofm_logfailed td{background:color-mix(in srgb,var(--dsw-alias-state-error-primary) 5%,transparent)}
-/* ══ 真实图标与积分展示 ════════════════════════════════════════════════ */
+/* ══ Real icons and credits display ════════════════════════════════════════════════ */
 .ofm_navmark img,.ofm_chanlogo img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
 .ofm_chanlogo{padding:0;overflow:hidden}
 .ofm_credittotal b{color:var(--dsw-alias-state-success-primary);font-variant-numeric:tabular-nums}
 .ofm_creditbadge{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;padding:2px 9px;border-radius:999px;border:1px solid color-mix(in srgb,var(--dsw-alias-state-warning-primary,#f0a441) 50%,transparent);background:color-mix(in srgb,var(--dsw-alias-state-warning-primary,#f0a441) 9%,transparent);color:var(--dsw-alias-state-warning-primary,#f0a441);white-space:nowrap}
 .ofm_creditbadge.strong{max-width:100%;white-space:normal;overflow-wrap:anywhere;color:var(--dsw-alias-state-success-primary);border-color:color-mix(in srgb,var(--dsw-alias-state-success-primary) 50%,transparent);background:color-mix(in srgb,var(--dsw-alias-state-success-primary) 9%,transparent)}
-/* ══ 账号池状态 ════════════════════════════════════════════════════════ */
+/* ══ Account pool status ═════════════════════════════════════════════════════════ */
 .ofm_pooltop{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .ofm_poolbadge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;border:1px solid var(--dsw-alias-border-l1);background:color-mix(in srgb,var(--dsw-alias-bg-layer-1) 72%,transparent);box-shadow:inset 0 1px 0 rgb(255 255 255 / 4%);font-size:12.5px;font-weight:650;white-space:nowrap}
 .ofm_pooldot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--dsw-alias-label-tertiary)}
@@ -2063,22 +2063,22 @@ window.__ModuleLoader__.load({
 .ofm_poolstats .ofm_stat.hot b{color:var(--dsw-alias-state-error-primary)}
 .ofm_poolmeta{display:flex;gap:8px 18px;align-items:baseline;flex-wrap:wrap;justify-content:space-between}
 @media (max-width:760px){.ofm_tank.xl{width:100%;max-width:340px}.ofm_tab{flex:1 1 auto;text-align:center}}
-/* ══ 动效降级：用户系统开启"减少动态效果"时全部收敛 ═══════════════════ */
-/* —— 交互锚点增强：激活态 / 状态色 / 加载态（additive，不改既有规则） —— */
-/* tab：激活项在滑块底衬之上再补一道品牌下划线，选中更明确 */
+/* ══ Motion downgrade: when the user's system enables "reduce motion", everything converges ══════ */
+/* —— Interaction anchor enhancements: active state / state colours / loading state (additive, no existing rules changed) —— */
+/* tabs: on top of the slider underlay, the active item gets one more brand underline, so the selection is clearer */
 .ofm_tab[aria-selected="true"]{color:var(--dsw-alias-label-primary)}
 .ofm_tab[aria-selected="true"]::after{content:"";position:absolute;left:12px;right:12px;bottom:3px;height:2px;border-radius:2px;background:var(--dsw-alias-state-business-primary);opacity:.85;transition:opacity .18s cubic-bezier(.32,.72,0,1)}
-/* 渠道卡：随接入状态着色顶部 hairline 与外发光（已接入=品牌色、关闭=灰、待接入=琥珀弱化） */
+/* Channel cards: the top hairline and outer glow are coloured by connection state (connected = brand colour, off = grey, pending = muted amber) */
 .ofm_chan[data-state="on"]::before{background:linear-gradient(90deg,var(--chan-accent,var(--dsw-alias-state-business-primary)),color-mix(in srgb,var(--chan-accent,var(--dsw-alias-state-business-primary)) 30%,transparent));opacity:1}
 .ofm_chan[data-state="on"]{border-color:color-mix(in srgb,var(--chan-accent,var(--dsw-alias-state-business-primary)) 34%,var(--dsw-alias-border-l2))}
 .ofm_chan[data-state="idle"]::before{background:linear-gradient(90deg,var(--dsw-alias-state-warning-primary,#f0a441),transparent);opacity:.6}
 .ofm_chan[data-state="off"]::before{background:linear-gradient(90deg,var(--dsw-alias-label-tertiary),transparent);opacity:.5}
-/* 按钮：异步进行中显示内联 spinner（aria-busy 锚点，文字仍保留占位避免布局跳动） */
+/* Buttons: while async work is in flight, show an inline spinner (aria-busy anchor; the text keeps its placeholder so the layout does not jump) */
 .ofm_btn[aria-busy="true"]{position:relative;color:transparent !important;pointer-events:none}
 .ofm_btn[aria-busy="true"]::after{content:"";position:absolute;left:50%;top:50%;width:13px;height:13px;margin:-6.5px 0 0 -6.5px;border-radius:50%;border:2px solid color-mix(in srgb,currentColor 30%,var(--dsw-alias-label-secondary));border-top-color:var(--dsw-alias-label-primary);animation:ofm-btn-spin .7s linear infinite}
 @keyframes ofm-btn-spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.ofm_root *,.ofm_root *::before,.ofm_root *::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}}
-/* ═══ 精密仪器精修层（世界观：原厂仪器手感）：颜色听宿主，质感在阻尼。曲线 --ease-instrument 冲得快落得稳，--ease-settle 极轻过冲。退场比进场快。 ═══ */
+/* ═══ Precision-instrument refinement layer (worldview: factory-instrument feel): colours obey the host, texture lives in the damping. The --ease-instrument curve launches fast and lands steadily, --ease-settle overshoots very slightly. Exits are faster than entrances. ═══ */
 .ofm_glass{transition:border-color .22s var(--ease-instrument),box-shadow .26s var(--ease-instrument),transform .22s var(--ease-instrument),background .22s var(--ease-instrument)}
 .ofm_glass:hover{border-color:color-mix(in srgb,var(--dsw-alias-border-l2) 92%,var(--dsw-alias-state-business-primary));box-shadow:0 1px 2px rgb(0 0 0 / 5%),0 10px 28px -14px color-mix(in srgb,var(--dsw-alias-state-business-primary) 18%,transparent)}
 .ofm_kpi{transition:border-color .22s var(--ease-instrument),transform .22s var(--ease-instrument),box-shadow .26s var(--ease-instrument)}
@@ -2094,11 +2094,11 @@ window.__ModuleLoader__.load({
 @media (prefers-reduced-motion:reduce){.ofm_glass,.ofm_kpi,.ofm_kpivalue,.ofm_minibtn,.ofm_prog i{transition:none!important}.ofm_kpi:hover,.ofm_kpi:hover .ofm_kpivalue{transform:none}}
 
 /* ==== V5 INSTRUMENT START ==== */
-/* 精密仪器·样板间覆盖层：1px细边+内高光，无外投影；颜色全部听宿主 var(--dsw-alias-*)。
-   夜(暗)高光更刃、纹理更显；昼(亮)高光收敛、纹理近乎哑。reduced-motion 去位移留状态。 */
+/* Precision instrument · showroom overlay: 1px fine border + inner highlight, no outer shadow; every colour obeys the host var(--dsw-alias-*).
+   Night (dark) highlights are sharper and textures more visible; day (light) highlights converge and textures are nearly mute. reduced-motion removes displacement, keeps state. */
 
-/* ── ① 面板卡片 .ofm_panel / .ofm_card ─────────────────────────── */
-/* 双基底：拉丝细纹(repeating-linear-gradient)垫底，实体色覆盖在上，从边缘隐约透出拉丝感 */
+/* ── ① Panel cards .ofm_panel / .ofm_card ─────────────────────────────── */
+/* Double base: a brushed fine texture (repeating-linear-gradient) underneath, with the solid colour laid over it, so the brushing shows faintly through at the edges */
 .ofm_root .ofm_panel{
   background:
     repeating-linear-gradient(115deg, rgb(255 255 255 / 4.5%) 0 1px, transparent 1px 2.5px) padding-box,
@@ -2113,15 +2113,15 @@ window.__ModuleLoader__.load({
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%), inset 0 -12px 24px -16px rgb(0 0 0 / 14%) !important;
   transition: transform .22s var(--ease-instrument), box-shadow .26s var(--ease-instrument), border-color .2s var(--ease-instrument) !important;
 }
-/* hover：kinetic tension —— 位移压浅(-1px)，去掉外投影，靠边色提亮+高光增强传递"浮起" */
+/* hover: kinetic tension —— shallower displacement (-1px), the outer shadow removed; the brightened edge colour + stronger highlight convey "lift" */
 .ofm_root .ofm_card:hover{
   transform: translateY(-1px) !important;
   border-color: color-mix(in srgb, var(--dsw-alias-state-business-primary) 58%, var(--dsw-alias-border-l2)) !important;
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 11%), inset 0 -12px 24px -16px rgb(0 0 0 / 10%) !important;
 }
 
-/* ── ② 按钮 .ofm_btn ─────────────────────────── */
-/* kinetic tension：外壳 active 陷落(scale .985)，内部 ::after 扫光条反向滑过形成"外陷内顶" */
+/* ── ② Buttons .ofm_btn ─────────────────────────────── */
+/* kinetic tension: on active the shell sinks in (scale .985) while the internal ::after sheen bar slides across in reverse, forming "sunk outside, pushed up inside" */
 .ofm_root .ofm_btn{
   position: relative !important;
   overflow: hidden !important;
@@ -2138,7 +2138,7 @@ window.__ModuleLoader__.load({
   transition: left .5s var(--ease-instrument) !important;
   pointer-events: none !important;
 }
-/* hover：扫光滑过（exit slower than press）；去掉原外投影，仅留顶部高光 */
+/* hover: the sheen sweeps across (exit slower than press); the original outer shadow is removed, leaving only the top highlight */
 .ofm_root .ofm_btn:hover:not(:disabled){
   transform: translateY(-1px) !important;
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 10%) !important;
@@ -2146,13 +2146,13 @@ window.__ModuleLoader__.load({
 .ofm_root .ofm_btn:hover:not(:disabled)::after{
   left: 118% !important;
 }
-/* active：快速陷落(.09s) + 内阴影加深=物理按压；松开靠 --ease-settle 回弹 */
+/* active: fast sink (.09s) + deeper inner shadow = a physical press; on release --ease-settle springs it back */
 .ofm_root .ofm_btn:active:not(:disabled){
   transform: scale(.985) !important;
   transition-duration: .09s !important;
   box-shadow: inset 0 2px 5px rgb(0 0 0 / 14%), inset 0 1px 0 rgb(255 255 255 / 3%) !important;
 }
-/* primary 按钮保留主色渐变，仅把外投影换成更克制的内高光+轻凹槽 */
+/* primary buttons keep the main-colour gradient; only the outer shadow is swapped for a more restrained inner highlight + light groove */
 .ofm_root .ofm_btn.primary{
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%), inset 0 -10px 18px -12px rgb(0 0 0 / 24%) !important;
 }
@@ -2160,8 +2160,8 @@ window.__ModuleLoader__.load({
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 26%), inset 0 -10px 18px -12px rgb(0 0 0 / 18%) !important;
 }
 
-/* ── ③ 表格行 hover .ofm_table tbody tr ─────────────────────────── */
-/* 行首 2px 主色竖条用 transform:scaleY 展开(不触发布局)；exit(.12s) 比 entrance(.16s) 快 */
+/* ── ③ Table-row hover .ofm_table tbody tr ─────────────────────────────── */
+/* The 2px main-colour vertical bar at the row start expands with transform:scaleY (without triggering layout); exit (.12s) is faster than entrance (.16s) */
 .ofm_root .ofm_table tbody tr{
   transition: background .16s var(--ease-instrument) !important;
 }
@@ -2184,11 +2184,11 @@ window.__ModuleLoader__.load({
   transform: scaleY(1) !important;
   opacity: 1 !important;
 }
-/* 数字列表针走格感：tabular-nums + pl5-tick 机械顿挫(steps) */
+/* Numerals get a gauge-needle stepped feel: tabular-nums + the pl5-tick mechanical stepping (steps) */
 .ofm_root .ofm_table td{
   font-variant-numeric: tabular-nums !important;
 }
-/* 表针走格：离散百分比快照模拟 steps 顿挫——同值连帧=停格，瞬间跳格=机械感；@keyframes 里用不了 steps() 函数，用帧堆出来 */
+/* Gauge-needle stepping: discrete percentage snapshots simulate the steps judder —— the same value held across frames = a held step, an instant jump = the mechanical feel; steps() cannot be used inside @keyframes, so it is built from stacked frames */
 @keyframes pl5-tick{
   0%,24%{ transform: translateY(0); }
   25%,54%{ transform: translateY(-1.5px); }
@@ -2196,7 +2196,7 @@ window.__ModuleLoader__.load({
   80%,100%{ transform: translateY(0); }
 }
 
-/* ── 昼(not-dark)收敛：高光更哑、拉丝更隐、回弹更小 ─────────────── */
+/* ── Daytime (not-dark) convergence: duller highlights, fainter brushing, smaller spring-back ─────────────── */
 @media not (prefers-color-scheme: dark){
   .ofm_root .ofm_panel,
   .ofm_root .ofm_card{
@@ -2226,9 +2226,9 @@ window.__ModuleLoader__.load({
   }
 }
 
-/* ── reduced-motion 降级：去位移/回弹/扫光/顿挫，保留颜色与不透明度反馈 ── */
+/* ── reduced-motion downgrade: remove displacement/spring-back/sheen/judder, keep colour and opacity feedback ── */
 @media (prefers-reduced-motion: reduce){
-  /* 统一过渡降级：所有交互件只留颜色/不透明度反馈，去位移 */
+  /* Unified transition downgrade: every interactive element keeps only colour/opacity feedback, displacement removed */
   .ofm_root .ofm_card,
   .ofm_root .ofm_panel,
   .ofm_root .ofm_btn,
@@ -2244,7 +2244,7 @@ window.__ModuleLoader__.load({
   .ofm_root .ofm_chanlogo{
     transition: border-color .12s ease, background .12s ease, box-shadow .12s ease, opacity .12s ease, color .12s ease !important;
   }
-  /* 去位移/回弹/陷落 */
+  /* Remove displacement/spring-back/sinking */
   .ofm_root .ofm_card:hover,
   .ofm_root .ofm_btn:hover:not(:disabled),
   .ofm_root .ofm_btn:active:not(:disabled),
@@ -2255,29 +2255,29 @@ window.__ModuleLoader__.load({
   .ofm_root .ofm_chan:hover .ofm_chanlogo{
     transform: none !important;
   }
-  /* 开关捏扁还原 */
+  /* Restore the squashed switch thumb */
   .ofm_root .ofm_switch:active i::after{
     width: 14px !important;
   }
-  /* 扫光条砍掉 */
+  /* Cut the sheen bar */
   .ofm_root .ofm_btn::after,
   .ofm_root .ofm_starbtn::after{
     content: none !important;
   }
-  /* 呼吸灯停跳，但保留颜色状态 */
+  /* The breathing light stops pulsing, but keeps its colour state */
   .ofm_root .ofm_dot.ok{
     animation: none !important;
     opacity: 1 !important;
   }
-  /* 表针走格动画停走，但保留数字本身 */
+  /* The gauge-needle animation stops, but the numbers themselves stay */
   .ofm_root .ofm_kpi:hover .ofm_kpivalue,
   .ofm_root .ofm_stat:hover b{
     animation: none !important;
   }
 }
 
-/* ── ④ 输入框 .ofm_input：仪器凹槽手感 ─────────────────────────── */
-/* 常态凹槽(inset 顶高光+底内阴影)；focus 时凹槽不动，只换边色+外发光，像仪器被点亮 */
+/* ── ④ Inputs .ofm_input: instrument-groove feel ─────────────────────────────── */
+/* At rest a groove (inset top highlight + bottom inner shadow); on focus the groove does not move, only the border colour changes + an outer glow, like an instrument lighting up */
 .ofm_root .ofm_input{
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%), inset 0 2px 6px -2px rgb(0 0 0 / 10%) !important;
   transition: border-color .18s var(--ease-instrument), box-shadow .2s var(--ease-instrument), background .18s var(--ease-instrument) !important;
@@ -2290,8 +2290,8 @@ window.__ModuleLoader__.load({
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%), inset 0 2px 6px -2px rgb(0 0 0 / 8%), 0 0 0 3px color-mix(in srgb, var(--dsw-alias-state-business-primary) 16%, transparent) !important;
 }
 
-/* ── ⑤ 开关 .ofm_switch：spring 滑块阻尼 ─────────────────────────── */
-/* 滑块用 --ease-settle 带回弹；按下时滑块变宽=被"捏扁"，松开回弹归位 */
+/* ── ⑤ Switches .ofm_switch: spring-thumb damping ─────────────────────────────── */
+/* The thumb uses --ease-settle with spring-back; while pressed it widens, as if "squashed", and springs back into place on release */
 .ofm_root .ofm_switch i{
   box-shadow: inset 0 1px 3px rgb(0 0 0 / 10%), inset 0 -1px 0 rgb(255 255 255 / 4%) !important;
   transition: background .22s var(--ease-instrument), border-color .22s var(--ease-instrument), box-shadow .22s var(--ease-instrument) !important;
@@ -2311,8 +2311,8 @@ window.__ModuleLoader__.load({
   width: 17px !important;
 }
 
-/* ── ⑥ 徽章/药丸/标签 .ofm_badge/.ofm_pill/.ofm_tag/.ofm_chantag/.ofm_chip ── */
-/* 统一加顶部发丝高光；状态色只用 color-mix 调透明度，不换色相 */
+/* ── ⑥ Badges/pills/tags .ofm_badge/.ofm_pill/.ofm_tag/.ofm_chantag/.ofm_chip ── */
+/* Uniformly add a hairline highlight at the top; state colours only adjust transparency with color-mix, never the hue */
 .ofm_root .ofm_pill,
 .ofm_root .ofm_tag,
 .ofm_root .ofm_chip,
@@ -2324,7 +2324,7 @@ window.__ModuleLoader__.load({
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%) !important;
   transition: border-color .2s var(--ease-instrument), color .2s var(--ease-instrument), background .2s var(--ease-instrument) !important;
 }
-/* 状态点呼吸灯保留，但改成 pl5- 前缀、机械顿挫更明显的两拍节奏 */
+/* The status dot's breathing light is kept, but switched to the pl5- prefix and a two-beat rhythm with more pronounced mechanical judder */
 @keyframes pl5-dot-breathe{
   0%,100%{ opacity:1; }
   50%{ opacity:.45; }
@@ -2332,7 +2332,7 @@ window.__ModuleLoader__.load({
 .ofm_root .ofm_dot.ok{
   animation: pl5-dot-breathe 2.4s cubic-bezier(.4,0,.6,1) infinite !important;
 }
-/* 分段控件选中块：加顶部高光，按下时微微陷落 */
+/* The segmented control's selected block: add a top highlight; it sinks slightly when pressed */
 .ofm_root .ofm_seg button[aria-pressed="true"]{
   box-shadow: 0 1px 3px rgb(0 0 0 / 10%), inset 0 1px 0 rgb(255 255 255 / 8%) !important;
   transition: color .18s var(--ease-instrument), background .18s var(--ease-instrument), box-shadow .2s var(--ease-settle) !important;
@@ -2341,8 +2341,8 @@ window.__ModuleLoader__.load({
   transform: scale(.97) !important;
 }
 
-/* ── ⑦ 原生件接管：滚动条 / selection / caret / 聚焦环 ─────────────── */
-/* 滚动条：仪器滑轨——thumb 加顶部高光与底部凹槽，hover 时轻微增亮 */
+/* ── ⑦ Taking over native elements: scrollbar / selection / caret / focus ring ─────────────── */
+/* Scrollbar: an instrument slide rail —— the thumb gets a top highlight and a bottom groove, brightening slightly on hover */
 .ofm_root ::-webkit-scrollbar-thumb{
   background: color-mix(in srgb, var(--dsw-alias-label-tertiary) 30%, transparent) !important;
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%), inset 0 -1px 0 rgb(0 0 0 / 10%) !important;
@@ -2351,15 +2351,15 @@ window.__ModuleLoader__.load({
 .ofm_root ::-webkit-scrollbar-thumb:hover{
   background: color-mix(in srgb, var(--dsw-alias-label-tertiary) 48%, transparent) !important;
 }
-/* 文本选择：主色薄涂，昼模式再淡一点避免刺眼 */
+/* Text selection: a thin wash of the main colour, lighter still in day mode to avoid glare */
 .ofm_root ::selection{
   background: color-mix(in srgb, var(--dsw-alias-state-business-primary) 20%, transparent) !important;
 }
-/* 光标：跟随主色 */
+/* Caret: follows the main colour */
 .ofm_root input, .ofm_root textarea{
   caret-color: var(--dsw-alias-state-business-primary) !important;
 }
-/* 聚焦环：仪器刻度环——细环+外晕，用 --ease-instrument 淡入 */
+/* Focus ring: an instrument scale ring —— a fine ring + outer halo, fading in with --ease-instrument */
 .ofm_root :focus-visible{
   outline: 2px solid color-mix(in srgb, var(--dsw-alias-state-business-primary) 72%, transparent) !important;
   outline-offset: 2px !important;
@@ -2367,8 +2367,8 @@ window.__ModuleLoader__.load({
   transition: box-shadow .18s var(--ease-instrument), outline-color .18s var(--ease-instrument) !important;
 }
 
-/* ── ⑧【师傅批改①】拉丝纹理增强：金属感要真的能摸到 ─────────────── */
-/* 夜模式 3% → 4.5%，昼模式 1.5% → 2.8%，纹理间隔收紧让拉丝更密 */
+/* ── ⑧ [Reviewer correction ①] Brushed-texture enhancement: the metal feel must really be touchable ─────────────── */
+/* Night mode 3% → 4.5%, day mode 1.5% → 2.8%; tighter texture spacing makes the brushing denser */
 .ofm_root .ofm_panel{
   background:
     repeating-linear-gradient(115deg, rgb(255 255 255 / 4.5%) 0 1px, transparent 1px 2.5px) padding-box,
@@ -2393,7 +2393,7 @@ window.__ModuleLoader__.load({
   }
 }
 
-/* ── ⑧【师傅批改②】昼模式高光压暗：45-62% → 30-38%，更克制 ─────────── */
+/* ── ⑧ [Reviewer correction ②] Day-mode highlights pressed darker: 45-62% → 30-38%, more restrained ─────────── */
 @media not (prefers-color-scheme: dark){
   .ofm_root .ofm_panel{
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 34%), inset 0 -14px 28px -18px rgb(0 0 0 / 6%) !important;
@@ -2422,9 +2422,9 @@ window.__ModuleLoader__.load({
   }
 }
 
-/* ── ⑧【师傅批改③】表格竖条语言统一：所有表格行 hover 都带主色竖条 ── */
-/* .ofm_newsbody table 是内容型表格，保持朴素；仅给数据表 .ofm_table 统一竖条。
-   同时把 .ofm_kvc / .ofm_stat 等"类表格"卡片也纳入 hover 微提亮，保持语言一致 */
+/* ── ⑧ [Reviewer correction ③] Unified table vertical-bar language: every table row hover carries a main-colour vertical bar ── */
+/* .ofm_newsbody table is a content table and stays plain; the unified vertical bar applies only to the data table .ofm_table.
+   "Table-like" cards such as .ofm_kvc / .ofm_stat are also included in the hover slight brightening, keeping the language consistent */
 .ofm_root .ofm_stat,
 .ofm_root .ofm_kvc{
   transition: border-color .2s var(--ease-instrument), box-shadow .22s var(--ease-instrument), transform .2s var(--ease-settle) !important;
@@ -2436,8 +2436,8 @@ window.__ModuleLoader__.load({
   transform: translateY(-1px) !important;
 }
 
-/* ── ⑩【返工·收编租界】星按钮/导航标/渠道标 全部听宿主变量 ─────────────── */
-/* L1130 .ofm_starbtn:hover 混 #3ECFA0、L1181 .ofm_navmark 混 #3ECFA0 —— 统一改混 label-primary，零品牌色 */
+/* ── ⑩ [Rework · reining in the strays] Star button / nav mark / channel mark all obey host variables ─────────────── */
+/* L1130 .ofm_starbtn:hover mixes #3ECFA0, L1181 .ofm_navmark mixes #3ECFA0 —— unified to mix label-primary, zero brand colours */
 .ofm_root .ofm_starbtn{
   transition: transform .16s var(--ease-settle), box-shadow .2s var(--ease-instrument), color .2s var(--ease-instrument), background .2s var(--ease-instrument) !important;
 }
@@ -2449,11 +2449,11 @@ window.__ModuleLoader__.load({
 .ofm_root .ofm_starbtn:active{
   transform: scale(.97) !important;
 }
-/* 扫光条改走 --ease-instrument，与 .ofm_btn 同语言 */
+/* The sheen bar now runs on --ease-instrument, the same language as .ofm_btn */
 .ofm_root .ofm_starbtn::after{
   transition: left .5s var(--ease-instrument) !important;
 }
-/* 导航标：去掉 #3ECFA0 混色，改混 label-primary；外投影换成内高光+轻凹槽 */
+/* Nav mark: the #3ECFA0 mix removed, now mixes label-primary; the outer shadow is swapped for an inner highlight + light groove */
 .ofm_root .ofm_navmark{
   background: linear-gradient(145deg, var(--dsw-alias-state-business-primary), color-mix(in srgb, var(--dsw-alias-state-business-primary) 58%, var(--dsw-alias-label-primary))) !important;
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 26%), inset 0 -6px 12px -8px rgb(0 0 0 / 20%) !important;
@@ -2461,7 +2461,7 @@ window.__ModuleLoader__.load({
 .ofm_root .ofm_navmark svg{
   fill: var(--dsw-alias-label-on-accent, #fff) !important;
 }
-/* 渠道标：--chan-accent 兜底本来就是宿主变量，收编写死的 #fff / #101828，外投影换内高光 */
+/* Channel mark: the --chan-accent fallback was already a host variable; bring the hard-coded #fff / #101828 under control, the outer shadow swapped for an inner highlight */
 .ofm_root .ofm_chanlogo{
   color: var(--dsw-alias-label-on-accent, #fff) !important;
   background: linear-gradient(150deg, var(--chan-accent, var(--dsw-alias-state-business-primary)), color-mix(in srgb, var(--chan-accent, var(--dsw-alias-state-business-primary)) 52%, var(--dsw-alias-bg-layer-3))) !important;
@@ -2472,21 +2472,21 @@ window.__ModuleLoader__.load({
   transform: scale(1.05) rotate(-2deg) !important;
 }
 
-/* ── ⑩【返工·收编 SEASON 落地件】色板/选中 chip/渠道卡顶条 ─────────────── */
-/* SEASON 数组在 JS(L1663) 里、靠内联 style 注入，CSS 改不了值；
-   收编它落地的元素，让质感听宿主：色板加高光、chip 选中不再花、渠道卡顶条收敛 */
+/* ── ⑩ [Rework · bringing in the SEASON pieces] Palette / selected chip / channel-card top bar ─────────────── */
+/* The SEASON array lives in the JS (L1663) and is injected via inline styles, so CSS cannot change its values;
+   bring the elements it lands on under control so their texture obeys the host: the palette gets a highlight, selected chips stop being garish, the channel-card top bar converges */
 .ofm_root .ofm_swatch{
   border-radius: 3px !important;
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 30%), inset 0 -1px 0 rgb(0 0 0 / 16%) !important;
 }
-/* chip 选中态：JS 注入彩色背景，这里压回宿主语言——主色薄涂+主色边，去掉杂色 */
+/* Selected chip state: JS injects a coloured background; press it back into the host language here —— a thin wash of the main colour + a main-colour border, stray colours removed */
 .ofm_root .ofm_chip[aria-pressed="true"]{
   background: color-mix(in srgb, var(--dsw-alias-state-business-primary) 14%, transparent) !important;
   border-color: color-mix(in srgb, var(--dsw-alias-state-business-primary) 55%, transparent) !important;
   color: var(--dsw-alias-state-business-primary) !important;
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%) !important;
 }
-/* 渠道卡顶条(::before 用 --chan-accent)：收敛高度与发光，听宿主凹槽语言 */
+/* Channel-card top bar (::before uses --chan-accent): converge its height and glow, obeying the host's groove language */
 .ofm_root .ofm_chan::before{
   height: 2px !important;
   box-shadow: 0 1px 0 rgb(255 255 255 / 6%) !important;
@@ -2496,8 +2496,8 @@ window.__ModuleLoader__.load({
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%) !important;
 }
 
-/* ── ⑩【返工·接上 pl5-tick】KPI/统计数字获得表针走格感 ─────────────── */
-/* 挂到 KPI 大数字与统计卡数字：hover 时数字以机械顿挫走一格，模拟仪表指针跳动 */
+/* ── ⑩ [Rework · wiring up pl5-tick] KPI/statistic numerals gain the gauge-needle stepped feel ─────────────── */
+/* Attached to the KPI big numbers and the stat-card numbers: on hover the number steps once with mechanical judder, imitating a gauge needle ticking */
 .ofm_root .ofm_kpivalue,
 .ofm_root .ofm_stat b{
   display: inline-block !important;
@@ -2507,10 +2507,10 @@ window.__ModuleLoader__.load({
   animation: pl5-tick .34s var(--ease-instrument) 1 !important;
 }
 /* ==== V5 INSTRUMENT END ==== */
-/* ── 聚合渠道 / 省 Token / 路由：新页面的表面 ─────────────────────────────
-   动效一律走 150–250ms 的短过渡，不弹跳；reduced-motion 下由文件末尾的
-   媒体查询整体关掉。ofm_rise 用 backwards 而不是 both：动画结束后元素回到
-   样式表里的 transform，卡片的 hover 抬升才不会被动画的终态钉死。 */
+/* ── Aggregate channel / Token savers / Routing: surfaces for the new pages ─────────────────────────────
+   All motion uses short 150–250ms transitions, with no bounce; under reduced-motion the media query at the end of the file
+   turns it off wholesale. ofm_rise uses backwards rather than both: after the animation ends, the element returns to
+   the transform in the stylesheet, so a card's hover lift is not pinned down by the animation's end state. */
 .ofm_rise{animation:ofmrisein .22s cubic-bezier(.22,.61,.36,1) backwards}
 @keyframes ofmrisein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .ofm_duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(272px,100%),1fr));gap:12px;align-items:start}
@@ -2532,11 +2532,11 @@ window.__ModuleLoader__.load({
 @media (max-width:600px){.ofm_duo{grid-template-columns:1fr}.ofm_picklist{grid-template-columns:1fr}.ofm_member{flex-wrap:wrap}}
 @media (prefers-reduced-motion:reduce){.ofm_rise,.ofm_page{animation:none}.ofm_pickrow,.ofm_member,.ofm_meter i,.ofm_card,.ofm_kpi,.ofm_chan{transition:none}.ofm_root .ofm_card:hover,.ofm_pickrow:hover:not(:disabled){transform:none}}
 
-/* ── 推荐项目页：两张「去点 Star」的卡片 ─────────────────────────────────
-   这一页只有一件事要促成——点开仓库、点下 Star。所以卡片比常规模型卡大一档，
-   入场逐张错峰（--i 由调用方给），悬停抬升；主 CTA 是渐变星按钮，带一圈呼吸
-   光环与悬停扫光；数字用 count-up 落地。全部只动 transform/opacity/颜色。
-   动效降级：文件末尾的 reduced-motion 块统一关掉位移与动画。 */
+/* ── Recommended projects page: two "go give it a Star" cards ─────────────────────────────────
+   This page exists to accomplish one thing only —— get the repository opened and Star clicked. So the cards are one size up from regular model cards,
+   their entrances staggered card by card (--i is supplied by the caller), lifting on hover; the main CTA is a gradient star button carrying a breathing
+   halo and a hover sheen; the numbers land with a count-up. Everything moves only transform/opacity/colour.
+   Motion downgrade: the reduced-motion block at the end of the file turns displacement and animation off wholesale. */
 .ofm_recogrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(360px,100%),1fr));gap:14px;align-items:stretch}
 .ofm_recocard{position:relative;display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:18px;border:1px solid var(--dsw-alias-border-l2);background:linear-gradient(168deg,color-mix(in srgb,var(--dsw-alias-bg-layer-3) 86%,transparent),color-mix(in srgb,var(--dsw-alias-bg-layer-2) 80%,transparent));box-shadow:inset 0 1px 0 rgb(255 255 255 / 7%),0 2px 8px rgb(0 0 0 / 5%),0 14px 34px color-mix(in srgb,var(--dsw-alias-state-business-primary) 6%,transparent);overflow:hidden;animation:ofm-reco-in .5s var(--ease-instrument) backwards;animation-delay:calc(var(--i,0)*90ms);transition:transform .24s var(--ease-instrument),box-shadow .28s ease,border-color .2s ease}
 .ofm_recocard::before{content:"";position:absolute;inset:-45% 45% 50% -35%;pointer-events:none;opacity:0;background:radial-gradient(58% 58% at 32% 32%,color-mix(in srgb,var(--dsw-alias-state-business-primary) 13%,transparent),transparent 72%);transition:opacity .4s ease}
@@ -2580,7 +2580,7 @@ window.__ModuleLoader__.load({
 @media (max-width:600px){.ofm_recogrid{grid-template-columns:1fr}.ofm_recoacts{width:100%;margin-left:0}}
 @media (prefers-reduced-motion:reduce){.ofm_recocard,.ofm_recostar,.ofm_recogo,.ofm_recochip,.ofm_recomark{animation:none;transition:border-color .12s ease,background .12s ease,box-shadow .12s ease,opacity .12s ease,color .12s ease}.ofm_recocard:hover,.ofm_recostar:hover,.ofm_recostar:active,.ofm_recogo:hover,.ofm_recochip:hover,.ofm_recocard:hover .ofm_recomark{transform:none}.ofm_recostar::after,.ofm_recostarring,.ofm_recoglow{display:none}}
 
-/* 装饰特效默认关闭；鱼缸独立保留。布局用的 transform 不受影响。 */
+/* Decorative effects are off by default; the aquarium is kept independently. Transforms used for layout are unaffected. */
 .ofm_navtools{grid-column:2;grid-row:1;display:flex;align-items:center;justify-self:end;gap:12px;flex-wrap:wrap}
 .ofm_root[data-ofm-effects="off"]::before{content:none}
 .ofm_root[data-ofm-effects="off"],
@@ -2668,25 +2668,25 @@ window.__ModuleLoader__.load({
 `
 
     // ── helpers ───────────────────────────────────────────────────────────────
-    // 用页面 base 解析，而不是 origin-absolute 的「/api/...」：DSH 挂在反向代理
-    // 子路径下（https://<host>/<prefix>/）时，前导斜杠会把 <prefix> 丢掉，请求
-    // 直接打到站点根被前置网关 404，设置面板报「无法连接插件后端」（#54）。
-    // 相对路径随页面 base 走，根路径部署下与原值完全一致。解析不了（无 document
-    // 的宿主、非常规 base）就退回根路径原值——行为不比修复前差。
+    // Resolve against the page base, rather than an origin-absolute '/api/...': when DSH is mounted under a sub-path of a reverse proxy
+    // (https://<host>/<prefix>/), a leading slash drops the <prefix> and the request
+    // goes straight to the site root, where the front gateway 404s it and the settings panel reports "Cannot reach the plugin backend" (#54).
+    // A relative path follows the page base; under a root-path deployment it is identical to the original value. When it cannot be resolved (a host with no document,
+    // an unconventional base) fall back to the original root-path value —— no worse than the behaviour before the fix.
     const API = (() => {
       try { return new URL('api/our-free-model', document.baseURI).pathname } catch { return '/api/our-free-model' }
     })()
     const SEASON = ['#4C8DFF', '#3ECFA0', '#F2A65A', '#E36AA6', '#8B7BF0', '#39B8C4', '#D9743E', '#7BB24A']
 
     async function api(path, options) {
-      // 8 秒超时兜底：后端路由未注册/挂起时 fetch 不再永久挂起——此前全部 api 调用
-      // （onboarding /announcement、设置页 /announcements /update/status、面板 /summary /stats
-      // /forward/key 等）无任何超时，一个不响应端点即可阻塞 settings.onboarding 协调流程
-      // 并长期占用同源连接池。超时按 AbortError 抛给调用方，走各自 .catch 降级路径。
-      // 慢路由按需放宽（options.timeout，毫秒）：/bench 要等一整段真实生成（本车道
-      // 首帧动辄数十秒），/update/apply 要下载+校验+安装整包，/refresh /reprobe 要
-      // 跑完一整轮探测——8 秒兜底套在它们身上只会“前端报失败、后端继续烧”，
-      // 测速按钮因此几乎必失败而配额照付。
+      // 8-second timeout backstop: when a backend route is unregistered/hung, fetch no longer hangs forever —— previously every api call
+      // (onboarding /announcement, the settings page's /announcements /update/status, the panel's /summary /stats
+      // /forward/key, and so on) had no timeout at all, so a single unresponsive endpoint could block the settings.onboarding coordination flow
+      // and occupy the same-origin connection pool for a long time. On timeout an AbortError is thrown to the caller, which follows its own .catch downgrade path.
+      // Slow routes are widened on demand (options.timeout, in milliseconds): /bench has to wait for a whole real generation (on this lane
+      // the first frame routinely takes tens of seconds), /update/apply has to download + verify + install the whole package, /refresh /reprobe have to
+      // run a whole probing round through —— putting the 8-second backstop on them would only mean "the frontend reports failure while the backend keeps burning",
+      // so the speed-test button would then almost always fail while the quota is still charged.
       const { timeout = 8000, ...fetchOptions } = options ?? {}
       const ctrl = new AbortController()
       const timer = setTimeout(() => ctrl.abort(), timeout)
@@ -3241,7 +3241,7 @@ window.__ModuleLoader__.load({
         const state = model.availabilitySource === 'listing' ? 'unknown' : model.availability
         counts[Object.hasOwn(counts, state) ? state : 'unknown']++
       }
-      // 选择器可能保留暂时限流的模型；这些已知受阻模型不应抬高水位。
+      // The picker may keep temporarily throttled models; these known-blocked models must not raise the water level.
       const blocked = new Set(['throttled', 'unavailable', 'region-blocked'])
       const selectable = data.settings?.enabled === false ? 0 : rows.filter(model => {
         const state = model.availabilitySource === 'listing' ? 'unknown' : model.availability
@@ -3256,7 +3256,7 @@ window.__ModuleLoader__.load({
 
     function Roster(props) {
       const { summary, t, onBench, benches = {}, auth, eacLogin, only, onApply, busy } = props
-      // 免费页与水位采用相同范围：匿名免费模型和 Kilo；其他付费来源留在各自页面。
+      // The free page and the water level use the same scope: the anonymous free models and Kilo; other paid sources stay on their own pages.
       const roster = only === undefined ? summary.catalog
         : only === 'eac' ? summary.catalog.filter(m => m.channel === 'eac')
           : summary.catalog.filter(isFreePoolModel)
@@ -3271,8 +3271,8 @@ window.__ModuleLoader__.load({
         const ids = summary.settings.hiddenModelIds ?? []
         return onApply({ hiddenModelIds: ids.includes(model.id) ? ids.filter(id => id !== model.id) : [...ids, model.id] })
       }
-      // 只有拿到过明确判定（网关答过 /eac/status）且未授权时才上锁：状态未知
-      // 不该显示一把凭空的锁，网关不可达时本地记录仍算已授权。
+      // Only lock once there is an explicit verdict (the gateway has answered /eac/status) and the user is not authorized: an unknown state
+      // must not conjure a lock out of thin air; when the gateway is unreachable, the local records still count as authorized.
       const locked = auth !== undefined && auth.available === true && auth.authorized !== true
       const group = (title, list, hint) => list.length === 0 ? null
         : h('div', { className: 'ofm_sec', style: { gap: 8 } },
@@ -3306,7 +3306,7 @@ window.__ModuleLoader__.load({
     // Numbers come from the gateway through the plugin backend (/pool), which
     // is the only place the sealed gateway URL exists. All of them are real:
     // capacity is the operator's actual provisioning rule (stars × 1.5, or a
-    // configured count), and the load verdict — 畅通 / 繁忙 / 过载 — is computed
+    // configured count), and the load verdict — Healthy / Busy / Overloaded — is computed
     // by the gateway process itself from its in-flight streams and event-loop
     // saturation, so the panel and the server can never disagree about the
     // color. The panel renders nothing at all when the host has no lane or the
@@ -3432,15 +3432,15 @@ window.__ModuleLoader__.load({
       return t('pool.capacityUnknown')
     }
 
-    // ── EAC 渠道授权（GitHub 登录 + Star） ────────────────────────────────────
-    // 闸门在服务器：网关拒绝没有用户令牌的对话，而这个面板是取得令牌的唯一入口。
-    // 三种状态如实呈现——未登录 / 已登录但未 star / 已授权——并且登录全程无需
-    // 复制粘贴：后端把授权页交给系统浏览器，前端轮询网关领取令牌。令牌本身从不
-    // 到达浏览器，这里只显示登录名与判定结果。
+    // ── EAC channel authorization (GitHub sign-in + Star) ────────────────────────────────────
+    // The gate is on the server: the gateway refuses conversations that carry no user token, and this panel is the only entry point for obtaining the token.
+    // The three states are presented truthfully —— not signed in / signed in but not starred / authorized —— and the whole sign-in flow needs no
+    // copy-and-paste: the backend hands the authorization page to the system browser, and the frontend polls the gateway to collect the token. The token itself never
+    // reaches the browser; only the login name and the verdict are shown here.
     //
-    // 登录流（发起、轮询、busy/notice）住在 SettingsPage 级的 hook 里：页头的
-    // 未授权按钮、上锁模型卡的「去授权」和这个面板必须共享同一个进行中的会话，
-    // 各挂一份轮询会互相抢令牌的领取权。
+    // The sign-in flow (start, polling, busy/notice) lives in a SettingsPage-level hook: the page header's
+    // unauthorized button, the locked model cards' "Go authorize" action and this panel must share the same in-flight session;
+    // if each mounted its own polling, they would fight each other over the right to collect the token.
     const EAC_LOGIN_TTL = 10 * 60_000
     const EAC_LOGIN_KEY = `ofm.eac.pending:${API}`
     function rememberEacLogin(pending) {
@@ -3609,10 +3609,10 @@ window.__ModuleLoader__.load({
       const { stats, t } = props
       const days = useMemo(() => [...stats.days].sort((a, b) => a.day.localeCompare(b.day)), [stats.days])
       const recent = [...(stats.samples ?? [])].slice(-40)
-      // 「最近一回合」跟着一个轻量轮询走（#26）：看板其余部分仍是页面加载时的
-      // 快照，这一行单独刷新，让「刚发完一条消息」的用户不用整页重载就能看到
-      // 这一回合的 token 去向。聊天窗属于宿主内核，插件无法在对话流里注入，
-      // 这是插件表面能做到的最接近实时的位置。
+      // The "most recent turn" follows a lightweight poll (#26): the rest of the dashboard is still the snapshot taken at page load,
+      // and this row alone refreshes, so a user who "just sent a message" can see where this turn's tokens went without reloading the whole page.
+      // The chat window belongs to the host kernel; the plugin cannot inject into the conversation stream,
+      // so this is the closest-to-real-time spot the plugin surface can manage.
       const [fresh, setFresh] = useState(null)
       useEffect(() => {
         let alive = true
@@ -3676,8 +3676,8 @@ window.__ModuleLoader__.load({
           active.tps === null || active.tps === undefined ? null : ' · ',
           active.tps === null || active.tps === undefined ? null : `${active.tps} ${t('unit.tokPerSec')}`))
 
-      // 最近一回合（#26）：取最新一条调用样本，输入/输出 token、首帧、速度，
-      // 失败的调用也如实标出。数据源优先用轮询到的新快照，退回页面加载时的。
+      // Most recent turn (#26): take the newest call sample —— input/output tokens, first frame, speed ——
+      // and failed calls are marked truthfully too. The data source prefers the newly polled snapshot, falling back to the one from page load.
       const lastSample = (fresh?.samples ?? stats.samples ?? []).slice(-1)[0] ?? null
       const nameOfModel = id => models.find(m => m.model === id)?.name ?? id
       const agoOf = at => {
@@ -4240,12 +4240,12 @@ window.__ModuleLoader__.load({
         h(UpgradePanel, { t, settings, onApply, busy }))
     }
 
-    // ── 推荐项目页 ────────────────────────────────────────────────────────────
-    // 这一页只有一个任务：让人点开仓库、点下 Star。所以文案是「说清它解决什么
-    // 问题」，动作是「一眼能看到的星按钮」，数字是宿主 /picks 取回的真实 Star /
-    // Fork / 最近提交——拿不到就整块不显示，绝不用占位数字凑版面（这块页面的
-    // 全部说服力都在数字是真的）。每张卡片的文案按语言直写 t('字面量')，字典
-    // 保持可 grep；各仓库的地址与「第二个动作」在这里各写一份。
+    // ── Recommended projects page ────────────────────────────────────────────────────────────
+    // This page has a single job: get people to open the repository and click Star. So the copy is "explain clearly what problem it
+    // solves", the action is "a star button you can spot at a glance", and the numbers are the real Star / Fork / latest-commit figures
+    // the host fetches from /picks —— if they cannot be fetched, the whole block is not shown; placeholder numbers are never used to pad the layout (this page's
+    // whole persuasiveness rests on the numbers being real). Each card's copy is written inline per language as a literal t() call, so the dictionary
+    // stays greppable; each repository's address and its "second action" are each written out once here.
     const RECO_LINKS = {
       desktop: { repo: 'https://github.com/Ebony-Vinyl/EAC-Desktop', extra: 'https://github.com/Ebony-Vinyl/EAC-Desktop/releases' },
       pack: { repo: 'https://github.com/Ebony-Vinyl/EAC-Pack', extra: 'https://github.com/Ebony-Vinyl/EAC-Pack#git-安装' },
@@ -4410,19 +4410,19 @@ window.__ModuleLoader__.load({
      * and logo tile; `login` picks the flow the card offers.
      */
     const CHANNEL_PROVIDERS = [
-      { id: 'lobsterai', name: 'LobsterAI', org: '有道', accent: '#FF6A00', note: '龙虾 · 每日签到积分', login: 'browser' },
-      { id: 'qoder', name: 'Qoder', org: '阿里系', accent: '#615CED', note: '每日 100 Credits，加密推理端点', login: 'browser' },
-      { id: 'qodercn', name: 'Qoder 中国版', org: '阿里系', accent: '#7A6CF0', note: '中国版端点与模型池', login: 'browser' },
-      { id: 'trae', name: 'TRAE', org: '字节', accent: '#00BFA6', note: '手机号登录', login: 'browser' },
-      { id: 'cline', name: 'Cline', org: 'Cline', accent: '#5B5BD6', note: 'Cline 账号免费额度', login: 'browser' },
-      { id: 'loomy', name: 'Loomy', org: '讯飞', accent: '#2F6BFF', note: '微信扫码，或短信验证码备用', login: 'browser+sms' },
-      { id: 'raccoon', name: 'Raccoon', org: '商汤', accent: '#00A6A6', note: '手机号登录', login: 'browser' },
-      { id: 'minimax', name: 'MiniMax Code', org: 'MiniMax', accent: '#E4007F', note: '设备码 + PKCE，每日签到', login: 'browser' },
-      { id: 'zcode', name: 'ZCode', org: '智谱', accent: '#3B6EF6', note: '浏览器登录（需本机可开浏览器）', login: 'browser' },
-      { id: 'gemini', name: 'Gemini', org: 'Google Code Assist', accent: '#4285F4', note: '本地回调 OAuth 免费线', login: 'browser' },
+      { id: 'lobsterai', name: 'LobsterAI', org: 'NetEase Youdao', accent: '#FF6A00', note: 'Lobster · daily check-in credits', login: 'browser' },
+      { id: 'qoder', name: 'Qoder', org: 'Alibaba', accent: '#615CED', note: '100 Credits a day, encrypted inference endpoint', login: 'browser' },
+      { id: 'qodercn', name: 'Qoder (China)', org: 'Alibaba', accent: '#7A6CF0', note: 'China-edition endpoint and model pool', login: 'browser' },
+      { id: 'trae', name: 'TRAE', org: 'ByteDance', accent: '#00BFA6', note: 'Phone-number sign-in', login: 'browser' },
+      { id: 'cline', name: 'Cline', org: 'Cline', accent: '#5B5BD6', note: 'Free quota on a Cline account', login: 'browser' },
+      { id: 'loomy', name: 'Loomy', org: 'iFLYTEK', accent: '#2F6BFF', note: 'WeChat QR scan, or SMS verification code as backup', login: 'browser+sms' },
+      { id: 'raccoon', name: 'Raccoon', org: 'SenseTime', accent: '#00A6A6', note: 'Phone-number sign-in', login: 'browser' },
+      { id: 'minimax', name: 'MiniMax Code', org: 'MiniMax', accent: '#E4007F', note: 'Device code + PKCE, daily check-in', login: 'browser' },
+      { id: 'zcode', name: 'ZCode', org: 'Zhipu', accent: '#3B6EF6', note: 'Browser sign-in (requires a browser that can open on this machine)', login: 'browser' },
+      { id: 'gemini', name: 'Gemini', org: 'Google Code Assist', accent: '#4285F4', note: 'Free lane with local-callback OAuth', login: 'browser' },
     ]
 
-    /** 与现有 RPC 的能力对应：余额、每日领取及独立签到状态分别判断。 */
+    /** Matches the capabilities of the existing RPC: the balance, the daily claim and the independent check-in state are each judged separately. */
     const CHANNEL_CREDITS = {
       lobsterai: { claim: true },
       qoder: { claim: true },
@@ -4517,8 +4517,8 @@ window.__ModuleLoader__.load({
       const [accounts, setAccounts] = useState(undefined)
       const [models, setModels] = useState(undefined)
       const [credits, setCredits] = useState(undefined)
-      // 实时积分：每个账号的剩余余额（credits.balances），卡片汇总 + 账号行
-      // 逐条展示；随账号列表与领积分动作刷新，另有一个慢轮询兜底。
+      // Live credits: each account's remaining balance (credits.balances), summarised on the card + shown per account
+      // row; refreshed together with the account list and the credit-claim actions, with a slow poll as a backstop.
       const [balances, setBalances] = useState(undefined)
       const [busy, setBusy] = useState('')
       const [notice, setNotice] = useState('')
@@ -4727,7 +4727,7 @@ window.__ModuleLoader__.load({
             if (value?.done === true) {
               setLogin(null)
               if (value.success === false) {
-                setNotice(t('chan.login.failed').replace('{reason}', value.error ?? '未知原因'))
+                setNotice(t('chan.login.failed').replace('{reason}', value.error ?? 'unknown reason'))
               } else {
                 setNotice(t('chan.login.done').replace('{login}', value.login ?? ''))
                 onChanged()
@@ -4782,8 +4782,8 @@ window.__ModuleLoader__.load({
           const credit = Number(summary?.totalCredit ?? 0)
           const failed = (value?.results ?? []).filter(row => row.outcome?.kind === 'failed')
           const successText = t('chan.claim.result').replace('{count}', String(claimed)).replace('{credit}', String(credit))
-          const failureText = t('chan.claim.failed').replace('{reason}', failed.map(row => row.outcome.message).join('；'))
-          setNotice(failed.length > 0 ? claimed > 0 ? `${successText}；${failureText}` : failureText
+          const failureText = t('chan.claim.failed').replace('{reason}', failed.map(row => row.outcome.message).join('; '))
+          setNotice(failed.length > 0 ? claimed > 0 ? `${successText}; ${failureText}` : failureText
             : claimed > 0 ? successText : t('chan.claim.none'))
           void loadCredits(); void loadBalances(true)
         } catch (error) { onError(channel, error) } finally { claimPending.current = false; setBusy('') }
@@ -4910,7 +4910,7 @@ window.__ModuleLoader__.load({
                         // `value`, so a failed probe lands on this branch with its
                         // reason in `value.message`. Reading `value.error` (which
                         // the server never sets) printed an empty reason: the
-                        // user saw "测试失败：" and nothing else (#681).
+                        // user saw "Test failed:" and nothing else (#681).
                         setNotice(value?.ok === false
                           ? t('chan.test.failed').replace('{reason}', value?.error ?? value?.message ?? '')
                           : t('chan.test.ok').replace('{ms}', String(value?.ms ?? value?.latencyMs ?? '—')))
@@ -5122,7 +5122,7 @@ window.__ModuleLoader__.load({
         error !== '' && !failed ? h('p', { className: 'ofm_note' }, `${t('chan.error').replace('{reason}', error)}`) : null)
     }
 
-    // ── 数据看板 / 运行日志 / 网关设置 ────────────────────────────────────────
+    // ── Usage dashboard / request log / gateway settings ────────────────────────────────────────
     // The absorbed pack keeps a per-request token ledger (channel → provider →
     // account → model trees, plus a ring of individual requests). These three
     // pages are its reading surface, modelled on the standalone gateway
@@ -5185,7 +5185,7 @@ window.__ModuleLoader__.load({
       return [...map.values()].map(row => ({ model: row.model, providers: [...row.providers], ...mergeLedgerRows(row.rows) }))
     }
 
-    /** Flatten history days into one merged tree (the 全部历史 view). */
+    /** Flatten history days into one merged tree (the all-history view). */
     function mergedHistoryChannels(days) {
       const map = new Map()
       for (const day of days ?? []) {
@@ -5261,10 +5261,10 @@ window.__ModuleLoader__.load({
       const ledger = useLedger(props)
       const [scope, setScope] = useState('today')
       const loaded = ledger.status === 'ready'
-      // 今日 = the pack's live snapshot (its in-memory day tree); 全部 = the
+      // Today = the pack's live snapshot (its in-memory day tree); All = the
       // persisted day aggregation, merged back into one tree. The grand
-      // cumulative number always reads the history total — even on 今日 —
-      // because "累计" that resets at midnight is a lie.
+      // cumulative number always reads the history total — even on Today —
+      // because a "Cumulative" that resets at midnight is a lie.
       const channels = scope === 'today'
         ? (ledger.snapshot?.channels ?? [])
         : mergedHistoryChannels(ledger.history)
@@ -5274,8 +5274,8 @@ window.__ModuleLoader__.load({
       const cumulative = ledger.totals ?? ledger.snapshot?.totals ?? {}
       const accounts = ledgerAccountRows(channels)
       const models = ledgerModelRows(channels).sort((a, b) => (b.inputTokens + b.outputTokens) - (a.inputTokens + a.outputTokens))
-      // The pack's ring is already newest-first (`token-ledger.ts`: "最近明细
-      // （最新在前）", built with `unshift`), so it is used as served. Reversing it
+      // The pack's ring is already newest-first (`token-ledger.ts`: "recent entries
+      // (newest first)", built with `unshift`), so it is used as served. Reversing it
       // here put the oldest request at the top of the table — and, behind the log
       // page's pagination, the request the user just made on the last page.
       const entries = ledger.snapshot?.entries ?? []
@@ -5357,7 +5357,7 @@ window.__ModuleLoader__.load({
                 h('td', { className: 'ofm_num' }, fmtInt(row.outputTokens)),
                 h('td', { className: 'ofm_num' }, fmtInt(row.reasoningTokens)),
                 h('td', { className: 'ofm_num' }, fmtInt(row.cacheReadTokens)),
-                h('td', null, (row.models ?? []).slice().sort((a, b) => ((b.inputTokens ?? 0) + (b.outputTokens ?? 0)) - ((a.inputTokens ?? 0) + (a.outputTokens ?? 0))).slice(0, 2).map(model => `${model.model} · ${fmtInt((model.inputTokens ?? 0) + (model.outputTokens ?? 0))}`).join('，') || '—'))))))) : null,
+                h('td', null, (row.models ?? []).slice().sort((a, b) => ((b.inputTokens ?? 0) + (b.outputTokens ?? 0)) - ((a.inputTokens ?? 0) + (a.outputTokens ?? 0))).slice(0, 2).map(model => `${model.model} · ${fmtInt((model.inputTokens ?? 0) + (model.outputTokens ?? 0))}`).join(', ') || '—'))))))) : null,
         loaded ? h(Section, { title: t('dash.modelsTitle'), hint: t('dash.modelsHint') },
           models.length === 0 ? h('p', { className: 'ofm_note' }, t('dash.empty'))
             : h('div', { className: 'ofm_tablewrap' }, h('table', { className: 'ofm_table' },
@@ -5374,7 +5374,7 @@ window.__ModuleLoader__.load({
                 h('th', { key: 'share' }, t('log.share')))),
               h('tbody', null, models.map(row => h('tr', { key: row.model },
                 h('td', null, h('b', null, row.model)),
-                h('td', null, row.providers.join('，')),
+                h('td', null, row.providers.join(', ')),
                 h('td', { className: 'ofm_num' }, fmtInt(row.requests)),
                 h('td', { className: 'ofm_num' }, row.errors > 0 ? h('span', { className: 'ofm_badge unavailable' }, fmtInt(row.errors)) : fmtInt(0)),
                 h('td', { className: 'ofm_num' }, fmtInt(row.inputTokens + row.outputTokens)),
@@ -5467,9 +5467,9 @@ window.__ModuleLoader__.load({
       const [relay, setRelay] = useState(undefined)
       const [relayKey, setRelayKey] = useState('')
       const [relayBusy, setRelayBusy] = useState(false)
-      // 免费车道转发端口的接入配方。它和上面这块网关是两条独立监听：这里的地址与
-      // 密钥由宿主按实际绑定的端口生成，端口没开就只给一句说明而不是一堆会骗人的
-      // 配方（未启用时 /clients 回的是占位端口与占位 Key）。
+      // The client recipes for the free lane's forward port. It and the gateway block above are two independent listeners: the addresses and
+      // keys here are generated by the host from the port that actually bound; when the port is off, only an explanation is given instead of a pile of misleading
+      // recipes (when disabled, /clients returns a placeholder port and a placeholder Key).
       const clients = usePanel(() => api('/clients'), [])
 
       const loadGateway = useCallback(async () => {
@@ -5614,7 +5614,7 @@ window.__ModuleLoader__.load({
           children))
     }
 
-    // ── 聚合渠道 / 省 Token / 路由 ─────────────────────────────────────────────
+    // ── Aggregate channel / Token savers / Routing ─────────────────────────────────────────────
     /**
      * One panel fetch per page, plus the merge for what a write answers with.
      *
@@ -5992,7 +5992,7 @@ window.__ModuleLoader__.load({
     }
 
     /**
-     * 聚合渠道: the registry, the configured providers and their editors.
+     * Aggregate channel: the registry, the configured providers and their editors.
      *
      * The catalog is read from the summary the shell already holds, so the
      * "contributes N models" line is the picker's own view rather than a second
@@ -6371,7 +6371,7 @@ window.__ModuleLoader__.load({
     }
 
     /**
-     * 省 Token: the three savers and what they have actually saved.
+     * Token savers: the three savers and what they have actually saved.
      *
      * Every control posts and then renders the host's own answer; nothing here
      * shows a switch state the settings file does not have. The dashboard reads
@@ -6711,7 +6711,7 @@ window.__ModuleLoader__.load({
     }
 
     /**
-     * 路由: the stored fallback chains and their editor.
+     * Routing: the stored fallback chains and their editor.
      *
      * The resolution shown per chain is derived from the model list this page
      * already holds — the same intersection the host uses to build the virtual
@@ -6802,8 +6802,8 @@ window.__ModuleLoader__.load({
       const [benches, setBenches] = useState({})
       const summary = useAsync(() => api('/summary'), [])
       const stats = useAsync(() => api('/stats'), [])
-      // GitHub 授权状态由这一层持有：模型卡的锁标记与 EAC 面板必须看到同一个
-      // 判定，登录 / 退出后两边同时更新；60 秒轮询兜住别处（另一台机器）的变动。
+      // The GitHub authorization state is held at this layer: the model cards' lock marks and the EAC panel must see the same
+      // verdict; after sign-in / sign-out both sides update together; a 60-second poll covers changes made elsewhere (on another machine).
       const [eacAuth, setEacAuth] = useState(undefined)
       useEffect(() => {
         let alive = true
@@ -6814,8 +6814,8 @@ window.__ModuleLoader__.load({
         const timer = setInterval(load, 60_000)
         return () => { alive = false; clearInterval(timer) }
       }, [])
-      // 登录流只有这一份：EAC 面板、页头的未授权按钮、上锁模型卡的「去授权」
-      // 共享同一个进行中的会话（同一轮询、同一条提示），见 useEacLogin。
+      // There is only one copy of the sign-in flow: the EAC panel, the page header's unauthorized button and the locked model cards'
+      // "Go authorize" action share the same in-flight session (the same polling, the same notice); see useEacLogin.
       const eacLogin = useEacLogin({ t, summary, onAuth: setEacAuth })
 
       const apply = async patch => {
@@ -6832,9 +6832,9 @@ window.__ModuleLoader__.load({
       const bench = async model => {
         setBenches(current => ({ ...current, [model.id]: { running: true } }))
         try {
-          // 默认档（balanced）而不是 deep：测速要回答的是“这个模型日常多快”，
-          // 默认档就是日常档；deep 每次最多烧 32K 输出 token，且经常把固定
-          // bench 会话自己打到 429。
+          // The default level (balanced) rather than deep: a speed test has to answer "how fast is this model in everyday use";
+          // the default level is the everyday level; deep burns up to 32K output tokens per run, and often drives the fixed
+          // bench session itself into a 429.
           // The backend owns the 300s total budget; leave 30s for its final response.
           const result = await post('/bench', { model: model.id }, 330_000)
           setBenches(current => ({ ...current, [model.id]: { running: false, result: t('bench.result').replace('{ttft}', result.ttftMs).replace('{tps}', result.tokensPerSecond ?? '—').replace('{reasoning}', result.reasoningTokens ?? '—') + (result.persisted === false ? ' · ' + t('bench.notSaved') : '') } }))
@@ -6852,7 +6852,7 @@ window.__ModuleLoader__.load({
           h('div', null, h(Button, { onClick: () => summary.reload() }, t('retry'))))
       }
       const data = summary.data
-      // 匿名免费与 Kilo 共用状态统计；清单条目不会被当成实测成功。
+      // The anonymous free lane and Kilo share the state statistics; roster entries are not treated as measured successes.
       const counts = freePoolView(data).counts
       return h(Shell, {
         t: tagged, data, counts, summary, stats, eacAuth, setEacAuth, eacLogin,
@@ -6865,8 +6865,8 @@ window.__ModuleLoader__.load({
     // behind one glass navigation bar, because the three lanes answer three
     // different questions and mixing them pushed the model roster — the thing
     // people actually open this page for — below the fold:
-    //   免费模型       the no-account lane (this plugin's own gateway),
-    //   EAC 模型       the desktop co-paid lane behind GitHub auth,
+    //   Free models      the no-account lane (this plugin's own gateway),
+    //   EAC models       the desktop co-paid lane behind GitHub auth,
     //   EAC router     the current enabled account channels and their logins.
     // The active page lives in localStorage so a reload — or the hot reload the
     // upgrader triggers — comes back to the page the user was reading.
@@ -7055,7 +7055,7 @@ window.__ModuleLoader__.load({
     function WorkspacePage({ t, summary, section, onSelect }) {
       const [visited, setVisited] = useState(() => new Set([section]))
       useEffect(() => {
-        try { window.localStorage?.setItem('ofm.workspace.section', section) } catch { /* 当前页面仍可切换 */ }
+        try { window.localStorage?.setItem('ofm.workspace.section', section) } catch { /* the current page can still be switched */ }
       }, [section])
       const sections = [['tools', t('engine.tools')], ['accounts', t('sub.title')]]
       const select = next => { onSelect(next); setVisited(previous => new Set([...previous, next])) }
@@ -7097,7 +7097,7 @@ window.__ModuleLoader__.load({
       })
       const toggleEffects = () => setEffects(current => {
         const next = !current
-        try { window.localStorage?.setItem(EFFECTS_KEY, next ? 'on' : 'off') } catch { /* 当前页面仍可切换 */ }
+        try { window.localStorage?.setItem(EFFECTS_KEY, next ? 'on' : 'off') } catch { /* the current page can still be switched */ }
         return next
       })
       /* The disclaimer is not a gate on the lanes: it reads once on the first
@@ -7258,7 +7258,7 @@ window.__ModuleLoader__.load({
       const ok = counts.available ?? 0
       const pct = total > 0 ? Math.max(0, Math.min(100, Math.round(100 * selectable / total))) : null
       const ratio = total > 0 ? selectable / total : 0
-      // 颜色跟随可选比例；实际探测结果仍由下方五格状态独立显示。
+      // The colour follows the selectable share; the actual probe results are still shown independently by the five state cells below.
       const level = ratio >= 0.6 ? 'ok' : ratio >= 0.3 ? 'busy' : 'over'
       return h('div', { className: 'ofm_page' },
         h(SponsorBanner, { t }),
@@ -7338,8 +7338,8 @@ window.__ModuleLoader__.load({
                   : h('span', { className: `ofm_poolbadge ${reading.level}` },
                     h('span', { className: 'ofm_pooldot' }),
                     `${levelText} · ${t('pool.live')} ${pool.inflight}`),
-                // 未授权时把登录入口放到页头：撞到「没授权」的用户第一眼看到的
-                // 位置就该有钥匙，而不是要先找到下方的授权区。
+                // When unauthorized, put the sign-in entry in the page header: a user who has run into "not authorized" should see the key
+                // in the first place they look, rather than having to find the authorization section below first.
                 eacAuth?.available === true && eacAuth?.authorized !== true
                   ? h(Button, { kind: 'primary', disabled: eacLogin.busy || eacLogin.pending !== null, onClick: eacLogin.login },
                     eacLogin.busy ? t('eac.starting') : t('eac.login'))
@@ -7523,23 +7523,23 @@ window.__ModuleLoader__.load({
         let disposed = false
         let source
         let retryTimer
-        // 重连轮次必须活在 open() 之外：open() 每次重连都会重入，计数器若在里面
-        // 会被清零，退避就永远是第一档而不是 30s 翻倍到 5 分钟。
+        // The reconnect round must live outside open(): open() is re-entered on every reconnect, so a counter inside it
+        // would be reset to zero, and the backoff would forever stay on the first tier instead of doubling from 30s up to 5 minutes.
         let retries = 0
         api('/announcements').then(payload => { osEnabled = payload?.notifyOs === true }).catch(() => {})
         const open = () => {
           if (disposed) return
           source = new EventSource(`${API}/events`)
-          // 断连保护：服务端不可达时 EventSource 默认无限自动重连（持续占连接池）。
-          // 连续失败达到上限先关闭让出连接，但按退避（30s 翻倍、封顶 5 分钟）定时
-          // 重新打开——永久关闭让公告/更新/升级推送在宿主重启或休眠后整体静默失效，
-          // 只有刷新页面才能恢复；退避重连在恢复连接性的同时保住连接池。
+          // Disconnect protection: when the server is unreachable, EventSource by default reconnects automatically without limit (continuously occupying the connection pool).
+          // Once consecutive failures reach the cap, close first to yield the connection, but reopen on a timer with backoff (30s doubling, capped at 5 minutes) ——
+          // a permanent close would leave announcement/update/upgrade pushes silently dead as a whole after a host restart or sleep,
+          // recoverable only by refreshing the page; backoff reconnection preserves the connection pool while restoring connectivity.
           let errCount = 0
           source.onopen = () => { errCount = 0; retries = 0 }
           source.onerror = () => {
             errCount += 1
             if (errCount < 5) return
-            try { source.close() } catch { /* 已关闭 */ }
+            try { source.close() } catch { /* already closed */ }
             if (disposed || retryTimer !== undefined) return
             retryTimer = setTimeout(() => {
               retryTimer = undefined
@@ -7655,9 +7655,9 @@ window.__ModuleLoader__.load({
           .then(payload => { if (alive) setAck(payload) })
           .catch(() => { if (alive) setAck({ acknowledged: true, version: '' }) })
         api('/summary').then(payload => { if (alive) setSummary(payload) }).catch(() => {})
-        // 超时兜底：3 秒拿不到 ack（后端挂起/超时/异常）→ 当作已 ack 主动放行——
-        // 本组件是 settings.onboarding 协调器最先执行的 step（order:-50），complete 依赖 ack；
-        // ack 永远 undefined 会永久卡住 onboarding 流程（连带阻塞后续 step 与主题启动画面）。
+        // Timeout backstop: if no ack arrives within 3 seconds (backend hung/timed out/errored) → treat it as acked and let it through ——
+        // this component is the first step the settings.onboarding coordinator executes (order:-50), and complete depends on the ack;
+        // an ack that stays undefined forever would jam the onboarding flow permanently (blocking the later steps and the theme splash screen along with it).
         const timer = setTimeout(() => {
           if (alive) setAck(current => current ?? { acknowledged: true, version: '' })
         }, 3000)

@@ -179,10 +179,10 @@ try {
       assert.match(named, new RegExp(channel), `the disclaimer names ${channel}`)
     }
     const body = DISCLAIMER.sections.map(section => section.body).join(' ')
-    assert.match(body, /不包含、也不提供/, 'it says the build does not provide them')
-    assert.match(body, /与本项目作者及团队无关/, 'it states the team is not responsible')
-    assert.match(body, /个人学习/, 'it states the project purpose')
-    assert.match(body, /自行承担/, 'it places the consequences on the user')
+    assert.match(body, /does not include or offer/, 'it says the build does not provide them')
+    assert.match(body, /unrelated to the authors and team of this project/, 'it states the team is not responsible')
+    assert.match(body, /personal learning/, 'it states the project purpose')
+    assert.match(body, /borne by the user/, 'it places the consequences on the user')
   })
 
   await engineCheck('saving a provider from the excluded preset is refused', async () => {

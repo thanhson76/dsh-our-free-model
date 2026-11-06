@@ -1,44 +1,44 @@
-# 赞助广告入口与每日公告
+# Sponsor Advertisement Entry and Daily Announcement
 
-本次增加赞助广告页面与每日一次的完整公告，不改变推理、账号、网关和登录业务。
+This change adds a sponsor advertisement page and a full announcement shown once a day; it does not change inference, account, gateway or login behaviour.
 
-## 界面预览
+## UI Preview
 
-![插件、桌面浅色与桌面深色公告](images/sponsor-ui-preview.jpg)
+![Announcement in the plugin, desktop light and desktop dark](images/sponsor-ui-preview.jpg)
 
-## 显示位置
+## Display Locations
 
-- DSH 插件：顶部菜单增加“来自赞助商的广告”，可进入长文页面。
-- 独立服务及桌面端：左侧“项目支持”下增加同名入口。窄窗口沿用现有横向菜单。
-- 插件继承宿主配色；桌面端分别适配浅色纸面与深色终端主题。
-- 完整公告的正文单独滚动，头部关闭按钮与底部“收起至菜单”始终可用。
-- 收起时先让菜单进入可见区域，再把公告缩向该菜单并短暂强调入口。系统设置减少动效时立即收起。
-- Esc 与点击遮罩也能立即收起，没有倒计时、阅读进度要求或自动外跳。
+- DSH plugin: a "Ads from sponsors" item is added to the top menu, leading to the long-form page.
+- Standalone service and desktop: an entry of the same name is added under "Project support" on the left. Narrow windows reuse the existing horizontal menu.
+- The plugin inherits the host's colour scheme; the desktop build adapts separately to the light paper and dark terminal themes.
+- The full announcement's body scrolls separately, and the close button in the header and "Collapse to menu" at the bottom are always available.
+- When collapsing, the menu is first brought into the visible area, then the announcement shrinks towards that menu and briefly highlights the entry. When the system is set to reduce motion, it collapses immediately.
+- Esc and clicking the overlay also collapse it immediately; there is no countdown, no reading-progress requirement and no automatic external redirect.
 
-## 每天一次的边界
+## The Once-a-Day Boundary
 
-首次成功打开界面后，等待 700ms 尝试展示；登录界面、后台窗口和已有其他模态窗口时不会抢占。
-插件所在的宿主设置弹窗不作为避让对象；同一设置页中另开的业务弹窗仍需关闭后才展示公告。
-公告打开时 Esc 只收起公告并将焦点返回广告菜单，不触发宿主设置页的 Esc 关闭操作。
-“今天”按设备本地年月日判断，不使用 UTC 日期。记录键为 `ofm.sponsor.last-shown.v1`，公告成功打开后才保留记录。
-刷新、切页、组件重新挂载和同源多窗口都沿用记录；支持 Web Locks 的浏览器在并发窗口之间串行处理展示。
-浏览器不允许访问或写入本地存储时跳过自动公告，仍保留广告菜单，避免每次刷新重复弹出。
+After the UI is first opened successfully, it waits 700ms before trying to show it; it does not pre-empt the login screen, background windows or other existing modal windows.
+The host settings dialog in which the plugin sits does not count as something to avoid; a business dialog opened separately within the same settings page still has to be closed before the announcement is shown.
+While the announcement is open, Esc only collapses the announcement and returns focus to the ad menu; it does not trigger the host settings page's Esc close behaviour.
+"Today" is judged by the device's local year, month and day, not the UTC date. The record key is `ofm.sponsor.last-shown.v1`, and the record is kept only after the announcement has been opened successfully.
+Refreshes, page switches, component re-mounts and multiple same-origin windows all reuse the record; browsers supporting Web Locks serialise display across concurrent windows.
+When the browser does not allow reading or writing local storage, the automatic announcement is skipped and only the ad menu is kept, avoiding a pop-up on every refresh.
 
-记录属于当前浏览器/桌面应用的数据环境与站点地址。不同浏览器、不同端口、不同桌面配置以及清空站点数据后，各有自己的首次记录。
-界面保持开启跨过午夜时不会在操作中突然弹出；下一次进入或回到该界面时按新日期判断。
+The record belongs to the current browser/desktop app's data environment and site address. Different browsers, different ports, different desktop profiles and cleared site data each have their own first record.
+If the UI stays open across midnight, nothing suddenly pops up mid-operation; the next time the UI is entered or returned to, it is judged against the new date.
 
-## 内容与资源
+## Content and Resources
 
-- `src/sponsor.js`：原文、注册链接、邀请码、群号、日期规则和共用 React 组件。
-- `src/sponsor.css`：共用排版及三种视觉适配。
-- `docs/images/sponsor-beichen-examples.jpg`：用户提供的原始附图。
-- `scripts/build-sponsor.mjs`：将共用组件、样式、附图内联进插件 `client.js`。附图不依赖外部图床。
-- `packages/standalone/frontend/sponsor.tsx`：独立端使用同一套组件与图片。
+- `src/sponsor.js`: the original text, registration link, invitation code, group number, date rules and shared React components.
+- `src/sponsor.css`: shared typography and the three visual adaptations.
+- `docs/images/sponsor-beichen-examples.jpg`: the original attached image provided by the user.
+- `scripts/build-sponsor.mjs`: inlines the shared components, styles and attached image into the plugin's `client.js`. The attached image does not depend on an external image host.
+- `packages/standalone/frontend/sponsor.tsx`: the standalone build uses the same components and image.
 
-注册链接实际使用标准半角问号，邀请码为 `DL49WAC2DQNG`；外链只在用户主动点击后打开。
-图片作为提供的生成示例展示，不增加独立验证的承诺。
+The registration link actually uses a standard half-width question mark, and the invitation code is `DL49WAC2DQNG`; external links open only after the user actively clicks.
+The image is shown as the provided generated example and carries no independently verified claims.
 
-修改内容后运行：
+After changing the content, run:
 
 ```powershell
 node scripts/build-sponsor.mjs
@@ -47,7 +47,7 @@ node scripts/sponsor-test.mjs
 npm run typecheck:standalone
 ```
 
-独立端构建会同步更新插件内联组件；`--check` 只检查一致性，不写文件。
-自动离线测试包含每日规则测试。真实浏览器测试为 `node scripts/sponsor-ui-test.mjs`，可通过 `OFM_PLAYWRIGHT_MODULE` 指向已有 Playwright 模块、`OFM_BROWSER_PATH` 指向浏览器，以及 `OFM_SPONSOR_OUTPUT` 指定截图目录。
+The standalone build synchronously updates the plugin's inlined components; `--check` only checks consistency and writes no files.
+The automatic offline tests include the daily-rule tests. The real-browser test is `node scripts/sponsor-ui-test.mjs`, which can be pointed at an existing Playwright module via `OFM_PLAYWRIGHT_MODULE`, at a browser via `OFM_BROWSER_PATH`, and at a screenshot directory via `OFM_SPONSOR_OUTPUT`.
 
-本次只更新源码和网页构建文件，未重新生成 Windows EXE 或安装包，也未生成新的发布签名。
+This change only updates the source and web build files; no Windows EXE or installer was regenerated, and no new release signature was produced.

@@ -137,15 +137,17 @@ export class FreeModelAdapter {
   /**
    * Resolve provider-side request-image pricing for one exact model route.
    *
-   * 宿主 spill-policy 遇到 undefined 会放弃整条含图结果的落盘（issue #151）。
-   * 免费出口没有统一视觉计价协议，提供同步估算以支持预算与落盘。
+   * The host spill-policy, on encountering undefined, abandons persisting the
+   * entire result containing images (issue #151). The free egress has no
+   * unified visual pricing protocol, so a synchronous estimate is provided to
+   * support budgeting and persistence.
    *
    * Must stay synchronous: the token meter resolves it per measurement, with no
    * I/O window (issue #42).
    *
    * @param {string} _provider - a route passed to `registerAdapter()` for this instance.
    * @param {string} _model - exact model id passed to GenerateOptions.model.
-   * @returns {typeof FALLBACK_IMAGE_PRICING} 视觉 Token 估算，不是厂商真实消耗。
+   * @returns {typeof FALLBACK_IMAGE_PRICING} A visual token estimate, not the vendor's actual consumption.
    */
   imageRequestPricing(_provider, _model) {
     return FALLBACK_IMAGE_PRICING
@@ -227,7 +229,7 @@ export class FreeModelAdapter {
         throw error
       }
     }
-    // 原生生成器把 return 排在 pending next 后；先取消请求才能立即退出。
+    // A native generator queues return behind a pending next; cancel the request first to exit immediately.
     return {
       [Symbol.asyncIterator]() { return this },
       next: value => step('next', value),
@@ -453,18 +455,22 @@ export class FreeModelAdapter {
     // the token savers measured for the body that actually shipped.
     let attemptSavings = null
 
-    // 一次逻辑回合的丢弃内容告警只由首个 payload 收集。检查点估算和续写段都要另建
-    // 一份 payload，共用同一个数组会让 `image-dropped` 按 build 次数重复累积，还会
-    // 让已经交出去的首段样本跟着后面的 build 一起变长。
+    // Dropped-content warnings for one logical turn are collected only by the
+    // first payload. Checkpoint estimates and continuation segments each build
+    // their own payload; sharing one array would make `image-dropped`
+    // accumulate repeatedly per build, and would let the already-handed-over
+    // first-segment sample grow along with later builds.
     const payloadFor = (input, ceiling, sink, savingsSink) => {
       const payload = buildPayload(wire, entry.id, input, options, ceiling, resolveImage, sink)
       if (declared.length > 0) payload.tools = declared
       if (typeof options.temperature === 'number' && Number.isFinite(options.temperature)) payload.temperature = options.temperature
       if (wire !== 'responses' && Array.isArray(options.stop) && options.stop.length > 0) payload.stop = options.stop
-      // ⚠️ 续写回合**不再**下发 `tool_choice: 'none'`：v2 门禁见到 `none` 一律
-      // 403 FreeTierError（旧实现靠它压住工具调用）。压制手段改为续写指令本身
-      // ——`recoveryMessages()` 的正文里已经写着「Do not call tools」，这条提示
-      // 是 v1 时代就有的，不依赖 tool_choice。
+      // ⚠️ A continuation turn **no longer** sends `tool_choice: 'none'`: the
+      // v2 gate answers 403 FreeTierError whenever it sees `none` (the old
+      // implementation relied on it to hold down tool calls). Suppression now
+      // comes from the continuation instruction itself — the body of
+      // `recoveryMessages()` already says "Do not call tools", a prompt that
+      // dates back to the v1 era and does not depend on tool_choice.
       // A declared thinking menu means the selected level is the real control
       // on the wire: it rides the request as the model's own effort field (a
       // JSON merge patch, ZCode's declaration shape). The free lane's own ids
@@ -606,7 +612,7 @@ export class FreeModelAdapter {
             if (options.signal?.aborted === true) throw new UpstreamError('request aborted', CODE.aborted)
             const chunk = row.value
             if (chunk.type === 'text-delta' && typeof chunk.text === 'string' && chunk.text.trim() !== '') sawAnswer = true
-            // 续写禁用工具；网关不遵守时也不把工具块交给宿主执行。
+            // Tools are disabled in a continuation; if the gateway does not comply, do not hand the tool block to the host to execute either.
             if (recovering && (chunk.blockType === 'tool-call' || chunk.type === 'tool-call-delta' || chunk.block?.type === 'tool-call')) {
               throw new UpstreamError('our free model continuation unexpectedly requested a tool', 'STREAM_CUT')
             }
@@ -631,18 +637,22 @@ export class FreeModelAdapter {
           return { advance: false, verdict: null, ok: false }
         }
         const reason = outcome.brokenToolCall === true ? { kind: 'max-tokens' } : finishReason(outcome.finish)
-        // finishReason 是兜底映射，failed/cancelled 也会落成 stop：正常收尾的判定必须显式查原 token。
+        // finishReason is a fallback mapping, and failed/cancelled also land as stop: determining a normal ending must explicitly check the original token.
         const elapsed = Date.now() - started
         const interrupted = canRecover(outcome, policy, elapsed)
-        // 正文撞输出上限被截断（finish=length）：把已出正文回灌成 assistant 轮、
-        // 用剩余预算自动续写一次，替代宿主提示的「发送继续」手动接力（#28）。
-        // 只在首段触发（recovering 段自己也撞墙就如实报 max-tokens，不无限续），
-        // 且不与断流/空停续写共用 attempt 名额以外的路径。
+        // Body text truncated by hitting the output ceiling (finish=length):
+        // feed the already-emitted body back as an assistant turn and
+        // automatically continue once with the remaining budget, replacing the
+        // host-prompted manual "send continue" relay (#28). This only triggers
+        // on the first segment (if the recovering segment also hits the wall,
+        // report max-tokens honestly rather than continuing indefinitely), and
+        // it does not share a path with stream-cut / silent-stop continuation
+        // beyond the attempt allowance.
         const maxTokensCut = policy.enabled && !recovering && reason.kind === 'max-tokens' && outcome.brokenToolCall !== true
           && outcome.sawText === true && outcome.sawToolCall !== true
           && typeof outcome.answerText === 'string' && outcome.answerText.trim() !== ''
         const silentStop = !interrupted && !maxTokensCut && reason.kind === 'stop'
-          // 无 token 的正常收尾（message_stop / response.done 不带 status）也算停收；failed、length 这类有 token 的收尾仍被挡在外面。
+          // A normal ending with no token (message_stop / response.done without a status) also counts as a stopped finish; endings that do carry a token, such as failed and length, are still kept out.
           && (outcome.finish === undefined || ['stop', 'end_turn', 'stop_sequence'].includes(outcome.finish))
           && canRecoverSilentStop(outcome, policy, elapsed)
         if (!recovering && (interrupted || silentStop || maxTokensCut)) {

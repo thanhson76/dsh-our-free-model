@@ -38,7 +38,7 @@ for (const source of only) {
       const staged = await stageRelease({ manifest, manifestUrl: snapshot, stageDir: stage })
       verifyStaged(stage, manifest)
       verified++
-      console.log(`OK   ${host}: version=${manifest.version}, ${staged.files} files, ${staged.bytes} bytes — 全部 SHA-256 与回读校验通过 (${snapshot})`)
+      console.log(`OK   ${host}: version=${manifest.version}, ${staged.files} files, ${staged.bytes} bytes — all SHA-256 and read-back verifications passed (${snapshot})`)
     } finally {
       fs.rmSync(stage, { recursive: true, force: true })
     }

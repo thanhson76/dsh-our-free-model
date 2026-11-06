@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       candidate_sha:
-        description: 已审查且包含最新 main 的候选完整提交 SHA
+        description: Full candidate commit SHA that has been reviewed and contains the latest main
         required: true
         type: string
 

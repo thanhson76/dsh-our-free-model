@@ -1,69 +1,69 @@
-# 独立端用量统计页改版
+# Standalone usage statistics page redesign
 
-## 授权与范围
+## Authorization and scope
 
-用户已确认本批计划：改版用量统计页，保留原有统计业务，展示请求数、
-用户回合、输入/输出 Token、失败与恢复次数，整理每日趋势、按模型统计、
-空状态和刷新，并验证桌面及窄屏、分多个 commit 提 PR。
-模型清单 PR #164 的本地交付为 `59297b9`，该 PR 已合并至主线 `2a1c366`。
-本批提交已 rebase 到此主线版本，单独提交用量统计改版。
-不自动合并 PR，不提升版本或发布 Release。
+The user has confirmed this batch's plan: redesign the usage statistics page, keep the original statistics business logic, and show request counts,
+user turns, input/output Tokens, failure and recovery counts; tidy up the daily trend, per-model statistics,
+empty states and refresh; verify desktop and narrow screens; and submit a PR split across multiple commits.
+The model roster PR #164's local delivery is `59297b9`, and that PR has been merged into mainline at `2a1c366`.
+This batch's commits have been rebased onto that mainline version, submitting the usage statistics redesign separately.
+No PR is merged automatically, and no version is bumped or Release published.
 
-## 前置核对
+## Preliminary checks
 
-对模型清单实现者自查：按需导入使用当前快照，切页返回保留筛选，
-退出清空组件，取消以 controller 身份和 active 状态防止迟到结果覆盖，
-管理请求沿用鉴权和超时；此轮未发现阻塞下一批的问题。
-这不是独立 Agent 审查，也不保证完全无缺陷。
-本轮 GitHub 连接曾出现 TLS 超时；恢复后已核对 PR #164 合并状态和主线版本。
-正常服务使用独立产品默认数据目录，压测服务仍使用 `.verify` 隔离目录；
-不读取 DSH 凭据或把测试统计搬入正常服务。
+Self-check by the model-roster implementer: on-demand imports use the current snapshot, returning after a page switch keeps the filters,
+signing out clears the component, cancellation uses the controller identity and active state to prevent late results from overwriting,
+and management requests reuse authentication and timeouts; this round found no problem blocking the next batch.
+This is not an independent Agent review, nor a guarantee of being completely defect-free.
+This round's GitHub connection experienced TLS timeouts; after recovery, PR #164's merge status and the mainline version were verified.
+The normal service uses the standalone product's default data directory, while the stress-test service still uses the `.verify` isolated directory;
+no DSH credentials are read and no test statistics are moved into the normal service.
 
-## 方案选择
+## Approach chosen
 
-1. 推荐迁入现有 React 与基础组件，按需分包；原统计接口保持不变。
-   页面结构、状态清理和视觉风格与概览及模型页保持一致。
-2. 只修改旧 HTML/CSS：工作量小，但继续保留两套页面状态与渲染方式。
-3. 引入完整图表库：交互能力更多，本批只有日用量柱图，增加依赖与体积不划算。
+1. Recommended: move into the existing React and base components, split into on-demand bundles; the original statistics interface stays unchanged.
+   Page structure, state cleanup and visual style stay consistent with the overview and model pages.
+2. Only modify the old HTML/CSS: little work, but two sets of page state and rendering approaches remain.
+3. Introduce a full charting library: more interaction capability, but this batch has only a daily-usage bar chart, so the added dependency and size are not worthwhile.
 
-采用方案一，日趋势使用现有 CSS 图形方式，不新增图表依赖。
+Approach one is adopted; the daily trend uses the existing CSS graphics approach, and no charting dependency is added.
 
-## 页面与数据
+## Page and data
 
-- 顶部六项累计指标：用户回合、物理请求、输入 Token、输出 Token、
-  失败回合、已恢复回合。补充物理失败请求和思考 Token。
-- 累计指标与按模型表格使用 `/api/management/stats` 的累计字段，
-  不用最近日序列重算历史总量。说明物理重试可能多于用户回合。
-- 历史估算沿用 `logicalEstimated`、`requestFailuresEstimated`，
-  未知或未测得的性能值显示“—”，不能伪装为零。
-- 日趋势默认最近 14 个本地自然日，可切换 7/14/30 天；
-  缺失日期补零，使用服务返回的每日总量，不伪造输入/输出拆分。
-- 按模型显示名称和完整 ID、回合、请求、输入/输出、失败与恢复、
-  首字延迟和生成速度。支持名称/ID 搜索、明确的排序选项和每页 20 条。
-  切换查询或排序回第一页，刷新后页码限于有效范围。
-- 全局无记录、趋势窗口无记录和搜索无匹配分别说明；
-  不把窗口无记录误报为从未调用，不展示虚构增长率或费用。
+- Six cumulative metrics at the top: user turns, physical requests, input Tokens, output Tokens,
+  failed turns, recovered turns. Physical failed requests and thinking Tokens are added.
+- The cumulative metrics and the per-model table use the cumulative fields of `/api/management/stats`,
+  rather than recomputing historical totals from the recent daily series. A note explains that physical retries may outnumber user turns.
+- Historical estimates reuse `logicalEstimated` and `requestFailuresEstimated`;
+  unknown or unmeasured performance values are shown as "—" and cannot masquerade as zero.
+- The daily trend defaults to the most recent 14 local calendar days and can switch between 7/14/30 days;
+  missing dates are zero-filled, using the daily totals returned by the service, with no fabricated input/output split.
+- Per model, the name and full ID, turns, requests, input/output, failures and recoveries,
+  time-to-first-token and generation speed are shown. Name/ID search, explicit sort options and 20 rows per page are supported.
+  Changing the query or sort returns to the first page, and after a refresh the page number is clamped to the valid range.
+- No records globally, no records in the trend window and no search matches are each explained separately;
+  an empty window is not misreported as never having been called, and no fabricated growth rates or costs are shown.
 
-## 生命周期与兼容
+## Lifecycle and compatibility
 
-用量页首次进入才动态导入，隐藏页面不挂载统计表格。
-保留现有全局刷新与 15 秒状态轮询，刷新不会发送推理请求。
-手动刷新禁用重复点击，成功/错误反馈仅在当前活动页面显示，
-切页或退出后旧回调不能恢复旧页面反馈。退出后重置搜索、排序及分页。
-按需页面导入失败提供重试；迟到导入使用最新会话快照。
-移除旧用量 DOM 与事件绑定，其他页面、插件和后端统计口径不变。
+The usage page is dynamically imported only on first entry, and hidden pages do not mount the statistics table.
+The existing global refresh and 15-second status polling are kept, and refreshing sends no inference requests.
+Manual refresh disables repeat clicks; success/error feedback is shown only on the currently active page,
+and old callbacks cannot restore old page feedback after switching pages or signing out. Signing out resets the search, sort and pagination.
+If an on-demand page import fails, a retry is offered; late imports use the latest session snapshot.
+The old usage DOM and event binding are removed; other pages, the plugin and the backend statistics definitions are unchanged.
 
-## 实施与验收清单
+## Implementation and acceptance checklist
 
-1. 已核对原插件与独立端统计结构，记录本设计和基线。
-2. 新增统计类型、趋势与筛选分页纯函数及 React 页面，迁移页面承载。
-3. 生成静态产物，移除不再使用的旧用量样式。
-4. 离线专项验证累计与日趋势分离、本地日期补零、跨月/跨年、
-   历史估算、排序、搜索、分页边界、输入数据不被修改。
-5. 实际浏览器核对正常服务真实零值，以及隔离测试服务的非零数据、
-   空趋势、无匹配、刷新、分页、切页/退出、桌面与窄屏。
-6. 类型检查、构建一致性、管理专项、贡献者及发布校验；
-   记录截图、资源体积、已执行和未执行项目。
-7. 分多个中文 commit，网络可用时核对主线后推送并开中文六章节 PR。
+1. The original plugin's and the standalone side's statistics structures were checked, and this design and the baseline were recorded.
+2. Add statistics types, pure functions for trend and filter pagination, and the React page; migrate the page hosting.
+3. Generate the static artefacts and remove the no-longer-used old usage styles.
+4. Offline special validation of cumulative vs. daily-trend separation, local-date zero filling, cross-month/cross-year boundaries,
+   historical estimates, sorting, search, pagination boundaries, and input data not being modified.
+5. Actually check in the browser the normal service's real zero values, and an isolated test service's non-zero data,
+   empty trend, no matches, refresh, pagination, page switching/signing out, and desktop and narrow screens.
+6. Type checking, build consistency, management special tests, and contributor and release checks;
+   record screenshots, asset sizes, and items performed and not performed.
+7. Split across multiple commits in Chinese; when the network is available, check mainline, then push and open a six-section PR in Chinese.
 
-无新的配置或数据迁移。回退本批源码和对应构建资源并重启即可。
+There is no new configuration or data migration. Rolling back is just reverting this batch's sources and the corresponding build assets and restarting.

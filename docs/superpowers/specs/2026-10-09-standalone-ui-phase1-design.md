@@ -1,49 +1,49 @@
-# 独立端界面改版：第一阶段
+# Standalone interface redesign: phase one
 
-## 已确认的范围
+## Confirmed scope
 
-用户已确认先完成概览、渠道管理、公共布局和可点击预览。采用 React、
-TypeScript、Vite、Tailwind，以及项目内维护的 shadcn 风格基础组件。
-以浅灰背景、白色内容区、深色文字和蓝色强调色建立工作台视觉。
-第一阶段完成后提供视觉及性能证据，等待用户评审再铺其他业务页面。
+The user has confirmed completing the overview, channel management, shared layout and a clickable preview first. React,
+TypeScript, Vite, Tailwind, and shadcn-style base components maintained in-project are used.
+A light-grey background, white content areas, dark text and a blue accent colour establish the workbench look.
+Once phase one is complete, visual and performance evidence is provided, and the other business pages wait for the user's review before being rolled out.
 
-## 结构与兼容
+## Structure and compatibility
 
-- Vite 生成本地 ES module 及 CSS，渠道模块动态加载，共用一份 React。
-- 概览以 React 组件展示真实统计、接入地址、服务信息和最近错误。
-- 渠道列表新增搜索、状态筛选和集中详情，详情复用原 ChannelCard 的登录、
-  账号池、模型开关、续期、签到及积分业务。
-- 用量、日志、供应商设置、备份、EAC 保留原业务组件；统一承载样式。
-- 未改版的模型、设置、API 接入和登录操作保留已有控制逻辑。渐进适配器
-  将管理摘要提供给新 React 组件，不重写后端接口或原插件。
-- 只挂载实际构建出的脚本及样式，不提供任意文件路径访问。
-- 异步加载应处理错误、重试及过期导航，退出管理后不显示先前账号状态。
-- 页面保留替身提示，不把预览账号误作真实账号。
+- Vite generates local ES modules and CSS, the channel module loads dynamically, and a single React is shared.
+- The overview uses React components to show real statistics, the connection address, service information and recent errors.
+- The channel list gains search, status filtering and a centralised detail view, which reuses the original ChannelCard's sign-in,
+  account pool, model toggles, renewal, check-in and credit business logic.
+- Usage, the log, provider settings, backup and EAC keep their original business components; hosting styles are unified.
+- The un-redesigned model, settings, API connection and sign-in operations keep their existing control logic. A progressive adapter
+  provides the management summary to the new React components without rewriting the backend interfaces or the original plugin.
+- Only scripts and styles that were actually built are mounted; no arbitrary file-path access is provided.
+- Asynchronous loading should handle errors, retries and stale navigation, and after leaving management no previous account state is shown.
+- The pages keep the stand-in notice, so a preview account is not mistaken for a real account.
 
-## 页面
+## Pages
 
-概览：标题和更新操作、四项指标、七天用量、快速接入、渠道入口和最近错误。
-无历史数据时显示真实零值及空状态，不使用虚构增长率或调用记录。
+Overview: title and refresh action, four metrics, seven days of usage, quick connection, the channel entry point and recent errors.
+With no historical data, real zero values and an empty state are shown; no fabricated growth rates or call records are used.
 
-渠道管理：账号渠道/EAC/匿名与 Kilo 入口可达；十三个账号渠道均可搜索和筛选。
-渠道详情集中呈现原业务操作，用量、日志和备份入口始终可达。
-页面适配桌面与窄屏，键盘焦点和文字对比度清晰。
+Channel management: the account channels / EAC / anonymous and Kilo entry points are reachable; all thirteen account channels can be searched and filtered.
+The channel detail view presents the original business operations centrally, and the usage, log and backup entry points are always reachable.
+The pages adapt to desktop and narrow screens, with clear keyboard focus and text contrast.
 
-## 验证与交付
+## Validation and delivery
 
-记录改版前全部前端资源原始/gzip 体积，以及同一浏览器刷新至概览可见的
-三次时间。后者包含自动化工具往返，不宣称为纯渲染耗时。
-新版本采用相同方法，补充首次/再次切入渠道及长列表操作结果。
+Record the raw/gzip sizes of all front-end assets before the redesign, and three timings for refreshing in the same browser until the overview becomes visible.
+The latter includes automation-tool round trips and is not claimed to be pure rendering time.
+The new version uses the same method, adding first/repeat entry into channels and long-list operation results.
 
-执行类型检查、生成一致性检查、管理与渠道专项、贡献者回归；
-保存概览、渠道、详情及窄屏截图。完整第三方授权由用户操作。
-分多个中文 commit，不发布 Release、不创建 tag、不提升版本。
+Run type checking, generation consistency checks, management and channel special tests, and the contributor regression;
+save screenshots of the overview, channels, detail view and narrow screens. Full third-party authorization is performed by the user.
+Split across multiple commits in Chinese; publish no Release, create no tag, and bump no version.
 
-## 实施任务
+## Implementation tasks
 
-1. 基线及设计记录。
-2. Vite、TypeScript、Tailwind 和共享页面构建适配。
-3. 统一公共组件、布局及概览。
-4. 渠道筛选与详情，保留共享业务。
-5. 业务与资源加载回归、桌面与窄屏实际验收。
-6. 体积/速度对比及已验证、未验证范围记录。
+1. Baseline and design record.
+2. Vite, TypeScript, Tailwind and shared-page build adaptation.
+3. Unified shared components, layout and overview.
+4. Channel filtering and detail, keeping the shared business logic.
+5. Business and asset-loading regression, and actual desktop and narrow-screen acceptance.
+6. Size/speed comparison and recording of the verified and unverified scope.

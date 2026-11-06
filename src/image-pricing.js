@@ -1,6 +1,6 @@
 /**
- * 缺少厂商视觉计价协议时的同步估算，供宿主的 Token 预算和结果落盘使用。
- * 1024 是兜底估算值，不代表所有厂商的真实消耗或上限。已移出请求的图片只计描述文本。
+ * Synchronous estimate used when a vendor's visual pricing protocol is missing, for the host's token budget and for persisting results.
+ * 1024 is a fallback estimate; it does not represent any vendor's actual consumption or cap. Images already removed from the request count only their description text.
  */
 export const FALLBACK_IMAGE_PRICING = Object.freeze({
   /** @param {readonly { offloaded?: boolean }[]} images */

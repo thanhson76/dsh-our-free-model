@@ -51,23 +51,24 @@ const flush = async () => { for (const effect of effects.splice(0)) effect(); aw
 render(); await flush()
 let tree = render()
 const host = () => all(tree).find(node => node.type === 'Sidebar').props.host
-// #678：侧边栏列了「模型工作台」，但白名单里没有它，`navigate('workspace')` 被
-// `includes` 静默丢弃 —— 点击无反应、无报错、无 loading。白名单现在从侧边栏
-// 推导，这一条钉住「侧边栏有的页面，点了真的会切过去」。
+// #678: the sidebar listed "Model workbench" but the allowlist did not, so
+// `navigate('workspace')` was silently dropped by `includes` — clicking did
+// nothing: no reaction, no error, no loading. The allowlist is now derived
+// from the sidebar; this pins down "a page the sidebar has really switches when clicked".
 host().navigate('workspace'); tree = render()
-assert.ok(all(tree).some(node => node.type === 'Workspace'), '「模型工作台」必须可达，点击后真的切页（#678）')
+assert.ok(all(tree).some(node => node.type === 'Workspace'), '"Model workbench" must be reachable and really switch pages when clicked (#678)')
 host().navigate('settings'); tree = render()
 assert.ok(all(tree).some(node => node.type === 'LazyPage' && node.props.name === 'settings'))
 host().navigate('models'); tree = render()
-assert.ok(all(tree).some(node => node.type === 'LazyPage' && node.props.name === 'settings' && node.props.active === false), '切页后保留设置组件及草稿，但停止非活动页面任务')
+assert.ok(all(tree).some(node => node.type === 'LazyPage' && node.props.name === 'settings' && node.props.active === false), 'switching pages keeps the settings component and its draft, but stops inactive-page tasks')
 assert.ok(all(tree).some(node => node.type === 'LazyPage' && node.props.name === 'models' && node.props.active === true))
 host().navigate('usage'); tree = render()
-assert.ok(all(tree).some(node => node.type === 'LazyPage' && node.props.name === 'models' && node.props.active === false), '模型筛选状态在切页后保留')
-assert.ok(!all(tree).some(node => node.type === 'Connection'), '密钥页面离开后卸载，清除显示的密钥')
+assert.ok(all(tree).some(node => node.type === 'LazyPage' && node.props.name === 'models' && node.props.active === false), 'model filter state is kept after switching pages')
+assert.ok(!all(tree).some(node => node.type === 'Connection'), 'the key page unmounts after leaving, clearing the displayed key')
 host().navigate('channels'); tree = render()
-assert.equal(all(tree).find(node => node.type === 'ChannelMount').props.key, 'channels', '账号渠道使用独立嵌套根容器')
+assert.equal(all(tree).find(node => node.type === 'ChannelMount').props.key, 'channels', 'the account channels use an independent nested root container')
 host().navigate('eac'); tree = render()
-assert.equal(all(tree).find(node => node.type === 'ChannelMount').props.key, 'eac', 'EAC 切换时更换容器，避免旧 React 根覆盖新页面')
+assert.equal(all(tree).find(node => node.type === 'ChannelMount').props.key, 'eac', 'switching to EAC replaces the container, so an old React root cannot overwrite the new page')
 let releaseOldKey
 context.fetch = async url => url.endsWith('/key') ? new Promise(resolve => { releaseOldKey = resolve }) : { ok: true, json: async () => ({}) }
 const oldKey = host().getApiKey().catch(error => error)
@@ -76,7 +77,7 @@ assert.equal(tree.type, 'LoginScreen')
 context.fetch = async url => ({ ok: true, json: async () => url.endsWith('/summary') ? summary : { models: [], days: [] } })
 await tree.props.request('/session', { key: 'test' }); tree = render()
 assert.equal(tree.props.id, 'app')
-releaseOldKey({ ok: false, status: 401, json: async () => ({ error: '旧会话已过期' }) })
+releaseOldKey({ ok: false, status: 401, json: async () => ({ error: 'Old session expired' }) })
 await oldKey; tree = render()
-assert.equal(tree.props.id, 'app', '旧会话迟到 401 不得登出新会话')
-console.log('ok  切页保留设置草稿与模型筛选，非活动页面暂停任务，退出移除工作空间')
+assert.equal(tree.props.id, 'app', 'a late 401 from an old session must not log out the new session')
+console.log('ok  page switching keeps the settings draft and model filters, inactive pages pause their tasks, exit removes the workspace')

@@ -121,7 +121,7 @@ try {
   assert.equal(adapters.has('opencode'), false, 'disabled account provider is not registered')
   assert.equal(adapters.size, 10, 'all other account providers remain registered')
   verifyChannelImagePricing(adapters)
-  console.log('ok  十渠道同步图片计价：缺失及默认方法兜底，厂商计价优先，重复图片与已卸载图片正确计数')
+  console.log('ok  ten channels synchronous image pricing: fallback for missing and default methods, vendor pricing takes priority, repeated and offloaded images counted correctly')
   assert.equal(writes.length, 0, 'mount neither creates nor deletes credentials')
   assert.equal(fetched.some(url => url.includes('opencode') || url.includes('models.dev')), false, 'no OpenCode capability/catalog warmup')
   assert.deepEqual(ctx.accountPool.listAccountsByProvider('opencode'), state.accounts.filter(entry => entry.provider === 'opencode'), 'historical account data survives')
@@ -191,7 +191,7 @@ try {
   console.log(`ok  ${sourceMode ? 'source modules' : 'generated pack'}: 10 providers, no OpenCode registration/warmup, historical data retained, account RPCs refused`)
   if (sourceMode) await verifySourceRegressions({ ctx, adapters, call, creds })
   await verifyChannelCreditsRpc({ ctx, call, creds, adapters })
-  console.log('ok  实际渠道 RPC：七渠道仅账号池凭据即可查余额，ZCode 账号池回退及缺凭据反馈')
+  console.log('ok  actual channel RPC: seven channels can query balances with account-pool credentials alone, ZCode account-pool fallback and missing-credential feedback')
 
   // A failed browser callback must become a terminal, readable poll result.
   // Before this regression check, the Gemini placeholder was removed and
@@ -274,8 +274,8 @@ try {
   console.log('ok  actual channel page: 10 account cards, OpenCode and unsupported providers removed')
   await verifyChannelModelActions()
   await verifyChannelCreditsUi()
-  console.log('ok  共享渠道余额：十渠道能力、失败原因、重试、签到反馈和请求交错')
-  console.log('ok  共享渠道卡片：批量开关、单次请求、重复点击保护和失败恢复')
+  console.log('ok  shared channel balances: ten-channel capability, failure reasons, retries, check-in feedback and request interleaving')
+  console.log('ok  shared channel card: batch toggles, single request, repeated-click protection and failure recovery')
 
   // The retained OFM anonymous lane still enumerates and streams without any
   // account, independently of the disabled vendored OpenCode provider.
@@ -322,19 +322,20 @@ async function verifySourceRegressions({ ctx, adapters, call, creds }) {
   await verifyLoopResumeEvents()
   await verifyGatewayToolCallFrames()
 
-  // ── #681：探测分派表、候选链与耗时回传 ─────────────────────────────────
+  // ── #681: probe dispatch table, candidate chain and latency reporting ──
   //
-  // 三处缺陷，各自独立：
-  // 1. `probeWithAdapter` 没有 loomy 分支 → 「测试」必然抛
-  //    `Unsupported probe adapter: loomy`；
-  // 2. `account.test` 只测目录第一个模型 → TRAE 的 `doubao-for-auto`（自动路由
-  //    占位模型，回 3003）把好好的账号报成不可用；
-  // 3. 服务端从不返回 `ms`，客户端却一直在读它。
+  // Three independent defects:
+  // 1. `probeWithAdapter` has no loomy branch → the "Test" action inevitably
+  //    throws `Unsupported probe adapter: loomy`;
+  // 2. `account.test` only tests the first model in the catalog → TRAE's
+  //    `doubao-for-auto` (an auto-routing placeholder model that returns
+  //    3003) reports a perfectly good account as unavailable;
+  // 3. The server never returns `ms`, yet the client keeps reading it.
   {
     const probe = await import('../vendor/channel-pack/src/account-probe.ts')
     const sse = (...frames) => new Response(frames.map(row => `data: ${JSON.stringify(row)}\n\n`).join('') + 'data: [DONE]\n\n')
 
-    // 候选链的挑选规则：显式指定只测它；否则「已有标记 → 目录顺序」去重截断。
+    // Candidate-chain selection rule: an explicit model is tested alone; otherwise 'existing marks → catalog order', deduped and capped.
     assert.deepEqual(
       probe.pickTestModels({ provider: 'trae', modelRateLimits: { b: 1, a: 2 } }, ['a', 'c', 'd', 'e', 'f']),
       ['b', 'a', 'c', 'd'],
@@ -343,7 +344,7 @@ async function verifySourceRegressions({ ctx, adapters, call, creds }) {
     assert.deepEqual(probe.pickTestModels({ provider: 'trae' }, ['a', 'b'], 'only'), ['only'], 'an explicit model is tested alone')
     assert.deepEqual(probe.pickTestModels({ provider: 'trae' }, []), [], 'no candidates stays empty rather than guessing')
 
-    // 候选链的执行：第一个成功即停，失败的留在 `tried` 里。
+    // Candidate-chain execution: stop at the first success; failures stay in `tried`.
     const chainEntry = { id: 'chain', provider: 'trae', credentialRef: 'CHAIN', enabled: true, createdAt: 1 }
     const attempted = []
     const chained = await probe.testAccountCandidates({ findAccount: () => chainEntry }, 'chain', ['m0', 'm1', 'm2'], {
@@ -359,8 +360,9 @@ async function verifySourceRegressions({ ctx, adapters, call, creds }) {
     assert.deepEqual(chained.tried.map(row => [row.modelId, row.ok]), [['m0', false], ['m1', true]])
     assert.equal(typeof chained.ms, 'number', 'the latency the client renders is actually reported')
 
-    // loomy 走真实 RPC：没有分支时这里拿到的是 `ok: false` +
-    // `无法确认：Unsupported probe adapter: loomy`。
+    // loomy goes through the real RPC: without a branch, what comes back
+    // here is `ok: false` + `无法确认：Unsupported probe adapter: loomy`
+    // (the vendor probe's "cannot confirm" message, quoted verbatim).
     const loomyId = 'probe-loomy-fixture', loomyRef = 'PROBE_LOOMY_FIXTURE'
     creds.set(loomyRef, { value: JSON.stringify({ access_token: 'probe-token', userid: '123456789012345678', phone: '13800138000' }) })
     await ctx.accountPool.addAccount({ id: loomyId, provider: 'loomy', nickname: 'Probe fixture', credentialRef: loomyRef, enabled: true, refreshable: false, createdAt: 1 })
@@ -383,13 +385,15 @@ async function verifySourceRegressions({ ctx, adapters, call, creds }) {
     }
     console.log('ok  #681 probe: loomy has an adapter, the chain skips dead models, latency is reported')
   }
-  // 目录 `efforts` 的键序不是强度序（`dfmodel` 实测是 high/max/low），
-  // 官方客户端还会按强度稳定排序；这条回归保证下发给 DSH 的档位序也是强度序。
+  // The key order of the catalog's `efforts` is not strength order
+  // (`dfmodel` was measured as high/max/low), and the official client also
+  // sorts stably by strength; this regression ensures the level order sent
+  // to DSH is strength order too.
   {
     const { verifyQoderEffortOrder } = await import('./qoder-effort-order-test.mjs')
     const { qoderEffortsFor, sortEffortsByStrength } = await import('../vendor/channel-pack/src/qoder-adapter.ts')
     verifyQoderEffortOrder(qoderEffortsFor, sortEffortsByStrength)
-    console.log('ok  qoder effort order: 档位按强度序下发（关闭思考在最左、max 在最右），未登记 id 排末尾且保持原序')
+    console.log('ok  qoder effort order: levels are sent in strength order (thinking off leftmost, max rightmost), unregistered ids go last and keep their original order')
   }
   {
     const { QoderAdapter } = await import('../vendor/channel-pack/src/qoder-adapter.ts')
@@ -412,7 +416,7 @@ async function verifySourceRegressions({ ctx, adapters, call, creds }) {
       messages: [{ role: 'user', content: [{ type: 'text', text: 'hello' }] }],
     }
 
-    // 模拟不同账号的请求签名输入，专注验证重试状态机；不访问 Qoder 或消耗真实额度。
+    // Simulate the request-signing inputs of different accounts to focus on the retry state machine; Qoder is not contacted and no real quota is consumed.
     QoderEncryptedInfer.create = async () => ({ prepareInfer: () => ({ url: 'fixture:', headers: {}, body: '{}' }) })
     const run = async ({
       kind, candidates = ['b'], responseForAttempt, abortOnSleep = false,
@@ -479,7 +483,7 @@ async function verifySourceRegressions({ ctx, adapters, call, creds }) {
         sent.push(token)
         return responseForAttempt(++attempt, token)
       }
-      // 把 token 写进测试请求，便于断言每次发送实际使用了哪个账号。
+      // Put the token into the test request so assertions can tell which account each send actually used.
       QoderEncryptedInfer.create = async ({ user }) => ({
         prepareInfer: () => ({ url: 'fixture:', headers: {}, body: user.securityOauthToken }),
       })
@@ -531,15 +535,15 @@ async function verifySourceRegressions({ ctx, adapters, call, creds }) {
           await Promise.all(['a', 'b'].map(id => collect(adapter.stream({ ...qoderOptions, model: `fixture-${id}` }))))
           assert.deepEqual(sent.filter(([model]) => model === 'fixture-a').map(([, token]) => token), ['token-a', 'token-a-new'])
           assert.deepEqual(sent.filter(([model]) => model === 'fixture-b').map(([, token]) => token), expiredB ? ['token-b-new'] : ['token-b', 'token-b-new'])
-          assert.deepEqual(refreshed.sort(), ['a', 'b'], '并发认证与初始过期续期都必须绑定实际账号')
+          assert.deepEqual(refreshed.sort(), ['a', 'b'], 'concurrent auth and initial-expiry refresh must both be bound to the actual account')
           adapter.options.queueAccountIdForCredential = async () => { throw new Error('fixture identity lookup failed') }
           const count = sent.length
           await assert.rejects(collect(adapter.stream({ ...qoderOptions, model: 'fixture-a' })), /identity lookup failed/)
-          assert.equal(sent.length, count, '身份反查失败不能退回共享账号发送')
-          assert.equal(sharedReads, 0, '已提供凭据反查时，禁止读取共享默认账号')
+          assert.equal(sent.length, count, 'a failed identity lookup must not fall back to sending with the shared account')
+          assert.equal(sharedReads, 0, 'when a credential lookup is provided, reading the shared default account is forbidden')
         }
       }
-      // HTTP 403 排队：第 3 次排队后换到健康账号；略过缺少 uid 的坏条目，且不误写额度限制。
+      // HTTP 403 queueing: after the 3rd queue, rotate to a healthy account; skip bad entries missing a uid, and do not mistakenly write a quota limit.
       const http = await run({
         kind: 'http', candidates: ['broken', 'b'],
         responseForAttempt: (attempt, token) => {
@@ -553,10 +557,10 @@ async function verifySourceRegressions({ ctx, adapters, call, creds }) {
       assert.deepEqual(http.sent, ['token-a', 'token-a', 'token-a', 'token-b'])
       assert.deepEqual(http.lookupSets, [['a'], ['a', 'broken']])
       assert.deepEqual(http.switched, ['queue-switch'])
-      assert.deepEqual(http.marked, [], '排队不得被记录成额度耗尽')
+      assert.deepEqual(http.marked, [], 'queueing must not be recorded as quota exhaustion')
       assert.ok(http.chunks.some(row => row.type === 'text-delta' && row.text === 'http-rotated-ok'))
 
-      // HTTP 200 + SSE 内嵌排队：必须走同一换号逻辑，而不是落回通用重试。
+      // HTTP 200 + queue embedded in SSE: must use the same account-rotation logic, not fall back to generic retries.
       const sse = await run({
         kind: 'sse',
         responseForAttempt: (attempt, token) => token === 'token-a' && attempt <= 3
@@ -567,7 +571,7 @@ async function verifySourceRegressions({ ctx, adapters, call, creds }) {
       assert.deepEqual(sse.marked, [])
       assert.ok(sse.chunks.some(row => row.type === 'text-delta' && row.text === 'sse-rotated-ok'))
 
-      // 新的备用账号在等待期间出现时，会在下一批检查中被当前请求发现。
+      // When a new backup account appears during the wait, the current request discovers it in the next batch of checks.
       const solo = await run({
         kind: 'solo', candidates: [], addCandidateAfterLookup: true,
         responseForAttempt: (attempt, token) => attempt <= 5
@@ -579,13 +583,13 @@ async function verifySourceRegressions({ ctx, adapters, call, creds }) {
       assert.equal(solo.sent.length, 6)
       assert.deepEqual(solo.sent.slice(0, 5), Array(5).fill('token-a'))
       assert.equal(solo.sent[5], 'token-late-b')
-      assert.equal(solo.lookupSets.length, 2, '账号池会按有限批次重新检查新添加的账号')
+      assert.equal(solo.lookupSets.length, 2, 'the account pool re-checks newly added accounts in bounded batches')
       assert.deepEqual(solo.slept, [10_000, 10_000, 10_000, 10_000])
       assert.deepEqual(solo.marked, [])
-      assert.equal(solo.rotationFailures.length, 1, '无备用账号只提示一次，不重复刷屏')
+      assert.equal(solo.rotationFailures.length, 1, 'with no backup account, report only once instead of spamming')
       assert.deepEqual(solo.switched, ['queue-switch'])
 
-      // 中国版使用同一状态机，但换号仍只从 qodercn 自己的账号池取。
+      // The China edition uses the same state machine, but rotation still draws only from qodercn's own account pool.
       const cn = await run({
         kind: 'sse-cn', product: QODER_CN,
         responseForAttempt: (attempt, token) => token === 'token-a' && attempt <= 3
@@ -600,7 +604,7 @@ async function verifySourceRegressions({ ctx, adapters, call, creds }) {
         const opened = await run({
           kind: 'open-queue', product,
           responseForAttempt: (_attempt, token) => {
-            assert.equal(pending, false, 'Qoder 重发前必须通过信封转换流取消旧上游')
+            assert.equal(pending, false, 'before Qoder resends, the old upstream must be cancelled through the envelope transform stream')
             if (token !== 'token-a') return answerSse('open-rotated-ok')
             pending = true
             return new Response(new ReadableStream({
@@ -614,7 +618,7 @@ async function verifySourceRegressions({ ctx, adapters, call, creds }) {
         assert.deepEqual(canceled, ['token-a', 'token-a', 'token-a'])
       }
 
-      // 排队换号不能破坏原有额度换号：仍按真实账号标记额度，并重置其重试状态。
+      // Queue rotation must not break the existing quota rotation: quota is still marked against the real account and its retry state is reset.
       const quota = await run({
         kind: 'quota',
         responseForAttempt: (_attempt, token) => token === 'token-a'
@@ -643,7 +647,7 @@ async function verifySourceRegressions({ ctx, adapters, call, creds }) {
           })
           assert.equal(mixed.error, undefined)
           assert.deepEqual(mixed.sent, ['token-a', 'token-a', 'token-a', 'token-b', 'token-c'])
-          assert.deepEqual(mixed.marked.map(row => row[0]), ['b'], '仅标记真正额度不足的 B')
+          assert.deepEqual(mixed.marked.map(row => row[0]), ['b'], 'only B, which genuinely lacks quota, is marked')
         }
         for (const refreshDefaultFirst of [false, true]) {
           for (const status of [401, 403]) {
@@ -675,11 +679,11 @@ async function verifySourceRegressions({ ctx, adapters, call, creds }) {
         })
         assert.equal(denied.error?.code, 'AUTH')
         assert.deepEqual(denied.sent, ['token-a', 'token-a', 'token-a', 'token-b', 'token-b-new'])
-        assert.deepEqual(denied.refreshed, ['b'], '每个账号最多续期一次，不回退默认账号')
+        assert.deepEqual(denied.refreshed, ['b'], 'each account is refreshed at most once, with no fallback to the default account')
         assert.deepEqual(denied.marked, [])
       }
 
-      // 用户把等待上限设为 0 时，不能被默认值覆盖，也不应该睡眠或重发。
+      // When the user sets the wait limit to 0, it must not be overridden by the default, and there should be no sleep or resend.
       const zeroTimeout = await run({
         kind: 'zero-timeout', queueTimeoutMs: '0',
         responseForAttempt: () => new Response(JSON.stringify(queueError), { status: 403 }),
@@ -689,7 +693,7 @@ async function verifySourceRegressions({ ctx, adapters, call, creds }) {
       assert.deepEqual(zeroTimeout.slept, [])
       assert.deepEqual(zeroTimeout.lookupSets, [])
 
-      // 没有备用号时，间隔回查不能频繁打磁盘；约 20 秒重试一次并发现后加入的号。
+      // With no backup account, interval re-checks must not hit disk frequently; retry roughly every 20 seconds and discover accounts added later.
       const interval = await run({
         kind: 'interval', candidates: [], addCandidateAfterLookup: true,
         responseForAttempt: (attempt, token) => attempt <= 5
@@ -701,7 +705,7 @@ async function verifySourceRegressions({ ctx, adapters, call, creds }) {
       assert.equal(interval.lookupSets.length, 2)
       assert.equal(interval.sent.at(-1), 'token-late-b')
 
-      // 用户在排队间隔点击停止时要立即终止，不再发第二次请求。
+      // When the user clicks stop during a queue interval, terminate immediately and send no second request.
       const canceled = await run({
         kind: 'abort', abortOnSleep: true,
         responseForAttempt: () => new Response(JSON.stringify(queueError), { status: 403 }),
@@ -710,7 +714,7 @@ async function verifySourceRegressions({ ctx, adapters, call, creds }) {
       assert.equal(canceled.error?.code, 'QUEUE')
       assert.equal(canceled.lookupSets.length, 0)
 
-      // 已经向用户发出部分正文后遇到排队帧，不能重放整轮或切账号。
+      // After partial body text has already been sent to the user, a queue frame must not replay the whole round or switch accounts.
       const partial = await run({
         kind: 'partial', candidates: ['b'],
         responseForAttempt: () => new Response(
@@ -1133,17 +1137,24 @@ async function verifyLoopResumeEvents() {
 }
 
 /**
- * 网关的 OpenAI 流式输出：`delta.tool_calls[]` 的 `id` 与 `function.name` 只能随该调用的首帧
- * 出现一次，`index` 必须是客户端能直接当下标的连续调用序号。
- * 官方客户端的流式累加器对这两个字段是**字符串拼接**（openai-python 的 `accumulate_delta`
- * 会把每帧的 name 追加），每帧重发就会把工具名拼成 `readreadread`，客户端随后报
- * 「未找到指定的工具」；DSH 侧 issue #20 记录的是同一机制的另一条通路。
- * 这里按客户端语义重放一遍，修复前会得到 `readread` 与翻倍的 id。
+ * The gateway's OpenAI streaming output: the `id` and `function.name` of
+ * `delta.tool_calls[]` may appear only once, with that call's first frame,
+ * and `index` must be a consecutive call ordinal the client can use
+ * directly as a subscript.
+ * The official client's streaming accumulator **concatenates** these two
+ * fields as strings (openai-python's `accumulate_delta` appends each
+ * frame's name), so resending them on every frame would splice the tool
+ * name into `readreadread` and the client would then report
+ * 「未找到指定的工具」 ("the specified tool was not found", quoted verbatim
+ * from the DSH client); DSH issue #20 records another path of the same
+ * mechanism.
+ * This replays the client semantics; before the fix it produced `readread`
+ * and doubled ids.
  */
 async function verifyGatewayToolCallFrames() {
   const { toOpenAiSse } = await import('../vendor/channel-pack/src/openai-gateway/stream.ts')
   const upstream = async function* () {
-    yield { type: 'reasoning-delta', text: '先想一下' } // 推理块占掉 DSH 的块 0
+    yield { type: 'reasoning-delta', text: 'let me think first' } // the reasoning block takes DSH block 0
     yield { type: 'tool-call-delta', index: 1, id: 'call_a', name: 'read', argumentsDelta: '{"file":' }
     yield { type: 'tool-call-delta', index: 1, id: 'call_a', name: 'read', argumentsDelta: '"x.md"}' }
     yield { type: 'tool-call-delta', index: 2, id: 'call_b', name: 'write', argumentsDelta: '{}' }
@@ -1157,10 +1168,10 @@ async function verifyGatewayToolCallFrames() {
   }
   const calls = frames.flatMap(frame => frame.choices?.[0]?.delta?.tool_calls ?? [])
   const callAt = index => calls.filter(call => call.index === index)
-  assert.deepEqual(calls.map(call => call.index), [0, 0, 1], 'index 必须从 0 起连续编号，不能透传 DSH 的块序号')
-  assert.deepEqual(callAt(0).filter(call => call.id !== undefined).map(call => call.id), ['call_a'], 'id 只随首帧发一次')
-  assert.deepEqual(callAt(0).filter(call => call.function.name !== undefined).map(call => call.function.name), ['read'], 'function.name 只随首帧发一次')
-  assert.equal(callAt(0).map(call => call.function.arguments).join(''), '{"file":"x.md"}', 'arguments 仍是每帧增量')
+  assert.deepEqual(calls.map(call => call.index), [0, 0, 1], 'index must be numbered consecutively from 0; the DSH block ordinal must not be passed through')
+  assert.deepEqual(callAt(0).filter(call => call.id !== undefined).map(call => call.id), ['call_a'], 'id is sent only with the first frame')
+  assert.deepEqual(callAt(0).filter(call => call.function.name !== undefined).map(call => call.function.name), ['read'], 'function.name is sent only with the first frame')
+  assert.equal(callAt(0).map(call => call.function.arguments).join(''), '{"file":"x.md"}', 'arguments are still per-frame deltas')
   assert.equal(callAt(1).map(call => call.function.arguments).join(''), '{}')
   const accumulated = []
   for (const call of calls) {
@@ -1173,6 +1184,6 @@ async function verifyGatewayToolCallFrames() {
   assert.deepEqual(accumulated, [
     { id: 'call_a', name: 'read', arguments: '{"file":"x.md"}' },
     { id: 'call_b', name: 'write', arguments: '{}' },
-  ], '按客户端累加器拼接后，工具名与 id 不能重复')
-  console.log('ok  openai-gateway tool-call frames: id/name 只在首帧、index 从 0 起，客户端拼接后工具名不重复')
+  ], 'after concatenation by the client accumulator, the tool name and id must not be duplicated')
+  console.log('ok  openai-gateway tool-call frames: id/name only on the first frame, index from 0, no duplicated tool name after client concatenation')
 }

@@ -1,4 +1,4 @@
-/** 从受签名发布清单保护的本地分片还原引擎，不访问网络。 */
+/** Reconstructs the engine from local shards protected by a signed release manifest, without accessing the network. */
 import fs from 'node:fs'
 import { mkdir, rename, unlink } from 'node:fs/promises'
 import path from 'node:path'
@@ -86,7 +86,7 @@ export async function materializeEngine({ pkgDir, dataDir, entry, platform = pro
       await pipeline(Readable.from(parts()), createGunzip(), verifyOutput, fs.createWriteStream(temporary, { flags: 'wx', mode: 0o700 }))
       if (size !== value.outputSize || outputHash.digest('hex') !== entry.sha256) throw new Error('Engine payload output checksum mismatch')
       try { await rename(temporary, executable) } catch (error) {
-        // 另一个进程可能已经完成同一份还原；仅接受摘要一致的文件。
+        // Another process may already have completed the same reconstruction; only accept a file whose digest matches.
         if (!await matches(executable, entry, value.outputSize)) throw error
       }
       return executable

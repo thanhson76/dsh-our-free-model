@@ -1,4 +1,4 @@
-/** 资源字节与理论 gzip 体积；不将理论压缩体积冒充 HTTP 传输量。 */
+/** Asset bytes and theoretical gzip sizes; the theoretical compressed size is not passed off as the HTTP transfer size. */
 import fs from 'node:fs'
 import zlib from 'node:zlib'
 

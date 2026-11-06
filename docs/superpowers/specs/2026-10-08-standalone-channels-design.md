@@ -1,21 +1,21 @@
-# 独立服务渠道补齐
+# Completing the channels in the standalone service
 
-## 已确认需求
+## Confirmed requirements
 
-拆分为 DSH 插件和独立本地应用后，两者继续提供原有匿名、Kilo、EAC 和十三个账号渠道。沿用现有登录、账号轮换、模型开关、积分锁定、自动签到及账本业务。独立网页提供实际可操作的渠道与 EAC 入口。
+After the split into the DSH plugin and a standalone local app, both continue to provide the original anonymous, Kilo, EAC and thirteen account channels. The existing sign-in, account rotation, model toggles, credit locking, automatic check-in and ledger behaviour is retained. The standalone web pages provide channel and EAC entry points that can actually be operated.
 
-## 实施边界
+## Implementation boundaries
 
-- 独立服务复用发布渠道包的业务，生成只替换平台接口的独立产物；生成时校验替换位置，避免静默漏改。原插件渠道包不变。
-- 每个独立服务实例使用单独 Worker 承载渠道业务，隔离模块级缓存、定时任务与登录流程。Worker 使用本地凭据、模型注册、生命周期和管理路由接口，不加载 Cordis 或 DSH。
-- 所有独立状态显式定位于 OFM_HOME。禁止全局修改 DSH_HOME、冒用宿主 profile 或读取 DSH 凭据。
-- EAC 使用原封装与签名、原网关 GitHub 授权流程。独立入口明确打开自身产品的渠道，插件仍保留原宿主判定。每次请求注入本实例的用户 token；不改变信任根。
-- 同一个本地 HTTP 端口和 API Key 提供全部模型。账号模型采用 provider/model ID，保留原消息、图片、工具和思考档位转换。
-- 网页复用原 ChannelsPage 与 EacAuth，通过同源且已鉴权的管理接口连接。脚本和 React 随包提供，不使用 CDN。第三方授权由用户操作。
-- 关闭时先停止管理请求，取消流式生成并回收 Worker，再释放数据目录锁。
-- HTTP 挂载不等待账号模型目录；Worker 就绪后在后台采集目录。`--no-refresh` 仅关闭核心目录周期任务，原账号登录轮询、续期和签到遵循各渠道规则。
-- 增加渠道用量、请求日志、供应商开关、永久积分锁定、昵称、账号优先级、限流重置和备份页面。插件备份只能由用户手动导入，不能自动读取宿主凭据。
+- The standalone service reuses the business logic of the released channel pack and generates a standalone artefact in which only the platform interfaces are replaced; generation validates the replacement points to avoid silently missing a change. The original plugin channel pack is unchanged.
+- Each standalone service instance uses a separate Worker to host the channel business logic, isolating module-level caches, scheduled tasks and sign-in flows. The Worker uses the local credential, model registration, lifecycle and management routing interfaces, and does not load Cordis or DSH.
+- All standalone state is explicitly located under OFM_HOME. Globally modifying DSH_HOME, impersonating a host profile or reading DSH credentials is forbidden.
+- EAC uses the original packaging and signing, and the original gateway GitHub authorization flow. The standalone entry point explicitly opens its own product's channels, while the plugin keeps its original host determination. Each request injects this instance's user token; the root of trust is unchanged.
+- A single local HTTP port and API Key serve all models. Account models use provider/model IDs, and the original message, image, tool and thinking-level conversions are retained.
+- The web pages reuse the original ChannelsPage and EacAuth, connecting through a same-origin, authenticated management interface. Scripts and React ship with the package; no CDN is used. Third-party authorization is performed by the user.
+- On shutdown, management requests are stopped first, streaming generation is cancelled and the Worker is reclaimed, and only then is the data-directory lock released.
+- The HTTP mount does not wait for the account-model catalog; once the Worker is ready, the catalog is collected in the background. `--no-refresh` only disables the core catalog's periodic task; the original account sign-in polling, renewal and check-in follow each channel's own rules.
+- Add pages for channel usage, the request log, provider toggles, permanent credit locking, nicknames, account priority, rate-limit reset and backup. A plugin backup can only be imported manually by the user; host credentials cannot be read automatically.
 
-## 验收
+## Acceptance
 
-隔离加载验证无 DSH import；十三个真实适配器与 RPC 注册；账号状态、禁用模型、积分锁定及本地凭据持久化；EAC 登录、取消、退出和签名 token 隔离；统一模型目录及 Chat/Responses 流式工具调用；停止后无后台写入。使用本机替身验证网络链路，不调用真实账号上游。原插件渠道、EAC 与全套贡献者回归。网页取得截图，明确真实外部登录未验证的部分。
+Verify in isolation that loading has no DSH import; that the thirteen real adapters and RPCs register; account state, disabled models, credit locking and local credential persistence; EAC sign-in, cancellation, sign-out and signed-token isolation; the unified model catalog and Chat/Responses streaming tool calls; and no background writes after shutdown. Use a local stand-in to verify the network path without calling real account upstreams. Run the contributor regression for the original plugin channels and EAC in full. Capture web-page screenshots, and state explicitly which parts involving real external sign-in were not verified.

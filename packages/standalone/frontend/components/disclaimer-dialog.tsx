@@ -30,7 +30,7 @@ export function DisclaimerDialog({ open, onClose }: { open: boolean; onClose(): 
       await management('/disclaimer/ack', {})
       onClose()
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : '保存失败，请重试。')
+      setError(reason instanceof Error ? reason.message : 'Failed to save. Please try again.')
     } finally { setBusy(false) }
   }
   return createPortal(
@@ -51,10 +51,10 @@ export function DisclaimerDialog({ open, onClose }: { open: boolean; onClose(): 
         ))}
       </div>
       <footer>
-        <span className="ofm-disclaimer-version">免责声明版本 v{DISCLAIMER_VERSION}</span>
+        <span className="ofm-disclaimer-version">Disclaimer version v{DISCLAIMER_VERSION}</span>
         {error && <span className="ofm-disclaimer-error" role="alert">{error}</span>}
         <button type="button" className="primary" disabled={busy} onClick={() => void dismiss()}>
-          {busy ? '保存中…' : DISCLAIMER.accept}
+          {busy ? 'Saving…' : DISCLAIMER.accept}
         </button>
       </footer>
     </dialog>,

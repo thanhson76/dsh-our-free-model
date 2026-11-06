@@ -1,9 +1,9 @@
 /* ============================================
-   用量统计页面样式 — 呼吸感纸面（昼）+ 深海仪器（夜）
-   同时包含 Overview 页面的 ov- 前缀样式
+   Usage statistics page styles — breathing paper surface (day) + deep-sea instrument (night)
+   Also includes the ov- prefixed styles for the Overview page
    ============================================ */
 
-/* ---- 昼主题变量 ---- */
+/* ---- Day theme variables ---- */
 :root {
   --us-surface: #fffdfa;
   --us-surface-raised: #f7f3eb;
@@ -37,7 +37,7 @@
   --us-grid-line: rgba(86, 52, 10, 0.07);
 }
 
-/* ---- 夜主题变量 ---- */
+/* ---- Night theme variables ---- */
 [data-theme="dark"] {
   --us-surface: #11161f;
   --us-surface-raised: #151b26;
@@ -68,10 +68,10 @@
 }
 
 /* ============================================
-   Overview 页面样式（ov- 前缀）
+   Overview page styles (ov- prefix)
    ============================================ */
 
-/* ---- 指标卡图标容器 ---- */
+/* ---- Metric card icon container ---- */
 .ov-metric-icon {
   width: 34px; height: 34px; display: grid; place-items: center;
   border-radius: 8px; flex-shrink: 0;
@@ -81,7 +81,7 @@
   transform: translateY(-1px);
 }
 
-/* 昼主题：纸面上的彩色印章 */
+/* Day theme: colorful stamps on paper */
 :root .ov-metric:nth-child(1) .ov-metric-icon { background: var(--amber-soft, #fdf6ec); color: var(--amber, #b45309); }
 :root .ov-metric:nth-child(2) .ov-metric-icon { background: #eff7f2; color: #177552; }
 :root .ov-metric:nth-child(3) .ov-metric-icon { background: #fbf6ea; color: #8a6215; }
@@ -89,7 +89,7 @@
 :root .ov-metric:nth-child(5) .ov-metric-icon { background: #fdf5f5; color: #9c3343; }
 :root .ov-metric:nth-child(6) .ov-metric-icon { background: #eaf5f6; color: #0f7285; }
 
-/* 夜主题：仪器上的指示灯 */
+/* Night theme: indicator lights on an instrument */
 [data-theme="dark"] .ov-metric:nth-child(1) .ov-metric-icon { background: var(--cp-cyan-soft, rgba(0, 208, 192, 0.12)); color: var(--cp-cyan, #00d0c0); box-shadow: 0 0 8px color-mix(in srgb, var(--cp-cyan, #00d0c0) 10%, transparent); }
 [data-theme="dark"] .ov-metric:nth-child(2) .ov-metric-icon { background: rgba(88, 221, 176, 0.11); color: #58ddb0; box-shadow: 0 0 8px rgba(88, 221, 176, 0.06); }
 [data-theme="dark"] .ov-metric:nth-child(3) .ov-metric-icon { background: rgba(242, 166, 90, 0.11); color: #f4b46f; box-shadow: 0 0 8px rgba(242, 166, 90, 0.06); }
@@ -97,7 +97,7 @@
 [data-theme="dark"] .ov-metric:nth-child(5) .ov-metric-icon { background: rgba(227, 106, 106, 0.11); color: #ef8585; box-shadow: 0 0 8px rgba(227, 106, 106, 0.06); }
 [data-theme="dark"] .ov-metric:nth-child(6) .ov-metric-icon { background: rgba(76, 196, 224, 0.11); color: #4cc4e0; box-shadow: 0 0 8px rgba(76, 196, 224, 0.06); }
 
-/* 指标卡 hover 浮起 */
+/* Metric card lifts on hover */
 .ov-metric {
   transition: transform var(--us-duration-normal) var(--us-ease-out), box-shadow var(--us-duration-normal) var(--us-ease-out);
 }
@@ -106,7 +106,7 @@
   box-shadow: var(--us-shadow-metric-hover);
 }
 
-/* ---- Overview 图表增强 ---- */
+/* ---- Overview chart enhancements ---- */
 .ov-chart-panel { position: relative; }
 .ov-chart-total { font-variant-numeric: tabular-nums; }
 .ov-chart-col { position: relative; }
@@ -121,7 +121,7 @@
 }
 .ov-chart-col:hover::after { opacity: 1; }
 
-/* 图表柱子圆角增强 */
+/* Chart bar radius enhancement */
 .ov-chart .dashboard-chart-bar {
   border-radius: 4px 4px 0 0;
   transition: background var(--us-duration-fast) var(--us-ease-out), transform var(--us-duration-fast) var(--us-ease-out), box-shadow var(--us-duration-fast) var(--us-ease-out);
@@ -134,14 +134,14 @@
   box-shadow: 0 0 12px color-mix(in srgb, var(--cp-cyan, #00d0c0) 24%, transparent);
 }
 
-/* 空态插画感 */
+/* Empty-state illustration feel */
 .ov-chart-empty {
   background: var(--us-surface) !important;
   border-radius: 8px;
 }
 .ov-chart-empty svg { opacity: 0.4; }
 
-/* ---- Overview 快速接入 ---- */
+/* ---- Overview quick access ---- */
 .ov-quick-icon {
   width: 40px; height: 40px; display: grid; place-items: center;
   border-radius: 10px; margin-bottom: 12px;
@@ -162,14 +162,14 @@
 }
 [data-theme="dark"] .ov-endpoint { background: #0a0c10; }
 
-/* 复制按钮成功态 */
+/* Copy button success state */
 .ov-copied {
   color: var(--us-success) !important;
   background: var(--us-success-soft) !important;
   border-radius: 6px;
 }
 
-/* ---- Overview 来源渠道 ---- */
+/* ---- Overview source channels ---- */
 .ov-source-row {
   animation: us-fade-in-up var(--us-duration-slow) var(--us-ease-out) both;
   transition: background var(--us-duration-normal) var(--us-ease-out), transform var(--us-duration-normal) var(--us-ease-out);
@@ -180,7 +180,7 @@
 }
 [data-theme="dark"] .ov-source-row:hover { background: rgba(255, 255, 255, 0.03); }
 
-/* ---- Overview 失败样本 ---- */
+/* ---- Overview failure samples ---- */
 .ov-failure-row {
   display: flex; justify-content: space-between; gap: 8px;
   font-size: 11px; padding: 6px 0;
@@ -193,7 +193,7 @@
 .ov-failure-row small { color: var(--us-ink-muted); }
 [data-theme="dark"] .ov-failure-row:hover { background: rgba(227, 106, 106, 0.06); }
 
-/* 空态运行检查 */
+/* Empty-state runtime check */
 .ov-runtime-empty {
   display: flex; align-items: center; gap: 8px;
   padding: 20px 0; color: var(--us-success);
@@ -202,25 +202,25 @@
 .ov-runtime-empty span { color: var(--us-ink-tertiary); }
 
 /* ============================================
-   用量统计页面样式
+   Usage statistics page styles
    ============================================ */
 
-/* ---- 指标卡区域 ---- */
+/* ---- Metric card area ---- */
 .usage-metrics {
   display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 20px;
 }
 
-/* ---- 统计范围说明 ---- */
+/* ---- Statistics scope note ---- */
 .usage-scope {
   display: flex; align-items: center; flex-wrap: wrap; gap: 8px 24px;
   margin-bottom: 20px; color: var(--us-ink-tertiary); font-size: 12px;
 }
 .usage-scope strong { font-weight: 500; color: var(--us-ink-secondary); margin-left: 5px; font-variant-numeric: tabular-nums; }
 
-/* ---- 反馈消息 ---- */
+/* ---- Feedback message ---- */
 .usage-feedback { margin-bottom: 20px; font-size: 12px; color: var(--us-success); }
 
-/* ---- 估算提示 ---- */
+/* ---- Estimate notice ---- */
 .usage-estimated {
   display: flex; align-items: flex-start; gap: 8px; font-size: 12px;
   color: var(--us-warning); margin: 0 0 20px;
@@ -230,14 +230,14 @@
 .usage-estimated svg { margin-top: 2px; flex-shrink: 0; }
 .usage-estimated span { color: var(--us-ink-secondary); }
 
-/* ---- 趋势图卡片 ---- */
+/* ---- Trend chart card ---- */
 .usage-trend { margin-bottom: 24px; }
 .usage-trend .channel-filters button {
   font-size: 12px; padding: 6px 11px;
   transition: background var(--us-duration-fast) var(--us-ease-out), color var(--us-duration-fast) var(--us-ease-out);
 }
 
-/* ---- 窗口总量 ---- */
+/* ---- Window total ---- */
 .usage-window-total { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; margin: 18px 0 14px; }
 .usage-window-total strong {
   font-size: 28px; font-weight: 650; font-variant-numeric: tabular-nums; line-height: 1.15;
@@ -245,7 +245,7 @@
 }
 .usage-window-total span { color: var(--us-ink-muted); font-size: 11px; }
 
-/* ---- 趋势图 ---- */
+/* ---- Trend chart ---- */
 .usage-trend-scroll { overflow-x: auto; margin-bottom: 16px; padding: 6px 4px 2px; }
 .usage-scroll-hint { font-size: 11px; color: var(--us-ink-tertiary); padding: 0 0 8px; letter-spacing: 0.01em; }
 .usage-trend-chart {
@@ -276,10 +276,10 @@
 }
 .usage-day span { color: var(--us-ink-tertiary); font-size: 10px; white-space: nowrap; }
 
-/* ---- 空态提示 ---- */
+/* ---- Empty-state notice ---- */
 .usage-window-empty { font-size: 12px; padding: 0 0 16px; color: var(--us-ink-tertiary); }
 
-/* ---- 按模型统计面板 ---- */
+/* ---- Per-model statistics panel ---- */
 .usage-model-filters {
   display: flex; align-items: center; flex-wrap: wrap; gap: 10px; padding: 16px 0;
 }
@@ -312,7 +312,7 @@
   box-shadow: 0 0 0 3px var(--us-accent-soft);
 }
 
-/* ---- 统计表格 ---- */
+/* ---- Statistics table ---- */
 .usage-model-scroll { overflow-x: auto; }
 .usage-model-table { min-width: 1000px; font-variant-numeric: tabular-nums; border-collapse: separate; border-spacing: 0; width: 100%; }
 .usage-model-table th {
@@ -343,7 +343,7 @@
 .usage-model-table tbody tr:hover { background: var(--us-accent-soft); }
 [data-theme="dark"] .usage-model-table tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
 
-/* ---- 空态 ---- */
+/* ---- Empty state ---- */
 .usage-empty {
   padding: 46px 20px 50px; text-align: center;
   border-top: 1px solid var(--us-line);
@@ -352,14 +352,14 @@
 .usage-empty h3 { font-size: 15px; color: var(--us-ink); }
 .usage-empty p { font-size: 12px; margin-top: 7px; color: var(--us-ink-tertiary); }
 
-/* ---- 分页器 ---- */
+/* ---- Pagination ---- */
 .usage-pagination {
   display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end;
   gap: 10px; padding-top: 16px; font-size: 11px; color: var(--us-ink-tertiary);
 }
 .usage-pagination > span:first-child { margin-right: auto; font-variant-numeric: tabular-nums; }
 
-/* ---- 入场动画 ---- */
+/* ---- Entrance animation ---- */
 @keyframes us-fade-in-up {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
@@ -372,7 +372,7 @@
 .usage-trend { animation-delay: 80ms; }
 .usage-model-panel { animation-delay: 120ms; }
 
-/* ---- 响应式 ---- */
+/* ---- Responsive ---- */
 @media (max-width: 950px) {
   .usage-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 }
@@ -392,10 +392,10 @@
 }
 
 /* ============================================
-   打磨层 — 精密仪表盘 · 编辑级排版
-   本节只做增强：全部为新增选择器与新增关键帧，
-   不改动上方任何既有 class 名、DOM 契约或关键帧名称。
-   动效只使用 transform / opacity 两个属性。
+   Polish layer — precision dashboard · editorial typography
+   This section only enhances: everything here is new selectors and new keyframes,
+   without changing any existing class names, DOM contracts, or keyframe names above.
+   Motion uses only the transform / opacity properties.
    ============================================ */
 
 @keyframes us-grow-y {
@@ -407,7 +407,7 @@
   50% { opacity: 0.8; transform: translateY(-2px); }
 }
 
-/* ---- 指标卡：按位次建立四色家族（蓝 / 绿 / 黄 / 紫） ---- */
+/* ---- Metric cards: a four-color family by position (blue / green / yellow / purple) ---- */
 .ov-metric {
   --ov-accent: var(--us-accent);
   --ov-accent-soft: var(--us-accent-soft);
@@ -425,7 +425,7 @@
 .ov-metric:nth-child(5) { --ov-accent: #9c3343; --ov-accent-soft: #fdf5f5; }
 .ov-metric:nth-child(6) { --ov-accent: #0f7285; --ov-accent-soft: #eaf5f6; }
 
-/* 数据主角：数字用等宽数字 + 紧凑字距，hover 时轻微提亮 */
+/* Data as the hero: numbers use tabular figures + tight letter-spacing, brightening slightly on hover */
 .ov-metric strong {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
@@ -434,13 +434,13 @@
 }
 .ov-metric:hover strong { color: var(--ov-accent); }
 
-/* 指标名：小号大写感的精密标签 */
+/* Metric names: small, uppercase-feeling precision labels */
 .ov-metric > div > span {
   font-weight: 500;
   color: var(--us-ink-secondary);
 }
 
-/* 图标容器升级：色彩印章 + 内描边，hover 有呼应 */
+/* Icon container upgrade: color stamp + inner border, responding on hover */
 .ov-metric-icon {
   border-radius: 9px;
   box-shadow: var(--ov-icon-ring), var(--ov-icon-glow), 0 1px 2px rgba(32, 35, 41, 0.05);
@@ -452,10 +452,10 @@
     color-mix(in srgb, var(--ov-accent) 32%, transparent) 0 3px 11px -2px;
 }
 
-/* 卡片 hover：色相染过的柔和光晕，而不是纯黑阴影 */
+/* Card hover: a soft halo tinted by hue, not a pure-black shadow */
 .ov-metric:hover { box-shadow: var(--ov-card-hover-shadow); }
 
-/* 递减的卡片级联入场 */
+/* Staggered card cascade entrance */
 .usage-metrics .ov-metric {
   animation: us-fade-in-up var(--us-duration-slow) var(--us-ease-out) both;
 }
@@ -466,7 +466,7 @@
 .usage-metrics .ov-metric:nth-child(5) { animation-delay: 180ms; }
 .usage-metrics .ov-metric:nth-child(6) { animation-delay: 225ms; }
 
-/* ---- 趋势图：柱子生长 + 呼吸式 hover ---- */
+/* ---- Trend chart: bars grow + breathing hover ---- */
 .usage-day-bar,
 .ov-chart .dashboard-chart-bar {
   transform-origin: bottom center;
@@ -499,7 +499,7 @@
 .ov-chart-col:nth-child(7) .dashboard-chart-bar { animation-delay: 260ms; }
 .ov-chart-col:nth-child(8) .dashboard-chart-bar { animation-delay: 300ms; }
 
-/* hover / 键盘聚焦：提亮 + 轻微放大 + 柔和光晕 */
+/* hover / keyboard focus: brighten + slight enlargement + soft halo */
 .usage-day:hover .usage-day-bar,
 .usage-day:focus .usage-day-bar,
 .usage-day:focus-visible .usage-day-bar {
@@ -518,7 +518,7 @@
 .usage-day:focus span,
 .usage-day:focus-visible span { color: var(--us-ink-secondary); }
 
-/* ---- 图表提示气泡：加边框与阴影，读起来更像仪表读数 ---- */
+/* ---- Chart tooltip bubble: add border and shadow so it reads more like an instrument reading ---- */
 .ov-chart-col::after {
   padding: 3px 7px;
   border-radius: 5px;
@@ -527,7 +527,7 @@
   box-shadow: 0 4px 12px -3px rgba(32, 35, 41, 0.28);
 }
 
-/* ---- 空态：不只是灰字，给引导容器 ---- */
+/* ---- Empty state: not just gray text — give it a guidance container ---- */
 .ov-chart-empty svg {
   animation: us-chart-breathe 2.6s ease-in-out infinite;
 }
@@ -560,7 +560,7 @@
   text-wrap: pretty;
 }
 
-/* ---- 表格：数字列对齐、表头更有秩序 ---- */
+/* ---- Table: numeric columns aligned, header more orderly ---- */
 .usage-model-table th:not(:first-child) { text-align: right; }
 .usage-model-table th { color: var(--us-ink-secondary); }
 .usage-model-table td { font-variant-numeric: tabular-nums; }
@@ -571,7 +571,7 @@
   letter-spacing: 0.01em;
 }
 
-/* ---- 筛选与搜索：统一圆角与图标对齐，聚焦反馈更明确 ---- */
+/* ---- Filters and search: unified radius and icon alignment, clearer focus feedback ---- */
 .usage-model-search { display: flex; align-items: center; }
 .usage-model-search > svg { top: auto; }
 .usage-model-search input {
@@ -600,7 +600,7 @@
 }
 .channel-filters button[aria-pressed="true"]:hover { transform: translateY(-1px); }
 
-/* ---- 其他细节 ---- */
+/* ---- Other details ---- */
 .usage-scroll-hint { color: var(--us-ink-tertiary); text-wrap: pretty; }
 .usage-feedback {
   display: inline-block;
@@ -619,7 +619,7 @@
 .ov-quick .ov-endpoint { border-radius: 8px; }
 
 /* ============================================
-   深色主题：同样的家族色彩，换成仪表指示灯
+   Dark theme: the same family colors, turned into instrument indicator lights
    ============================================ */
 [data-theme="dark"] .ov-metric {
   box-shadow:
@@ -639,7 +639,7 @@
 [data-theme="dark"] .ov-metric:nth-child(5) { --ov-accent: #ef8585; --ov-accent-soft: rgba(227, 106, 106, 0.11); }
 [data-theme="dark"] .ov-metric:nth-child(6) { --ov-accent: #4cc4e0; --ov-accent-soft: rgba(76, 196, 224, 0.11); }
 
-/* 图表 hover 光晕跟随卡片色相（蓝色家族）而不是纯黑 */
+/* Chart hover halo follows the card hue (blue family) instead of pure black */
 [data-theme="dark"] .ov-metric:hover .ov-metric-icon {
   box-shadow:
     rgba(255, 255, 255, 0.06) 0 0 0 1px inset,
@@ -669,7 +669,7 @@
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.045));
 }
 
-/* 图表格线：更轻，让柱子成为主角 */
+/* Chart grid lines: lighter, so the bars are the hero */
 .chart-grid-lines span,
 .usage-trend-chart {
   border-color: var(--us-line-soft);
@@ -677,7 +677,7 @@
 [data-theme="dark"] .chart-grid-lines span { border-color: rgba(255, 255, 255, 0.03); }
 [data-theme="dark"] .usage-trend-chart { border-bottom-color: rgba(255, 255, 255, 0.03); }
 
-/* 深色下的空态与标签 */
+/* Empty states and labels in dark theme */
 [data-theme="dark"] .usage-empty > svg {
   background: rgba(255, 255, 255, 0.03);
   border-color: rgba(255, 255, 255, 0.05);
@@ -708,7 +708,7 @@
 [data-theme="dark"] .ov-endpoint code { color: var(--cp-cyan, #00d0c0); }
 [data-theme="dark"] .ov-failure-row:hover { background: rgba(227, 106, 106, 0.08); }
 
-/* ---- 窄屏微调 ---- */
+/* ---- Narrow-screen tweaks ---- */
 @media (max-width: 700px) {
   .usage-metrics .ov-metric strong { letter-spacing: -0.01em; }
   .ov-metric-icon { border-radius: 8px; }
@@ -718,7 +718,7 @@
   .usage-trend-chart { gap: 6px; }
 }
 
-/* ---- 减少动画 ---- */
+/* ---- Reduced motion ---- */
 @media (prefers-reduced-motion: reduce) {
   .usage-metrics, .usage-scope, .usage-trend, .usage-model-panel,
   .ov-source-row, .ov-metric, .usage-day-bar, .ov-chart .dashboard-chart-bar,
@@ -741,12 +741,12 @@
 
 
 /* ==========================================================================
-   逐元素精修层 · 用量页 + 数据可视化（ov-）
-   约束遵守：不删类名 / 不改 DOM 契约 / 不改既有 keyframe 名；
-   新增关键帧（us-toast-in）只使用 transform 与 opacity。
+   Per-element refinement layer · usage page + data visualization (ov-)
+   Constraints honored: no class names removed / no DOM contracts changed / no existing keyframe names changed;
+   The new keyframe (us-toast-in) uses only transform and opacity.
    ========================================================================== */
 
-/* ---------- 1. 浏览器表面：选区 / 插入符 / 滚动条 / 焦点 ---------- */
+/* ---------- 1. Browser surface: selection / caret / scrollbar / focus ---------- */
 .usage-browser ::selection { background: color-mix(in srgb, var(--amber, #b45309) 18%, transparent); color: var(--us-ink); }
 :root[data-theme="dark"] .usage-browser ::selection { background: color-mix(in srgb, var(--cp-cyan, #00d0c0) 28%, transparent); }
 .usage-browser .usage-model-search input,
@@ -764,7 +764,7 @@
 }
 .usage-model-scroll:focus-visible { outline: 2px solid var(--us-accent); outline-offset: 3px; border-radius: 8px; }
 
-/* ---------- 2. 指标卡：夜主题六色图标不再被全局灰色 svg 规则吞掉 ---------- */
+/* ---------- 2. Metric cards: night-theme six-color icons are no longer swallowed by the global gray svg rule ---------- */
 :root[data-theme="dark"] .ov-metric .ov-metric-icon svg { color: inherit; }
 :root[data-theme="dark"] .ov-metric .ov-metric-icon {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 10px -2px color-mix(in srgb, var(--ov-accent) 26%, transparent);
@@ -774,7 +774,7 @@
 }
 .ov-metric > div > span { letter-spacing: 0.01em; }
 
-/* ---------- 3. 趋势图：刻度网格 / 柱体质感 / 日期标签 ---------- */
+/* ---------- 3. Trend chart: tick grid / bar texture / date labels ---------- */
 .usage-day-track { background-image: repeating-linear-gradient(to top, var(--us-grid-line) 0 1px, transparent 1px 25%); }
 .usage-day-bar, .ov-chart .dashboard-chart-bar { border-radius: 5px 5px 0 0; }
 :root:not([data-theme="dark"]) .usage-day-bar {
@@ -806,12 +806,12 @@
 .usage-day span { font-weight: 500; }
 :root[data-theme="dark"] .usage-trend-chart { border-bottom-color: rgba(255, 255, 255, 0.055); }
 
-/* ---------- 4. 窗口汇总与范围说明 ---------- */
+/* ---------- 4. Window summary and scope note ---------- */
 .usage-window-total strong { letter-spacing: -0.02em; line-height: 1.15; }
 .usage-window-total span { font-weight: 500; }
 .usage-scope strong[data-testid="usage-request-failures"] { color: var(--us-ink); font-weight: 600; font-variant-numeric: tabular-nums; }
 
-/* ---------- 5. 模型表：冻结首列 / 行悬停 / 数字列 ---------- */
+/* ---------- 5. Model table: frozen first column / row hover / numeric columns ---------- */
 .usage-model-table th:first-child, .usage-model-table td:first-child { position: sticky; left: 0; }
 .usage-model-table th:first-child { z-index: 6; border-right: 1px solid var(--us-line); }
 .usage-model-table td:first-child { z-index: 2; background: var(--us-surface); border-right: 1px solid var(--us-line-soft); }
@@ -829,7 +829,7 @@
 :root[data-theme="dark"] .usage-model-table td:first-child code,
 :root[data-theme="dark"] .usage-model-table td small { color: var(--us-ink-muted); }
 
-/* ---------- 6. 筛选、搜索与分页 ---------- */
+/* ---------- 6. Filters, search and pagination ---------- */
 :root:not([data-theme="dark"]) .usage-model-filters select {
   appearance: none; -webkit-appearance: none; cursor: pointer;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b655c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
@@ -864,7 +864,7 @@
 .usage-trend .channel-filters button:focus-visible { outline: 2px solid var(--us-accent); outline-offset: 2px; }
 :root:not([data-theme="dark"]) .usage-trend .channel-filters button:not([aria-pressed="true"]):hover { color: var(--us-ink); }
 
-/* ---------- 7. 空态 / 反馈 / 错误 ---------- */
+/* ---------- 7. Empty state / feedback / errors ---------- */
 .usage-empty p { margin: 7px auto 0; max-width: 46ch; line-height: 1.75; }
 .usage-empty > svg { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7); }
 :root[data-theme="dark"] .usage-empty > svg { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045); }
@@ -879,7 +879,7 @@
 .usage-browser .channel-error > svg { flex-shrink: 0; }
 .usage-browser .channel-error > span { line-height: 1.6; }
 
-/* ---------- 8. ov- 数据可视化细部 ---------- */
+/* ---------- 8. ov- data visualization details ---------- */
 .ov-chart-col:not([data-value])::after { display: none; }
 .ov-chart-total { letter-spacing: -0.02em; }
 .ov-endpoint code { overflow-wrap: anywhere; }
@@ -889,7 +889,7 @@
 :root[data-theme="dark"] .ov-source-row:hover { background: linear-gradient(90deg, color-mix(in srgb, var(--cp-cyan, #00d0c0) 8%, transparent), rgba(255, 255, 255, 0.02)); }
 :root[data-theme="dark"] .ov-failure-row:hover { background: rgba(227, 106, 106, 0.08); }
 
-/* ---------- 9. 响应式细部 ---------- */
+/* ---------- 9. Responsive details ---------- */
 @media (max-width: 700px) {
   .usage-model-table th, .usage-model-table td { padding: 11px 9px; }
   .usage-window-total { margin: 16px 0 12px; }
@@ -904,42 +904,42 @@
   .usage-window-total strong { font-size: 23px; }
 }
 
-/* ---------- 10. 减少动画：新加入场同样降级 ---------- */
+/* ---------- 10. Reduced motion: the new entrance is likewise downgraded ---------- */
 @media (prefers-reduced-motion: reduce) {
   .usage-feedback, .usage-browser .channel-error { animation: none !important; }
 }
 /* ==========================================================================
-   质感彩蛋层 · 微交互与精致细节（只新增，不改动上方任何内容）
-   约束：仅新增选择器 / 新增关键帧；动画只使用 transform 与 opacity；
-        全部彩蛋在昼主题与夜主题下同时成立。
+   Texture easter-egg layer · micro-interactions and refined details (only adds, changes nothing above)
+   Constraints: only new selectors / new keyframes; animations use only transform and opacity;
+        All easter eggs hold in both the day and night themes.
    ========================================================================== */
 
-/* 新关键帧：空态插画的“安静浮动” */
+/* New keyframe: the empty-state illustration's "quiet floating" */
 @keyframes us-drift-soft {
   0%, 100% { transform: translateY(0) scale(1); opacity: 0.62; }
   50% { transform: translateY(-3px) scale(1.02); opacity: 0.82; }
 }
 
-/* 新关键帧：复制成功的“按一下”回弹确认 */
+/* New keyframe: copy success's "press" rebound confirmation */
 @keyframes us-copy-pop {
   0% { transform: scale(1); }
   38% { transform: scale(1.14); }
   100% { transform: scale(1); }
 }
 
-/* 新关键帧：表格行进入的极轻淡入（只作用于行内文本，不动 sticky 单元格） */
+/* New keyframe: a very light fade-in for table row entry (only affects inline text, not sticky cells) */
 @keyframes us-row-fade {
   from { opacity: 0.35; }
   to { opacity: 1; }
 }
 
-/* 新关键帧：空态状态点的低幅呼吸 */
+/* New keyframe: low-amplitude breathing of the empty-state status dot */
 @keyframes us-dot-breathe {
   0%, 100% { transform: translateY(0) scale(1); opacity: 0.42; }
   50% { transform: translateY(-1px) scale(1.08); opacity: 0.66; }
 }
 
-/* ---- 1. 指标卡 / 图表：图标与数字的弹性联动 ---- */
+/* ---- 1. Metric cards / charts: elastic linkage between icons and numbers ---- */
 .ov-metric-icon,
 .ov-metric:hover .ov-metric-icon {
   transition: transform var(--us-duration-normal) cubic-bezier(0.34, 1.56, 0.64, 1),
@@ -952,7 +952,7 @@
   transition: color var(--us-duration-normal) cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* ---- 2. 趋势图柱子：顶部高光的“抬眸” ---- */
+/* ---- 2. Trend chart bars: the top highlight "lifts its gaze" ---- */
 .usage-day-bar {
   position: relative;
 }
@@ -987,7 +987,7 @@
   transform: translateY(-1px);
 }
 
-/* ---- 3. 空态：图标轻轻漂浮 + 呼吸 ---- */
+/* ---- 3. Empty state: icon floats gently + breathes ---- */
 .usage-empty > svg,
 .ov-chart-empty svg {
   animation: us-drift-soft 3.4s ease-in-out infinite;
@@ -1006,12 +1006,12 @@
   animation: us-dot-breathe 3s ease-in-out infinite;
 }
 
-/* ---- 4. 复制反馈：成功时按钮“按一下” ---- */
+/* ---- 4. Copy feedback: the button "presses" on success ---- */
 .ov-copied {
   animation: us-copy-pop 340ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-/* ---- 5. 表格行：细微淡入，翻页与搜索切换更顺滑 ---- */
+/* ---- 5. Table rows: subtle fade-in, smoother paging and search switching ---- */
 .usage-model-table tbody tr {
   animation: us-row-fade 200ms var(--us-ease-out) backwards;
 }
@@ -1029,7 +1029,7 @@
   transform: translateX(2px);
 }
 
-/* ---- 6. 更新按钮：等待时图标轻微“醒来” ---- */
+/* ---- 6. Refresh button: the icon "wakes up" slightly while waiting ---- */
 .usage-browser .dashboard-heading .ui-button svg,
 .usage-browser header .ui-button svg {
   transition: opacity var(--us-duration-normal) var(--us-ease-out);
@@ -1043,7 +1043,7 @@
   opacity: 1;
 }
 
-/* ---- 7. 减少动画：新层同样完整降级 ---- */
+/* ---- 7. Reduced motion: the new layer is likewise fully downgraded ---- */
 @media (prefers-reduced-motion: reduce) {
   .usage-empty > svg,
   .ov-chart-empty svg,
@@ -1073,13 +1073,13 @@
   }
 }
 
-/* ===== 世界观注入 · usage ===== */
-/* 本层只按圣经的“物理身份”重写用量页与 ov- 数据可视化：
-   夜=终端 / 扫描 / 故障；昼=纸面 / 阳光 / 黄铜。
-   只新增选择器与 keyframe；不改上方任何 class / DOM 契约 / data-testid。
-   新动画只使用 transform / opacity / clip-path；图表柱“长高”只用 transform，不动 height。 */
+/* ===== Worldview injection · usage ===== */
+/* This layer rewrites the usage page and ov- data visualization only according to the bible's "physical identity":
+   Night = terminal / scan / glitch; Day = paper / sunlight / brass.
+   Only new selectors and keyframes; no class / DOM contract / data-testid above is changed.
+   New animations use only transform / opacity / clip-path; chart bars "grow taller" using only transform, never height. */
 
-/* ---------- 新增 keyframe（us- 前缀，不与既有重名） ---------- */
+/* ---------- New keyframes (us- prefix, no name collisions with existing ones) ---------- */
 @keyframes us-glow-breathe {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.8; }
@@ -1095,7 +1095,7 @@
   100% { opacity: 1; transform: scale(1) rotate(0deg); }
 }
 
-/* ---------- 两主题共同底座：只动几何，不设颜色 ---------- */
+/* ---------- Common base for both themes: geometry only, no colors ---------- */
 .usage-day-bar,
 .ov-chart .dashboard-chart-bar {
   transform-origin: bottom;
@@ -1110,10 +1110,10 @@
 }
 
 /* ============================================================
-   夜 · 赛博终端
+   Night · cyber terminal
    ============================================================ */
 
-/* --- 1. 总量：大的等宽终端读数 + 极轻呼吸微光 + 扫描光标 --- */
+/* --- 1. Total: a large monospace terminal reading + very light breathing glow + scan cursor --- */
 :root[data-theme="dark"] .usage-total,
 :root[data-theme="dark"] .usage-browser .usage-window-total strong {
   font-family: Consolas, "Cascadia Mono", "SF Mono", "JetBrains Mono", monospace;
@@ -1144,7 +1144,7 @@
   font-family: inherit;
 }
 
-/* --- 2. 指标卡：青主色 / 琥珀数据 / 红只留给失败；数字走 Consolas --- */
+/* --- 2. Metric cards: cyan primary / amber data / red reserved for failures; numbers use Consolas --- */
 :root[data-theme="dark"] .ov-metric:nth-child(1) { --ov-accent: var(--cp-cyan, #00d0c0); --ov-accent-soft: var(--cp-cyan-soft, rgba(0, 208, 192, 0.12)); }
 :root[data-theme="dark"] .ov-metric:nth-child(2) { --ov-accent: #63e8da; --ov-accent-soft: rgba(0, 208, 192, 0.09); }
 :root[data-theme="dark"] .ov-metric:nth-child(3) { --ov-accent: var(--cp-amber, #e8a33d); --ov-accent-soft: rgba(232, 163, 61, 0.12); }
@@ -1174,7 +1174,7 @@
     0 0 24px -12px color-mix(in srgb, var(--ov-accent, var(--cp-cyan, #00d0c0)) 55%, transparent);
 }
 
-/* --- 3. 图表柱：扫描青 + 柱面扫描线；hover 从底部 scaleY 长高约 2px --- */
+/* --- 3. Chart bars: scan cyan + scanlines on the bar faces; hover grows about 2px from the bottom via scaleY --- */
 :root[data-theme="dark"] .usage-browser .usage-day-bar,
 :root[data-theme="dark"] .ov-chart .dashboard-chart-bar {
   background-color: var(--cp-cyan, #00d0c0);
@@ -1221,7 +1221,7 @@
   border-bottom-color: var(--cp-cyan-line, rgba(0, 208, 192, 0.30));
 }
 
-/* --- 4. 表格：等宽读数 + hover 左侧青色刻度线 --- */
+/* --- 4. Table: monospace readings + cyan tick line on the left on hover --- */
 :root[data-theme="dark"] .usage-browser .usage-model-table th {
   font-family: Consolas, "Cascadia Mono", monospace;
   font-size: 10px;
@@ -1265,7 +1265,7 @@
   color: color-mix(in srgb, var(--cp-cyan, #00d0c0) 28%, #7e8ba1);
 }
 
-/* --- 5. 筛选、分页、空态：终端键与 NO SIGNAL 框 --- */
+/* --- 5. Filters, pagination, empty state: terminal keys and a NO SIGNAL box --- */
 :root[data-theme="dark"] .usage-browser .usage-model-search input,
 :root[data-theme="dark"] .usage-browser .usage-model-filters select {
   border-radius: 2px;
@@ -1318,7 +1318,7 @@
   border-radius: 2px;
 }
 
-/* --- 6. 反馈：对勾盖章 + 青/琥珀色差一闪（cp-glitch-pop） --- */
+/* --- 6. Feedback: checkmark stamp + a cyan/amber color-glitch flash (cp-glitch-pop) --- */
 :root[data-theme="dark"] .usage-browser .usage-feedback {
   color: var(--cp-cyan, #00d0c0);
   background: var(--cp-cyan-soft, rgba(0, 208, 192, 0.12));
@@ -1363,7 +1363,7 @@
   animation: us-stamp-in 280ms var(--us-ease-out, ease-out) both;
 }
 
-/* --- 7. 页面特有容器：selection / caret / 滚动条 --- */
+/* --- 7. Page-specific containers: selection / caret / scrollbar --- */
 :root[data-theme="dark"] .usage-browser ::selection {
   background: color-mix(in srgb, var(--cp-cyan, #00d0c0) 28%, transparent);
   color: #eafffd;
@@ -1391,10 +1391,10 @@
 }
 
 /* ============================================================
-   昼 · 流光岁月
+   Day · flowing light years
    ============================================================ */
 
-/* --- 1. 总量：黄铜刻度质感（刻线尺 + 纸面压印） --- */
+/* --- 1. Total: brass tick texture (etched ruler + paper embossing) --- */
 :root:not([data-theme="dark"]) .usage-total,
 :root:not([data-theme="dark"]) .usage-browser .usage-window-total strong {
   color: var(--amber-ink, #92400e);
@@ -1422,7 +1422,7 @@
   color: var(--us-ink-muted, #766f63);
 }
 
-/* --- 2. 指标卡：暖棕定向影 + 琥珀暖印章家族 ---- */
+/* --- 2. Metric cards: warm-brown directional shadow + amber warm stamp family ---- */
 :root:not([data-theme="dark"]) .ov-metric:nth-child(1) { --ov-accent: var(--amber, #b45309); --ov-accent-soft: var(--amber-soft, #fdf6ec); }
 :root:not([data-theme="dark"]) .ov-metric:nth-child(2) { --ov-accent: #8a6215; --ov-accent-soft: #fbf6ea; }
 :root:not([data-theme="dark"]) .ov-metric:nth-child(3) { --ov-accent: var(--amber, #b45309); --ov-accent-soft: var(--amber-soft, #fdf6ec); }
@@ -1451,7 +1451,7 @@
     inset 0 0 0 1px rgba(var(--warm-shadow, 86, 52, 10), 0.04);
 }
 
-/* --- 3. 图表柱：顶端最亮的暖渐变；hover 整柱亮起，像光移过来 --- */
+/* --- 3. Chart bars: warm gradient brightest at the top; hover lights the whole bar, as if light moved over --- */
 :root:not([data-theme="dark"]) .usage-browser .usage-day-bar,
 :root:not([data-theme="dark"]) .ov-chart .dashboard-chart-bar {
   background-color: #d98b2b;
@@ -1497,7 +1497,7 @@
   border-bottom-color: var(--amber-line, #eedfc6);
 }
 
-/* --- 4. 表格：纸张表头高光 + 琥珀数据刻度 --- */
+/* --- 4. Table: paper header highlight + amber data ticks --- */
 :root:not([data-theme="dark"]) .usage-browser .usage-model-table th {
   color: var(--us-ink-secondary, #4b453d);
   background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0));
@@ -1531,7 +1531,7 @@
   transform: scaleY(1);
 }
 
-/* --- 5. 筛选、搜索、空态：纸标签 + 琥珀柔光 --- */
+/* --- 5. Filters, search, empty state: paper labels + soft amber glow --- */
 :root:not([data-theme="dark"]) .usage-browser .usage-model-search input,
 :root:not([data-theme="dark"]) .usage-browser .usage-model-filters select {
   border-radius: 8px;
@@ -1568,7 +1568,7 @@
   border-radius: 6px;
 }
 
-/* --- 6. 反馈：琥珀墨洇开（us-ink-spread） --- */
+/* --- 6. Feedback: amber ink spreads (us-ink-spread) --- */
 :root:not([data-theme="dark"]) .usage-browser .usage-feedback {
   color: var(--amber-ink, #92400e);
   background: var(--amber-soft, #fdf6ec);
@@ -1596,7 +1596,7 @@
   box-shadow: 0 0 0 3px var(--amber-glow, rgba(217, 119, 6, 0.14));
 }
 
-/* --- 7. 页面特有容器：selection / caret / 滚动条 --- */
+/* --- 7. Page-specific containers: selection / caret / scrollbar --- */
 :root:not([data-theme="dark"]) .usage-browser ::selection {
   background: color-mix(in srgb, var(--amber, #b45309) 26%, transparent);
   color: #3a2a12;
@@ -1617,11 +1617,11 @@
   border-radius: 999px;
 }
 
-/* --- 圆角纪律：夜=0 直角切角 / 昼=8px 纸角 --- */
+/* --- Radius discipline: Night = 0 right-angle bevel cuts / Day = 8px paper corners --- */
 :root[data-theme="dark"] .usage-browser .ui-card { border-radius: 0; }
 :root:not([data-theme="dark"]) .usage-browser .ui-card { border-radius: 8px; }
 
-/* ---------- 减少动画：新增动作完整降级 ---------- */
+/* ---------- Reduced motion: new motions fully downgraded ---------- */
 @media (prefers-reduced-motion: reduce) {
   :root[data-theme="dark"] .usage-total,
   :root[data-theme="dark"] .usage-browser .usage-window-total strong,
@@ -1654,22 +1654,22 @@
   }
 }
 
-/* ==== V5 NIGHT · 深度打磨（usage 补丁） ==== */
+/* ==== V5 NIGHT · deep polish (usage patch) ==== */
 
-/* KPI 图标圆角清零（配合 app.css 切角） */
+/* KPI icon radius zeroed (to match app.css bevel cuts) */
 [data-theme="dark"] .ov-metric-icon {
   border-radius: 0 !important;
 }
 
-/* 趋势图柱条：圆角清零（五级切角已由 app.css 处理 clip-path） */
+/* Trend chart bars: radius zeroed (the five-level bevel cuts are already handled by app.css via clip-path) */
 [data-theme="dark"] .usage-day-bar,
 [data-theme="dark"] .ov-chart .dashboard-chart-bar {
   border-radius: 0 !important;
 }
 
-/* 移动端 KPI 图标也清零 */
+/* Mobile KPI icons are zeroed too */
 @media (max-width: 700px) {
   [data-theme="dark"] .ov-metric-icon { border-radius: 0 !important; }
 }
 
-/* ==== V5 NIGHT · usage 补丁 END ==== */
+/* ==== V5 NIGHT · usage patch END ==== */

@@ -151,7 +151,7 @@ say(`free lane stub at ${freeLane.base}`)
 // The aggregate providers' endpoint. Their keys are seeded, so their models reach
 // the catalog without a call — but the settings still name a base URL, and an
 // aggregate lane that pings it must not reach the internet from a preview run. A
-// local listing stands in, which also makes 「测试」 and 「发现模型」 safe to click.
+// local listing stands in, which also makes “Test” and “Discover models” safe to click.
 const aggregateRequests = []
 const aggregateServer = http.createServer((req, res) => {
   const url = String(req.url ?? '')

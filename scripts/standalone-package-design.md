@@ -1,31 +1,30 @@
-# 独立服务本地便携包
+# Standalone service local portable package
 
-## 目标与假设
+## Goals and assumptions
 
-为已完成的独立服务生成自带 Node 的 macOS 本地运行目录和 ZIP。面向本机开发验收，
-无需安装 DSH 或 npm 依赖。保持独立产品版本 0.1.0，不改变插件版本、CI 和发布链路。
-单机使用，服务仍只监听回环地址。使用原有数据目录规则，不把用户数据复制进程序包。
-启动性能沿用现有服务，不增加运行时构建或依赖下载。
+Generate a macOS local run directory and ZIP, with Node bundled, for the completed standalone service. Aimed at local development acceptance on this machine, with no need to install DSH or npm dependencies. Keep the standalone product version at 0.1.0, and do not change the plugin version, CI or the release pipeline.
+Single-machine use; the service still listens only on the loopback address. Use the existing data directory rules, and do not copy user data into the program package.
+Startup performance follows the existing service; add no runtime build or dependency downloads.
 
-## 决策记录
+## Decision log
 
-- 已确认采用便携包，舍弃要求用户安装 Node 的轻量包，以及增加桌面壳和签名流程的安装包。
-- 首期只构建和验证本机 macOS 架构。Node 可执行文件和完整许可证由构建者显式提供。
-- 保持现有源码、Worker、静态页面和 WASM 的相对路径，通过显式文件清单复制。
-  不递归打包工作区，因此账号、配置、日志、node_modules 和 Git 文件不会随包进入。
-- Node 必须满足产品 engines，并且只能链接 macOS 系统库。不把当前机器的第三方动态库依赖转嫁给用户。
-- 输出只进入 dist；已存在的同名产物报错。产物清单记录实际文件摘要和 Node 版本，不代表发布签名。
-- 启动入口按自身位置定位 Node 与代码，允许从其他工作目录启动，并透传现有命令行参数。
-- 验证实际 ZIP 解压产物，包括摘要、执行权限、无系统 Node 的启动、管理页、资源、鉴权、
-  本地替身推理、退出和重新启动后的密钥保留。
+- Confirmed: use a portable package, rejecting the lightweight package that requires the user to install Node, and the installer package that adds a desktop shell and a signing flow.
+- The first phase builds and validates only the build machine's macOS architecture. The Node executable and its complete license are provided explicitly by the builder.
+- Keep the relative paths of the existing sources, Workers, static pages and WASM, copying via an explicit file list.
+  The workspace is not packaged recursively, so accounts, configuration, logs, node_modules and Git files do not enter the package.
+- Node must satisfy the product's engines and may link only macOS system libraries. Do not pass the current machine's third-party dynamic-library dependencies on to the user.
+- Output goes only into dist; an existing artifact with the same name is an error. The artifact manifest records the actual file digests and the Node version; it does not represent a release signature.
+- The start entry point locates Node and the code relative to its own position, can be started from another working directory, and passes through the existing command-line arguments.
+- Validate the actual extracted ZIP artifact, including digests, execute permissions, starting with no system Node, the admin page, assets, authentication,
+  local stand-in inference, exit, and key retention after a restart.
 
-## 构建和验收
+## Build and acceptance
 
 ```sh
 npm run pack:standalone -- --node-license /path/to/the/matching/Node-LICENSE
 npm run test:package -- --package dist/ofm-standalone-...
 ```
 
-构建脚本不联网；Node LICENSE 必须与所提供运行时版本对应并包含第三方声明。
-该阶段不创建 tag、GitHub Release、npm 包，不上传产物，也不为打包调整产品版本。
-正式发布及其他操作系统的安装体验需要另行授权和验收。
+The build script does not access the network; the Node LICENSE must correspond to the supplied runtime version and include the third-party notices.
+This phase creates no tag, GitHub Release or npm package, uploads no artifact, and does not adjust the product version for packaging.
+An official release and the installation experience on other operating systems need separate authorization and acceptance.

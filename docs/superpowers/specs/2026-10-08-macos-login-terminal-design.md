@@ -1,29 +1,30 @@
-# macOS 本机取令牌设计
+# macOS local token retrieval design
 
-## 范围与假设
+## Scope and assumptions
 
-为独立服务的本机取令牌入口增加 macOS 支持。
-沿用 Windows 的本机恢复流程：打开可见终端，从当前服务的数据目录读取
-`settings.json`，复制 `forwardKey`，用户回网页粘贴登录。
-假设服务运行在有图形会话的本机 macOS，安装服务所用 Node 仍可执行。
-适用于单用户本地服务，点击无需网络访问；不改变账号数据、管理会话和推理接口。
-自动打开不支持的系统、系统自动化授权失败或配置读取失败，保留手动入口。
+Add macOS support to the standalone service's local token retrieval entry point.
+Reuse the Windows local recovery flow: open a visible terminal, read
+`settings.json` from the current service's data directory, copy the `forwardKey`,
+and have the user paste it back into the web page to sign in.
+Assume the service runs on a local macOS machine with a graphical session, and that the Node used to install the service is still executable.
+This applies to a single-user local service; the click requires no network access, and it does not change account data, management sessions or inference interfaces.
+If automatic opening is unsupported on the system, the system automation authorization fails, or reading the configuration fails, the manual entry point is retained.
 
-## 决策
+## Decisions
 
-- 沿用固定本机启动器，不新增返回密钥的未鉴权 API。
-- macOS 使用系统 osascript 打开 Terminal，用当前 Node 可执行文件读取 JSON，
-  通过标准输入将密钥交给 pbcopy；不在进程参数、终端输出或 HTTP 返回中包含密钥。
-- 配置路径只来自服务端，POSIX 参数逐个引用，再通过 AppleScript argv 传入。
-  不接受浏览器指定路径、程序或命令。
-- 服务端静态页面标记实际运行系统，按钮与手动命令据此切换，
-  不依赖浏览器 User-Agent 推测服务端系统；Linux 保留手动获取。
-- 保留同源来源限制、并发限制及成功打开后 30 秒冷却期。
-  不采用“后端直接复制而没有可见窗口”或“让页面读配置文件”的替代方案。
+- Reuse the fixed local launcher; do not add a new unauthenticated API that returns the key.
+- On macOS, use the system osascript to open Terminal, use the current Node executable to read the JSON,
+  and pass the key to pbcopy via standard input; the key is never included in process arguments, terminal output or HTTP responses.
+- The configuration path comes only from the server side; POSIX arguments are quoted one by one and then passed in via AppleScript argv.
+  No browser-specified path, program or command is accepted.
+- The server-side static page marks the system actually running, and the button and manual command switch accordingly,
+  rather than relying on the browser User-Agent to guess the server-side system; Linux keeps manual retrieval.
+- Keep the same-origin source restrictions, the concurrency limit and the 30-second cooldown after a successful open.
+  Do not adopt alternatives such as "the backend copies directly with no visible window" or "let the page read the configuration file".
 
-## 验证
+## Validation
 
-覆盖 Windows 原流程、macOS 启动参数、特殊路径转义、空/错误令牌与启动失败；
-复跑既有管理接口安全测试与独立服务套件。
-浏览器验证桌面/窄屏登录页，并用隔离验收目录验证 macOS 实际终端与剪贴板。
-不在测试套件中触碰用户剪贴板或第三方账号；实机验收明确隔离并还原剪贴板。
+Cover the original Windows flow, macOS launch arguments, escaping of special paths, empty/incorrect tokens and launch failure;
+re-run the existing management-interface security tests and the standalone service suite.
+Verify the desktop/narrow-screen sign-in page in the browser, and verify the actual macOS terminal and clipboard using an isolated acceptance directory.
+The test suite never touches the user's clipboard or third-party accounts; on-device acceptance explicitly isolates and restores the clipboard.

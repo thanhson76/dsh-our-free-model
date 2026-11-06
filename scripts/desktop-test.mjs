@@ -8,7 +8,7 @@ import { once } from 'node:events'
 import { pathToFileURL } from 'node:url'
 import { stageDesktopService, repositoryRoot } from './prepare-desktop.mjs'
 
-const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'ofm desktop 测试 '))
+const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'ofm desktop test '))
 const serviceRoot = path.join(scratch, 'service')
 const dataDir = path.join(scratch, 'data')
 const preload = path.join(scratch, 'offline.mjs')
@@ -41,10 +41,10 @@ function launch({ port = 0, directory = dataDir, endInput = false } = {}) {
     async ready() {
       for (let i = 0; i < 150; i++) {
         if (ready) return ready
-        if (child.exitCode !== null) throw new Error(`启动握手前退出：${error.slice(0, 200)}`)
+        if (child.exitCode !== null) throw new Error(`Exited before the startup handshake: ${error.slice(0, 200)}`)
         await delay(100)
       }
-      throw new Error('桌面服务握手超时')
+      throw new Error('Desktop service handshake timed out')
     },
     async stop(eof = false) {
       if (child.exitCode === null) {
@@ -59,14 +59,14 @@ function launch({ port = 0, directory = dataDir, endInput = false } = {}) {
 
 const occupied = net.createServer(socket => socket.end())
 try {
-  await check('仅选择完整运行资源，临时包在源码仓库之外，不带工具索引及用户数据', () => {
+  await check('only complete runtime resources are selected; the temp package lives outside the source repo and carries no tool index or user data', () => {
     const orphan = path.join(repositoryRoot, `packages/standalone/web/orphan-fixture-${process.pid}.js`)
     assert.equal(fs.existsSync(orphan), false)
     try {
       fs.writeFileSync(orphan, '// obsolete generated resource\n')
       stageDesktopService(serviceRoot)
       assert.equal(fs.existsSync(path.join(serviceRoot, path.relative(repositoryRoot, orphan))), false,
-        '资源清单之外的旧 JS 文件不得进入桌面安装包')
+        'an old JS file outside the resource manifest must not enter the desktop installer package')
     } finally {
       fs.rmSync(orphan, { force: true })
     }
@@ -82,7 +82,7 @@ try {
   })
   occupied.listen(0, '127.0.0.1'); await once(occupied, 'listening')
   let first, ready
-  await check('复制的内置 Node 在空 PATH 和含中文空格的安装路径启动，返回自身 PID 与真实端口', async () => {
+  await check('the copied bundled Node starts with an empty PATH and in an install path containing Chinese characters and spaces, and returns its own PID and the real port', async () => {
     first = launch({ port: occupied.address().port }); ready = await first.ready()
     assert.equal(ready.protocol, 'ofm-desktop-ready/v1')
     assert.equal(ready.pid, first.child.pid)
@@ -91,7 +91,7 @@ try {
     assert.equal(url.hostname, '127.0.0.1'); assert.equal(Number(url.port), ready.port)
     assert.ok(url.hash.startsWith('#login='))
   })
-  await check('一次性登录入口创建会话后可请求管理 API，令牌不写进测试输出', async () => {
+  await check('the one-time login entry can request the management API after creating a session, and the token is not written into the test output', async () => {
     const url = new URL(ready.managementUrl)
     const response = await fetch(`${url.origin}/api/management/session`, { method: 'POST', headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ bootstrapToken: new URLSearchParams(url.hash.slice(1)).get('login') }) })
@@ -102,7 +102,7 @@ try {
       body: JSON.stringify({ bootstrapToken: new URLSearchParams(url.hash.slice(1)).get('login') }) })
     assert.equal(duplicate.status, 401)
   })
-  await check('已有服务的数据锁不被删除，重复启动明确报错并保留原服务', async () => {
+  await check('the data lock of an existing service is not deleted; a duplicate start errors clearly and keeps the original service', async () => {
     const before = fs.readFileSync(path.join(dataDir, 'service.lock'))
     const second = launch(); const failure = await second.ready()
     assert.equal(failure.code, 'DATA_DIRECTORY_IN_USE')
@@ -110,12 +110,12 @@ try {
     assert.deepEqual(fs.readFileSync(path.join(dataDir, 'service.lock')), before)
     assert.equal((await fetch(`http://127.0.0.1:${ready.port}/health`)).status, 200)
   })
-  await check('私有管道关闭服务，清理锁后相同目录可以立即重启', async () => {
+  await check('the private pipe stops the service; after the lock is cleaned up, the same directory can restart immediately', async () => {
     await first.stop(); assert.ok(!fs.existsSync(path.join(dataDir, 'service.lock')))
     const restarted = launch(); assert.equal((await restarted.ready()).protocol, 'ofm-desktop-ready/v1')
     await restarted.stop(); assert.ok(!fs.existsSync(path.join(dataDir, 'service.lock')))
   })
-  await check('父进程管道 EOF 和启动前 EOF 均正常退出，不留下锁', async () => {
+  await check('parent-pipe EOF and pre-startup EOF both exit cleanly and leave no lock', async () => {
     const parentClosed = launch(); await parentClosed.ready(); await parentClosed.stop(true)
     const earlyClosed = launch({ endInput: true }); await earlyClosed.stop(true)
     assert.ok(!fs.existsSync(path.join(dataDir, 'service.lock')))
@@ -130,10 +130,10 @@ try {
       instance.child.kill('SIGKILL')
       await instance.exit
       children.delete(instance.child)
-      assert.ok(fs.existsSync(lockFile), '强杀应确实遗留锁，不能把正常退出当成恢复测试')
+      assert.ok(fs.existsSync(lockFile), 'a force kill must really leave a lock behind; a clean exit must not count as the recovery test')
       return instance.child.pid
     }
-    await check('强杀服务留下陈旧锁后可直接重启，保留密钥和已有数据', async () => {
+    await check('after a force kill leaves a stale lock, the service restarts directly, keeping the key and existing data', async () => {
       const key = JSON.parse(fs.readFileSync(path.join(dataDir, 'settings.json'))).forwardKey
       const savedData = path.join(dataDir, 'user-sentinel.json')
       fs.writeFileSync(savedData, '{"preserved":true}')
@@ -148,7 +148,7 @@ try {
       assert.equal((await fetch(`http://127.0.0.1:${recoveredReady.port}/health`)).status, 200)
       await recovered.stop()
     })
-    await check('四个进程同时恢复同一个陈旧锁，只有一个能启动且其锁不会被误删', async () => {
+    await check('four processes recovering the same stale lock at once: only one can start and its lock is not deleted by mistake', async () => {
       const directory = path.join(scratch, 'concurrent-recovery')
       await crash(directory)
       const instances = Array.from({ length: 4 }, () => launch({ directory }))
@@ -167,7 +167,7 @@ try {
       assert.equal((await fetch(`http://127.0.0.1:${results[winner].port}/health`)).status, 200)
       await instances[winner].stop()
     })
-    await check('旧版活进程、无效 PID、损坏内容及未知归属的锁均保留，拒绝后可再次启动', async () => {
+    await check('locks of live old-version processes, invalid PIDs, corrupt contents and unknown ownership are all kept; after a refusal, starting again works', async () => {
       const directory = path.join(scratch, 'unverifiable-lock')
       const lockFile = path.join(directory, 'service.lock')
       fs.mkdirSync(directory)
@@ -194,7 +194,7 @@ try {
       await recovered.stop()
     })
   }
-  await check('桌面配置使用明确资源映射，启动不依赖系统 Node；标题栏 API 使用 v2', () => {
+  await check('the desktop configuration uses an explicit resource mapping; startup does not depend on a system Node; the titlebar API uses v2', () => {
     const config = JSON.parse(fs.readFileSync(path.join(repositoryRoot, 'packages/desktop/src-tauri/tauri.conf.json')))
     assert.equal(config.bundle.resources['resources/service/'], 'service/')
     assert.equal(config.bundle.resources['resources/runtime/'], 'runtime/')
@@ -202,11 +202,11 @@ try {
     assert.ok(js.includes('getCurrentWindow'))
     assert.ok(!js.includes('getCurrent()'))
     const css = fs.readFileSync(path.join(repositoryRoot, 'packages/desktop/ui/titlebar.css'), 'utf8')
-    assert.ok(!css.startsWith('\uFEFF'), '注入的 CSS 不得带 BOM，否则第一个选择器失效')
+    assert.ok(!css.startsWith('\uFEFF'), 'the injected CSS must not carry a BOM, or the first selector breaks')
     const hooks = fs.readFileSync(path.join(repositoryRoot, 'packages/desktop/src-tauri/install-hooks.nsh'), 'utf8')
     assert.ok(!/taskkill|Delete |FileWrite/.test(hooks))
   })
-  console.log(`${checks}/${checks} 桌面回归检查通过`)
+  console.log(`${checks}/${checks} desktop regression checks passed`)
 } finally {
   for (const child of children) {
     if (child.exitCode !== null || child.signalCode !== null) continue

@@ -391,7 +391,7 @@ export function toResponseInput(messages, resolveImage, warnings) {
   }
   flushFollowUp()
   // Reasoning items from earlier turns carry encrypted content only the issuing
-  // account can open; the pooled免密 credential rotates accounts, so echoing them
+  // account can open; the pooled passwordless credential rotates accounts, so echoing them
   // back is a guaranteed 400. They are dropped on the way out by construction.
   return out
 }

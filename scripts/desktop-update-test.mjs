@@ -9,9 +9,9 @@ import { createDesktopUpdater, selectDesktopRelease, newerVersion, installerChec
 // to `/private/var` — the managed-storage checks reject any symlinked ancestor,
 // so an unresolved path fails on macOS before a single assertion runs.
 const scratch = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'ofm-desktop-update-')))
-const bytes = Buffer.from('官方安装包下载夹具，不执行安装')
+const bytes = Buffer.from('Official installer download fixture; no installation is performed')
 const sha = crypto.createHash('sha256').update(bytes).digest('hex')
-const release = version => ({ tag_name: `v${version}`, draft: false, prerelease: false, body: '更新说明', assets: [
+const release = version => ({ tag_name: `v${version}`, draft: false, prerelease: false, body: 'Release notes', assets: [
   { name: `Our.Free.Model_${version}_x64-setup.exe`, size: bytes.length, browser_download_url: `https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/download/v${version}/Our.Free.Model_${version}_x64-setup.exe` },
   { name: 'SHA256SUMS', browser_download_url: `https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/download/v${version}/SHA256SUMS` },
 ] })
@@ -25,7 +25,7 @@ const fixtureFetch = async (url) => {
     { ...release('9.0.0'), prerelease: true }, release('2.7.3'), release('2.7.1'),
   ]))
   if (url.endsWith('/SHA256SUMS')) return new Response(`${mode === 'bad-hash' ? '0'.repeat(64) : sha}  Our.Free.Model_2.7.3_x64-setup.exe\n`)
-  return new Response(mode === 'oversize' ? Buffer.concat([bytes, Buffer.from('多余')]) : bytes,
+  return new Response(mode === 'oversize' ? Buffer.concat([bytes, Buffer.from('extra')]) : bytes,
     { headers: mode === 'wrong-size-header' ? { 'content-length': '99999' } : {} })
 }
 let checks = 0
@@ -33,7 +33,7 @@ const check = async (name, run) => { await run(); console.log(`ok ${++checks} - 
 const manager = (name, extra = {}) => createDesktopUpdater({ dataDir: path.join(scratch, name), version: '2.7.1', platform: 'win32', arch: 'x64', fetchImpl: fixtureFetch, ...extra })
 const runCheck = async updater => { updater.check(); const state = await updater.settled(); assert.equal(state.phase, 'idle'); return state }
 try {
-  await check('跳过仅插件、预发布与旧版本，按真实桌面包选择最高版本', async () => {
+  await check('plugin-only, prerelease and older versions are skipped; the highest version is selected by the real desktop package', async () => {
     const updater = manager('versions'); const state = await runCheck(updater)
     assert.equal(state.latest.version, '2.7.3'); assert.equal(state.available, true)
     assert.equal(newerVersion('2.10.0', '2.9.9'), true)
@@ -41,17 +41,17 @@ try {
     assert.equal(selectDesktopRelease([{ tag_name: 'v3.0.0', assets: [{ name: 'plugin.tgz' }] }]), null)
     assert.equal(selectDesktopRelease([release('2.7.3')], 'arm64'), null)
   })
-  await check('SHA 校验成功后才生成原生安装凭据，并保留配置', async () => {
+  await check('the native install credential is generated only after SHA verification succeeds, and the configuration is kept', async () => {
     const updater = manager('download'); await runCheck(updater)
-    fs.mkdirSync(path.join(scratch, 'download'), { recursive: true }); fs.writeFileSync(path.join(scratch, 'download/settings.json'), '原有配置')
+    fs.mkdirSync(path.join(scratch, 'download'), { recursive: true }); fs.writeFileSync(path.join(scratch, 'download/settings.json'), 'Existing configuration')
     assert.equal(updater.download().phase, 'downloading'); assert.equal((await updater.settled()).phase, 'ready')
     const directory = path.join(scratch, 'download/desktop-updates')
     assert.deepEqual(fs.readFileSync(path.join(directory, `installer-${sha}.exe`)), bytes)
     assert.deepEqual(JSON.parse(fs.readFileSync(path.join(directory, 'ready.json'))), { schemaVersion: 1, version: '2.7.3', size: bytes.length, sha256: sha })
-    assert.equal(fs.readFileSync(path.join(scratch, 'download/settings.json'), 'utf8'), '原有配置')
-    const previous = requests; updater.download(); await updater.settled(); assert.equal(requests - previous, 1, '有效缓存只重读官方校验文件')
+    assert.equal(fs.readFileSync(path.join(scratch, 'download/settings.json'), 'utf8'), 'Existing configuration')
+    const previous = requests; updater.download(); await updater.settled(); assert.equal(requests - previous, 1, 'a valid cache only re-reads the official checksum file')
   })
-  await check('坏摘要、超限下载及错误长度不会写入安装凭据，临时文件被清理', async () => {
+  await check('a bad digest, an oversize download and a wrong length write no install credential, and temp files are cleaned up', async () => {
     for (const failure of ['bad-hash', 'oversize', 'wrong-size-header']) {
       mode = 'ok'; const updater = manager(failure); await runCheck(updater)
       mode = failure; updater.download(); const state = await updater.settled()
@@ -62,34 +62,34 @@ try {
     }
     mode = 'ok'
   })
-  await check('下载缓存篡改后重新下载，检查新版本时旧安装凭据失效', async () => {
+  await check('a tampered download cache triggers a re-download; checking a new version invalidates the old install credential', async () => {
     const updater = manager('corrupt'); await runCheck(updater); updater.download(); await updater.settled()
-    const dir = path.join(scratch, 'corrupt/desktop-updates'); fs.writeFileSync(path.join(dir, `installer-${sha}.exe`), '坏缓存')
+    const dir = path.join(scratch, 'corrupt/desktop-updates'); fs.writeFileSync(path.join(dir, `installer-${sha}.exe`), 'Corrupt cache')
     updater.download(); assert.equal((await updater.settled()).phase, 'ready'); assert.deepEqual(fs.readFileSync(path.join(dir, `installer-${sha}.exe`)), bytes)
     await runCheck(updater); assert.equal(fs.existsSync(path.join(dir, 'ready.json')), false)
   })
-  await check('拒绝重复操作、未检查的下载及已关闭管理器', async () => {
-    const updater = manager('concurrent'); assert.throws(() => updater.download(), /先检查/)
+  await check('duplicate operations, unchecked downloads and a closed manager are rejected', async () => {
+    const updater = manager('concurrent'); assert.throws(() => updater.download(), /Check first/)
     updater.check(); assert.throws(() => updater.check(), error => error.statusCode === 409)
-    await updater.settled(); updater.close(); assert.throws(() => updater.check(), /关闭/)
+    await updater.settled(); updater.close(); assert.throws(() => updater.check(), /closed/)
   })
-  await check('拒绝外部安装包地址、非 HTTPS 重定向和不唯一的摘要', async () => {
+  await check('external installer URLs, non-HTTPS redirects and non-unique digests are rejected', async () => {
     const foreign = release('2.7.3'); foreign.assets[0].browser_download_url = 'https://evil.invalid/setup.exe'
-    assert.throws(() => selectDesktopRelease([foreign]), /官方发布源/)
-    assert.throws(() => installerChecksum(`${sha}  setup.exe\n${sha}  setup.exe`, 'setup.exe'), /唯一/)
+    assert.throws(() => selectDesktopRelease([foreign]), /official release source/)
+    assert.throws(() => installerChecksum(`${sha}  setup.exe\n${sha}  setup.exe`, 'setup.exe'), /unique/)
     mode = 'redirect'; const updater = manager('redirect'); updater.check(); assert.equal((await updater.settled()).phase, 'error'); mode = 'ok'
   })
-  await check('不支持的平台与浏览器服务不发更新请求，当前版本无需降级', async () => {
+  await check('unsupported platforms and the browser service send no update requests; the current version needs no downgrade', async () => {
     const unsupported = manager('unsupported', { platform: 'darwin' }); const previous = requests
     assert.throws(() => unsupported.check(), /Windows/); assert.equal(requests, previous)
     const browser = manager('browser', { version: undefined }); assert.equal(browser.status().supported, false)
-    const latest = manager('latest', { version: '2.8.0' }); assert.equal((await runCheck(latest)).available, false); assert.throws(() => latest.download(), /先检查/)
+    const latest = manager('latest', { version: '2.8.0' }); assert.equal((await runCheck(latest)).available, false); assert.throws(() => latest.download(), /Check first/)
   })
-  await check('网络失败显示错误且允许重新检查恢复', async () => {
+  await check('a network failure shows an error and allows re-checking to recover', async () => {
     const updater = manager('recovery'); mode = 'network'; updater.check(); assert.equal((await updater.settled()).phase, 'error')
     mode = 'ok'; assert.equal((await runCheck(updater)).available, true)
   })
-  await check('实际管理接口要求私有会话与同源，且不提供 HTTP 安装入口', async () => {
+  await check('the real management endpoints require a private session and same origin, and offer no HTTP install entry', async () => {
     const savedFetch = globalThis.fetch
     const previousVersion = process.env.OFM_DESKTOP_VERSION
     process.env.OFM_DESKTOP_VERSION = '2.7.1'
@@ -131,7 +131,7 @@ try {
       else process.env.OFM_DESKTOP_VERSION = previousVersion
     }
   })
-  console.log(`${checks}/${checks} 桌面更新检查通过；所有下载均为本地替身，未执行安装器`)
+  console.log(`${checks}/${checks} desktop update checks passed; all downloads were local fixtures and no installer was executed`)
 } finally {
   assert.equal(path.dirname(scratch), fs.realpathSync(os.tmpdir()))
   fs.rmSync(scratch, { recursive: true, force: true })

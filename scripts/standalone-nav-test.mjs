@@ -1,17 +1,18 @@
 /**
  * The sidebar is the only list of pages — nothing may restate it.
  *
- * 「模型工作台」在 2.7.1 里是个死入口：侧边栏有这一项，`App` 的 `host.navigate`
- * 却拿另一份手写数组当白名单，`navigate('workspace')` 被 `includes` 直接短路，
- * 于是点击无反应、无报错、无 loading（#678）。
+ * "Model workbench" was a dead entry in 2.7.1: the sidebar listed it, but `App`'s
+ * `host.navigate` used another hand-written array as its allowlist, so
+ * `navigate('workspace')` was short-circuited by `includes` — clicking did
+ * nothing: no reaction, no error, no loading (#678).
  *
- * 修法不是往白名单里补一个字符串，而是让它**从侧边栏推导**。这个脚本守住两件事：
+ * The fix is not to add one more string to the allowlist, but to **derive it from the sidebar**. This script guards two things:
  *
- * 1. `Page` 联合类型与侧边栏条目是同一个集合 —— 类型允许的页面必须真的能点到，
- *    侧边栏也不能列出类型里没有的页面；
- * 2. `app.tsx` 不再自己写一份名单，而是用 `shell.tsx` 导出的 `navigationPages`。
+ * 1. The `Page` union type and the sidebar entries are the same set — a page the type allows must actually be clickable,
+ *    and the sidebar must not list a page the type does not have;
+ * 2. `app.tsx` no longer keeps its own list, but uses the `navigationPages` exported by `shell.tsx`.
  *
- * 纯静态检查：不需要浏览器，也不构建前端产物。
+ * Purely static checks: no browser needed, and no frontend artifacts are built.
  *
  * Run: node scripts/standalone-nav-test.mjs
  */

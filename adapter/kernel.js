@@ -3,7 +3,7 @@
  *
  * This file is the only module in the package allowed to name an
  * `@deepseek-ai/*` module — the ecosystem packaging rule (audit gate §4.3,
- * "adapter 层外不允许 `@deepseek-ai/*` import") in one line of grep. Everything
+ * "no `@deepseek-ai/*` imports outside the adapter layer") in one line of grep. Everything
  * the plugin takes from the harness kernel crosses here, so the rest of the
  * source stays a pure consumer of the structural `ctx` contract and can mount
  * on any kernel line that supplies it.

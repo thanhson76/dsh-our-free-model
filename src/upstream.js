@@ -1,5 +1,5 @@
 /**
- * Upstream wire for the免密 free lane.
+ * Upstream wire for the no-key free lane.
  *
  * Every fact encoded here was verified against the live gateway on 2026-09-24
  * by direct request: the public pooled
@@ -64,8 +64,10 @@ import crypto from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
 import { DATA_DIR_NAME, resolveDshHome } from './store.js'
-// 发布形态唯一导入点：src/o2a.js 由 scripts/build-legacy-payload.mjs 把
-// src/o2a/ 八个模块（官方资产内联）打成单文件；开发/测试直接跑仓库里的产物。
+// The sole import point for the published form: src/o2a.js is produced by
+// scripts/build-legacy-payload.mjs, which bundles the eight modules in
+// src/o2a/ (with the official assets inlined) into a single file;
+// development/tests run the artifact in the repository directly.
 import {
   BASE62_ALPHABET,
   CANONICAL_SESSION_RE,
@@ -167,8 +169,10 @@ export function mintSessionId(timestamp = Date.now()) {
 /**
  * Mint a `msg_`-shaped id for local bookkeeping (turn/recovery records).
  *
- * ⚠️ 这个值**不再上线**：`x-opencode-request` 是 v1 专用头，v2 收到即 403（见
- * {@link gatewayHeaders}）。保留铸造器是因为恢复记录与测试仍用它做一次性标识。
+ * ⚠️ This value **no longer goes on the wire**: `x-opencode-request` is a
+ * v1-only header, and v2 answers 403 as soon as it receives it (see
+ * {@link gatewayHeaders}). The minter is kept because recovery records and
+ * tests still use it as a one-time identifier.
  */
 export function mintRequestId(timestamp = Date.now()) {
   const value = BigInt(timestamp) * 0x1000n + 1n
@@ -296,7 +300,7 @@ export function wireFor(modelId) {
 
 /**
  * The headers the gateway fingerprints a genuine client by — the v2 set
- * (`o2a/headers.js`), with the pooled免密 credential `Bearer public`.
+ * (`o2a/headers.js`), with the pooled no-key credential `Bearer public`.
  *
  * @param {object} options
  * @param {string} options.session - canonical session (all four session headers)
@@ -354,12 +358,17 @@ function definitionOf(entry, shape) {
 /**
  * The note appended when official tools had to be injected.
  *
- * ⚠️ v2 的定义是**真工具**（描述与 schema 都来自官方客户端），模型会真的去调它
- * —— 实测把 `read` 用在「/etc 里有什么文件」这种问题上。本插件的宿主并不实现
- * 官方工具集，注入项必须用提示词压住。措辞是实测选出来的：写成「不可用」会让
- * 模型连调用方自己的 `Read`/`Bash` 也一起拒绝；「占位、请用别的工具」才既压住
- * 注入项、又不误伤调用方的工具。（参考实现不发这条 —— 它的下游是真 CLI ——
- * 这是本适配层的既列偏差，见 src/o2a/SYNC.md。）
+ * ⚠️ The v2 definitions are **real tools** (both the descriptions and the
+ * schemas come from the official client), and the model will actually try to
+ * call them — in live testing it used `read` on a question like "what files
+ * are in /etc". This plugin's host does not implement the official tool set,
+ * so the injected entries must be held down with a prompt. The wording was
+ * chosen by live testing: writing "unavailable" makes the model refuse the
+ * caller's own `Read`/`Bash` as well; only "placeholders, please use other
+ * tools" both holds down the injected entries and does not accidentally harm
+ * the caller's tools. (The reference implementation does not send this note —
+ * its downstream is a real CLI — this is a listed deviation of this adapter
+ * layer; see src/o2a/SYNC.md.)
  */
 function placeholderNote(names) {
   const list = names.map(name => `\`${name}\``).join(', ')
@@ -426,27 +435,34 @@ export function ensureFreeLaneEnvironment(body, style, environment = {}) {
  * Satisfy the v2 free-tier fingerprint on `body`, shaped as the reference
  * gateway shapes it (opencode2api v1.4.6, see the module header):
  *
- * 1. **官方系统提示注入**：base prompt + `<env>` + skills，逐线注入（Chat 折到
- *    首条 system，Responses 折到 `instructions`，Messages 折到 `system`）；
- *    已带官方标记的请求体原样跳过。
- * 2. **全部调用方工具改名** 为 `clint_<sha256[:12]>`（外来工具词汇一概不上
- *    线——`ReportFindings`/`ScheduleWakeup` 同时出现即 429，2026-10-30 实测）；
- *    Responses 内建与 Messages 服务端工具无客户名，原样保留。
- * 3. **补齐官方 13 工具集**（捕获自官方 CLI 的逐字定义，chat 形状带
- *    `strict: false`，Windows 主机 shell 描述换 powershell）；已带逐字官方
- *    定义的声明视为官方声明，不重命名也不重复补。
- * 4. **引用同步**：`tool_choice`、历史 tool_calls / tool_use / function_call、
- *    Responses 的 `input` 调用行全部跟随改名；字符串 choice 原样透传。
- * 5. **绝不下发 `tool_choice: 'none'`** —— v2 见到它就 403；调用方没给
- *    `tool_choice` 时，只有 Responses 线补 `auto`（官方行为）。
- * 6. Chat 请求体补上官方客户端的两个常量字段：流式时
- *    `stream_options.include_usage: true`；调用方未给上限时
- *    `max_completion_tokens: 32000`。
+ * 1. **Official system prompt injection**: base prompt + `<env>` + skills,
+ *    injected per wire (Chat folds into the first system message, Responses
+ *    into `instructions`, Messages into `system`); a body that already
+ *    carries the official marker is skipped unchanged.
+ * 2. **All caller tools are renamed** to `clint_<sha256[:12]>` (foreign tool
+ *    vocabulary never goes on the wire at all — `ReportFindings` and
+ *    `ScheduleWakeup` appearing together is an immediate 429, verified live
+ *    on 2026-10-30); Responses built-ins and Messages server tools have no
+ *    client name and are kept as-is.
+ * 3. **The official 13-tool set is completed** (verbatim definitions captured
+ *    from the official CLI, with `strict: false` on the chat shape, and the
+ *    shell description swapped to powershell on Windows hosts); a declaration
+ *    that already carries a verbatim official definition is treated as an
+ *    official declaration — it is neither renamed nor added again.
+ * 4. **References are renamed in sync**: `tool_choice`, historical
+ *    tool_calls / tool_use / function_call, and the Responses `input` call
+ *    lines all follow the renaming; a string choice is passed through as-is.
+ * 5. **Never send `tool_choice: 'none'`** — v2 answers 403 as soon as it sees
+ *    it; when the caller gave no `tool_choice`, only the Responses wire adds
+ *    `auto` (the official behavior).
+ * 6. Chat bodies gain the official client's two constant fields: when
+ *    streaming, `stream_options.include_usage: true`; when the caller named
+ *    no ceiling, `max_completion_tokens: 32000`.
  *
  * @param {object} body - request body, mutated in place
- * @param {boolean|'claude'} style - true 为 Responses，false 为 Chat，claude 为 Messages
- * @returns {ToolRenameMap} sent name -> caller's name（响应侧还原用；带
- *   {@link ToolRenameMap.resolve} 的折叠还原）
+ * @param {boolean|'claude'} style - true for Responses, false for Chat, 'claude' for Messages
+ * @returns {ToolRenameMap} sent name -> caller's name (for restoring on the
+ *   response side; with the folded restore of {@link ToolRenameMap.resolve})
  */
 export function applyFingerprint(body, style) {
   const shape = shapeOf(style)

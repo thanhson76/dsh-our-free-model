@@ -22,9 +22,9 @@ export function resolveStandaloneDataDir(env = process.env, home = os.homedir())
   return configured === '' ? path.join(home, '.our-free-model') : path.resolve(configured)
 }
 
-/** 内核自动释放的互斥端点，串行化同一数据目录的锁检查与回收。 */
+/** A kernel-released mutex endpoint that serializes lock checks and reclamation for the same data directory. */
 async function acquireProcessGuard(dataDir) {
-  // 其他平台保留原来的保守文件锁行为，不使用会遗留文件的 Unix Socket。
+  // Other platforms keep the original conservative file-lock behaviour and do not use a Unix socket that would leave a file behind.
   if (process.platform !== 'win32' && process.platform !== 'linux') return null
   let canonical = fs.realpathSync.native(dataDir)
   if (process.platform === 'win32') canonical = canonical.toLowerCase()
@@ -38,7 +38,7 @@ async function acquireProcessGuard(dataDir) {
     })
   } catch (error) {
     if (error.code === 'EADDRINUSE') {
-      throw Object.assign(new Error('数据目录已被服务占用'), { code: 'EEXIST', cause: error })
+      throw Object.assign(new Error('The data directory is already in use by a service'), { code: 'EEXIST', cause: error })
     }
     throw error
   }
@@ -72,7 +72,7 @@ async function acquireServiceLock(dataDir) {
       let owner
       try { owner = JSON.parse(previous) } catch { throw error }
       if (owner?.product !== PRODUCT || !Number.isSafeInteger(owner.pid) || owner.pid <= 0) throw error
-      // 只有 ESRCH 能证明进程已经退出；无权限、PID 复用等情况均保留原锁。
+      // Only ESRCH proves the process has exited; in cases such as missing permission or PID reuse, the original lock is kept.
       let exited = false
       try { process.kill(owner.pid, 0) }
       catch (probeError) { exited = probeError.code === 'ESRCH' }
@@ -96,7 +96,7 @@ async function acquireServiceLock(dataDir) {
   }
   return async () => {
     try {
-      // 在关闭文件句柄前核对归属，避免异常替换的锁被本实例清理。
+      // Verify ownership before closing the file handle, so a lock replaced abnormally is not cleaned up by this instance.
       const current = JSON.parse(fs.readFileSync(lockFile, 'utf8'))
       if (current?.token === token && current.pid === process.pid && current.product === PRODUCT) removeOwnedLock()
     } catch (error) {
@@ -107,7 +107,7 @@ async function acquireServiceLock(dataDir) {
   }
 }
 
-/** 直接创建核心和 HTTP 服务，不加载插件入口、Cordis 或 DSH 凭据。 */
+/** Creates the core and HTTP service directly, without loading the plugin entry point, Cordis or DSH credentials. */
 export async function startStandalone({
   dataDir = resolveStandaloneDataDir(), host = '127.0.0.1', port,
   logger = console, refresh = true, probe, lanEnabled, lanPort,
@@ -251,7 +251,7 @@ export async function startStandalone({
     eac = createStandaloneEac({
       dataDir,
       ...process.env.OFM_TEST_UPSTREAM ? { openExternal: async () => false } : {},
-      onSaved: () => { void runtime?.refreshSealedLane().catch(error => logger.warn?.(`EAC 清单刷新失败：${error.message}`)) },
+      onSaved: () => { void runtime?.refreshSealedLane().catch(error => logger.warn?.(`EAC roster refresh failed: ${error.message}`)) },
     })
     subscriptions = createSubscriptions({ dataDir, ...subscriptionOptions })
     const subscriptionRuntime = createSubscriptionRuntime({ subscriptions, stats: stores.stats, logger })
@@ -346,7 +346,7 @@ export async function startStandalone({
         .finally(() => { refreshInFlight = undefined; scheduleRefresh() })
       return refreshInFlight
     }
-    // 启动与周期刷新只更新清单，不自动探测；手动“探测可用性”仍走运行时 API。
+    // Startup and periodic refreshes only update the roster and never probe automatically; the manual "probe availability" action still goes through the runtime API.
     const ready = Promise.all([channels.ready, refresh ? refreshModels(false) : Promise.resolve()])
     return {
       product: PRODUCT, version: VERSION, dataDir,

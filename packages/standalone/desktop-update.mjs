@@ -1,4 +1,4 @@
-/** 桌面更新只下载本仓库正式安装包；安装交接留给原生窗口。 */
+/** Desktop updates only download this repository's official installers; the install handoff is left to the native window. */
 import fs from 'node:fs'
 import path from 'node:path'
 import crypto from 'node:crypto'
@@ -17,8 +17,8 @@ export function newerVersion(left, right) {
 }
 function officialURL(value, asset = false) {
   const url = new URL(value)
-  if (url.protocol !== 'https:' || url.port || url.username || url.password || !allowedHosts.has(url.hostname)) throw fail('更新地址不属于官方发布源')
-  if (asset && (url.hostname !== 'github.com' || !url.pathname.startsWith(`/${REPO}/releases/download/`))) throw fail('安装包地址不属于本项目')
+  if (url.protocol !== 'https:' || url.port || url.username || url.password || !allowedHosts.has(url.hostname)) throw fail('The update URL does not belong to an official release source')
+  if (asset && (url.hostname !== 'github.com' || !url.pathname.startsWith(`/${REPO}/releases/download/`))) throw fail('The installer URL does not belong to this project')
   return url.href
 }
 export function selectDesktopRelease(releases, arch = 'x64') {
@@ -43,7 +43,7 @@ export function selectDesktopRelease(releases, arch = 'x64') {
 export function installerChecksum(text, name) {
   const values = text.split(/\r?\n/).map(line => /^([a-f\d]{64})[ \t]+\*?([^\r\n]+)$/i.exec(line))
     .filter(row => row && row[2] === name).map(row => row[1].toLowerCase())
-  if (values.length !== 1) throw fail('官方校验文件中缺少唯一的安装包 SHA-256')
+  if (values.length !== 1) throw fail('The official checksum file does not contain a unique installer SHA-256')
   return values[0]
 }
 
@@ -57,9 +57,9 @@ export function createDesktopUpdater({ dataDir, version, platform = process.plat
     const stat = fs.lstatSync(file)
     if (stat.isFile() && stat.size < 16384) {
       const result = JSON.parse(fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, ''))
-      if (result.ok === false) snapshot = { ...snapshot, phase: 'error', error: '上次更新安装未完成，请重新检查更新。' }
+      if (result.ok === false) snapshot = { ...snapshot, phase: 'error', error: 'The previous update installation did not complete; please check for updates again.' }
     }
-  } catch { /* 没有安装记录或记录不完整时，仍允许检查更新。 */ }
+  } catch { /* With no install record, or an incomplete one, checking for updates is still allowed. */ }
   let candidate = null, active = null, controller = null, closed = false
   const status = () => structuredClone(snapshot)
   const request = async value => {
@@ -69,34 +69,34 @@ export function createDesktopUpdater({ dataDir, version, platform = process.plat
         headers: { accept: url.includes('api.github.com') ? 'application/vnd.github+json' : 'application/octet-stream', 'user-agent': 'Our-Free-Model-Desktop-Updater' } })
       if ([301, 302, 303, 307, 308].includes(response.status)) {
         const next = response.headers.get('location'); await response.body?.cancel()
-        if (!next) throw fail('更新源返回了无效跳转')
+        if (!next) throw fail('The update source returned an invalid redirect')
         url = officialURL(new URL(next, url).href); continue
       }
-      if (!response.ok) { await response.body?.cancel(); throw fail(response.status === 403 || response.status === 429 ? '官方更新源暂时限流，请稍后检查' : `更新源请求失败（HTTP ${response.status}）`) }
+      if (!response.ok) { await response.body?.cancel(); throw fail(response.status === 403 || response.status === 429 ? 'The official update source is temporarily rate-limited; please check again later' : `The update source request failed (HTTP ${response.status})`) }
       return response
     }
-    throw fail('更新源跳转次数过多')
+    throw fail('Too many redirects from the update source')
   }
   const text = async (url, limit) => {
     const response = await request(url)
     let bytes = 0; const chunks = []
     try {
-      for await (const chunk of response.body) { bytes += chunk.length; if (bytes > limit) throw fail('更新信息超过大小限制'); chunks.push(chunk) }
+      for await (const chunk of response.body) { bytes += chunk.length; if (bytes > limit) throw fail('The update information exceeds the size limit'); chunks.push(chunk) }
       return Buffer.concat(chunks).toString('utf8')
     } catch (error) { await response.body?.cancel().catch(() => {}); throw error }
   }
   const begin = (phase, run) => {
-    if (closed) throw fail('更新管理已关闭', 503)
-    if (!supported) throw fail('当前仅支持 Windows x64 桌面客户端更新')
-    if (active) throw fail('已有更新操作正在进行', 409)
+    if (closed) throw fail('Update management has been closed', 503)
+    if (!supported) throw fail('Only the Windows x64 desktop client can be updated at present')
+    if (active) throw fail('An update operation is already in progress', 409)
     controller = new AbortController()
     snapshot = { ...snapshot, phase, error: '' }
     active = Promise.resolve().then(run).catch(error => {
-      snapshot = { ...snapshot, phase: 'error', error: error?.name === 'AbortError' ? '更新操作已停止'
-        : error?.name === 'TimeoutError' ? '更新源响应超时，请稍后重试'
-          : error instanceof SyntaxError ? '官方更新信息格式无效，请稍后重试'
-            : error?.code ? '无法写入更新缓存，请检查磁盘空间与目录权限'
-              : error?.message === 'fetch failed' ? '无法连接官方更新源，请稍后重试' : String(error?.message ?? '更新失败') }
+      snapshot = { ...snapshot, phase: 'error', error: error?.name === 'AbortError' ? 'The update operation was stopped'
+        : error?.name === 'TimeoutError' ? 'The update source timed out; please try again later'
+          : error instanceof SyntaxError ? 'The official update information is malformed; please try again later'
+            : error?.code ? 'Cannot write to the update cache; check disk space and directory permissions'
+              : error?.message === 'fetch failed' ? 'Cannot connect to the official update source; please try again later' : String(error?.message ?? 'Update failed') }
     }).finally(() => { active = null })
     return status()
   }
@@ -115,7 +115,7 @@ export function createDesktopUpdater({ dataDir, version, platform = process.plat
       const releases = []
       for (let page = 1; page <= 5; page++) {
         const rows = JSON.parse(await text(`https://api.github.com/repos/${REPO}/releases?per_page=20&page=${page}`, 2 * 1024 * 1024))
-        if (!Array.isArray(rows)) throw fail('官方发布列表格式无效')
+        if (!Array.isArray(rows)) throw fail('The official release list is malformed')
         releases.push(...rows); if (rows.length < 20) break
       }
       candidate = selectDesktopRelease(releases, arch)
@@ -123,7 +123,7 @@ export function createDesktopUpdater({ dataDir, version, platform = process.plat
         checkedAt: Date.now(), available: !!candidate && newerVersion(candidate.version, version), received: 0, total: 0 }
     }) },
     download() {
-      if (!candidate || !newerVersion(candidate.version, version)) throw fail('请先检查并找到可更新的桌面版本')
+      if (!candidate || !newerVersion(candidate.version, version)) throw fail('Check first and find an updatable desktop version')
       const selected = candidate
       return begin('downloading', async () => {
         await mkdir(directory, { recursive: true, mode: 0o700 })
@@ -138,15 +138,15 @@ export function createDesktopUpdater({ dataDir, version, platform = process.plat
             handle = await open(partial, 'wx', 0o600)
             const response = await request(selected.installerURL)
             const declared = response.headers.get('content-length')
-            if (declared !== null && Number(declared) !== selected.size) { await response.body?.cancel(); throw fail('安装包大小与官方发布记录不一致') }
+            if (declared !== null && Number(declared) !== selected.size) { await response.body?.cancel(); throw fail('The installer size does not match the official release record') }
             let size = 0; const digest = crypto.createHash('sha256')
             for await (const chunk of response.body) {
               size += chunk.length
-              if (size > selected.size || size > MAX_INSTALLER) throw fail('安装包超过预期大小')
+              if (size > selected.size || size > MAX_INSTALLER) throw fail('The installer exceeds the expected size')
               await handle.writeFile(chunk); digest.update(chunk)
               snapshot = { ...snapshot, received: size }
             }
-            if (size !== selected.size || digest.digest('hex') !== checksum) throw fail('安装包 SHA-256 校验失败，当前应用未被修改')
+            if (size !== selected.size || digest.digest('hex') !== checksum) throw fail('Installer SHA-256 verification failed; the current application was not modified')
             await handle.sync(); await handle.close(); handle = null
             await rename(partial, target)
           } finally { await handle?.close(); await unlink(partial).catch(error => { if (error.code !== 'ENOENT') throw error }) }

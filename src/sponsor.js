@@ -1,35 +1,35 @@
-/** 赞助内容与每日公告交互：浏览器专用，不读取账号或调用赞助商接口。 */
+/** Sponsor content and daily notice interactions: browser-only; does not read accounts or call sponsor APIs. */
 export const SPONSOR = Object.freeze({
-  title: '来自赞助商的广告',
-  name: '北辰 API',
+  title: 'Advertisement from our sponsor',
+  name: 'Beichen API',
   url: 'https://beichenapi.com/register?aff=DL49WAC2DQNG',
   invite: 'DL49WAC2DQNG',
-  greeting: '非常抱歉，亲爱的朋友：',
+  greeting: 'We are very sorry, dear friends:',
   paragraphs: [
-    '为了租上服务器(超级贵，我们几个穷学生...)，让我们的插件正常使用，我们不得不找甲方接一点广告和挣一点佣金。非常抱歉，这都是为了提高服务器并发量和号池(100%是为了提升体验和维护运营)(突然爆火了，我们的小服务器直接炸，只好花钱换)，属实是无奈之举。若广告带来了不好的体验，还望体谅。',
-    '本插件旨在给大家学习提供免费的算力，可能响应速度确实偏慢，但已经尽我们所能在提升。(肯定不是为了骗你star，最近的爆火，真是意料之外)如果响应太慢，可能是因为同时多人使用，还希望多多包涵。',
-    '关于广告：广告是为了用服务器以及运营，并且其来源是大家使用中转站的抽成。(所以如果可以，请务必使用我们的邀请码呀ʕ  •ᴥ•ʔ)',
-    '这是我们甲方的中转站，可以去官网首页有群链接找群主要体验，提供了优质的外国大模型算力(肯定是有品质保证的，不然也不敢挂合作)。如果希望使用外国优质大模型(大胆进行鹈鹕)测试，请务必考虑使用我们的链接。(求求大家了，不要跳过这个邀请码，我们的某位成员为此什么都会做的( •̥́ ˍ •̀ू ))',
-    '(•‾̑⌣‾̑•)✧˖如果你希望使用相关付费算力，请务必考虑我们提供的渠道(其实这个渠道很不错的，价格和质量还不错)。我们的项目还会继续运营，以后也会免费下去。打这个广告也是迫不得已...(相信我们，真的不想圈米，只想运营好这个项目(所以租了个很贵的服务器)，(ó﹏ò｡) 对于讨厌广告的朋友实在抱歉啊)',
-    '总之，还是感谢大家的支持(没办法以中转站的形式中支持也没关系，愿意点Star和使用，就已经让我们非常高兴)和陪伴，有了这种变相的赞助，我们肯定会保障ofm服务的越来越好。再次真心谢谢大家。',
+    'In order to rent a server (super expensive, and we are just a few broke students...) so that our plugin can keep working normally, we had no choice but to find a sponsor, take on a few ads, and earn a little commission. We are very sorry — this is all to increase server concurrency and the account pool (100% to improve the experience and keep operations running) (we suddenly went viral, our little server just blew up, so we had to pay to replace it); we really had no other choice. If the ads make for a worse experience, we hope you will understand.',
+    'This plugin aims to provide everyone with free compute for learning. Response speeds may indeed be rather slow, but we are doing everything we can to improve them. (Definitely not trying to trick you into giving us a star — the recent sudden popularity really caught us by surprise.) If responses are too slow, it may be because many people are using it at the same time, and we hope you will bear with us.',
+    'About the ads: the ads are to pay for the server and for operations, and they come from the commission on everyone using the relay station. (So if you can, please be sure to use our invite code ʕ  •ᴥ•ʔ)',
+    'This is our sponsor\'s relay station. You can go to the official site\'s homepage, where there is a group link, and ask the group owner for a trial. It provides high-quality foreign large-model compute (the quality is definitely guaranteed, otherwise we would not dare list it as a partner). If you want to test high-quality foreign large models (go bold with the pelican test), please be sure to consider using our link. (Please, everyone, do not skip this invite code — one of our members will do anything for this ( •̥́ ˍ •̀ू ))',
+    '(•‾̑⌣‾̑•)✧˖ If you want to use paid compute like this, please be sure to consider the channel we provide (actually this channel is pretty good — the price and quality are both decent). Our project will keep running, and it will stay free in the future too. We only ran this ad because we had no choice... (Believe us, we really do not want to grab money, we just want to run this project well (so we rented a very expensive server), (ó﹏ò｡) and to friends who hate ads, we are really sorry)',
+    'In short, thank you all for your support (if you cannot support us through the relay station, that is okay too — just being willing to give us a Star and use it already makes us very happy) and for sticking with us. With this indirect form of sponsorship, we will definitely make sure the OFM service keeps getting better and better. Thank you all again, sincerely.',
   ],
 })
 
 export const SPONSOR_DAY_KEY = 'ofm.sponsor.last-shown.v1'
 
-/** 使用用户当地的日历日期，不能用 UTC 的 toISOString() 划分“今天”。 */
+/** Use the user's local calendar date; do not use UTC toISOString() to divide "today". */
 export function sponsorLocalDay(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
 
-/** 同源窗口共用 Web Lock；只有公告成功打开后才记账。存储禁用时跳过自动广告。 */
+/** Same-origin windows share a Web Lock; only record it after the notice has successfully opened. When storage is disabled, skip the automatic ad. */
 export async function claimSponsorDay({ storage, locks, now = () => new Date(), eligible = () => true, show = () => {} }) {
   const claim = () => {
     if (!eligible()) return false
     const day = sponsorLocalDay(now())
     try {
       if (storage.getItem(SPONSOR_DAY_KEY) === day) return false
-      // 写入失败时不弹窗，避免刷新、重挂载或隐私模式下反复打扰。
+      // If the write fails, do not show the popup, to avoid repeatedly disturbing the user on refresh, remount, or in private mode.
       const previous = storage.getItem(SPONSOR_DAY_KEY)
       storage.setItem(SPONSOR_DAY_KEY, day)
       try { show() } catch (error) {
@@ -44,7 +44,7 @@ export async function claimSponsorDay({ storage, locks, now = () => new Date(), 
   catch { return false }
 }
 
-/** 两端共用 React 组件；插件通过构建脚本内联，独立端直接导入。 */
+/** React component shared by both surfaces; the plugin inlines it via the build script, and the standalone surface imports it directly. */
 export function createSponsorUI(React, image, createPortal, variant = 'plugin') {
   const { createElement: h, useState, useEffect, useRef } = React
   const surfaceClass = `ofm-sponsor ofm-sponsor-${variant}`
@@ -60,37 +60,37 @@ export function createSponsorUI(React, image, createPortal, variant = 'plugin') 
     const copy = async (value, label) => {
       try {
         await navigator.clipboard.writeText(value)
-        setCopied(`${label}已复制`)
-      } catch { setCopied('复制未完成，请选中文字手动复制。') }
+        setCopied(`${label} copied`)
+      } catch { setCopied('Copy did not complete; please select the text and copy it manually.') }
       clearTimeout(copyTimer.current)
       copyTimer.current = setTimeout(() => setCopied(''), 3000)
     }
     const paragraph = index => h('p', { key: index }, SPONSOR.paragraphs[index])
     return h('article', { className: 'ofm-sponsor-article' },
       h('div', { className: 'ofm-sponsor-intro' },
-        h('div', null, h('h2', null, '让免费服务，继续陪伴。'), h('p', null, '一封来自 OFM 团队的说明，也是一份坦诚的赞助邀请。')),
+        h('div', null, h('h2', null, 'Let the free service keep you company.'), h('p', null, 'A note from the OFM team, and also a candid sponsorship invitation.')),
         h('span', { className: 'ofm-sponsor-seal', 'aria-hidden': true }, icon('cup', 26))),
       h('div', { className: 'ofm-sponsor-letter' },
         h('p', { className: 'ofm-sponsor-greeting' }, SPONSOR.greeting),
         paragraph(0), paragraph(1), paragraph(2),
         h('div', { className: 'ofm-sponsor-contact' },
-          h('p', null, '这里是附上了邀请码的链接：'),
+          h('p', null, 'Here is the link with the invite code attached:'),
           h('a', { className: 'ofm-sponsor-url', href: SPONSOR.url, target: '_blank', rel: 'noopener noreferrer' }, SPONSOR.url, icon('arrow', 16)),
-          h('div', { className: 'ofm-sponsor-copyrow' }, h('span', null, '邀请码 ', h('strong', null, SPONSOR.invite)),
-            h('button', { type: 'button', onClick: () => copy(SPONSOR.invite, '邀请码') }, '复制邀请码')),
+          h('div', { className: 'ofm-sponsor-copyrow' }, h('span', null, 'Invite code ', h('strong', null, SPONSOR.invite)),
+            h('button', { type: 'button', onClick: () => copy(SPONSOR.invite, 'Invite code') }, 'Copy invite code')),
           h('span', { className: 'ofm-sponsor-copy-status', role: 'status' }, copied)),
         paragraph(3), paragraph(4), paragraph(5),
-        h('div', { className: 'ofm-sponsor-signoff' }, h('span', null, '感谢你的理解与陪伴'), h('strong', null, 'OFM 团队'))),
+        h('div', { className: 'ofm-sponsor-signoff' }, h('span', null, 'Thank you for your understanding and company'), h('strong', null, 'The OFM team'))),
       h('figure', { className: 'ofm-sponsor-evidence' },
-        h('figcaption', null, h('strong', null, '另附：中转站鹈鹕测试'), h('span', null, '发现问题直接电 · 以下为提供的原图')),
-        h('img', { src: image, alt: '提供的生成示例：三幅图像分别展示骑行鹈鹕和山河场景，下方保留模型名称、生成时间与耗时。', width: 1227, height: 367, loading: 'lazy', decoding: 'async' })),
-      h('div', { className: 'ofm-sponsor-end' }, h('p', null, '愿意了解，再往前一步。'),
-        h('a', { className: 'ofm-sponsor-visit', href: SPONSOR.url, target: '_blank', rel: 'noopener noreferrer' }, '前往北辰 API', icon('arrow')), h('span', null, '赞助商网站 · 含邀请码')))
+        h('figcaption', null, h('strong', null, 'Also attached: relay station pelican test'), h('span', null, 'Found a problem? Contact them directly · The original image provided is below')),
+        h('img', { src: image, alt: 'Provided generation example: three images showing a pelican riding a bicycle and mountain-and-river scenery, with the model name, generation time, and elapsed time retained below.', width: 1227, height: 367, loading: 'lazy', decoding: 'async' })),
+      h('div', { className: 'ofm-sponsor-end' }, h('p', null, 'If you would like to learn more, take one step further.'),
+        h('a', { className: 'ofm-sponsor-visit', href: SPONSOR.url, target: '_blank', rel: 'noopener noreferrer' }, 'Go to Beichen API', icon('arrow')), h('span', null, 'Sponsor website · includes invite code')))
   }
 
   function SponsorPage() {
     return h('section', { className: surfaceClass + ' ofm-sponsor-page', 'aria-labelledby': 'ofm-sponsor-page-title' },
-      h('header', { className: 'ofm-sponsor-pagehead' }, h('h1', { id: 'ofm-sponsor-page-title' }, SPONSOR.title), h('p', null, '北辰 API × OFM · 你可以在这里随时阅读全文。')),
+      h('header', { className: 'ofm-sponsor-pagehead' }, h('h1', { id: 'ofm-sponsor-page-title' }, SPONSOR.title), h('p', null, 'Beichen API × OFM · You can read the full text here at any time.')),
       h(SponsorArticle))
   }
 
@@ -105,7 +105,7 @@ export function createSponsorUI(React, image, createPortal, variant = 'plugin') 
     const [leaving, setLeaving] = useState(false)
     const finish = () => {
       dialog.current?.close()
-      // 清除收起动画的 forwards 状态，否则同一界面跨日再打开会透明并卡住操作。
+      // Clear the closing animation's forwards state, otherwise reopening on a later day in the same UI would be transparent and block interaction.
       animation.current?.cancel()
       animation.current = null
       unlock.current()
@@ -146,7 +146,7 @@ export function createSponsorUI(React, image, createPortal, variant = 'plugin') 
       let cancelled = false
       const blockedByDialog = () => {
         const selector = 'dialog[open], [role="dialog"][aria-modal="true"]'
-        // 插件挂在宿主设置弹窗中；菜单所在的这一层不是需要避让的其他弹窗。
+        // The plugin is mounted inside the host settings dialog; the layer containing the menu is not another dialog that needs to be avoided.
         const hostDialog = variant === 'plugin' ? document.getElementById(targetId)?.closest(selector) : null
         return [...document.querySelectorAll(selector)].some(node => node !== dialog.current && node !== hostDialog && node.getClientRects().length > 0)
       }
@@ -176,7 +176,7 @@ export function createSponsorUI(React, image, createPortal, variant = 'plugin') 
       const observe = () => observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['open', 'aria-hidden'] })
       const timer = setTimeout(tryShow, 700)
       const onVisibility = () => { if (!document.hidden) tryShow() }
-      // 宿主在 document 上用 Esc 关闭设置页；公告打开时先消费按键，保留设置页。
+      // The host closes the settings page with Esc on document; when the notice is open, consume the keypress first and keep the settings page.
       const onKeyDown = event => {
         if (event.key !== 'Escape' || !dialog.current?.open) return
         event.preventDefault()
@@ -199,11 +199,11 @@ export function createSponsorUI(React, image, createPortal, variant = 'plugin') 
     return createPortal(h('dialog', { ref: dialog, className: `${surfaceClass} ofm-sponsor-dialog${leaving ? ' is-closing' : ''}`, 'aria-labelledby': 'ofm-sponsor-dialog-title', 'aria-describedby': 'ofm-sponsor-dialog-description', 'data-placement': placement,
       onCancel: event => { event.preventDefault(); dismiss() },
       onClick: event => { if (event.target === dialog.current) { const r = dialog.current.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) dismiss() } } },
-      h('header', { className: 'ofm-sponsor-dialoghead' }, h('div', null, h('h2', { id: 'ofm-sponsor-dialog-title' }, SPONSOR.title), h('p', { id: 'ofm-sponsor-dialog-description' }, '北辰 API × OFM · 每天首次打开时展示一次')),
-        h('button', { type: 'button', className: 'ofm-sponsor-close', autoFocus: true, onClick: dismiss, 'aria-label': '收起公告到广告菜单', title: '收起到广告菜单（Esc）' }, icon('close'))),
-      h('div', { className: 'ofm-sponsor-scroll', tabIndex: 0, role: 'region', 'aria-label': '广告全文，可向下滚动' }, opened ? h(SponsorArticle) : null),
-      h('footer', { className: 'ofm-sponsor-dialogfoot' }, h('p', null, '无需读完，也可以随时收起。', h('span', null, '全文会留在广告菜单中。')),
-        h('button', { type: 'button', className: 'ofm-sponsor-fold', onClick: dismiss }, '收起至菜单', icon('arrow', 16)))), document.body)
+      h('header', { className: 'ofm-sponsor-dialoghead' }, h('div', null, h('h2', { id: 'ofm-sponsor-dialog-title' }, SPONSOR.title), h('p', { id: 'ofm-sponsor-dialog-description' }, 'Beichen API × OFM · Shown once, the first time you open it each day')),
+        h('button', { type: 'button', className: 'ofm-sponsor-close', autoFocus: true, onClick: dismiss, 'aria-label': 'Collapse notice to the ad menu', title: 'Collapse to the ad menu (Esc)' }, icon('close'))),
+      h('div', { className: 'ofm-sponsor-scroll', tabIndex: 0, role: 'region', 'aria-label': 'Full ad text, scrollable' }, opened ? h(SponsorArticle) : null),
+      h('footer', { className: 'ofm-sponsor-dialogfoot' }, h('p', null, 'You do not need to read it all; you can collapse it at any time.', h('span', null, 'The full text will remain in the ad menu.')),
+        h('button', { type: 'button', className: 'ofm-sponsor-fold', onClick: dismiss }, 'Collapse to menu', icon('arrow', 16)))), document.body)
   }
   return { SponsorPage, SponsorNotice }
 }

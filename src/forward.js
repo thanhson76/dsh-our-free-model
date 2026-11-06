@@ -3,7 +3,7 @@
  *
  * Other local harnesses speak OpenAI at a base URL; this turns one of those
  * requests into a harness-shaped call and streams the answer back in the spelling
- * the caller expects. It exists so the same免密 lane that powers the picker can
+ * the caller expects. It exists so the same no-key lane that powers the picker can
  * also serve a `baseURL` in someone else's config.
  *
  * The harness's own web server is deliberately not reused: its port belongs to
@@ -173,7 +173,7 @@ function failureReply(res, outcome, anthropic = false, force = false) {
  * be a loopback address before `listen` sees anything: `localhost` is otherwise
  * matched as a string here and resolved as a name by the OS, and a hosts file
  * or enterprise DNS that points it at a routable interface would hand the
- *免密 lane's quota to the whole subnet while the check kept passing (issue #19).
+ *no-key lane's quota to the whole subnet while the check kept passing (issue #19).
  * The listener binds a resolved IP, never the original spelling.
  *
  * @returns {Promise<string>} the address to pass to `server.listen`
@@ -319,8 +319,8 @@ export async function bindForwardPort(server, { address, port, attempts = BIND_A
  * @param {() => Array<{id: string, created: number, owned_by: string}>} options.modelRows
  * @param {(message: string) => void} [options.log]
  * @param {(event: object) => void} [options.onTrace] - bounded request diagnostics, separate from warnings
- * @param {() => object} [options.health] - 健康应答由各产品入口注入，默认保持插件兼容。
- * @param {(req: http.IncomingMessage, res: http.ServerResponse) => Promise<boolean>} [options.handleRequest] - 产品附加路由，返回 true 表示已处理。
+ * @param {() => object} [options.health] - the health response is injected by each product entry point; the default keeps plugin compatibility.
+ * @param {(req: http.IncomingMessage, res: http.ServerResponse) => Promise<boolean>} [options.handleRequest] - product-specific extra routes; returning true means the request was handled.
  * @returns {Promise<{server: http.Server, port: number, close: () => Promise<void>}>}
  */
 export async function startForwardServer({ config, complete, modelRows, log = () => {}, onTrace = () => {}, heartbeatMs = SSE_HEARTBEAT_MS, optimize = null, health = () => ({ ok: true, service: 'our-free-model' }), handleRequest }) {
@@ -497,7 +497,7 @@ const RELAY_HOP_HEADER = 'x-ofm-relay-hop'
  * Start the optional LAN relay.
  *
  * The forward listener above binds loopback only, and on purpose: its key spends
- * this machine's免密 quota, and issue #19 closed the door on handing that to a
+ * this machine's no-key quota, and issue #19 closed the door on handing that to a
  * whole subnet through a bind address. A user who wants a second device on the
  * same network to reach these models needs something the local listener cannot
  * give — an address that is reachable *and* a credential that can be revoked on
@@ -638,7 +638,7 @@ export async function startLanRelay({ config, log = () => {}, onTrace = () => {}
   }
 }
 
-/** 转发客户端断开时中止正在生成的段，也阻止后续恢复请求。 */
+/** When the forwarding client disconnects, abort the segment being generated and also block any later recovery request. */
 async function serveCompletion(req, res, complete, endpoint, heartbeatMs, trace, extra = {}) {
   const controller = new AbortController()
   const socket = req.socket
@@ -841,7 +841,7 @@ async function chatCompletions(req, res, complete, options = {}) {
 
   if (!wantsStream) {
     const outcome = await complete({ model, openAi: body })
-    // 截断或恢复失败即使已有部分正文，也不能返回正常完成。
+    // A truncation or a failed recovery must not return a normal completion, even if some answer text already exists.
     if (outcome.error !== undefined) {
       failureReply(res, outcome, false, true)
       return

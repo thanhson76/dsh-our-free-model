@@ -1,7 +1,11 @@
-/** 恢复缺终帧的纯推理断流，或正常收尾却只有思考的空停；所有模型共用同一策略。
+/** Recover a reasoning-only stream that broke off without a final frame, or a
+ * silent stop that finished normally with thinking only and no answer; every
+ * model shares the same policy.
  *
- * 总时限覆盖首段与续写段；传输层另有按字节刷新的空闲截止。
- * 不再为 EAC 增加独立的有效输出截止，允许排队、静默思考和只有心跳的等待。
+ * The overall time limit covers both the first segment and the continuation;
+ * the transport layer has its own idle deadline, refreshed per byte.
+ * EAC no longer gets a separate effective-output deadline, so queueing, silent
+ * thinking and heartbeat-only waits are allowed.
  */
 export const RECOVERY_DEFAULTS = Object.freeze({
   maxContinuationMs: 1800000,
@@ -21,7 +25,7 @@ export function recoveryPolicy(value) {
   return policy
 }
 
-/** 可恢复的共性：策略开启、总时窗未过、纯思考检查点齐备；不问终帧。 */
+/** What recoverable outcomes share: the policy is on, the overall time window has not passed, and a reasoning-only checkpoint is complete; the final frame is not asked about. */
 function recoverable(outcome, policy, elapsedMs) {
   return policy.enabled && elapsedMs < policy.totalTimeoutMs
     && outcome.sawReasoning === true
@@ -35,9 +39,12 @@ export function canRecover(outcome, policy, elapsedMs) {
 }
 
 /**
- * 上游正常发了 stop 终帧却只有思考、没有正文：宿主（pi-ai）会把这种回合判成
- * 空响应，所以同样从检查点续写一次要正文。终帧本身是不是「正常收尾」由调用
- * 方用 finish 归类把关，这里只认「确实收到过终帧」。
+ * The upstream did send a normal stop final frame, but with thinking only and
+ * no answer text: the host (pi-ai) judges such a turn an empty response, so
+ * likewise continue once from the checkpoint and ask for the answer. Whether
+ * the final frame itself counts as a "normal finish" is gated by the caller's
+ * finish classification; here we only require that a final frame really was
+ * received.
  */
 export function canRecoverSilentStop(outcome, policy, elapsedMs) {
   return outcome.sawFinish === true && recoverable(outcome, policy, elapsedMs)
@@ -81,7 +88,7 @@ export function continuationMessages(messages, partialAnswer) {
   return [...history, { role: 'user', content: [{ type: 'text', text: instruction }] }]
 }
 
-/** 文本字节只作保守余量检查，不宣称是模型 tokenizer 的精确计数。 */
+/** Text bytes serve only as a conservative headroom check; they do not claim to be an exact count from the model's tokenizer. */
 export function checkpointFits(payload, entry, checkpoint, outputBudget) {
   const context = entry.contextWindow
   if (!Number.isFinite(context) || context <= 0) return true
@@ -103,7 +110,7 @@ export function addUsage(total, usage, present) {
   return next
 }
 
-/** 终态异常时关闭已交给消费者的块；工具只组装，不在这里执行。 */
+/** On a terminal-state error, close the blocks already handed to the consumer; tools are only assembled here, not executed. */
 export function createBlockTracker() {
   const blocks = new Map()
   return {

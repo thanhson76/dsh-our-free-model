@@ -1,64 +1,64 @@
-# 独立服务网页管理：第二阶段
+# Standalone service web management: phase two
 
-## 目标与已确认范围
+## Goal and confirmed scope
 
-用户已同意开展网页管理阶段。本次交付可实际操作的独立服务管理页面：
-服务状态、模型清单、用量统计、设置和 API Key 管理。沿用第一阶段双产品边界。
+The user has agreed to proceed with the web management phase. This delivers management pages for the standalone service that can actually be operated:
+service status, the model roster, usage statistics, settings and API Key management. The phase-one two-product boundaries are retained.
 
-## 实现选择
+## Implementation choice
 
-推荐使用本地 HTML、CSS 和 JavaScript，随独立服务在同一回环端口提供。
-现有插件页面依赖 DSH ModuleLoader、React 和槽位，不能直接作为独立页面运行。
-引入 React 构建工具会增加当前基础页面的安装与打包成本，暂不采用。
-公共统计汇总逻辑提取到核心，插件继续通过原有导出使用，避免统计口径分叉。
+Use local HTML, CSS and JavaScript, served by the standalone service on the same loopback port.
+The existing plugin pages depend on the DSH ModuleLoader, React and slots, and cannot run directly as standalone pages.
+Introducing React build tooling would increase the installation and packaging cost of the current basic pages, so it is not adopted for now.
+The shared statistics aggregation logic is extracted into the core, and the plugin continues to use it through its original exports, avoiding divergent statistics definitions.
 
-## 页面与交互
+## Pages and interaction
 
-1. 概览：运行/暂停状态、API 地址、模型数量、请求与 Token 概览、接入示例。
-2. 模型：搜索、渠道筛选、能力与可用性、清单刷新、主动探测和单模型测试。
-3. 用量：最近日用量图、按模型统计、物理请求和用户回合分别展示。
-4. 设置：推理开关、地区模型显示、刷新周期、自动探测、输出上限、流式恢复。
-5. API Key：显式查看、复制、确认后轮换；轮换后旧 Key 立即失效。
+1. Overview: running/paused status, API address, model count, request and Token overview, and connection examples.
+2. Models: search, channel filtering, capabilities and availability, roster refresh, active probing and single-model testing.
+3. Usage: recent daily usage chart, per-model statistics, with physical requests and user turns shown separately.
+4. Settings: inference toggle, region-model display, refresh interval, automatic probing, output cap, and stream recovery.
+5. API Key: explicit viewing, copying, and rotation after confirmation; the old Key becomes invalid immediately after rotation.
 
-页面为中文，适配窄屏，具备加载、空状态、错误提示和操作进行中的状态。
-首屏的服务状态与统计来自真实接口；自动读取数据不触发模型推理。
+The pages are in Chinese, adapt to narrow screens, and provide loading, empty, error and in-progress states.
+The service status and statistics on the first screen come from real interfaces; automatically reading data does not trigger model inference.
 
-## 管理接口与鉴权
+## Management interface and authentication
 
-独立服务在 `/api/management` 提供独立管理接口，沿用核心运行时与自己的数据目录。
-管理接口先验证回环 Host、Origin/Referer 和跨站标记，再验证管理会话或 API Key。
-管理接口不开放跨域，不沿用推理接口的宽松 CORS。
+The standalone service provides a separate management interface at `/api/management`, using the core runtime and its own data directory.
+The management interface first validates the loopback Host, Origin/Referer and the cross-site marker, and only then validates the management session or API Key.
+The management interface is not open to cross-origin use and does not reuse the inference interface's permissive CORS.
 
-CLI 打印管理页面的一次性登录链接：临时凭证放在 URL fragment 中，页面登录后
-移除 fragment。临时凭证有有效期且只能兑换一次，不是推理 API Key。
-也支持在登录页面输入现有 API Key。服务端兑换 HttpOnly、SameSite=Strict 的
-有限期 Cookie；会话只保存在内存，退出或服务重启后失效。
-不同端口使用不同 Cookie 名，避免同主机的多个服务相互覆盖登录状态。
+The CLI prints a one-time sign-in link for the management page: the temporary credential is placed in the URL fragment and removed
+after the page signs in. The temporary credential has an expiry and can be redeemed only once; it is not the inference API Key.
+Entering an existing API Key on the sign-in page is also supported. The server exchanges it for a time-limited Cookie with
+HttpOnly and SameSite=Strict; the session is kept only in memory and becomes invalid on sign-out or service restart.
+Different ports use different Cookie names, so multiple services on the same host do not overwrite each other's sign-in state.
 
-静态资源只按固定白名单提供，不加载第三方脚本；动态内容以文本方式渲染。
-设置只接受显式允许的字段，校验类型和范围，限制请求体大小，并同步检查持久化结果。
-关闭推理仍可访问管理页面并重新开启，管理会话不能作为推理接口的凭据。
+Static assets are served only from a fixed allowlist, with no third-party scripts loaded; dynamic content is rendered as text.
+Settings accept only explicitly allowed fields, validate types and ranges, limit the request-body size, and synchronously check the persisted result.
+When inference is turned off, the management page can still be accessed and inference re-enabled; a management session cannot be used as a credential for the inference interface.
 
-## 生命周期与兼容
+## Lifecycle and compatibility
 
-共享转发服务新增可选请求处理入口，插件默认流程与健康接口保持兼容。
-独立服务使用该入口提供页面和管理 API，绑定地址、端口选择和推理鉴权继续复用。
-设置修改后自动刷新重新安排周期；启用探测仍遵守已有 429 退避。
-`--no-refresh` 继续禁止自动任务，页面上的显式刷新和测试由用户主动触发。
-管理会话与临时登录凭证在退出时清除。已有独立服务数据无需迁移。
+The shared forwarding service gains an optional request-handling entry point, keeping the plugin's default flow and health interface compatible.
+The standalone service uses that entry point to provide the pages and management API, while bind address, port selection and inference authentication continue to be reused.
+After a settings change, automatic refresh is rescheduled; enabled probing still honours the existing 429 backoff.
+`--no-refresh` continues to forbid automatic tasks; explicit refreshes and tests on the page are triggered by the user.
+Management sessions and temporary sign-in credentials are cleared on sign-out. Existing standalone service data needs no migration.
 
-## 实施步骤与验收
+## Implementation steps and acceptance
 
-1. 提取公共统计汇总并保留插件导出。
-2. 提供管理会话、静态资源、设置/模型/统计/密钥接口并接入独立服务。
-3. 实现中文管理页面并更新启动说明。
-4. 通过本机 HTTP 测试验证鉴权、跨站拒绝、设置持久化、暂停后恢复、密钥轮换、
-   模型操作、统计和重启会话失效，同时运行原有贡献者套件。
-5. 启动独立实例，用浏览器实际操作并取得页面截图；测试状态与界面证据分别记录。
+1. Extract the shared statistics aggregation and keep the plugin exports.
+2. Provide the management session, static assets, and settings/model/statistics/key interfaces, and wire them into the standalone service.
+3. Implement the Chinese management pages and update the startup instructions.
+4. Verify authentication, cross-site rejection, settings persistence, resuming after a pause, key rotation,
+   model operations, statistics and session invalidation on restart through local HTTP tests, while running the existing contributor suite.
+5. Start a standalone instance, actually operate it in the browser and capture page screenshots; record test status and interface evidence separately.
 
-网页管理不包含 EAC 授权、账号渠道登录、桌面壳、服务安装器或发布流程。
+Web management does not include EAC authorization, account-channel sign-in, a desktop shell, a service installer or a release process.
 
-## 实际交付与证据
+## Actual delivery and evidence
 
-五页网页管理与同源管理接口已实现。实际执行的测试、浏览器操作、截图和
-发布签名遗留项见 [验收记录](../../standalone-web-management-verification.md)。
+The five web management pages and the same-origin management interface have been implemented. For the tests actually run, browser operations, screenshots and
+the remaining release-signing items, see the [acceptance record](../../standalone-web-management-verification.md).

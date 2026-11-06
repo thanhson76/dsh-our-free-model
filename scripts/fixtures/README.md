@@ -1,8 +1,8 @@
-# 历史升级器回归夹具
+# Historical upgrader regression fixtures
 
-这两个文件完整复制 Git 中对应版本的 `src/updater.js`，保持原字节，不修改文件数量、单文件大小或签名限制。
+These two files are complete copies of `src/updater.js` at the corresponding versions in Git, kept byte-for-byte, without changing the file count, per-file size or signature limits.
 
-- `updater-1.3.1.mjs`：提交 `f14d261557ae98e5d28eaa33f4471302cc7f35ad`。
-- `updater-2.5.9.mjs`：提交 `313eaa45c3abc769cd4169326b9b4e7161d141a9`。
+- `updater-1.3.1.mjs`: commit `f14d261557ae98e5d28eaa33f4471302cc7f35ad`.
+- `updater-2.5.9.mjs`: commit `313eaa45c3abc769cd4169326b9b4e7161d141a9`.
 
-沿用项目 MIT 许可证。测试同时核对夹具与历史 Git 对象一致；已安装包也从该提交的真实发布文件提取，不以新版代码伪装旧版。贡献者测试仅对支持注入测试公钥的 2.5.9 使用一次性签名；发布验证使用真实签名清单和原版公钥。
+They remain under the project's MIT license. The tests also check that the fixtures match the historical Git objects; installed packages are likewise extracted from the real release files at those commits, rather than disguising new code as an old version. Contributor tests use a one-time signature only for 2.5.9, which supports injecting a test public key; release verification uses the real signed manifest and the original public key.

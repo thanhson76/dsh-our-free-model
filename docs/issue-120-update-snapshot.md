@@ -1,96 +1,96 @@
-# issue #120：升级分发缓存与固定提交取件
+# Issue #120: Upgrade Distribution Cache and Pinned-Commit Fetching
 
-## 目标与边界
+## Goal and boundaries
 
-修复清单与文件经可变分支取件时可能来自不同提交的问题，并处理当前 CDN 对
-`vendor/channel-pack/NOTICE.md` 的重定向。保持现有公钥、清单字段、签名算法、
-文件大小和 SHA-256 校验；保留旧安装在暂存失败时不变的行为。
+Fix the problem where the manifest and files fetched via a mutable branch may come from different commits, and handle the current CDN's
+redirect for `vendor/channel-pack/NOTICE.md`. Keep the existing public key, manifest fields, signature algorithm,
+file sizes and SHA-256 verification; keep the behaviour that an old installation is unchanged when staging fails.
 
-复用现有镜像和原子升级流程，无新运行依赖。假设发布频率低，每次检查及应用允许
-一次 GitHub API 分支解析；解析和清单读取在每个源的 15 秒预算内完成。
-GitHub API 不可达或限流时拒绝可变分支下载，并显示失败；不增加用户 Token 要求。
+Reuse the existing mirrors and the atomic upgrade flow, with no new runtime dependencies. Assume a low release frequency, with each check and application allowing
+one GitHub API branch resolution; resolution and manifest reading complete within each source's 15-second budget.
+When the GitHub API is unreachable or rate-limiting, mutable-branch downloading is refused and the failure is displayed; no user Token requirement is added.
 
-## 核实结果（2026-10-07）
+## Verified results (2026-10-07)
 
-- main `fbc3b9b55686fe169bd1fd26bb9211b9d3008d9e` 的 40 个清单项与 Git
-  发布字节和 SHA-256 全部一致；最新重签提交是 `967a596`。
-- CDN 最初返回 05:14 的旧清单与四个旧代码文件，Git/raw 返回 07:34 的新清单。
-  分钟级 `?ofm=` 不改变这个差异。issue 所述四文件未重签不能据此视为当前 main 的事实。
-- 整树及逐路径 purge 返回 finished。一条网络路径随后确认当前清单和全部 40 个文件
-  与 Git 相符，但本机 Node 的旧升级器仍复现
-  `package.json: size 2354 != manifest 2328; vendor/channel-pack/NOTICE.md: fetch failed`。
-- 补刷 package/NOTICE 后，Node 取得正确的 2328 字节 package，但 NOTICE 仍返回
-  301，指向 raw；固定 SHA 也会收到该跳转。raw 的该文件在本次 Node 请求中超时。
-- 同一固定 SHA 的 gcore NOTICE 返回 200、3542 字节。
-- 新升级器实际通过 CDN 下载 2.0.0 全部 40 文件、4008049 字节，完成验签、摘要校验及回读。
-  该验证在临时目录完成，没有替换 Desktop 安装或部署新版本。
+- The 40 manifest entries of main `fbc3b9b55686fe169bd1fd26bb9211b9d3008d9e` all match Git's
+  release bytes and SHA-256; the most recent re-signing commit is `967a596`.
+- The CDN initially returned the old manifest from 05:14 and four old code files, while Git/raw returned the new manifest from 07:34.
+  A minute-level `?ofm=` does not change this difference. The issue's claim that four files were not re-signed cannot, on this basis, be regarded as a fact about the current main.
+- Whole-tree and per-path purges returned finished. One network path then confirmed the current manifest and all 40 files
+  match Git, but the local Node old upgrader still reproduced
+  `package.json: size 2354 != manifest 2328; vendor/channel-pack/NOTICE.md: fetch failed`.
+- After re-purging package/NOTICE, Node obtained the correct 2328-byte package, but NOTICE still returned
+  a 301 pointing to raw; a pinned SHA receives that redirect too. That file on raw timed out in this Node request.
+- The gcore NOTICE for the same pinned SHA returned 200, 3542 bytes.
+- The new upgrader actually downloaded all 40 files of 2.0.0 via the CDN, 4008049 bytes, and completed signature verification, digest verification and read-back.
+  That verification was done in a temporary directory and did not replace the Desktop installation or deploy a new version.
 
-## 决策记录
+## Decision record
 
-| 决策 | 考虑的方案 | 原因 |
+| Decision | Alternatives considered | Reason |
 | --- | --- | --- |
-| 先解析 SHA，再下载清单和文件 | 只加查询参数；只 purge | 实测查询参数无效，purge 无法消除各路径与访问边缘的差异 |
-| 使用 GitHub 官方 commits API | jsDelivr 分支解析接口 | 两个实测 jsDelivr 解析接口均返回 version=null，不能提供完整 SHA |
-| 不改变签名字段 | 新增必签 revision 字段 | 保持现有清单及旧客户端验签格式兼容 |
-| 同次检查跨镜像复用 SHA，apply 重新解析 | 每个镜像独立解析；复用旧检查结果 | 避免切换镜像或下载途中分支移动带来的版本混用 |
-| 固定 SHA 文件在连接、重定向、404/429/5xx 时回退至 gcore | 跟随任意 Location；移除 NOTICE 校验 | 同一 SHA/path 可取到合法文件；每份字节仍需符合签名清单 |
-| 对大小、哈希及鉴权拒绝不回退 | 任意错误都换镜像 | 保持已有完整性失败和授权拒绝的语义 |
+| Resolve the SHA first, then download the manifest and files | Only add a query parameter; only purge | Measurements show the query parameter is ineffective, and purging cannot eliminate differences between paths and access edges |
+| Use GitHub's official commits API | jsDelivr's branch resolution interface | Both measured jsDelivr resolution interfaces returned version=null and cannot provide a full SHA |
+| Do not change the signature fields | Add a mandatory signed revision field | Keeps compatibility with the existing manifest and old clients' signature-verification format |
+| Reuse the SHA across mirrors within one check; apply re-resolves | Resolve independently per mirror; reuse an old check result | Avoids version mixing caused by switching mirrors or the branch moving during download |
+| For a pinned-SHA file, fall back to gcore on connection, redirect, 404/429/5xx | Follow an arbitrary Location; remove the NOTICE check | A legitimate file can be fetched at the same SHA/path; every byte must still conform to the signed manifest |
+| No fallback on size, hash or authentication refusals | Switch mirrors on any error | Keeps the existing semantics of integrity failures and authorisation refusals |
 
-## 验证与交接
+## Verification and handover
 
-`npm run test:contributor` 覆盖版本解析、签名、固定提交、镜像切换、解析拒绝/超时、
-apply 重新解析、gcore 回退、坏文件拒绝、安装与回滚。`node --check src/updater.js`、
-`node --check scripts/live-audit.mjs` 和 `git diff --check` 已通过。
-类型检查使用相邻主工作区已安装的 TypeScript 5.9.3 执行
-`tsc --noEmit -p tsconfig.json`，范围仅 adapter。
+`npm run test:contributor` covers version resolution, signatures, pinned commits, mirror switching, resolution refusal/timeout,
+apply re-resolution, the gcore fallback, bad-file refusal, installation and rollback. `node --check src/updater.js`,
+`node --check scripts/live-audit.mjs` and `git diff --check` have passed.
+Type checking was run with the TypeScript 5.9.3 installed in the adjacent main workspace,
+`tsc --noEmit -p tsconfig.json`, with scope limited to the adapter.
 
-真实验证命令：
+The real verification command:
 
 ```bash
 node scripts/live-audit.mjs --source https://cdn.jsdelivr.net/gh/Ebony-Vinyl/dsh-our-free-model@main/feed/manifest.json
 ```
 
-日志中的实际清单 URL 为 `@fbc3b9b55686fe169bd1fd26bb9211b9d3008d9e`，
-40/40 文件通过。原版脚本的同一命令仍失败，不能用新脚本成功宣称旧客户端已自动修复。
+The actual manifest URL in the log was `@fbc3b9b55686fe169bd1fd26bb9211b9d3008d9e`,
+with 40/40 files passing. The same command with the original script still fails, so the new script's success must not be used to claim old clients are automatically fixed.
 
-本地源码已变，现有签名尚未覆盖本修复。发布检查中 manifest、release 因摘要漂移失败，
-catalog 在未提交状态通过；提交修复后再次执行 `npm run test:release`，
-manifest、release、catalog 三项均失败，catalog 原因是内容提交改变而 revision 尚未刷新。
-发布前由持钥维护者重签并更新目录 revision，保留普通 merge
-所需的内容提交身份；不用占位签名，不替换公钥。
+The local sources have changed and the existing signature does not yet cover this fix. In the release checks, manifest and release failed due to digest drift,
+and catalog passed in the uncommitted state; after committing the fix and running `npm run test:release` again,
+manifest, release and catalog all failed, with catalog's reason being that the content commit changed while the revision had not yet been refreshed.
+Before release, the key-holding maintainer re-signs and updates the catalog revision, keeping the content-commit identity required for an ordinary merge;
+no placeholder signature is used, and the public key is not replaced.
 
-旧客户端需要先成功升级或手动安装修复后的正式版本才能获得新逻辑；如果其网络仍将
-NOTICE 跳转到不可达 raw，仅刷新缓存不能保证过渡成功。本次已完成下述 macOS Desktop 宿主冒烟；
-没有执行 Windows UI 升级，也没有发布本修复。
+Old clients need to upgrade successfully first, or manually install the fixed production version, to obtain the new logic; if their network still
+redirects NOTICE to an unreachable raw, merely refreshing the cache cannot guarantee the transition succeeds. The macOS Desktop host smoke test below has been completed for this change;
+no Windows UI upgrade was performed, and this fix has not been released.
 
 
-## macOS Desktop 实机冒烟（2026-10-07）
+## macOS Desktop on-device smoke test (2026-10-07)
 
-- 实际应用：`/Applications/DeepSeek Harness.app`，Desktop profile 内的插件安装副本。
-- 原安装为 2.0.0 开发版（包含 EAC 本机 Exo 功能）；先完整备份插件及升级状态。
-  本次为 **2.0.0 → 2.0.0 同版本重新安装**，不是 1.4.5 → 2.0.0 或 Windows 实测。
-- 新升级器由实际 Desktop Node 宿主加载。采用临时本地文件触发探针调用真实
-  `PluginUpdater.apply()`，并将 `selfReload()` 作为激活回调；没有开放匿名接口，
-  没有读取或改变宿主鉴权，也没有用替身服务、替换签名公钥或伪造版本。
-  同版本页面没有升级按钮，因此本次没有覆盖用户点击“立即升级”的 UI 操作链。
-- 首轮下载 38/40 后失败：`client.js` 与 `adapter/dsh-llm.d.ts` 的连接失败。
-  暂存目录清理，未进入安装，没有版本不一致或恢复待办。该失败记录完整保留。
-- 重试通过，耗时约 23.7 秒；实际清单源固定为
-  `https://cdn.jsdelivr.net/gh/Ebony-Vinyl/dsh-our-free-model@fbc3b9b55686fe169bd1fd26bb9211b9d3008d9e/feed/manifest.json`。
-  raw 清单连接超时后使用同 SHA 的 CDN；NOTICE 等主 CDN 连接失败后使用固定镜像。
-- 宿主完成 40 文件、4008049 字节下载、验签、暂存、备份、安装及热重载。
-  激活返回 `ok:true`、`version:2.0.0`、`fibers:1`；generation 1→2。
-  事务为 `complete`，`activated:true`，没有错误、版本不一致或恢复待办。
-  随后独立逐文件核对已安装字节：大小与 SHA-256 **40/40** 符合正式签名清单。
-- 最后恢复测试前的开发插件及升级状态，仅保留本次 `src/updater.js`。
-  42 个原文件中其余 41 个摘要不变，无额外文件。恢复副本再次在真实宿主热重载成功，
-  generation 1→2、1 个 fiber；恢复后的旧开发入口没有导出运行版本，故不把其空版本
-  返回值作为严格版本激活证明。Desktop 插件页显示 v2.0.0、**共 1 个 · 1 运行中**。
-- 测试探针在重载前自移除，最终磁盘与运行实例使用干净入口。文件自动热重载设置
-  仍为测试前的关闭状态；没有操作用户账号、聊天或密钥数据。
+- Actual application: `/Applications/DeepSeek Harness.app`, the plugin installation copy inside the Desktop profile.
+- The original installation was the 2.0.0 development version (including the EAC local Exo feature); the plugin and upgrade state were fully backed up first.
+  This was a **2.0.0 → 2.0.0 same-version reinstallation**, not 1.4.5 → 2.0.0 or a Windows measurement.
+- The new upgrader was loaded by the actual Desktop Node host. A temporary local file triggered a probe calling the real
+  `PluginUpdater.apply()`, with `selfReload()` as the activation callback; no anonymous endpoint was opened,
+  the host authentication was not read or changed, and no stand-in service, replaced signing public key or forged version was used.
+  The same-version page has no upgrade button, so this round did not cover the user's click on "Upgrade now" in the UI operation chain.
+- The first round failed after downloading 38/40: connection failures for `client.js` and `adapter/dsh-llm.d.ts`.
+  The staging directory was cleaned up, installation was not entered, and there was no version inconsistency or recovery to-do. This failure record is kept in full.
+- The retry passed, taking about 23.7 seconds; the actual manifest source was pinned to
+  `https://cdn.jsdelivr.net/gh/Ebony-Vinyl/dsh-our-free-model@fbc3b9b55686fe169bd1fd26bb9211b9d3008d9e/feed/manifest.json`.
+  After the raw manifest connection timed out, the CDN at the same SHA was used; after connection failures on the main CDN for NOTICE and others, the pinned mirror was used.
+- The host completed the download, signature verification, staging, backup, installation and hot reload of 40 files, 4008049 bytes.
+  Activation returned `ok:true`, `version:2.0.0`, `fibers:1`; generation 1→2.
+  The transaction was `complete`, `activated:true`, with no errors, version inconsistency or recovery to-dos.
+  An independent per-file check of the installed bytes followed: sizes and SHA-256 matched the production signed manifest **40/40**.
+- Finally, the development plugin and upgrade state from before the test were restored, keeping only this round's `src/updater.js`.
+  Of the 42 original files, the other 41 digests are unchanged, with no extra files. The restored copy hot-reloaded successfully in the real host again,
+  generation 1→2, 1 fiber; the restored old development entry point does not export a running version, so its empty version
+  return value is not treated as strict version-activation proof. The Desktop plugin page shows v2.0.0, **1 in total · 1 running**.
+- The test probe removed itself before reloading; the final disk and running instance use a clean entry point. The automatic file hot-reload setting
+  is still the off state from before the test; no user account, chat or secret data was operated on.
 
-本机证据与原安装备份保留在仓库外，不提交本机路径、用户截图或原始运行数据。
-主要证据为 `attempt1-host-result.json`、`host-result.json`、`host-activation.json`、
-`installed-verification.json`、`restoration-runtime.json`、`final-verification.json` 和
-`desktop-restored.png`。首次失败及成功重试均记录，不将真实网络可用性解释为永久保证。
-本机当前保留修复后的开发升级器，尚不属于已签名发布版本。
+The local evidence and the original installation backup are kept outside the repository; no local paths, user screenshots or raw runtime data are committed.
+The main evidence is `attempt1-host-result.json`, `host-result.json`, `host-activation.json`,
+`installed-verification.json`, `restoration-runtime.json`, `final-verification.json` and
+`desktop-restored.png`. Both the first failure and the successful retry are recorded; real network availability is not interpreted as a permanent guarantee.
+This machine currently keeps the fixed development upgrader, which does not yet belong to a signed release version.

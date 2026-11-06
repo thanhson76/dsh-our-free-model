@@ -583,7 +583,7 @@ const { createGatewayServer, resetAnalytics, poolProbe } = await import('../work
   await new Promise(resolve => relay.close(resolve))
 
   // The self-hosted form: the same core behind the Node host shim, driven over
-  // a real socket exactly like a 宝塔/PM2 deployment would serve it.
+  // a real socket exactly like a BT Panel (Baota)/PM2 deployment would serve it.
   const { createGatewayServer } = await import('../worker/gateway-node.mjs')
   const nodeRelay = http.createServer((req, res) => {
     req.on('data', () => {})
@@ -755,7 +755,7 @@ const { createGatewayServer, resetAnalytics, poolProbe } = await import('../work
     const noTokenPage = await fetch(`http://127.0.0.1:${concServer.address().port}/stats`)
     check('the dashboard page serves its self-gate without a token', noTokenPage.status, 200)
     const entry = await fetch(`http://127.0.0.1:${concServer.address().port}/entry.js`)
-    check('the sidebar entry script is served by the gateway', [entry.status, (await entry.text()).includes('EAC ' + '看板')], [200, true])
+    check('the sidebar entry script is served by the gateway', [entry.status, (await entry.text()).includes('EAC Dashboard')], [200, true])
 
     const chatBodyText = JSON.stringify({ model: 'deepseek-ai/deepseek-v4.1-flash', messages: [{ role: 'user', content: 'hi' }] })
     const signedChat = () => new Request(`${concBase}/chat/completions`, {
@@ -784,7 +784,7 @@ const { createGatewayServer, resetAnalytics, poolProbe } = await import('../work
 
     const dashboardPage = await fetch(`http://127.0.0.1:${concServer.address().port}/stats?t=${encodeURIComponent('test-admin-token-0123456789')}`)
     const pageText = await dashboardPage.text()
-    check('the dashboard page serves the chart container markup', [dashboardPage.status, pageText.includes('请求热力图'), pageText.includes('stats-data')], [200, true, true])
+    check('the dashboard page serves the chart container markup', [dashboardPage.status, pageText.includes('Request heatmap'), pageText.includes('stats-data')], [200, true, true])
 
     concServer.close()
     slowRelay.close()

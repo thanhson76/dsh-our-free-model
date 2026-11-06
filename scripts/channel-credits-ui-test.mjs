@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 
-/** 实际共享组件的余额能力、查询反馈与请求交错回归。 */
+/** Regression for the actual shared component's balance capability, query feedback and request interleaving. */
 export async function verifyChannelCreditsUi() {
   const source = fs.readFileSync(new URL('../client.js', import.meta.url), 'utf8')
     .replace('exports.__test = {', 'exports.__test = { ChannelCard, DICT,')
@@ -66,10 +66,10 @@ export async function verifyChannelCreditsUi() {
   for (const provider of [...claimable, 'cline', 'raccoon', 'gemini']) {
     const app = mount(provider, async () => ({ accounts: [] }))
     await settle()
-    assert.equal(app.calls[0].method, 'credits.balances', `${provider} 必须查询已有后端余额能力`)
+    assert.equal(app.calls[0].method, 'credits.balances', `${provider} must query the existing backend balance capability`)
     assert.equal(app.calls[0].payload.provider, provider)
     assert.ok(app.button('刷新余额'))
-    assert.equal(Boolean(app.button('一键领取')), claimable.has(provider), `${provider} 必须单独判断签到能力`)
+    assert.equal(Boolean(app.button('一键领取')), claimable.has(provider), `${provider} must judge its check-in capability separately`)
     if (provider === 'zcode') assert.ok(app.text().includes('剩余 Token'))
     if (provider === 'cline') assert.ok(app.text().includes('USD'))
     if (provider === 'gemini') assert.ok(app.text().includes('剩余配额'))
@@ -77,7 +77,7 @@ export async function verifyChannelCreditsUi() {
   }
 
   let fail = false
-  const accountRows = [{ id: 'one', nickname: '账号一', enabled: true }, { id: 'two', nickname: '账号二', enabled: true }]
+  const accountRows = [{ id: 'one', nickname: 'Account One', enabled: true }, { id: 'two', nickname: 'Account Two', enabled: true }]
   let balances = [
     { accountId: 'one', balance: { total: 0 } },
     { accountId: 'two', balance: null, error: '凭据已失效，请重新登录' },
@@ -90,19 +90,19 @@ export async function verifyChannelCreditsUi() {
       return { accounts: balances }
     }
     if (method === 'credits.claimAll') return { summary: { claimed: 0 }, results: [{ accountId: 'two', outcome: { kind: 'failed', message: '签到凭据过期' } }] }
-    throw new Error(`意外的 RPC ${method}`)
+    throw new Error(`unexpected RPC ${method}`)
   })
   await settle()
   assert.ok(app.text().includes('1 个账号未能查询余额'))
   app.button('账号').props.onClick()
   await settle()
   assert.ok(app.text().includes('凭据已失效，请重新登录'))
-  assert.ok(app.text().includes('剩余积分 0'), '零余额必须显示，不能变成查询失败')
-  assert.ok(app.text().includes('今日已领 10'), '签到状态只解包一次')
+  assert.ok(app.text().includes('剩余积分 0'), 'a zero balance must be displayed, not turned into a query failure')
+  assert.ok(app.text().includes('今日已领 10'), 'the check-in status is unwrapped only once')
   fail = true
   app.button('刷新余额').props.onClick()
   await settle()
-  assert.equal(app.calls.filter(row => row.method === 'credits.balances').at(-1).payload.force, true, '手动重试必须跳过配额缓存')
+  assert.equal(app.calls.filter(row => row.method === 'credits.balances').at(-1).payload.force, true, 'a manual retry must skip the quota cache')
   assert.ok(app.text().includes('余额查询失败：网络暂时断开'))
   assert.equal(app.button('刷新余额').props.disabled, false)
   fail = false
@@ -114,10 +114,10 @@ export async function verifyChannelCreditsUi() {
   const beforeEvent = app.calls.length
   app.events.get('ofm:channels')()
   await settle()
-  assert.ok(app.calls.slice(beforeEvent).some(row => row.method === 'credits.balances'), '账号变化事件必须刷新余额')
+  assert.ok(app.calls.slice(beforeEvent).some(row => row.method === 'credits.balances'), 'an account-change event must refresh the balance')
   app.button('一键领取').props.onClick()
   await settle()
-  assert.ok(app.text().includes('领取失败：签到凭据过期'), '后端领取失败不能伪装成无可领积分')
+  assert.ok(app.text().includes('领取失败：签到凭据过期'), 'a backend claim failure must not be disguised as no credits available to claim')
   app.cleanup()
 
   let resolveOld, resolveNew, readCount = 0
@@ -128,24 +128,24 @@ export async function verifyChannelCreditsUi() {
     }
     if (method === 'account.list') return { accounts: accountRows }
     if (method === 'credits.claimAll') return { summary: { claimed: 1, totalCredit: 100 }, results: [] }
-    throw new Error(`意外的 RPC ${method}`)
+    throw new Error(`unexpected RPC ${method}`)
   })
   const busyText = race.text()
   assert.ok(busyText.includes('余额查询中'))
   race.events.get('ofm:channels')()
-  assert.equal(readCount, 1, '轮询和事件共用正在执行的只读请求')
+  assert.equal(readCount, 1, 'polling and events share the in-flight read-only request')
   const claimButton = race.button('一键领取')
   claimButton.props.onClick()
   claimButton.props.onClick()
   await settle()
-  assert.equal(race.calls.filter(row => row.method === 'credits.claimAll').length, 1, '重复点击不能重复领取')
-  assert.equal(readCount, 2, '写入后必须查询新余额，不能复用写入前的在途请求')
+  assert.equal(race.calls.filter(row => row.method === 'credits.claimAll').length, 1, 'repeated clicks cannot claim repeatedly')
+  assert.equal(readCount, 2, 'after a write, the new balance must be queried; the pre-write in-flight request cannot be reused')
   resolveNew({ accounts: [{ accountId: 'one', balance: { total: 456 } }] })
   await settle()
   resolveOld({ accounts: [{ accountId: 'one', balance: { total: 123 } }] })
   await settle()
   assert.ok(race.text().includes('456'))
-  assert.ok(!race.text().includes('"123"'), '旧请求晚到不能覆盖新余额')
+  assert.ok(!race.text().includes('"123"'), 'a late-arriving old request cannot overwrite the new balance')
   race.cleanup()
 
   let resolveUnmount
@@ -153,7 +153,7 @@ export async function verifyChannelCreditsUi() {
   unmounted.cleanup()
   resolveUnmount({ accounts: [{ accountId: 'one', balance: { total: 999 } }] })
   await settle()
-  assert.equal(unmounted.cells[4], undefined, '卸载后不回写余额')
+  assert.equal(unmounted.cells[4], undefined, 'no balance write-back after unmount')
 
   const quota = mount('gemini', async method => method === 'account.list'
     ? { accounts: [accountRows[0]] }
@@ -161,7 +161,7 @@ export async function verifyChannelCreditsUi() {
   await settle()
   quota.button('账号').props.onClick()
   await settle()
-  assert.ok(quota.text().includes('5 小时 80% · 每周 40%'), '不同配额窗口不能相加成积分')
+  assert.ok(quota.text().includes('5 小时 80% · 每周 40%'), 'different quota windows cannot be summed into credits')
   assert.ok(quota.text().includes('已查询 1 个账号'))
   quota.cleanup()
 }

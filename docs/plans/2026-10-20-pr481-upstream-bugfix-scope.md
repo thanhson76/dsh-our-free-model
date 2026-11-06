@@ -1,27 +1,27 @@
-# PR #481：以上游为准的三项 Bug 修复
+# PR #481: Three Bug Fixes Aligned with Upstream
 
-## 范围与优先级
+## Scope and Priority
 
-按用户在 2026-10-20 的最终要求：上游最新 main 是基准，只合入本轮修复的 Bug。当前核验基线为 5923ebef0f55578ca21bb5555b7ba5adb51aef21（插件 2.5.6）。
+Per the user's final requirements on 2026-10-20: the latest upstream main is the baseline, and only the bugs fixed in this round are merged in. The currently verified baseline is 5923ebef0f55578ca21bb5555b7ba5adb51aef21 (plugin 2.5.6).
 
-当前 PR 内容收拢为以下三项，不继续先前整套前端重构方案：
+The PR's content is now narrowed to the following three items; the earlier full frontend refactoring proposal is not continued:
 
-## 保留的上游行为
+## Upstream Behaviour Preserved
 
-- 插件沿用 main 的 11 个页面入口，赞助卡片仍位于免费模型和 EAC 页面。
-- 完整保留 main 的最新赞助商 PNG Logo、注册链接、邀请码、卡片原文和按钮直接访问路径。
-- 插件广告详情入口、全业务页统一横幅、独立页面广告流程均按 main 保持；既有独立端赞助页和每日公告按上游执行。
-- README 的最新交流群二维码和图片路径、2.5.6 发布信息，以及最新模型用量/Kilo 修正按 main 保留。
-- 未修改上游 CI、发行信任根或签名策略。运行文件变化后，正式发布记录仍由维护者按 prepare-release/release-sign 流程准备。
+- The plugin keeps main's 11 page entries, and the sponsor cards remain on the Free models and EAC pages.
+- Main's latest sponsor PNG logos, registration links, invitation codes, original card text and direct button access paths are preserved in full.
+- The plugin ad-detail entry, the unified banner across all business pages and the standalone-page ad flow all stay as in main; the existing standalone sponsor page and daily announcements follow upstream.
+- The README's latest community QR code and image paths, the 2.5.6 release information, and the latest model-usage / Kilo fixes are kept as in main.
+- Upstream CI, the release trust root and the signing policy are unchanged. After runtime files change, the formal release record is still prepared by the maintainer via the prepare-release / release-sign flow.
 
-## 先前 PR 回归的处理
+## Handling of the Earlier PR's Regressions
 
-此前审查定位的“取消探测后后台继续”和“保留路由页导致候选目录陈旧”，都由先前全面重构新增的界面/生命周期变化触发。本次以 main 的对应实现为准：没有加入误导性的取消按钮，返回路由页按上游原有生命周期重新取数。手动单模型测速的取消属于本轮三项修复，已在独立测试和真实原生程序验证。
+The "background work continues after probing is cancelled" and "keeping the routing page makes the candidate catalogue stale" issues located by the earlier review were both triggered by UI/lifecycle changes added by the earlier full refactoring. This time main's corresponding implementation governs: no misleading cancel button was added, and returning to the routing page re-fetches data following upstream's original lifecycle. Cancelling a manual single-model speed test is one of this round's three fixes, and has been verified in standalone tests and in the real native program.
 
-## 整合方式
+## Integration Method
 
-保留原 PR 的历史，在其后追加整合提交；文件结果以从最新 main 开发的原始修复候选 d865684 为基础。PR 的最终差异按当前 main 审核，旧 PR 的整套重构不会作为额外差异合入。没有重写或强制推送历史，也没有合入主线。
+The original PR's history is kept, with integration commits appended after it; the file result is based on the original fix candidate d865684 developed from the latest main. The PR's final diff is reviewed against the current main, and the old PR's full refactoring will not be merged in as an extra diff. History was not rewritten or force-pushed, and nothing was merged into the mainline.
 
-## 验证与边界
+## Verification and Boundaries
 
-原 PR 候选已有离线回归、浏览器矩阵及 Windows Computer Use 的实际程序验证，具体见 docs/testing/2026-10-20-four-fixes-native-validation.md。本次更新按用户要求去除界面降级功能，保留其余三项修复；修改后的验证以当前执行结果为准。
+The original PR candidate already has offline regression, a browser matrix and real-program verification via Windows Computer Use; see docs/testing/2026-10-20-four-fixes-native-validation.md for details. This update removes the UI downgrade feature as the user requested and keeps the other three fixes; verification after the change is governed by the current execution results.

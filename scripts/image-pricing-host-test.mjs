@@ -1,6 +1,6 @@
 /**
- * 使用指定宿主依赖执行真实 spill-policy；不安装依赖、不读取真实账号或调用上游。
- * node scripts/image-pricing-host-test.mjs <包含宿主 node_modules 的目录>
+ * Run the real spill-policy against the specified host dependencies; installs nothing, reads no real accounts and calls no upstream.
+ * node scripts/image-pricing-host-test.mjs <directory containing the host node_modules>
  */
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
@@ -10,7 +10,7 @@ import { createRequire, registerHooks } from 'node:module'
 import { pathToFileURL } from 'node:url'
 import { FreeModelAdapter, ROUTE_MAIN, ROUTE_REGION } from '../src/adapter.js'
 
-if (!process.argv[2]) throw new Error('请提供含宿主 node_modules 的隔离目录')
+if (!process.argv[2]) throw new Error('Please provide an isolated directory containing the host node_modules')
 const require = createRequire(import.meta.url)
 const resolve = name => require.resolve(name, { paths: [path.resolve(process.argv[2])] })
 const llmUrl = pathToFileURL(resolve('@deepseek-ai/dsh-llm')).href
@@ -33,12 +33,12 @@ const hooks = registerHooks({ resolve(specifier, context, next) {
   return next(specifier, context)
 } })
 const originalFetch = globalThis.fetch
-globalThis.fetch = async () => { throw new Error('宿主图片回归禁止外网请求') }
+globalThis.fetch = async () => { throw new Error('External network requests are forbidden in the host image regression') }
 const disposers = [], adapters = new Map()
 const services = {
   profileContext: { home },
   credentials: { resolve: async () => undefined, describe: async () => undefined,
-    set: async () => { throw new Error('禁止写入凭据') }, unset: async () => {} },
+    set: async () => { throw new Error('Writing credentials is forbidden') }, unset: async () => {} },
   llm: { registerAdapter(providers, adapter) { for (const provider of providers) adapters.set(provider, adapter) },
     listProviders: () => [...adapters.keys()].map(id => ({ id })) },
   connection: { fetch: { register() {} } },
@@ -61,7 +61,7 @@ async function verify(provider, withImage) {
     spillStore: { async saveText(input) {
       const file = path.join(home, `${provider}-${withImage}.txt`)
       fs.writeFileSync(file, input.content); saved.push(file)
-      return { locator: file, bytes: Buffer.byteLength(input.content), retrievalHint: '读取隔离文件。' }
+      return { locator: file, bytes: Buffer.byteLength(input.content), retrievalHint: 'Read the isolated file.' }
     } },
   }
   applySpill({ on: (event, fn) => listeners.set(event, fn), get: key => host[key],
@@ -73,14 +73,14 @@ async function verify(provider, withImage) {
   } }
   const content = withImage ? [{ type: 'text', text }, image] : [{ type: 'text', text }]
   const result = await listeners.get('tools/post-execute')(exec, { content, isError: false }, async () => ({ kind: 'accept' }))
-  assert.equal(saved.length, 1, `${provider} 必须落盘`)
-  assert.deepEqual(warnings, [], `${provider} 不应触发计价或存储失败`)
+  assert.equal(saved.length, 1, `${provider} must be written to disk`)
+  assert.deepEqual(warnings, [], `${provider} must not trigger a pricing or storage failure`)
   const preview = result.content.filter(block => block.type === 'text').map(block => block.text).join('')
-  assert.ok(preview.includes('Full formatted result stored at:'), `${provider} 必须返回可恢复文件提示`)
+  assert.ok(preview.includes('Full formatted result stored at:'), `${provider} must return a recoverable file hint`)
   assert.ok(Buffer.byteLength(preview) < Buffer.byteLength(text))
   const full = fs.readFileSync(saved[0], 'utf8')
-  assert.ok(full.startsWith(text), '完整文本不能丢失')
-  if (withImage) assert.ok(full.includes(JSON.stringify(imagePath)), '完整结果必须保留图片读取地址')
+  assert.ok(full.startsWith(text), 'the full text must not be lost')
+  if (withImage) assert.ok(full.includes(JSON.stringify(imagePath)), 'the full result must keep the image read address')
 }
 try {
   const { apply } = await import('../vendor/channel-pack/pack.js')
@@ -91,7 +91,7 @@ try {
   adapters.set(ROUTE_MAIN, free); adapters.set(ROUTE_REGION, free)
   await verify('lobsterai', false)
   for (const provider of adapters.keys()) await verify(provider, true)
-  console.log(`ok  宿主 ${version}：13 路由的 512KB 含图结果和纯文本对照均真实落盘，预览有恢复地址，无计价失败警告`)
+  console.log(`ok  host ${version}: the 512KB image-bearing results and plain-text controls of all 13 routes were really written to disk, previews carry a recovery address, and there were no pricing failure warnings`)
 } finally {
   for (const cleanup of disposers.reverse()) await cleanup()
   hooks.deregister(); globalThis.fetch = originalFetch

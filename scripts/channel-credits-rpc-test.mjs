@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 
-/** 使用实际已打包 RPC，只提供账号池 ref，禁止真实网络与旧单凭据回退。 */
+/** Uses the actually packaged RPC, providing only account-pool refs; no real network and no fallback to the old single credential. */
 export async function verifyChannelCreditsRpc({ ctx, call, creds, adapters }) {
   const originalFetch = globalThis.fetch
   const providers = ['qoder', 'qodercn', 'loomy', 'minimax', 'lobsterai', 'zcode', 'gemini']
@@ -13,10 +13,10 @@ export async function verifyChannelCreditsRpc({ ctx, call, creds, adapters }) {
       const ref = `FIXTURE_CREDITS_${provider.toUpperCase()}`
       creds.set(ref, { value: JSON.stringify({
         access_token: 'fixture-credits-token', token_type: 'Bearer', user_id: 'fixture-user',
-        zcode_jwt: 'fixture-credits-jwt', device_mid: 'fixture-device', account_label: '隔离账号',
+        zcode_jwt: 'fixture-credits-jwt', device_mid: 'fixture-device', account_label: 'isolated account',
       }) })
       await ctx.accountPool.addAccount({
-        id: `fixture-credits-${provider}`, provider, nickname: '隔离账号',
+        id: `fixture-credits-${provider}`, provider, nickname: 'isolated account',
         credentialRef: ref, enabled: true, refreshable: false, createdAt: 1,
       })
     }
@@ -42,14 +42,14 @@ export async function verifyChannelCreditsRpc({ ctx, call, creds, adapters }) {
           { bucketId: 'gemini-5h', window: '5h', remainingFraction: 0.8, resetTime: new Date(Date.now() + 3600000).toISOString() },
           { bucketId: 'gemini-weekly', window: 'weekly', remainingFraction: 0.4, resetTime: new Date(Date.now() + 86400000).toISOString() },
         ] }] }
-      } else throw new Error(`未预期的替身端点：${pathname}`)
+      } else throw new Error(`unexpected stub endpoint: ${pathname}`)
       return Response.json(body)
     }
     for (const provider of providers.filter(id => id !== 'zcode' && id !== 'gemini')) {
       resolvedRefs.length = 0
       const result = await call('credits.balances', { provider })
       assert.equal(result.ok, true)
-      assert.equal(result.value.accounts[0].balance?.total, 123, `${provider} 的账号池凭据应能查询余额`)
+      assert.equal(result.value.accounts[0].balance?.total, 123, `the account-pool credential for ${provider} should be able to query the balance`)
       assert.ok(resolvedRefs.includes(`FIXTURE_CREDITS_${provider.toUpperCase()}`))
     }
     assert.equal((await ctx.zcodeAuth.current()).zcode_jwt, 'fixture-credits-jwt')
@@ -57,30 +57,30 @@ export async function verifyChannelCreditsRpc({ ctx, call, creds, adapters }) {
     creds.delete('FIXTURE_CREDITS_QODER')
     const missing = await call('credits.balances', { provider: 'qoder' })
     assert.equal(missing.value.accounts[0].balance, null)
-    assert.equal(missing.value.accounts[0].error, '凭据未配置', '缺失凭据必须返回原因，不能伪造零余额')
+    assert.equal(missing.value.accounts[0].error, '凭据未配置', 'a missing credential must return a reason; a zero balance must not be fabricated')
     const unavailableQuota = await call('credits.balances', { provider: 'gemini' })
     assert.equal(unavailableQuota.value.accounts[0].balance, null)
     quotaFailed = false
     const cachedQuota = await call('credits.balances', { provider: 'gemini' })
     assert.equal(cachedQuota.value.accounts[0].balance, null)
-    assert.equal(quotaRequests, 1, '自动查询保留原有缓存')
+    assert.equal(quotaRequests, 1, 'automatic queries keep the existing cache')
     const freshQuota = await call('credits.balances', { provider: 'gemini', force: true })
-    assert.equal(quotaRequests, 2, '手动重试必须真正查询上游替身')
+    assert.equal(quotaRequests, 2, 'a manual retry must actually query the upstream stub')
     assert.equal(freshQuota.value.accounts[0].balance.total, 60)
     await verifyRefreshDispatch({ ctx, call })
     for (const provider of ['qoder', 'qodercn']) {
       const service = ctx[`${provider}Auth`], saved = service.refreshAccountCredential, calls = []
       const ref = `FIXTURE_CREDITS_${provider.toUpperCase()}`
-      // 默认账号之外的 B 必须由实际注册接线按 id 刷新，不能重新选默认 ref。
+      // B, which is not the default account, must be refreshed by id through the actual registration wiring; the default ref must not be re-selected.
       const otherId = `fixture-auth-${provider}-b`, otherRef = `FIXTURE_AUTH_${provider.toUpperCase()}_B`
       try {
         creds.set(otherRef, { value: '{"access_token":"fixture-b"}' })
         await ctx.accountPool.addAccount({ id: otherId, provider, nickname: 'B', credentialRef: otherRef, enabled: true, refreshable: true, createdAt: 1 })
-        // qoder 的缺凭据测试刚删除了默认 ref，这里恢复为有效 A，确保错误实现会选中它。
+        // The qoder missing-credential test just deleted the default ref; restore it here as a valid A so a wrong implementation would select it.
         creds.set(ref, { value: '{"access_token":"fixture-a"}' })
         service.refreshAccountCredential = async (...args) => { calls.push(args) }
         await adapters.get(provider).options.refresh(otherId)
-        assert.deepEqual(calls, [[otherRef, ctx.accountPool, otherId]], `${provider}: 实际认证续期绑定 B`)
+        assert.deepEqual(calls, [[otherRef, ctx.accountPool, otherId]], `${provider}: the actual auth refresh is bound to B`)
         const lookup = ctx.accountPool.findAccountIdByCredential
         try {
           assert.equal(await adapters.get(provider).options.queueAccountIdForCredential({ access_token: 'fixture-b' }), otherId)
@@ -88,7 +88,7 @@ export async function verifyChannelCreditsRpc({ ctx, call, creds, adapters }) {
           await assert.rejects(adapters.get(provider).options.queueAccountIdForCredential({ access_token: 'fixture-b' }), /strict lookup failed/)
         } finally { ctx.accountPool.findAccountIdByCredential = lookup }
         await assert.rejects(adapters.get(provider).options.refresh('missing-account'), /当前请求的账号已移除/)
-        assert.equal(calls.length, 1, '账号删除后不得退回 A 续期')
+        assert.equal(calls.length, 1, 'after the account is deleted, refresh must not fall back to A')
       } finally {
         service.refreshAccountCredential = saved
         await ctx.accountPool.removeAccount(otherId)

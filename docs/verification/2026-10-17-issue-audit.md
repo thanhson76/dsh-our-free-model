@@ -1,63 +1,63 @@
-# 2026-10-17 全量 Issue 审计与本地验收
+# 2026-10-17 Full Issue Audit and Local Acceptance
 
-审计基线：`f73da6b`，版本 `2.5.1`。读取了 GitHub 全部 272 条 issue 的快照，并按当前代码、定向复现及测试逐项判断；没有以 GitHub 的 open/closed 状态代替验证。
+Audit baseline: `f73da6b`, version `2.5.1`. A snapshot of all 272 GitHub issues was read, and each was judged against the current code, targeted reproductions and tests; GitHub's open/closed status was not used as a substitute for verification.
 
-**结论：本次修复了多组仍可复现的本地缺陷，但不能宣称所有 issue 已解决或所有真实上游均可用。没有推送、发布、修改版本、替换公钥或重签发布清单。**
+**Conclusion: this round fixed several groups of local defects that were still reproducible, but it cannot be claimed that all issues are resolved or that all real upstreams are usable. Nothing was pushed, released, version-bumped, nor was any public key replaced or release manifest re-signed.**
 
-## 审计计数
+## Audit counts
 
-| 判断 | 数量 |
+| Judgment | Count |
 | --- | ---: |
-| 上游或环境阻断 | 68 |
-| 本次修复 | 25 |
-| 待发布或分发处理 | 10 |
-| 待补复现或验证 | 62 |
-| 未实现的功能请求 | 17 |
-| 现版本已有修复 | 52 |
-| 部分解决 | 36 |
-| 无有效问题 | 2 |
+| Blocked by upstream or environment | 68 |
+| Fixed in this round | 25 |
+| Awaiting release or distribution handling | 10 |
+| Awaiting reproduction or verification | 62 |
+| Unimplemented feature requests | 17 |
+| Already fixed in the current version | 52 |
+| Partially resolved | 36 |
+| No valid issue | 2 |
 
-重复报告保留各自编号；这些计数是 issue 数量，不是独立根因数量。“现版本已有修复”只覆盖对应代码路径，不等同于已经验证报告者的生产环境。
+Duplicate reports keep their own numbers; these counts are numbers of issues, not numbers of distinct root causes. “Already fixed in the current version” covers only the corresponding code path and does not mean the reporter's production environment has been verified.
 
-## 本次修复
+## Fixed in this round
 
-- 公告镜像回退后反复弹出（#406），包括跨重启去重及空 feed 的后续到达检测。
-- 热重载 callback/namespace 身份、隐藏缓存、连续重载及失败回滚的 Cordis 注入声明（#348）。
-- 升级限流诊断、重复解析请求及失败历史的目标版本（#384 部分、#148）。
-- 纯中文链路名静默丢失（#379），聚合模型出站 ID 错误（#323），RTK 将源码当成干净 git 状态（#322/#389）。
-- 五条适配器空白响应判定及混合工具/思考流的协议完整性（#397），空白历史序列化（#308），并行图片与工具结果（#112）。
-- Raccoon/Loomy 额度耗尽后的账号轮换、准确续期归属及额度错误提示（#382/#166）；覆盖 HTTP 402、SSE 业务错误、HTTP 200 JSON 业务错误。
-- 自动续跑的旧 idle 事件重入、用户停止、生命周期销毁及真实宿主收件箱结构（#282）。
-- 模型单项与分组隐藏、恢复入口和重启持久化（#409/#319/#317/#276/#182/#116）；账号状态/动作歧义及开关底色（#212/#115/#218）。
-- 探测不再锁住整个设置页（#194），端口冲突后保留用户期望端口（#305），链路编辑器展示成员容量与实时交集（#372）。
-- 独立包缺失运行依赖和前端资源分块；补入隔离安装资源测试。默认测试入口补齐遗漏的回归套件，并增加渠道源码协议验证。
+- Announcement reappearing repeatedly after a mirror fallback (#406), including de-duplication across restarts and detection of later arrivals when the feed is empty.
+- Cordis injection declarations for hot-reload callback/namespace identity, hidden caches, consecutive reloads and failure rollback (#348).
+- Target version in upgrade rate-limit diagnostics, duplicate parse requests and failure history (#384 partial, #148).
+- Purely Chinese lane names being silently dropped (#379), wrong outbound IDs for aggregate models (#323), RTK treating source code as a clean git state (#322/#389).
+- Blank-response judgment in five adapters and protocol integrity of mixed tool/thinking streams (#397), blank-history serialization (#308), and parallel image and tool results (#112).
+- Account rotation after Raccoon/Loomy credits are exhausted, accurate renewal attribution and credit error messages (#382/#166); covering HTTP 402, SSE business errors and HTTP 200 JSON business errors.
+- Re-entry of stale idle events in auto-resume, user stop, lifecycle teardown and the real host inbox structure (#282).
+- Hiding individual models and groups, restore entry points and persistence across restarts (#409/#319/#317/#276/#182/#116); ambiguity in account state/actions and toggle background colour (#212/#115/#218).
+- Probing no longer locks the whole settings page (#194), the user's desired port is kept after a port conflict (#305), and the lane editor shows member capacity and the live intersection (#372).
+- Missing runtime dependencies and frontend resource chunking in the standalone package; an isolated-install resource test was added. The default test entry now includes previously omitted regression suites, and channel source protocol verification was added.
 
-## 验证结果
+## Verification results
 
-| 验证 | 结果与范围 |
+| Verification | Result and scope |
 | --- | --- |
-| 最终代码检查 | `npm run test:contributor`：66/66 套件通过 |
-| 默认完整检查 | `npm test`：65/68；失败仅为 manifest、release、catalog 三项发布一致性门禁 |
-| 类型检查 | 根 adapter 与独立前端通过；vendor 对照原始 HEAD：25 → 21 项诊断，新增 0；vendor 整体仍未通过 |
-| Node 兼容 | Node 22.19.0 与 24.11.1 的重载回归均通过 |
-| 渠道源码兼容 | Node 22.19.0 的渠道源码、真实宿主流协议与收件箱回归通过 |
-| 干净依赖安装 | 独立复制最终源码，不带任何现有 node_modules 或根锁文件；`npm install --ignore-scripts` 及真实宿主/渠道源码测试通过，CI 已补对应安装步骤 |
-| Rust | 4/4 通过，包含真实 Node 进程和 Windows 含空格/中文路径 |
-| 浏览器 | 最终 React、登录套件通过，覆盖桌面、390px、320px、导航、草稿、保存、密钥、会话与退出 |
-| 真实 DSH | 已安装 CLI 0.2.0-rc.2 的完整 web profile，隔离 home，以本地 tarball 从 2.1.0 更新到 2.5.1；真实 API、插件资源、重启和数据保留通过；推理使用本地替身 |
-| Windows 原生 | NSIS 安装、2.5.0 → 2.5.1 覆盖更新、启动、39 项 UI 操作、鉴权、模型列表、设置和 API Key 保留、正常退出、数据锁释放、卸载通过 |
-| 原环境恢复 | 测试使用独立 OFM_HOME/WebView 数据；原安装可执行文件哈希、注册信息和快捷方式已恢复；没有向原有 DSH 进程发送退出信号 |
-| 生成物 | 渠道 pack、独立业务包与前端已统一生成；前端与独立渠道 check 通过 |
-| 真实匿名上游 | 两次请求分别连接重置/Socket 失败；不能标为恢复可用 |
+| Final code check | `npm run test:contributor`: 66/66 suites passed |
+| Default full check | `npm test`: 65/68; the only failures were the manifest, release and catalog release-consistency gates |
+| Type check | Root adapter and standalone frontend passed; vendor compared with the original HEAD: diagnostics 25 → 21, 0 new; vendor as a whole still does not pass |
+| Node compatibility | Reload regressions passed on Node 22.19.0 and 24.11.1 |
+| Channel source compatibility | Channel source, real host streaming protocol and inbox regressions passed on Node 22.19.0 |
+| Clean dependency install | The final source was copied in isolation, with no existing node_modules or root lock file; `npm install --ignore-scripts` and the real host/channel source tests passed, and CI gained the corresponding install step |
+| Rust | 4/4 passed, including a real Node process and Windows paths containing spaces/Chinese characters |
+| Browser | The final React and login suites passed, covering desktop, 390px, 320px, navigation, drafts, saving, keys, sessions and sign-out |
+| Real DSH | The full web profile of installed CLI 0.2.0-rc.2, with an isolated home, updated from 2.1.0 to 2.5.1 from a local tarball; the real API, plugin resources, restart and data retention passed; inference used a local stand-in |
+| Windows native | NSIS install, 2.5.0 → 2.5.1 in-place update, startup, 39 UI operations, authentication, model list, settings and API Key retention, normal exit, data-lock release and uninstall all passed |
+| Original environment restoration | The tests used a separate OFM_HOME/WebView data set; the original installation's executable hash, registration information and shortcuts were restored; no exit signal was sent to the original DSH process |
+| Generated artifacts | The channel pack, standalone business package and frontend were all regenerated uniformly; the frontend and standalone channel checks passed |
+| Real anonymous upstream | Two requests failed with connection reset / Socket failure respectively; cannot be marked as restored and usable |
 
-本地 Windows 安装包仅用于验收，未发布。签名清单仍描述原来的发布字节；代码修改之后三项发布门禁拒绝通过是正确行为，不能复制旧签名、换公钥或跳过校验。未来发布前还须用既有授权签名流程完成一致性准备。
+The local Windows installer package was used for acceptance only and was not released. The signed manifest still describes the original release bytes; after code changes, it is correct behaviour for the three release gates to refuse to pass — an old signature must not be copied, a public key must not be swapped, and validation must not be skipped. Before any future release, the consistency preparation must also be completed using the existing authorized signing process.
 
-## 尚未解决的边界
+## Boundaries not yet resolved
 
-- npm latest 实测仍是 2.1.0。#407/#408/#335/#378/#404 等线上包管理器回退/分发问题，需要发布渠道同步；本地 tarball 更新成功不能替代 npm 发布。
-- #315 的真实活跃 AgentLoop 工具/skill 上下文问题，#263 的 macOS Electron/undici QoS 路径，仍需相应宿主/操作系统下的复现。当前 Windows 结果不覆盖 macOS/Linux/手机实机。
-- 新供应商、独立端完整英文、独立 LAN/容器部署、跨账号路由能力及其他未实现产品需求保留在下表中；没有把“不做产品决策”写成“已修复”。
+- npm latest was still measured as 2.1.0. Online package-manager rollback/distribution issues such as #407/#408/#335/#378/#404 require the release channels to be synchronized; a successful local tarball update is no substitute for an npm release.
+- The real active AgentLoop tool/skill context issue in #315 and the macOS Electron/undici QoS path in #263 still need reproduction under the corresponding host/operating system. The current Windows results do not cover real macOS/Linux/phone devices.
+- New providers, full English for the standalone app, standalone LAN/container deployment, cross-account routing capability and other unimplemented product requirements remain in the table below; “no product decision made” was not written up as “fixed”.
 
-原始快照、各域完整证据、最终测试日志、安装记录和截图保存在本仓库 `.verify/issue-audit-20261017/`；该目录被忽略，不随插件或发布包分发。机器可读总账为同目录 `audit-ledger.json`。
+The original snapshot, the full evidence for each area, the final test logs, installation records and screenshots are stored in this repository's `.verify/issue-audit-20261017/`; that directory is ignored and is not distributed with the plugin or release packages. The machine-readable ledger is `audit-ledger.json` in the same directory.
 
-## 逐条判断
+## Per-issue judgments

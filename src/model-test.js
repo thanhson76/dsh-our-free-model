@@ -74,7 +74,7 @@ export async function runModelTest(createStream, { signal, timeoutMs = MODEL_TES
 
 /** Keep manual samples apart from the automatic round so an older probe cannot erase them. */
 export function modelAvailability(id, snapshot, listed = false) {
-  // 旧出口的测量仍保留在磁盘，但不再作为当前出口的可用性判定。
+  // Measurements from the old egress remain on disk, but are no longer used to judge the current egress's availability.
   const probeRow = listed ? undefined : snapshot?.results?.[id]
   const manualRow = snapshot?.manualResults?.[id]
   const probe = probeRow?.stale === true ? undefined : probeRow

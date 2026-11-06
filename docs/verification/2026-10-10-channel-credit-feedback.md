@@ -1,84 +1,84 @@
-# issue #178：渠道余额反馈验收
+# Issue #178: Channel Balance Feedback Acceptance
 
-日期：2026-10-10。范围：共享渠道页面、插件 RPC、独立服务生成产物。
+Date: 2026-10-10. Scope: the shared channels page, the plugin RPC, and the generated standalone service artifacts.
 
-## 问题定位
+## Locating the problem
 
-issue #178 引用的 ZCode 注释描述历史上的凭据回退问题。当前版本已经优先读取账号池，余额 RPC 也按账号的 `credentialRef` 解析凭据。使用仅有账号池凭据的替身测试确认七个渠道能查余额，ZCode 的 `current()` 和 `status()` 能读取账号池。
+The ZCode comment quoted by issue #178 describes a historical credential fallback problem. The current version already reads the account pool first, and the balance RPC also resolves credentials by the account's `credentialRef`. A substitute test using account-pool-only credentials confirmed that seven channels can query their balance, and that ZCode's `current()` and `status()` can read the account pool.
 
-本次确认并修复的共享页面问题：
+The shared-page problems confirmed and fixed in this round:
 
-- 余额能力名单遗漏 TRAE、Cline、Raccoon、ZCode、Gemini。
-- 查询异常与单账号失败没有展示；签到状态重复解包，今日已领徽标失效。
-- Gemini 会缓存失败结果，手动刷新必须携带可选 `force: true` 才能真正重试。
+- The balance-capability list omitted TRAE, Cline, Raccoon, ZCode, and Gemini.
+- Query errors and single-account failures were not displayed; the check-in status was unwrapped twice, breaking the "claimed today" badge.
+- Gemini caches failed results, so a manual refresh must carry the optional `force: true` to actually retry.
 
-没有验证真实账号或上游，因此不声称解决了所有厂商的登录与余额协议问题。
+No real accounts or upstreams were verified, so this does not claim to have solved the login and balance protocol problems of every vendor.
 
-## 能力与数据边界
+## Capability and data boundaries
 
-独立签到状态查询仅使用已有后端真实支持的渠道。所有渠道保留原登录、续期与领取协议。
+The standalone check-in status query only uses channels that the existing backend genuinely supports. All channels keep their original login, renewal, and claim protocols.
 
-零余额正常显示。失败显示未知余额及后端原因；部分失败保留成功账号余额并显示失败计数。Gemini 的不同配额窗口分别展示，卡片汇总只显示已查询账号数。
+A zero balance is displayed normally. A failure displays an unknown balance and the backend reason; a partial failure keeps the balances of the successful accounts and displays the failure count. Gemini's different quota windows are displayed separately, and the card summary only shows the number of accounts queried.
 
-手动刷新和账号写入后的查询携带 `force: true`；只有 Gemini 消费该选项，自动读取保留原缓存。余额请求按代次隔离，写入前的迟到结果与卸载后的结果不能覆盖新状态。重复点击领取不会重复发送请求。
+Manual refreshes and queries after an account write carry `force: true`; only Gemini consumes that option, and automatic reads keep the original cache. Balance requests are isolated by generation, so a late result from before a write, or a result arriving after unmounting, cannot overwrite the new state. Repeated clicks on claim do not send the request repeatedly.
 
-## 实际验证
+## Actual verification
 
-最终源码与生成产物已执行：
+The final source and generated artifacts were run:
 
-提交前合入主线 `0b7ec68`（含 PR #190 的 UI 动画），生成文件冲突通过重新构建解决。合并后再次执行贡献者回归 33/33、页面生成检查、文案检查和独立端类型检查，并刷新部分成功页面截图。
+Merged mainline `0b7ec68` before committing (including the UI animation from PR #190), and resolved the generated-file conflict by rebuilding. After the merge, ran the contributor regression suite again, 33/33, the page-generation check, the copy check, and the standalone type check, and refreshed the partial-success page screenshot.
 
-| 命令 | 结果 |
+| Command | Result |
 | --- | --- |
-| `node scripts/build-channel-pack.mjs` | 成功，pack 约 2.74 MiB |
-| `node scripts/build-standalone-channels.mjs` | 成功 |
-| `node scripts/channel-pack-test.mjs` | 通过，含共享页面及实际 RPC 回归 |
-| `node scripts/standalone-channels-test.mjs` | 12/12 通过 |
-| `node scripts/test-all.mjs --mode contributor` | 33/33 通过 |
-| `node scripts/client-lint.mjs` | 424 个文案键、141 条样式规则通过 |
-| `node --check scripts/standalone-ui-preview.mjs` | 通过 |
-| `node scripts/build-standalone-ui.mjs --check` | 10 个本地资源一致；两条既有 lucide `use client` 忽略警告 |
-| `npm run typecheck:standalone` | 通过 |
-| `git diff --check` | 通过 |
-| `node scripts/test-all.mjs --mode release` | 0/3；清单摘要、大小和 catalog revision 未更新 |
+| `node scripts/build-channel-pack.mjs` | Succeeded, pack about 2.74 MiB |
+| `node scripts/build-standalone-channels.mjs` | Succeeded |
+| `node scripts/channel-pack-test.mjs` | Passed, including the shared page and actual RPC regression |
+| `node scripts/standalone-channels-test.mjs` | 12/12 passed |
+| `node scripts/test-all.mjs --mode contributor` | 33/33 passed |
+| `node scripts/client-lint.mjs` | 424 copy keys and 141 style rules passed |
+| `node --check scripts/standalone-ui-preview.mjs` | Passed |
+| `node scripts/build-standalone-ui.mjs --check` | 10 local resources consistent; two pre-existing lucide `use client` ignore warnings |
+| `npm run typecheck:standalone` | Passed |
+| `git diff --check` | Passed |
+| `node scripts/test-all.mjs --mode release` | 0/3; the manifest digest, sizes, and catalog revision were not updated |
 
-渠道包构建使用 esbuild 0.24.2、jose 6.2.8、undici 8.11.2，与原产物的依赖代码一致。生成 pack 仅改变 Gemini 调用参数；独立渠道额外更新原包 SHA256。没有手改生成文件或引入依赖升级。
+The channel pack build uses esbuild 0.24.2, jose 6.2.8, and undici 8.11.2, matching the dependency code of the original artifacts. The generated pack only changes the Gemini call parameters; the standalone channels additionally update the original package SHA256. No generated files were edited by hand and no dependency upgrades were introduced.
 
-发布检查失败需要维护者按仓库现有 `release-sign` 流程更新清单、catalog 和签名；本次没有修改信任公钥、伪造签名或发布 release。
+The failing release checks require the maintainer to update the manifest, catalog, and signature following the repository's existing `release-sign` flow; this round did not modify the trust public key, forge a signature, or publish a release.
 
-未执行：真实 DSH 桌面宿主、真实厂商账号、真实签到领取。共享组件与实际插件 bundle 使用替身测试，独立端使用隔离预览服务。
+Not run: a real DSH desktop host, real vendor accounts, or real check-in claims. The shared components and the actual plugin bundle use substitute tests, and the standalone side uses an isolated preview service.
 
-## 浏览器验收
+## Browser acceptance
 
-预览地址：`http://127.0.0.1:18906/?issue=178`。使用专用忽略目录 `.verify/ui-credits-data`，自动签到与模型自动刷新关闭。所有账号、Token 和余额都是替身数据。正式 CLI 不加载预览脚本。
+Preview address: `http://127.0.0.1:18906/?issue=178`. It uses the dedicated ignored directory `.verify/ui-credits-data`, with automatic check-in and automatic model refresh turned off. All accounts, tokens, and balances are substitute data. The production CLI does not load the preview script.
 
-2. 替身上游全部返回 502：显示两个失败账号，汇总为 `—`，没有伪造零余额。
-3. 恢复上游后点击“刷新余额”：正常账号恢复 123，另一个账号仍保留失败状态。
-4. ZCode：卡片和账号行显示 123K Token，保留刷新与领取入口。
-5. Gemini：显示 5 小时窗口 80%、周窗口 40%，汇总为“已查询 1 个账号”，没有领取按钮。
+2. The substitute upstream returns 502 for everything: two failed accounts are displayed, the summary is `—`, and no zero balance is fabricated.
+3. After the upstream recovers, clicking "Refresh balance": the normal account recovers to 123, while the other account keeps its failed state.
+4. ZCode: the card and the account row show 123K tokens, keeping the refresh and claim entry points.
+5. Gemini: shows 80% for the 5-hour window and 40% for the weekly window, summarised as "1 account queried", with no claim button.
 
-### 部分成功
+### Partial success
 
-![正常余额和失败账号并列展示](channel-credit-feedback/partial-success.png)
+![Normal balance and failed accounts displayed side by side](channel-credit-feedback/partial-success.png)
 
-### 查询失败
+### Query failure
 
-![全部失败时显示未知余额及失败提示](channel-credit-feedback/query-failed.png)
+![Unknown balance and a failure notice displayed when everything fails](channel-credit-feedback/query-failed.png)
 
-### 重试恢复
+### Retry recovery
 
-![刷新后恢复正常账号余额](channel-credit-feedback/retry-recovered.png)
+![Normal account balance recovered after refreshing](channel-credit-feedback/retry-recovered.png)
 
 ### ZCode
 
-![ZCode Token 余额及操作](channel-credit-feedback/zcode-controls.png)
+![ZCode token balance and actions](channel-credit-feedback/zcode-controls.png)
 
 ### Gemini
 
-![Gemini 各窗口配额](channel-credit-feedback/gemini-quota.png)
+![Gemini quota for each window](channel-credit-feedback/gemini-quota.png)
 
-## 配置与回退
+## Configuration and rollback
 
-不迁移账号数据，不改变凭据存储位置。RPC 新字段可选，原调用保持兼容。回退本 PR 的代码并重新构建共享页面与独立渠道产物即可；无需删除账号或数据目录。
+No account data is migrated and the credential storage location is unchanged. The new RPC fields are optional, and the original calls remain compatible. Rolling back this PR's code and rebuilding the shared page and standalone channel artifacts is sufficient; there is no need to delete accounts or data directories.
 
-Git 仅包含源码、生成资源、测试、验收文档与实际截图；替身凭据、管理令牌、日志和测试数据目录均未纳入提交。
+Git only includes source code, generated resources, tests, acceptance documentation, and actual screenshots; substitute credentials, management tokens, logs, and test data directories were not included in the commit.

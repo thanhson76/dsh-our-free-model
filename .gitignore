@@ -23,13 +23,13 @@ worker/.env
 c3099.txt
 stats.json
 
-# 本地代码索引及工具状态，不进入仓库。
+# Local code index and tool state; not committed to the repository.
 .aoci/
 /aoci.txt
 /aoci.code.txt
 /aoci.meta.txt
 
-# PR 审查截图保留在本地，按需作为 PR 附件上传。
+# PR review screenshots are kept locally and uploaded as PR attachments as needed.
 .pr-screenshots/
 
 # AOCI agent host integration (machine-bound; do not commit)

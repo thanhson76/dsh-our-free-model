@@ -685,7 +685,7 @@ export function apply(ctx, config) {
 
   // ── the channels' gateway relay ─────────────────────────────────────────────
   /**
-   * The absorbed pack serves every 白嫖 provider through one OpenAI-compatible
+   * The absorbed pack serves every free-channel provider through one OpenAI-compatible
    * gateway on the loopback. The relay is this plugin's own door in front of
    * it: callers authenticate with `chanGateway.relay.key` and the forwarded
    * hop is re-stamped with the gateway's own credential, which never leaves
@@ -1039,9 +1039,9 @@ export function apply(ctx, config) {
   const fenceConnection = connectionAdmissionView(() => optional('connection'))
   // ── the absorbed free-channel pack ──────────────────────────────────────────
   /**
-   * The 白嫖 channels — LobsterAI
-   * (有道), Qoder / Qoder CN (阿里系), TRAE (字节), Cline, Loomy (讯飞), Raccoon
-   * (商汤), MiniMax Code, ZCode (智谱) and Gemini (Google) — are
+   * The free channels — LobsterAI
+   * (NetEase Youdao), Qoder / Qoder CN (Alibaba), TRAE (ByteDance), Cline, Loomy (iFLYTEK), Raccoon
+   * (SenseTime), MiniMax Code, ZCode (Zhipu) and Gemini (Google) — are
    * carried with local integration adaptations from the plugin that shipped them, vendored under
    * `vendor/channel-pack` (provenance in `vendor/channel-pack/NOTICE.md`). Mounting the
    * pack keeps every login flow, account pool, credit claim, model blacklist
@@ -1260,7 +1260,7 @@ export function apply(ctx, config) {
       lanKey: settings.get().forwardLanKey ?? '',
       models: publicModelRows().map(row => row.id),
     }),
-    // The absorbed channel pack's liveness, for the 白嫖接入 page: the page
+    // The absorbed channel pack's liveness, for the free-channels page: the page
     // renders its channel grid from this bit plus the pack's own RPC.
     channels: () => channelPack,
     chanRelay: {
@@ -1487,7 +1487,7 @@ export function apply(ctx, config) {
       // sockets and nothing in them depends on the gateway. Binding them after
       // the full listing + probe round meant a lane that stalled held the port
       // down for the whole round — the settings page still said it was on, and
-      // it only started when the user clicked 应用, whose POST calls
+      // it only started when the user clicked Apply, whose POST calls
       // `syncForward()` by itself.
       await syncForward()
       if (disposed) return

@@ -1,238 +1,237 @@
-# Issue #12：长思考流截断后的有界恢复
+# Issue #12: Bounded Recovery After a Long-Thinking Stream Is Truncated
 
-## 状态与目标
+## Status and goal
 
-- 记录日期：2026-09-30。
-- 当前状态：定向离线回归、全量离线与清单检查已通过；修订恢复提示后，一次真实 MiMo Deep 截断恢复成功。首次真实失败记录保留；真实 dsh UI 仍待完成。
-- 目标：上游在仅返回思考、尚未产生正文或工具调用时无正常结束帧地关闭流，插件最多追加一次请求，尝试根据已收到的思考生成回答。
-- 适用范围：默认对全部模型开放，覆盖 Chat Completions、Messages、Responses 三种上游协议。模型进入恢复流程仍必须满足相同的触发条件。
-- 非目标：无限续接、完整重放原请求、自动恢复已经输出正文或工具调用的回合、保证上游一定能完成回答。
+- Record date: 2026-09-30.
+- Current status: targeted offline regression, the full offline suite and manifest checks have passed; after revising the recovery prompt, one real MiMo Deep truncation recovery succeeded. The first real failure record is retained; the real dsh UI is still to be completed.
+- Goal: when upstream closes the stream with no normal end frame after returning only thinking and before producing any body text or tool call, the plugin appends at most one more request, attempting to generate an answer from the thinking already received.
+- Scope: open to all models by default, covering the three upstream protocols Chat Completions, Messages and Responses. A model entering the recovery flow must still satisfy the same trigger conditions.
+- Non-goals: unlimited continuation, a full replay of the original request, automatically recovering a turn that already output body text or a tool call, or guaranteeing that upstream will be able to complete the answer.
 
-## 已有事实与本次变化
+## Existing facts and this change
 
-v1.3.1 的实现已经能区分正常结束与无结束帧的 EOF。无输出的 EOF 会返回可重试的 `TRANSPORT`；已有输出的 EOF 会返回不可重试的 `STREAM_CUT`。这能防止宿主将同一段长思考整轮重复发送，但纯思考被截断的回合仍没有正文。
+The v1.3.1 implementation could already distinguish a normal ending from an EOF with no end frame. An EOF with no output returns a retryable `TRANSPORT`; an EOF with output returns a non-retryable `STREAM_CUT`. That prevents the host from re-sending the same long thinking for a whole turn, but a turn whose pure thinking is truncated still has no body text.
 
-README 中 304 秒、608 秒、912 秒的重试记录是旧版本的历史证据，不是本次恢复实现的验收结果。上游截断时刻和恢复请求的成功率仍受模型、负载与网络影响。
+The 304-second, 608-second and 912-second retry records in the README are historical evidence from old versions, not acceptance results for this recovery implementation. The moment of upstream truncation and the recovery request's success rate are still affected by the model, load and network.
 
-本次增加的是适配器内部的一次恢复请求。宿主看到的仍是一个逻辑回合；本机统计必须记下最多两次实际发出的物理请求。
+This change adds one recovery request inside the adapter. The host still sees one logical turn; local statistics must record at most two physical requests actually sent.
 
-## 触发条件
+## Trigger conditions
 
-以下条件必须全部满足：
+All of the following conditions must be satisfied:
 
-1. 第一段流自然到达 EOF，且没有协议认可的正常结束帧。
-2. 第一段收到非空思考内容。
-3. 第一段未产生正文，也未产生任何工具调用，包括未完整结束的工具调用。
-4. 用户未取消，调用信号未中止，整体截止时间仍有余量。
-5. 尚未发起过恢复请求。
-6. 思考检查点不超过 131072 个字符，且原始上下文与恢复材料通过保守容量检查。
+1. The first stream segment reaches EOF naturally, with no protocol-recognised normal end frame.
+2. The first segment received non-empty thinking content.
+3. The first segment produced no body text and no tool call of any kind, including a tool call that did not finish completely.
+4. The user has not cancelled, the call signal has not aborted, and the overall deadline still has room.
+5. No recovery request has been sent yet.
+6. The thinking checkpoint does not exceed 131072 characters, and the original context and recovery material pass a conservative capacity check.
 
-正常 `stop`、输出预算用尽、明确的上游失败、地区拒绝、限流、网络异常或取消不能被解释为上述 EOF。第一段完全无输出时，保持原有的空输出失败处理。
+A normal `stop`, an exhausted output budget, an explicit upstream failure, a region refusal, rate limiting, a network anomaly or a cancellation must not be interpreted as the EOF above. When the first segment has no output at all, the original empty-output failure handling is kept.
 
-第二段不会再次进入恢复流程。已经产生正文或工具的第一段仍按原有截断规则结束，避免重复回答或重复执行工具。
+The second segment does not enter the recovery flow again. A first segment that already produced body text or a tool still ends under the original truncation rules, to avoid a repeated answer or repeated tool execution.
 
-恢复段只有在正常结束且产生非空白正文时才算成功。仅有思考、空白正文或结束帧不能被记为已恢复。
+A recovery segment counts as successful only when it ends normally and produces non-blank body text. Thinking alone, blank body text or an end frame cannot be recorded as recovered.
 
-## 恢复材料与工具边界
+## Recovery material and tool boundaries
 
-恢复请求保留原始会话输入，将第一段已收到的思考作为明确标注的检查点文本，要求模型直接整理回答。检查点属于输入材料，不能变成系统指令，也不能被当成待执行的工具结果。不会重新向宿主播放第一段已经输出的思考块。
+The recovery request keeps the original conversation input, takes the thinking received in the first segment as explicitly labelled checkpoint text, and asks the model to organise the answer directly. The checkpoint is input material; it must not become a system instruction, nor be treated as a tool result awaiting execution. The thinking blocks the first segment already output are not replayed to the host.
 
-恢复提示明确说明检查点已经满足原任务要求的长分析，要求结论优先、最多 800 词，不再
-重新开始分析或探索更多构造。800 词是提示约束，不是硬性 token 限制，模型可能不遵守。
-这是一种降级回答，原任务要求的长篇或逐步分析可能被简化；不能承诺每次一定完成。
+The recovery prompt states explicitly that the checkpoint already satisfies the original task's long-analysis requirement, asks for conclusion-first, at most 800 words, and no
+restarting the analysis or exploring more constructions. 800 words is a prompt constraint, not a hard token limit, and the model may not comply.
+This is a degraded answer; a long-form or step-by-step analysis required by the original task may be simplified; it cannot be promised to complete every time.
 
-检查点只在当前调用内存中存在，结束后释放；本机统计、警告和探测摘要不保存或打印思考原文、用户提示词、工具结果、图像和凭据。
+The checkpoint exists only in the current call's memory and is released when it ends; local statistics, warnings and probe summaries do not save or print the original thinking text, user prompts, tool results, images or credentials.
 
-恢复段关闭工具选择，不允许新的工具调用执行。上游免费车道要求的四个工具指纹声明可以保留，但工具禁用必须使用每种协议认可的方言，不能把 Chat 的设置直接当成 Messages 的契约。若上游仍返回工具调用，不能转交宿主执行。
+The recovery segment disables tool selection and allows no new tool call to execute. The four tool fingerprint declarations required by the upstream free lane may be kept, but tool disabling must use the dialect recognised by each protocol; Chat's setting must not be treated directly as the Messages contract. If upstream still returns a tool call, it must not be handed to the host for execution.
 
-第一段与恢复段属于同一个稳定上游 session；恢复段使用新的 request ID，便于区分两次请求。
+The first segment and the recovery segment belong to the same stable upstream session; the recovery segment uses a new request ID, to make the two requests easy to distinguish.
 
-本地转发收到最终失败时，即使已经收到部分正文，非流式 Chat/Responses 也返回 JSON
-502；Chat SSE 返回 error 后 `[DONE]`，不能伪造正常 `stop`。客户端断开会取消当前
-生成段，并阻止后续恢复请求。实际回归结果以本次测试记录为准，真实 dsh UI 尚未运行。
+When local forwarding receives a final failure, even if some body text was already received, non-streaming Chat/Responses returns a JSON
+502; Chat SSE returns an error followed by `[DONE]`, and must not fake a normal `stop`. A client disconnect cancels the current
+generation segment and prevents a subsequent recovery request. The actual regression results are as recorded in this round's test record; the real dsh UI has not yet been run.
 
-## 次数、时限与容量
+## Counts, time limits and capacity
 
-| 约束 | 默认值 | 行为 |
+| Constraint | Default | Behaviour |
 | --- | --- | --- |
-| 恢复次数 | 1 | 每个逻辑回合最多追加一次物理请求 |
-| 逻辑回合总时限 | 900 秒 | 从第一段发起时计算，包含第一段、恢复准备和恢复段 |
-| 恢复段时限 | 300 秒 | 同时受剩余总时限约束，取两者较小值 |
-| 恢复输出上限 | 8192 tokens | 同时受用户原有上限与模型输出容量约束；扣除首段已知输出 tokens 后不足 512 就不恢复 |
-| 检查点大小 | 131072 字符 | 超出时不恢复，不能无提示地裁剪后声称保留了完整思考 |
-| 上下文容量 | 模型已知容量的文本字节估算 | 估算原始文本、检查点、控制提示与输出预留；不计算图片 token，不是精确 tokenizer 校验 |
+| Recovery count | 1 | At most one additional physical request per logical turn |
+| Total time limit per logical turn | 900 seconds | Counted from when the first segment is sent, including the first segment, recovery preparation and the recovery segment |
+| Recovery segment time limit | 300 seconds | Also constrained by the remaining total time limit; the smaller of the two applies |
+| Recovery output cap | 8192 tokens | Also constrained by the user's original cap and the model's output capacity; if less than 512 remains after deducting the first segment's known output tokens, do not recover |
+| Checkpoint size | 131072 characters | If exceeded, do not recover; do not silently trim and then claim the full thinking was kept |
+| Context capacity | A text-byte estimate of the model's known capacity | Estimates the original text, checkpoint, control prompt and output reservation; does not count image tokens and is not an exact tokenizer check |
 
-> 2026-10-05 修订（issue #69/#70）：总时限 480→900 秒、恢复段 180→300 秒。此前的值在
-> 上游号池饱和时（实测 1923 容量 / 2451 并发、首字 34–220 秒、深度思考 6 分钟以上）
-> 会稳定砍掉正常长回合；传输层对「无字节」另有 300 秒空闲截止，墙钟只兜底「持续出帧
-> 但整体慢」的回合，放宽后防挂死语义不变。数值仍只允许向下调整。
+> 2026-10-05 revision (issues #69/#70): the total time limit went 480→900 seconds and the recovery segment 180→300 seconds. The earlier values, when
+> the upstream account pool was saturated (measured 1923 capacity / 2451 concurrent, first token 34–220 seconds, deep thinking over 6 minutes),
+> would reliably cut off normal long turns; the transport layer has a separate 300-second idle deadline for "no bytes", and the wall clock only backstops turns that "keep emitting frames
+> but are slow overall", so relaxing it does not change the anti-hang semantics. The values may still only be adjusted downwards.
 
-用户取消必须中止当前请求并阻止后续请求。取消、总时限耗尽、容量检查拒绝、第二段再次截断或第二段失败都应给出可识别的最终失败，不能伪造正常完成。
+User cancellation must abort the current request and prevent subsequent requests. Cancellation, total-time-limit exhaustion, a capacity-check refusal, the second segment being truncated again, or the second segment failing must all produce a recognisable final failure and must not fake normal completion.
 
-“所有模型开放”指不设模型名单；不表示忽略容量、工具、取消或时限保护，也不表示已经逐一完成真实模型验证。
+"Open to all models" means there is no model list; it does not mean ignoring capacity, tool, cancellation or time-limit protections, nor that real-model verification has been completed one by one.
 
-本机设置 `streamRecovery: false` 关闭恢复；对象形式支持 `enabled` 开关与数值边界。
-数值只允许向下调整，不能突破上述默认上限。超过容量或检查点上限时跳过恢复；恢复失败
-返回 `STREAM_CUT`，防止宿主重新发送整个长思考回合。用户取消是例外，仍返回
-`kind: 'aborted'` 和 `code: 'ABORTED'`，不能改写成截断或重试。
+Setting `streamRecovery: false` locally disables recovery; the object form supports an `enabled` switch and numeric bounds.
+Numeric values may only be adjusted downwards and cannot break through the default caps above. When the capacity or checkpoint cap is exceeded, recovery is skipped; a recovery failure
+returns `STREAM_CUT`, preventing the host from re-sending the whole long-thinking turn. User cancellation is the exception and still returns
+`kind: 'aborted'` and `code: 'ABORTED'`; it must not be rewritten as a truncation or retry.
 
-文本字节检查会略去 `image_url` 和 `data` 内容，不能保证多模态输入的实际 token 总量
-低于模型窗口；模型容量未知时也不能宣称已经通过精确容量校验。上游仍可能拒绝恢复请求。
+The text-byte check skips `image_url` and `data` content and cannot guarantee a multimodal input's actual total tokens
+are below the model window; nor, when the model capacity is unknown, can it claim to have passed an exact capacity check. Upstream may still refuse the recovery request.
 
-## Usage 与本机统计
+## Usage and local statistics
 
-### 逻辑回合
+### Logical turns
 
-适配器最终只发出一个逻辑回合的 usage 汇总和最终结束结果。usage 汇总只相加上游实际报告的已知计数；缺少某一段的 usage 时，不能根据思考字符数推算 token，也不能把未知用量写成已确认的零。
+In the end the adapter emits only one logical turn's usage summary and final end result. The usage summary only adds up the known counts actually reported by upstream; when one segment's usage is missing, tokens must not be inferred from the thinking character count, and unknown usage must not be written as a confirmed zero.
 
-如果宿主 usage 契约不能表达缺失计数，兼容字段只返回已知部分；本机样本同时明确标记存在缺失，避免把该汇总描述成整轮完整用量。
+If the host usage contract cannot express a missing count, the compatibility field returns only the known part; the local sample also explicitly marks that something is missing, to avoid describing that summary as the whole turn's complete usage.
 
-### 物理请求
+### Physical requests
 
-每个实际发出的请求分别进入 `recordUsage`，因此一段截断后恢复成功的逻辑回合会留下两条样本：
+Each request actually sent enters `recordUsage` separately, so a logical turn that is truncated in one segment and then recovers successfully leaves two samples:
 
-- 第一段：截断失败；保留实际已知 usage；缺 usage 时显式标记 `noUsage`。
-- 第二段：按实际结束结果记录成功或失败；保留其实际已知 usage；缺 usage 时同样标记 `noUsage`。
+- First segment: a truncation failure; keeps the actual known usage; when usage is missing, explicitly marks `noUsage`.
+- Second segment: recorded as a success or failure according to the actual end result; keeps its actual known usage; when usage is missing, likewise marks `noUsage`.
 
-请求总数和各模型 calls 增量对应物理请求数。恢复元数据包括 `recoveryId`、`attempt`（0/1）、`recoveryAttempt`、`recoveryScheduled`、`recovered` 和 `noUsage`。缺失信息记录在各段样本的 `noUsage` 中，通过相同 `recoveryId` 关联判断；没有单独的整轮缺失字段。验收须读取落盘样本，而不是只检查适配器回调。
+The total request count and each model's calls increment correspond to the number of physical requests. The recovery metadata includes `recoveryId`, `attempt` (0/1), `recoveryAttempt`, `recoveryScheduled`, `recovered` and `noUsage`. Missing information is recorded in each segment sample's `noUsage` and correlated via the same `recoveryId`; there is no separate whole-turn missing field. Acceptance must read the persisted samples, not only check the adapter callbacks.
 
-`src/store.js` 采用显式样本字段列表，已经加入上述恢复元数据的持久化；新字段不能只由适配器传入，否则落盘时会被丢弃。正常已完成但无 usage 的请求也保留缺失标记。
+`src/store.js` uses an explicit sample field list, to which the persistence of the recovery metadata above has been added; a new field cannot be passed in by the adapter alone, or it will be dropped when persisted. Requests that completed normally but have no usage also keep the missing mark.
 
-失败段的耗时不能加入成功解码速度；恢复段测速只使用该段自己的解码窗口与对应已知 token，不能把两段时间和一段 token 混合相除。
+A failed segment's duration must not be added to the successful decoding speed; the recovery segment's speed measurement uses only that segment's own decoding window and its corresponding known tokens, and must not mix the two segments' time with one segment's tokens in a division.
 
-## 验收条件
+## Acceptance conditions
 
-| 场景 | 预期结果 | 当前证据状态 |
+| Scenario | Expected result | Current evidence state |
 | --- | --- | --- |
-| 三种协议：第一段只有思考且 EOF，第二段正常回答 | 两次上游请求；只输出一次非空白正文；最终正常结束 | 离线套件结果见下节；真实 Chat/MiMo 成功一次，其他模型及协议未逐一实测 |
-| 任意模型进入同一恢复条件 | 不受模型名单限制 | 离线套件结果见下节；真实模型不能宣称逐一验证 |
-| 第一段已有正文 | 不追加恢复请求，保留截断失败 | 离线套件结果见下节 |
-| 第一段已有工具调用，含不完整调用 | 不恢复、不重复执行工具 | 离线套件结果见下节 |
-| 第一段有正常终止帧或达到输出上限 | 保持协议对应结束结果，不恢复 | 离线套件结果见下节 |
-| 第一段或两段间取消 | 不产生第二次请求；结果为取消 | 离线套件结果见下节 |
-| 第二段取消、超时、截断或明确错误 | 最终失败，不能发出第三次请求；取消保持 ABORTED | 离线套件结果见下节 |
-| 第二段只有空白正文 | 不记为恢复成功 | 离线套件结果见下节 |
-| 三种协议的恢复请求工具设置 | 声明满足指纹要求；工具调用关闭且不可执行 | 离线套件结果见下节 |
-| 检查点超过字符上限或文本上下文估算不足 | 拒绝恢复，保留可识别失败 | 离线套件结果见下节 |
-| 剩余已知输出预算不足 512 tokens | 不发起恢复请求 | 离线套件结果见下节 |
-| 第一段无 usage、第二段有 usage | 最终 usage 为第二段已知值；第一条样本 noUsage 与 recoveryId 落盘 | 离线套件结果见下节 |
-| 两段均有 usage | 已知计数相加；请求计数为 2，不能重复记账 | 离线套件结果见下节 |
-| 两段均无 usage | 各段 noUsage 明确；不以零值伪装完整用量 | 离线套件结果见下节 |
-| 本地转发与宿主消费 | 一个逻辑回合能接收恢复正文及最终结束结果 | 真实插件 + 本地 HTTP 集成验证通过；真实 dsh UI 未执行 |
-| 真实上游长思考请求 | 记录实际模型、协议、耗时、两段样本和最终结果 | 第一次恢复达到总截止后失败；提示修订后第二次恢复成功，见下节 |
+| Three protocols: the first segment has only thinking and EOFs, the second segment answers normally | Two upstream requests; only one non-blank body text output; a normal final ending | For the offline suite results, see the next section; one real Chat/MiMo success, other models and protocols not measured one by one |
+| Any model entering the same recovery condition | Not restricted by a model list | For the offline suite results, see the next section; real models cannot be claimed verified one by one |
+| The first segment already has body text | No recovery request is appended; the truncation failure is kept | For the offline suite results, see the next section |
+| The first segment already has a tool call, including an incomplete one | No recovery, no repeated tool execution | For the offline suite results, see the next section |
+| The first segment has a normal termination frame or reaches the output cap | The protocol's corresponding end result is kept; no recovery | For the offline suite results, see the next section |
+| Cancellation during the first segment or between the two segments | No second request is produced; the result is a cancellation | For the offline suite results, see the next section |
+| The second segment is cancelled, times out, is truncated or has an explicit error | A final failure; no third request may be sent; a cancellation stays ABORTED | For the offline suite results, see the next section |
+| The second segment has only blank body text | Not recorded as a recovery success | For the offline suite results, see the next section |
+| The recovery requests' tool settings on three protocols | Declarations satisfy the fingerprint requirements; tool calls are off and not executable | For the offline suite results, see the next section |
+| The checkpoint exceeds the character cap, or the text-context estimate is insufficient | Recovery is refused; a recognisable failure is kept | For the offline suite results, see the next section |
+| The remaining known output budget is under 512 tokens | No recovery request is sent | For the offline suite results, see the next section |
+| The first segment has no usage, the second segment has usage | The final usage is the second segment's known value; the first sample's noUsage and recoveryId are persisted | For the offline suite results, see the next section |
+| Both segments have usage | The known counts are added; the request count is 2, with no double counting | For the offline suite results, see the next section |
+| Neither segment has usage | Each segment's noUsage is explicit; zero values do not fake complete usage | For the offline suite results, see the next section |
+| Local forwarding and host consumption | One logical turn can receive the recovered body text and the final end result | Verified through a real plugin + local HTTP integration; the real dsh UI was not run |
+| A real upstream long-thinking request | Record the actual model, protocol, duration, both segments' samples and the final result | The first recovery failed after reaching the total deadline; after the prompt revision, the second recovery succeeded — see the next section |
 
-离线测试应通过本地上游服务控制 EOF、结束帧、usage、工具和取消，验证实际请求数及发出的请求体。真实探测使用 `scripts/probes/long-think-truncation.mjs`，会访问上游并消耗免费车道额度；未运行时不得写成通过。
+Offline tests should use a local upstream service to control EOF, end frames, usage, tools and cancellation, and verify the actual number of requests and the request bodies sent. Real probing uses `scripts/probes/long-think-truncation.mjs`, which accesses upstream and consumes free-lane quota; if it was not run, it must not be written as passed.
 
-## 验收记录
+## Acceptance record
 
-以下是本次主代理提供的实际离线结果，记录于 2026-09-30；本记录编辑者未重复运行这些测试。
+The following are the actual offline results provided by this round's main agent, recorded on 2026-09-30; the editor of this record did not re-run these tests.
 
-| 检查 | 已收到的结果 | 限制 |
+| Check | Result received | Limitation |
 | --- | --- | --- |
-| `scripts/recovery-test.mjs` | 100/100 通过，退出码 0 | 本地受控上游回归，不代表真实模型成功率 |
-| `scripts/fingerprint-test.mjs` | 新增 11 项通过 | 不把新增断言数写成套件总数 |
-| `scripts/truncation-test.mjs` | 35/35 通过 | 本地截断与终帧回归 |
-| `npm run typecheck` | 退出码 0 | 静态类型检查，不替代运行时验收 |
-| 真实插件转发 + 本地 HTTP | 12 项集成验证通过 | 2 项恢复成功与落盘、6 项部分正文后的 EOF/错误、4 项首段/恢复段 SSE/JSON 客户端断开；不是在线上游或真实 dsh UI |
-| `node scripts/build-manifest.mjs --force` | 退出码 0；29 个发布文件，465385 字节 | 只生成本地清单，没有提交或发布 |
-| `npm test` | 19/19 套件通过，退出码 0 | 包含 manifest、release、catalog 与 recovery |
-| `npm run manifest:check` | 退出码 0 | 两份清单与全部 29 个发布文件一致 |
-| `git diff --check` | 退出码 0 | 无空白错误，不替代行为验证 |
+| `scripts/recovery-test.mjs` | 100/100 passed, exit code 0 | A locally controlled upstream regression; does not represent real-model success rates |
+| `scripts/fingerprint-test.mjs` | 11 new items passed | Does not write the number of new assertions as the suite total |
+| `scripts/truncation-test.mjs` | 35/35 passed | Local truncation and end-frame regression |
+| `npm run typecheck` | Exit code 0 | A static type check; no substitute for runtime acceptance |
+| Real plugin forwarding + local HTTP | 12 integration verifications passed | 2 recovery successes with persistence, 6 EOF/error after partial body text, 4 first-segment/recovery-segment SSE/JSON client disconnects; not an online upstream or the real dsh UI |
+| `node scripts/build-manifest.mjs --force` | Exit code 0; 29 release files, 465385 bytes | Only generated a local manifest; nothing was committed or released |
+| `npm test` | 19/19 suites passed, exit code 0 | Includes manifest, release, catalog and recovery |
+| `npm run manifest:check` | Exit code 0 | Both manifests match all 29 release files |
+| `git diff --check` | Exit code 0 | No whitespace errors; no substitute for behaviour verification |
 
-Responses cancelled、failed 缺少 status、Chat content_filter、两段间取消仍保留已知
-usage 等边界也已通过本次 recovery 回归。测试扩展已结束，发布清单已刷新，最终 19 个
-套件统一运行通过。
+Boundaries such as Responses cancelled, failed missing a status, Chat content_filter, and cancellation between the two segments still keeping the known
+usage have also passed this recovery regression. Test expansion has ended, the release manifest has been refreshed, and the final 19
+suites were run uniformly and passed.
 
-### 真实上游第一轮：恢复失败
+### Real upstream, first round: recovery failed
 
-执行命令：
+Command executed:
 
 ```powershell
 node .verify/issue-12/repro.mjs --mode thinking --effort deep
 ```
 
-证据文件：
+Evidence files:
 
 - `.verify/issue-12/2026-09-30T08-59-34-775Z-thinking-result.json`
 - `.verify/issue-12/2026-09-30T08-59-34-775Z-thinking-trace.jsonl`
 
-MiMo V2.6 Flash · Deep，Chat 协议，原输出预算 32768。第一段在 303.882 秒自然 EOF，
-没有 finish 或 `[DONE]`；插件实际发起第二次 HTTP 请求。两段累计收到思考 63123
-字符，没有正文和工具。总截止在 480.024 秒结束请求，最终为 `error / STREAM_CUT`，
-不可重试；探测端未主动取消。两条物理请求样本均带 `noUsage`，因此零值汇总表示没有
-已知计数，不能解释为两段没有花费 token。
+MiMo V2.6 Flash · Deep, Chat protocol, original output budget 32768. The first segment EOF'd naturally at 303.882 seconds,
+with no finish or `[DONE]`; the plugin actually sent a second HTTP request. The two segments accumulated 63123 received
+characters of thinking, with no body text or tools. The total deadline ended the request at 480.024 seconds, ending as `error / STREAM_CUT`,
+not retryable; the probing side did not cancel proactively. Both physical request samples carry `noUsage`, so a zero-value summary means there are no
+known counts and cannot be interpreted as the two segments spending no tokens.
 
-这次失败说明初版恢复提示仍让模型延续原任务的长分析。随后收紧提示：检查点已满足旧
-任务的长分析要求，直接输出结论优先、最多 800 词的答案，不重新分析或探索额外构造。
-保留失败证据，不将“发出了恢复请求”当成“恢复成功”。
+This failure shows that the first version's recovery prompt still let the model continue the original task's long analysis. The prompt was then tightened: the checkpoint already satisfies the old
+task's long-analysis requirement, so output a conclusion-first answer of at most 800 words directly, without re-analysing or exploring additional constructions.
+The failure evidence is retained; "a recovery request was sent" is not treated as "recovery succeeded".
 
-### 真实上游第二轮：提示修订后恢复成功
+### Real upstream, second round: recovery succeeded after the prompt revision
 
-执行同一命令，证据文件：
+The same command was executed, with evidence files:
 
 - `.verify/issue-12/2026-09-30T09-08-57-348Z-thinking-result.json`
 - `.verify/issue-12/2026-09-30T09-08-57-348Z-thinking-trace.jsonl`
 
-| 观测 | 实际结果 |
+| Observation | Actual result |
 | --- | --- |
-| 模型、档位、协议 | MiMo V2.6 Flash · Deep，Chat |
-| 第一段 | 304.161 秒自然 EOF，无 finish、无 `[DONE]` |
-| 恢复段 | 32.777 秒，收到 4264 字符非空白正文，无工具 |
-| 正常收尾 | 原始 `stop` 在 336.910 秒，usage 在 336.920 秒，`[DONE]` 在 336.924 秒 |
-| 逻辑结果 | `stop`，总耗时 336.942 秒；探测端未主动取消 |
-| 请求次数 | 2；使用同一 session、恢复段新 request ID 的约定由代码和离线检查覆盖 |
-| 第一条样本 | `attempt:0`、`ok:false`、`truncated:true`、`noUsage:true`、`recoveryScheduled:true` |
-| 第二条样本 | `attempt:1`、`ok:true`、`recoveryAttempt:true`、`recovered:true` |
-| 已知 usage | uncached input 12380、cached input 192、output 1475，其中 reasoning 397；total 14047 包含 cached input |
+| Model, level, protocol | MiMo V2.6 Flash · Deep, Chat |
+| First segment | A natural EOF at 304.161 seconds, no finish, no `[DONE]` |
+| Recovery segment | 32.777 seconds, received 4264 characters of non-blank body text, no tools |
+| Normal wrap-up | The original `stop` at 336.910 seconds, usage at 336.920 seconds, `[DONE]` at 336.924 seconds |
+| Logical result | `stop`, total duration 336.942 seconds; the probing side did not cancel proactively |
+| Request count | 2; using the same session, and the recovery segment having a new request ID, is covered by the code and offline checks |
+| First sample | `attempt:0`, `ok:false`, `truncated:true`, `noUsage:true`, `recoveryScheduled:true` |
+| Second sample | `attempt:1`, `ok:true`, `recoveryAttempt:true`, `recovered:true` |
+| Known usage | uncached input 12380, cached input 192, output 1475, of which reasoning 397; total 14047 includes the cached input |
 
-两段样本共享 `recoveryId`，只记两次物理请求。第一段用量未知，最终 usage 仅汇总
-已收到的第二段计数；14047 不能描述成整轮完整 token 总量。
+The two samples share a `recoveryId` and record only two physical requests. The first segment's usage is unknown, and the final usage only summarises
+the second segment's counts that were received; 14047 must not be described as the whole turn's complete token total.
 
-该结果证明这一条真实请求发生了截断并通过新请求生成答案，不能推出所有模型、三种
-真实协议或任意长任务都已通过。真实 dsh UI 未运行；本地插件转发的 12 项集成回归
-已通过。最终全量离线检查、发布清单一致性与静态类型检查均已通过。
+This result proves that this one real request was truncated and generated an answer through a new request; it cannot be extrapolated to all models, all three
+real protocols, or arbitrary long tasks having passed. The real dsh UI was not run; the local plugin forwarding's 12 integration regressions
+have passed. The final full offline checks, release manifest consistency and static type checks have all passed.
 
-双语 README 属于发布文件，修改后必须重新生成并核对 `feed/manifest.json` 与 `catalog/integrity.json`。本设计文档及探测脚本不在发布文件列表中。提交、推送、tag、Release 与 CDN purge 仍由用户的发布授权决定。
+The bilingual READMEs are release files, so after modification `feed/manifest.json` and `catalog/integrity.json` must be regenerated and verified. This design document and the probing scripts are not in the release file list. Committing, pushing, tagging, Release and CDN purge are still decided by the user's release authorisation.
 
-## 合并前 review 修复
+## Pre-merge review fixes
 
-review 提出两处，均在真实插件 + 本地 HTTP 的入口上复现后再修，没有只靠读代码定案。
+The review raised two points, both reproduced at the entry of a real plugin + local HTTP before being fixed, rather than decided by reading code alone.
 
-1. **一个恢复回合把丢弃内容的告警累积了三倍。** `payloadFor` 复用回合级共享的
-   `warnings` 数组，而检查点容量估算要另建一份 payload、续写段还要再建一份，三次
-   `buildPayload` 各自向同一个数组 push。取证：构造一段带两张无法解析图片的恢复回合
-   （Chat 协议，首段纯思考 EOF，续写正常 `stop`），两段样本的 `warnings` 各含 **6** 条
-   `image-dropped`，用户可见的那行 warn 同样重复 6 次；`src/adapter.js` 改动前只有一次
-   build，因此这是本 PR 引入的。另一半问题是首段样本持有的是数组引用，后段 build 追加
-   时它也会跟着变。
-   修法：告警只由首段（canonical）payload 收集，估算与续写段各用一次性数组，丢弃内容
-   的集合本来就不会变。修后同一回合为 2 条，warn 行 1 条。
-2. **首段撞上限时的文案把没发生过的恢复说成已发生。** `expired` 只判断是否超时，不区分
-   段号，首段超时也报 "automatic recovery reached its time limit"。改为按该段实际生效的
-   deadline 报 `our free model reached its Ns time limit before its finish token`，续写段
-   另加后缀；这条只在 `streamRecovery` 启用时才会触发，关掉后仍无任何客户端时限。
+1. **One recovery turn accumulated three times the discarded-content warnings.** `payloadFor` reuses the turn-level shared
+   `warnings` array, while the checkpoint capacity estimate builds another payload and the continuation segment builds yet another, so three
+   `buildPayload` calls each push into the same array. Evidence: construct a recovery turn with two unparseable images
+   (Chat protocol, first segment pure-thinking EOF, continuation a normal `stop`); both segments' samples' `warnings` each contain **6**
+   `image-dropped` entries, and the user-visible warn line likewise repeats 6 times; before the `src/adapter.js` change there was only one
+   build, so this was introduced by this PR. The other half of the problem is that the first segment's sample holds an array reference, so when a later build appends, it changes along with it.
+   Fix: warnings are collected only by the first segment's (canonical) payload; the estimate and the continuation segment each use a one-off array, and the set of discarded content
+   does not change anyway. After the fix, the same turn has 2 entries and the warn line 1.
+2. **When the first segment hit the limit, the wording described a recovery that never happened as if it had.** `expired` only judged whether it timed out and did not distinguish
+   the segment number, so a first-segment timeout also reported "automatic recovery reached its time limit". It now reports, according to the deadline actually in effect for that segment,
+   `our free model reached its Ns time limit before its finish token`, with the continuation segment
+   adding a suffix; this only triggers while `streamRecovery` is enabled, and with it off there is still no client time limit at all.
 
-新增回归：`恢复回合的丢弃内容告警不按 payload 重建次数累积`（同时钉住样本数组与用户
-可见文本），另在整轮时限那条既有检查里追加钉住文案中的实际秒数。recovery 由 98 项增至
-99 项——新增的是检查项数，追加断言不单独计数。
+New regressions: `The discarded-content warnings of a recovery turn do not accumulate with the number of payload rebuilds` (pinning both the sample array and the user-
+visible text), plus, in the existing whole-turn time-limit check, additionally pinning the actual seconds in the wording. recovery grew from 98 items to
+99 items — what was added is a check item; appended assertions are not counted separately.
 
-本次修复改动 `src/adapter.js` 与双语 README，属于发布文件，因此
-`node scripts/build-manifest.mjs --force` 重新生成清单：29 个发布文件，
-465932 字节；`npm run manifest:check` 退出码 0。
+This fix changed `src/adapter.js` and the bilingual READMEs, which are release files, so
+`node scripts/build-manifest.mjs --force` regenerated the manifest: 29 release files,
+465932 bytes; `npm run manifest:check` exit code 0.
 
-> 复核修正：上段的"100 项"是把"新增一项检查"和"在既有检查里追加断言"都按检查项计了。
-> 以套件实际输出为准，recovery 为 **99/99**，双语 README 与本文的该项数字已改回 99，
-> 清单随之重算为 29 个发布文件 / 465928 字节。其余数字均出自当次运行输出。
+> Review correction: the "100 items" above counted both "one new check added" and "an assertion appended in an existing check" as check items.
+> Based on the suite's actual output, recovery is **99/99**, and the bilingual READMEs and this document's figure have been changed back to 99,
+> with the manifest recalculated accordingly to 29 release files / 465928 bytes. All other figures come from that run's output.
 
-### Issue #15：物理请求与逻辑回合分开统计
+### Issue #15: Physical requests and logical turns counted separately
 
-已修复。每个实际发出的 HTTP 请求仍由 `recordUsage` 单独记录，因此首段中断、续写成功
-会留下 2 条物理样本，其中首段的 `ok:false` 仍计入请求失败；适配器另在最终结果确定时
-调用一次 `recordTurn`，把同一过程记为 1 个对话回合、0 次回合失败、1 次已恢复。失败、
-取消和生成器清理路径同样只记一条逻辑回合。
+Fixed. Each HTTP request actually sent is still recorded separately by `recordUsage`, so a first segment interrupted and a continuation succeeding
+leaves 2 physical samples, of which the first segment's `ok:false` still counts as a request failure; the adapter additionally, when the final result is determined,
+calls `recordTurn` once, recording the same process as 1 conversation turn, 0 turn failures and 1 recovered. The failure,
+cancellation and generator-cleanup paths likewise record only one logical turn each.
 
-`stats.json` 的 `failedRequests` 保存累计物理失败数，`logical` 保存累计回合结果；看板
-同时展示两套数字，避免把恢复过程中的内部失败说成用户回合失败。v2 及更早数据无法从
-物理样本可靠还原回合边界，迁移会用保留的物理记录建立估算基线，并以 `estimated` 标记；
-升级后的记录精确累加。请求、回合和 Token 总量使用 lifetime 累计；速度、首帧和热力图
-仍使用保留窗口。回归覆盖恢复成功、失败、取消、生成器 `return()`、样本保留和落盘重载。
+`stats.json`'s `failedRequests` stores the cumulative physical failure count, and `logical` stores the cumulative turn results; the dashboard
+displays both sets of numbers at the same time, avoiding describing an internal failure during recovery as a user turn failure. Data from v2 and earlier cannot reliably reconstruct turn boundaries from
+physical samples, so migration builds an estimated baseline from the retained physical records and marks it with `estimated`;
+records after the upgrade accumulate exactly. Request, turn and Token totals use lifetime accumulation; speed, first frame and the heatmap
+still use the retained window. The regressions cover recovery success, failure, cancellation, generator `return()`, sample retention and persisted reload.

@@ -24,7 +24,7 @@ export async function verifyLoginLaunchers() {
   assert.match(args[1], /do script \(item 1 of argv\)/)
   assert.match(args[1], /tell application "Terminal"/)
   assert.ok(!args[1].includes(dataDir))
-  // 用 printf 替代 Node，只验收真实 shell 参数分词，不打开终端或修改剪贴板。
+  // Use printf instead of Node to verify real shell argument splitting only, without opening a terminal or modifying the clipboard.
   const unquote = value => value.slice(1, -1).replaceAll("'\\''", "'")
   const command = unquote(args[2].slice('/bin/sh -c '.length))
   const keyFile = path.posix.join(dataDir, 'settings.json')
@@ -88,7 +88,7 @@ export async function verifyLoginLaunchers() {
   assert.equal(calls.length, 1)
 }
 
-/** 使用替身启动器验收登录前入口，回归测试不弹窗口或接触用户剪贴板。 */
+/** Verifies the pre-login entry point with a stub launcher; the regression test opens no windows and does not touch the user clipboard. */
 export async function verifyLoginTerminal() {
   const { createManagement } = await import('../packages/standalone/management.mjs')
   let baseUrl
@@ -106,7 +106,7 @@ export async function verifyLoginTerminal() {
     loginTerminal: async received => {
       assert.equal(received, dataDir)
       attempts++
-      if (rejectLaunch) throw new Error('测试启动失败')
+      if (rejectLaunch) throw new Error('Test launch failed')
       if (!holdLaunch) return
       const finished = new Promise(resolve => { finishLaunch = resolve })
       launchStarted()
@@ -144,7 +144,7 @@ export async function verifyLoginTerminal() {
     rejectLaunch = false
     const pending = request()
     await Promise.race([started, pending.then(response => {
-      throw new Error(`启动器未执行，请求提前结束：${response.status}`)
+      throw new Error(`The launcher did not run and the request ended early: ${response.status}`)
     })])
     assert.equal((await request()).status, 429)
     assert.equal(attempts, 2)
@@ -162,7 +162,7 @@ export async function verifyLoginTerminal() {
       assert.equal((await request()).status, 200)
       assert.equal(attempts, 3)
     } finally { Date.now = nativeNow }
-    // 打开本机窗口不创建管理会话，网页仍须粘贴令牌登录。
+    // Opening a local window does not create a management session; the web page still requires pasting the token to log in.
     assert.equal((await request({}, source, '/key', 'GET')).status, 401)
   } finally {
     finishLaunch?.()

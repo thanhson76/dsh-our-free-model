@@ -59,7 +59,7 @@ const CATALOG = [
 const STATE = () => ({
   catalog: CATALOG,
   membership: { [ROUTE_MAIN]: CATALOG.map(entry => entry.id), [ROUTE_REGION]: [] },
-  // 原始断流分类独立于续写策略，续写路径由 recovery-test 覆盖。
+  // The raw stream-cut classification is independent of the continuation strategy; the continuation path is covered by recovery-test.
   settings: { enabled: true, defaultMaxTokens: 4096, streamRecovery: false },
   attributionUserAgent: 'test/1.0',
 })

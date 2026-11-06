@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 
-/** 与实际适配器注册入口组合验证槽位资格和跨重试续期预算。 */
+/** Combined with the actual adapter registration entry points, verifies slot eligibility and the refresh budget across retries. */
 export async function verifyChannelQueuePolicies({ makePool, collect, success, sse }) {
   const { registerOpencodeLlm } = await import('../vendor/channel-pack/src/opencode-adapter.ts')
   const slot = (id, kind) => ({ id, kind, apiKey: kind === 'anonymous' ? 'public' : `fixture-${id}`,
@@ -39,9 +39,9 @@ export async function verifyChannelQueuePolicies({ makePool, collect, success, s
             assert.deepEqual(sent, [])
           } else {
             await result
-            assert.deepEqual(sent, ['a', 'a', 'a', scenario.paid ? 'c' : 'b'], `${scenario.kinds} ${transport}: 按模型资格排队换槽`)
+            assert.deepEqual(sent, ['a', 'a', 'a', scenario.paid ? 'c' : 'b'], `${scenario.kinds} ${transport}: queue and rotate slots by model eligibility`)
           }
-          assert.deepEqual(marked, [], '排队不应写额度或认证冷却')
+          assert.deepEqual(marked, [], 'queueing must not write quota or auth cooldowns')
         } finally { globalThis.fetch = originalFetch }
       }
     }
@@ -105,15 +105,15 @@ export async function verifyChannelQueuePolicies({ makePool, collect, success, s
       const result = collect(call.stream({ model, messages: [{ role: 'user', content: [{ type: 'text', text: 'hello' }] }] }))
       if (scenario === 'expiry-queue-auth') {
         await result
-        assert.deepEqual(refreshed, [['a', undefined], ['a', 'auth']], `${provider}: 初始过期和服务端认证保留各自预算`)
+        assert.deepEqual(refreshed, [['a', undefined], ['a', 'auth']], `${provider}: initial expiry and server-side auth keep separate budgets`)
       } else if (scenario === 'auth-queue-rotate-auth') {
         await result
-        assert.deepEqual(refreshed, [['a', 'auth'], ['b', 'auth']], `${provider}: 新账号保留独立预算`)
+        assert.deepEqual(refreshed, [['a', 'auth'], ['b', 'auth']], `${provider}: a new account keeps an independent budget`)
         assert.deepEqual(sent, ['a', 'a', 'a', 'a', 'b', 'b'])
       } else {
         await assert.rejects(result, error => ['AUTH', 'QUOTA_EXCEEDED'].includes(error.code))
-        assert.deepEqual(refreshed, [['a', 'auth']], `${provider}: 排队重启不能重复续期同一账号`)
-        assert.ok(sent.length <= 5, `${provider}: 认证失败必须有界退出`)
+        assert.deepEqual(refreshed, [['a', 'auth']], `${provider}: a queue restart cannot refresh the same account again`)
+        assert.ok(sent.length <= 5, `${provider}: auth failure must exit within a bound`)
       }
     }
     console.log(`ok  ${provider} queue refresh budget: auth→queue→auth, queue→auth→queue→auth, expiry budget, per-account budget, HTTP/SSE, direct/prepared`)
@@ -140,10 +140,10 @@ export async function verifyChannelQueuePolicies({ makePool, collect, success, s
   const call = await mounted.prepareCall('cline', model)
   await Promise.all([adapter, call].map((value, index) => collect(value.stream({ model,
     messages: [{ role: 'user', content: [{ type: 'text', text: `request-${index}` }] }] }))))
-  assert.deepEqual(refreshes, [[undefined, 'auth'], [undefined, 'auth']], '无账号池的并发请求拥有独立续期预算')
+  assert.deepEqual(refreshes, [[undefined, 'auth'], [undefined, 'auth']], 'concurrent requests without an account pool have independent refresh budgets')
   assert.deepEqual([...sends.values()], [3, 3])
 
-  // 凭据刷新成功但存储仍返回过期凭据时，排队重启也不能无限刷新。
+  // When a credential refresh succeeds but storage still returns the expired credential, a queue restart must not refresh indefinitely either.
   credential.expire_time = 1
   const previousRefreshes = refreshes.length
   await assert.rejects(collect(adapter.stream({ model,

@@ -1,4 +1,4 @@
-/** 日趋势使用本地自然日；累计指标始终由服务端累计字段提供。 */
+/** Daily trends use local calendar days; cumulative metrics always come from the server-side cumulative fields. */
 export function usageDays(series, count = 14, now = new Date()) {
   const values = new Map(series.map(row => [row.day, row.total]))
   const today = new Date(now)
@@ -11,11 +11,11 @@ export function usageDays(series, count = 14, now = new Date()) {
   })
 }
 
-/** 视图查询不修改统计；每页 20 条，刷新或筛选后限制在有效页码内。 */
+/** View queries do not modify the statistics; 20 rows per page, clamped to a valid page after a refresh or filter change. */
 export function usageModels(models, { search = '', sort = 'calls', page = 1 } = {}) {
   const query = search.trim().toLocaleLowerCase()
   const matches = models.filter(row => `${row.name} ${row.model}`.toLocaleLowerCase().includes(query))
-  const tie = (a, b) => a.name.localeCompare(b.name, 'zh-CN') || a.model.localeCompare(b.model)
+  const tie = (a, b) => a.name.localeCompare(b.name, 'en-US') || a.model.localeCompare(b.model)
   matches.sort((a, b) => {
     if (sort === 'name') return tie(a, b)
     const value = row => sort === 'tokens' ? row.input + row.output : sort === 'failedTurns' ? row.failedTurns : row.calls

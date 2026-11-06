@@ -1,17 +1,19 @@
 /**
- * 真实上游长思考探测：分别记录原请求结束、自动恢复和最终截断。
+ * Live upstream long-thinking probe: records the original request's finish, automatic recovery and final truncation separately.
  *
- * issue #10 修正了无结束帧的 EOF 被当成 stop；issue #12 在只有思考、
- * 没有正文或工具调用时，默认允许一次检查点新请求。它不是原生 resume。
+ * Issue #10 fixed EOF without a finish frame being treated as stop; issue #12, when there is only thinking
+ * and no body text or tool call, allows one checkpoint new request by default. It is not a native resume.
  *
- * 默认使用恢复实现；--recovery off 可对照不恢复的行为。已有内容的
- * 截断代码是 STREAM_CUT，完全无输出才可能是可重试的 TRANSPORT，
- * 不能只统计 TRANSPORT，也不能把恢复成功算作原请求正常结束。
+ * The recovery implementation is used by default; --recovery off compares against the no-recovery behaviour.
+ * Truncation of existing content has code STREAM_CUT; only a complete absence of output may be a retryable
+ * TRANSPORT, so do not count only TRANSPORT, and do not count a successful recovery as the original request
+ * finishing normally.
  *
- * 脚本会访问真实上游并消耗额度；不输出提示词、思考原文或检查点。
- * 一次没有截断的请求不能证明恢复成功，也不能否定截断检测。
+ * The script reaches the real upstream and spends quota; it does not print the prompt, the original thinking
+ * text or checkpoints. A single request with no truncation neither proves recovery succeeds nor refutes
+ * truncation detection.
  *
- * 运行：node scripts/probes/long-think-truncation.mjs
+ * Run: node scripts/probes/long-think-truncation.mjs
  *       [--model id] [--runs N] [--effort deep] [--recovery on|off]
  */
 
@@ -32,7 +34,7 @@ if (!Number.isInteger(RUNS) || RUNS < 1) throw new Error('--runs must be a posit
 if (RECOVERY !== 'on' && RECOVERY !== 'off') throw new Error('--recovery must be on or off')
 
 /**
- * 原请求不给真实工具，并要求长思考；能否到达上游截断仍需实际观测。
+ * The original request is given no real tools and is asked for long thinking; whether it reaches upstream truncation still needs live observation.
  */
 const PROMPT = 'Without counting on any tool, reason at length and carefully about whether a sorting algorithm that is O(n log n) comparisons on average can also be O(n) worst case, examining three constructions and every place the argument breaks. Do not write the conclusion until the analysis is finished, and write out the full analysis before answering.'
 

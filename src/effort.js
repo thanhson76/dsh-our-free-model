@@ -67,7 +67,7 @@ export function normalizeLevel(level) {
  * The two each failed differently before: a no-menu model inherited `balanced`
  * and had its window cut by a rung it never offered, while a menu model with no
  * rung sent the full capacity and *logged* the default — so the dashboard showed
- * 均衡 next to a 32K generation that 均衡 had never promised.
+ * the Chinese label for Balanced next to a 32K generation that that label had never promised.
  *
  * @param {string|undefined} level - effort id from the harness, when it sent one
  * @param {object} model - catalog entry
@@ -75,7 +75,7 @@ export function normalizeLevel(level) {
  */
 export function resolveLevel(level, model) {
   // A menu model's recorded effort is the level the wire actually carries —
-  // resolving 'high' onto the free ladder's nearest rung logged 均衡 next to a
+  // resolving 'high' onto the free ladder's nearest rung logged the Chinese label for Balanced next to a
   // generation the model delivered at High.
   if (hasDeclaredEffortMenu(model)) {
     const chosen = model.efforts.includes(level) ? level : eacDefaultLevel(model)

@@ -21,7 +21,7 @@ const FALLBACK_CATALOG = buildCatalog([
   'muse-spark-1.3-contributor-free', 'muse-spark-1.2-contributor-free',
 ])
 
-/** 路径由产品入口决定；核心不解析 DSH_HOME，也不发现宿主服务。 */
+/** Paths are decided by the product entry point; the core does not parse DSH_HOME or discover host services. */
 export function createRuntimeStores({ dataDir, logger = console }) {
   if (typeof dataDir !== 'string' || !path.isAbsolute(dataDir)) {
     throw new TypeError('dataDir must be an absolute path')
@@ -53,8 +53,10 @@ export function createRuntimeStores({ dataDir, logger = console }) {
 }
 
 /**
- * 两个产品共同使用的模型运行时。宿主仅注入能力，不传入 Cordis ctx。
- * 创建不启动网络任务；入口先绑定本地监听器，再决定何时刷新和探测。
+ * The model runtime shared by both products. The host injects capabilities
+ * only and does not pass in a Cordis ctx.
+ * Creating it starts no network tasks; the entry point first binds the local
+ * listeners, then decides when to refresh and probe.
  * Optional subscriptionRuntime supplies catalog() and complete(request, onChunk);
  * its helper owns accounting. Call syncAggregateCatalog() after account mutations.
  */
@@ -148,7 +150,7 @@ export function createModelRuntime({
     // real turn stays a turn failure and never fires a background probe.
   })
 
-  // 手动强制刷新不能借用一个因限流而跳过探测的普通刷新。
+  // A manual forced refresh must not piggyback on an ordinary refresh that skipped probing because of rate limiting.
   let catalogRefresh = null
   let catalogRefreshForced = false
   let catalogRefreshProbed = false
@@ -157,7 +159,7 @@ export function createModelRuntime({
     // and every automatic caller passes false. Only an explicit user action (the
     // reprobe button or an explicit caller) asks for `probe: true`.
     const { probe = false, force = false, report = false } = opts ?? {}
-    // 管理接口按需取本轮结果，其他调用仍返回模型数组。
+    // The management interface takes this round's result on demand; other calls still return the model array.
     const result = value => report ? value : value.catalog
     if (disposed) return result({ catalog, sources: {} })
     while (catalogRefresh !== null) {
@@ -216,7 +218,7 @@ export function createModelRuntime({
     try {
       const ids = parseListing(await fetchSealedListing(credential, { signal: lifetime.signal }))
       if (disposed) return
-      // 独立应用授权变更时，旧账号正在返回的清单不得覆盖新状态。
+      // When the standalone app's authorization changes, a listing still returning for the old account must not overwrite the new state.
       if (Object.hasOwn(credential, 'userToken') && sealedCredential()?.userToken !== credential.userToken) return { ok: false, count: sealedCatalog.length, skipped: true }
       if (ids.length > 0) {
         sealedCatalog = buildEacCatalog(ids)
@@ -340,7 +342,7 @@ export function createModelRuntime({
     egress = seen
     if (changed) {
       egressGeneration++
-      // 保留历史记录，但旧出口的成功、拒绝和手动测量均不能代表新出口。
+      // History is kept, but the old egress's successes, refusals and manual measurements can none of them stand for the new egress.
       const expire = rows => Object.fromEntries(Object.entries(rows ?? {}).map(([id, row]) => [id, { ...row, stale: true }]))
       availability.edit(value => ({
         ...value, egress: seen, at: 0,
@@ -350,7 +352,7 @@ export function createModelRuntime({
       probeThrottleStreak = 0
       probeBackoffUntil = 0
       emitTopology()
-      // 只使旧判定失效并通知选择器，不发送任何自动探测请求。
+      // Only invalidate the old verdicts and notify the picker; send no automatic probe requests.
       logger.info?.(`our-free-model: egress changed to ${seen.ip}${seen.country ? ` (${seen.country})` : ''}; previous availability marked stale`)
     }
     return true

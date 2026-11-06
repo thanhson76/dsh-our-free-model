@@ -41,7 +41,7 @@ fs.writeFileSync(path.join(scratch, 'our-free-model', 'settings.json'), JSON.str
 // The sealed roster persists under catalog.json. This composition has no
 // profileContext, so the host gate refuses the lane; the refusal has to say so
 // in the log, and it must not wipe what a desktop session on this install
-// persisted — that wipe in silence is what made "EAC 渠道不显示" undiscoverable.
+// persisted — that wipe in silence is what made "the EAC channel does not show" undiscoverable.
 fs.writeFileSync(path.join(scratch, 'our-free-model', 'catalog.json'), JSON.stringify({
   version: 1, at: 0, entries: [], sealIds: ['deepseek-ai/deepseek-v4.1-flash'],
 }), { mode: 0o600 })

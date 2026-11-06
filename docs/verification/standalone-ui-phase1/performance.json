@@ -1,5 +1,5 @@
 {
-  "method": "自动化刷新或点击至目标可见，包含工具往返，非纯浏览器渲染耗时",
+  "method": "Automated refresh or click until the target is visible; includes tool round trips, not pure browser rendering time",
   "reloadMs": [
     138,
     137,

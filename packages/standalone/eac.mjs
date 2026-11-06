@@ -6,7 +6,7 @@ import { createEacLoginPoller } from '../../src/eac-login.js'
 import { directFetch } from '../../src/eac.js'
 import { openExternal as openSystemBrowser } from './open-external.mjs'
 
-/** 独立产品自己的 EAC 入口；插件仍走 unlockSealedLane 的宿主判定。 */
+/** The standalone product's own EAC entry point; the plugin still goes through unlockSealedLane's host check. */
 export function createStandaloneEac({ dataDir, onSaved = () => {}, credentialOf = openSeal, fetch = directFetch, openExternal = openSystemBrowser }) {
   const file = path.join(dataDir, EAC_USER_FILE)
   const readUser = () => readEacUser(file)
@@ -37,9 +37,9 @@ export function createStandaloneEac({ dataDir, onSaved = () => {}, credentialOf 
     credential() {
       const lane = credential()
       const user = readUser()
-      // 未授权安装不在启动时访问 EAC 上游；授权入口仍可查询网关状态。
+      // An unauthorized installation does not contact the EAC upstream at startup; the authorization entry point can still query the gateway status.
       if (lane?.mode === 'worker' && user === null) return null
-      // 未登录时显式传 null，防止读取插件的默认凭据文件。
+      // When not signed in, pass null explicitly so the plugin's default credential file is not read.
       return lane === null ? null : { ...lane, flavor: 'standalone', userToken: user?.token ?? null }
     },
     cached: () => cached,
@@ -86,7 +86,7 @@ export function createStandaloneEac({ dataDir, onSaved = () => {}, credentialOf 
       poller.reset()
       const lane = credential()
       const user = readUser()
-      // 先清除本地授权；网关不可达也不能继续以旧身份发出请求。
+      // Clear the local authorization first; requests must not keep going out under the old identity even if the gateway is unreachable.
       if (!clearEacUser(file)) return { ok: false }
       generation++
       cached = { available: lane !== null, authorized: false, login: '', local: false }

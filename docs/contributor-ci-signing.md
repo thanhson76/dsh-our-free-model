@@ -1,27 +1,27 @@
-# 贡献者检查与发布签名
+# Contributor Checks and Release Signing
 
-## 目标与约束
+## Goal and constraints
 
-- 普通贡献者无需发布私钥即可验证代码、协议、恢复、前端及 adapter 隔离。
-- main 是现有客户端的自动更新源，合并发布源码前必须完成签名和摘要对齐。
-- 保留既有 Ed25519 公钥、客户端更新源、清单格式和 LF 发布字节约定。
-- 不向 fork PR 提供 Secrets，不在签名 job 执行候选提交的代码或 npm 生命周期。
-- 签名产物只是一份待审查补丁，不自动提交、推送、合并、打 tag 或发布。
-- 假设发布频率较低，优先使用标准 Node/Git，无新增运行依赖；审批和私钥归维护者管理。
+- Ordinary contributors can verify code, protocols, recovery, the frontend and adapter isolation without a release private key.
+- main is the auto-update source for existing clients, so signing and digest alignment must be completed before release sources are merged.
+- Keep the existing Ed25519 public key, the client update source, the manifest format and the LF release-byte convention.
+- Do not provide Secrets to fork PRs, and do not execute a candidate commit's code or npm lifecycle in the signing job.
+- The signing artifact is only a patch awaiting review; it does not automatically commit, push, merge, tag or release.
+- Assume a low release frequency, prefer standard Node/Git, add no new runtime dependencies; approvals and the private key are managed by the maintainer.
 
-## 决策记录
+## Decision record
 
-| 决策 | 考虑过的方案 | 选择原因 |
+| Decision | Alternatives considered | Reason for the choice |
 | --- | --- | --- |
-| 将代码检查与发布就绪分开 | 所有 PR 都跑签名摘要校验；直接删掉发布校验 | 前者把维护者签名待办混入代码失败，后者会放行损坏的更新源 |
-| 默认 `npm test` 仍为完整验证 | 默认跳过发布套件 | 避免旧命令静默失去发布保护 |
-| 可信 main 脚本读取候选 Git 对象 | 带私钥 checkout PR 并运行其构建脚本 | 候选脚本及 `src/updater.js` 都可能被贡献者更改，不能在 Secrets job 导入 |
-| 受保护手动流程生成补丁 | 合并后自动重签；自动向 main 写入 | main 即更新源，合并到重签之间的漂移会影响旧客户端；补丁可在合并前审查 |
-| 保留发布就绪合并门禁 | 普通代码检查通过就直接合并 | 代码通过与可安全升级是两件独立的验收事实 |
+| Separate code checks from release readiness | Run the signing digest check on all PRs; delete the release check outright | The former mixes the maintainer's signing to-do into code failures; the latter would let a broken update source through |
+| The default `npm test` remains the full verification | Skip the release suite by default | Avoids the old command silently losing release protection |
+| Trusted main scripts read candidate Git objects | Check out the PR with the private key and run its build scripts | Candidate scripts and `src/updater.js` can both be changed by a contributor and must not be imported in a Secrets job |
+| A protected manual flow generates the patch | Re-sign automatically after merging; write to main automatically | main is the update source, so drift between merging and re-signing would affect old clients; a patch can be reviewed before merging |
+| Keep the release-readiness merge gate | Merge as soon as ordinary code checks pass | Passing code and being safe to upgrade to are two independent acceptance facts |
 
-不改为新发布分支或 tag 更新源：只改新客户端的默认 URL 无法迁移旧客户端。
+Do not switch to a new release branch or a tag update source: changing only new clients' default URL cannot migrate old clients.
 
-## 贡献者
+## Contributors
 
 ```bash
 npm run test:contributor
@@ -30,45 +30,45 @@ npm run typecheck
 git diff --check
 ```
 
-项目没有构建步骤。类型检查仅覆盖 adapter；不得称其覆盖整个插件。
+The project has no build step. Type checking covers the adapter only; do not claim it covers the whole plugin.
 
-贡献者模式仍运行 catalog 的结构、来源及 adapter 隔离检查；只将发布字节和
-最近内容 revision 的对齐交给维护者。清单与目录完整性记录之间的一致性仍检查。
-不要用占位签名或新公钥让检查变绿，不要将已有签名复制到修改过的清单。
+Contributor mode still runs the catalog's structure, provenance and adapter isolation checks; only the alignment of release bytes and
+the most recent content revision is left to the maintainer. Consistency between the manifest and the catalog integrity records is still checked.
+Do not make checks green with a placeholder signature or a new public key, and do not copy an existing signature onto a modified manifest.
 
-GitHub 的 `offline` 与 `typecheck` 是代码检查。`release-readiness` 运行
-`npm run test:release`，失败表示发布准备尚未完成；由持钥维护者处理。
-默认 `npm test` 跑所有套件；`npm run test:release` 专门检查真实清单、升级链和目录。
+GitHub's `offline` and `typecheck` are code checks. `release-readiness` runs
+`npm run test:release`; a failure means release preparation is not yet complete and is handled by the key-holding maintainer.
+The default `npm test` runs all suites; `npm run test:release` specifically checks the real manifest, the upgrade chain and the catalog.
 
-## 维护者配置（一次性）
+## Maintainer configuration (one-time)
 
-本次代码改动不会替你创建 Secrets、审批人或分支保护。需要仓库管理权限完成：
+This code change does not create Secrets, approvers or branch protection for you. Repository administration rights are required to complete:
 
-1. 创建 Environment `release-signing`，配置 Required reviewers，并禁止运行发起者自行审批；
-   Deployment branches 仅允许 `main`，关闭管理员绕过（平台支持时）。
-2. 保护规则确认生效后，把**既有**发布私钥的 PEM 内容存入该 Environment 的
-   `RELEASE_MANIFEST_PRIVATE_KEY`。不要使用普通仓库 Secret，不要生成替代信任根。
-3. main 的合并门禁要求 `offline`、`typecheck` 和 `release-readiness` 全部成功，
-   并要求分支与 main 保持最新。仅添加 workflow 文件不会配置这些保护。
-4. 使用保留候选提交历史的普通 merge。Squash 或 rebase 会改变内容 commit SHA，
-   破坏目录 revision 的约定；不得在签名完成后改变合并方式。
+1. Create the Environment `release-signing`, configure Required reviewers, and forbid the run initiator from approving their own run;
+   allow Deployment branches only from `main`, and disable administrator bypass (where the platform supports it).
+2. After confirming the protection rules are in effect, store the PEM content of the **existing** release private key in that Environment's
+   `RELEASE_MANIFEST_PRIVATE_KEY`. Do not use an ordinary repository Secret, and do not generate a replacement trust root.
+3. main's merge gate requires `offline`, `typecheck` and `release-readiness` all to succeed,
+   and requires branches to be up to date with main. Merely adding workflow files does not configure these protections.
+4. Use an ordinary merge that preserves the candidate commit history. Squash or rebase changes the content commit SHA and
+   breaks the catalog revision convention; do not change the merge method after signing is complete.
 
-首次引入本流程时，工作流还未进入 main，维护者先按 `RELEASING.md` 的本地签名方法
-完成当前 PR 的清单与目录记录，并跑完整测试；之后才能从 main 启动新流程。
+When this flow is first introduced, the workflow is not yet in main, so the maintainer first completes the current PR's manifest and catalog records using the local signing method in `RELEASING.md`
+and runs the full tests; only then can the new flow be started from main.
 
-## 为审查完的候选准备签名
+## Preparing a signature for a reviewed candidate
 
-1. 将最新 main 合入候选分支，完成审查和代码检查；记录完整 40 位候选 commit SHA。
-2. 从 **main** 手动运行 `prepare-release`，填入 `candidate_sha`。
-   Environment 审批人在放行前核对输入 SHA、diff 和代码检查结果。
-3. 工作流固定使用本次 main 的脚本，仅 fetch 候选 Git 对象，不 checkout 候选。
-   main 已前移、候选不是 main 的后代、错钥、降级、路径越界、链接文件、
-   超出客户端清单限制都会失败，不产生可用签名补丁。
-4. 下载 `signed-release-<SHA>` Artifact（保留 7 天），解压后审查
-   `receipt.json` 与 `release.patch`。receipt 记录可信 main、候选提交、
-   最近内容 commit、发布版本和补丁 SHA-256。
+1. Merge the latest main into the candidate branch, complete the review and code checks; record the full 40-character candidate commit SHA.
+2. Manually run `prepare-release` from **main**, filling in `candidate_sha`.
+   The Environment approver verifies the input SHA, the diff and the code check results before approving.
+3. The workflow pins this main's scripts, only fetches the candidate Git objects, and does not check out the candidate.
+   A main that has moved ahead, a candidate that is not a descendant of main, a wrong key, a downgrade, a path escape, a linked file,
+   or exceeding the client manifest limits all fail, and produce no usable signature patch.
+4. Download the `signed-release-<SHA>` Artifact (retained for 7 days), unpack it and review
+   `receipt.json` and `release.patch`. The receipt records the trusted main, the candidate commit,
+   the most recent content commit, the release version and the patch's SHA-256.
 
-在无私钥的本地候选工作区应用补丁；下例 `ARTIFACT` 是已下载并解压的目录：
+Apply the patch in a local candidate workspace without the private key; in the example below, `ARTIFACT` is the downloaded, unpacked directory:
 
 ```bash
 test -z "$(git status --porcelain)"
@@ -81,7 +81,7 @@ import path from 'node:path'
 const [dir, head] = process.argv.slice(2)
 const receipt = JSON.parse(fs.readFileSync(path.join(dir, 'receipt.json')))
 const patch = fs.readFileSync(path.join(dir, 'release.patch'))
-assert.equal(receipt.candidate, head, '候选已变化，请重新准备')
+assert.equal(receipt.candidate, head, 'The candidate has changed; please prepare again')
 assert.equal(receipt.patchSha256, crypto.createHash('sha256').update(patch).digest('hex'))
 NODE
 git apply --check "$ARTIFACT/release.patch"
@@ -90,34 +90,33 @@ git diff --check
 git diff --stat
 npm test
 npm run typecheck
-# 仅提交这四份发布记录，不同时修改发布源码
+# Commit only these four release records; do not modify release sources at the same time
 git add feed/manifest.json catalog/integrity.json catalog/dsh-plugin.json catalog/provenance.json
-git commit -m "准备已审查候选的发布签名与目录记录"
+git commit -m "Prepare the release signature and catalog records for the reviewed candidate"
 ```
 
-补丁同时刷新两个 catalog revision 为候选中最近触及 `package.json` / `files` 的提交；
-这次元数据提交不改变发布字节，因此无需再改 revision。补丁格式与客户端解析/验签契约
-由真实 updater 校验。签名只承诺候选字节，不代表测试或代码审查已经通过。
+The patch also refreshes both catalog revisions to the most recent commit in the candidate that touched `package.json` / `files`;
+this metadata commit does not change release bytes, so the revision does not need to be changed again. The patch format and the client's parse/signature-verification contract
+are validated by the real updater. The signature only vouches for the candidate bytes; it does not mean tests or code review have passed.
 
-维护者将签名提交送回原 PR 分支，或建立包含原贡献提交和签名提交的整合分支/PR；
-贡献者仍无需私钥。待 GitHub 三个检查全绿后按普通 merge 合入 main。
-候选源码、版本或 main 再变化时重新准备，不沿用旧补丁。按 `RELEASING.md`
-继续 tag、CDN purge 和安装用户视角的 live audit。
+The maintainer sends the signature commit back to the original PR branch, or creates an integration branch/PR containing the original contribution commits and the signature commit;
+contributors still need no private key. Once GitHub's three checks are all green, merge into main with an ordinary merge.
+If the candidate sources, the version or main change again, prepare anew; do not reuse an old patch. Continue with tagging, CDN purge and a live audit from an installed user's perspective as described in `RELEASING.md`.
 
-## 安全边界与验收限制
+## Security boundaries and acceptance limitations
 
-- `prepare-release` 只有 `contents: read`，私钥仅在签名步骤的环境变量中存在；
-  Node 在启动 Git 子进程前移除该环境变量，Artifact 不含私钥。
-- 它仅从 Git blob 读取普通发布文件与四份 JSON 记录，候选脚本、Git hooks、
-  checkout filters、npm install 和候选模块均不执行。签名 API 的测试钥注入入口
-  不暴露为 CLI 参数；正式 CLI 固定验证可信 main 的内置公钥。
-- 测试使用一次性夹具密钥和隔离 Git 仓库，不修改正式清单，也不验证真实 GitHub
-  Environment 审批、Secrets 配置或正式发布；这些必须由维护者配置后验收。
-- 发布就绪检查仍可能因当前 main 的旧清单漂移失败。该流程不把未签署的 main
-  描述为可发布，不改变已安装客户端的验签与回滚机制。
+- `prepare-release` has only `contents: read`, and the private key exists only in the signing step's environment variables;
+  Node removes that environment variable before starting Git child processes, and the Artifact contains no private key.
+- It only reads ordinary release files and the four JSON records from Git blobs; candidate scripts, Git hooks,
+  checkout filters, npm install and candidate modules are not executed. The signature API's test-key injection entry point
+  is not exposed as a CLI parameter; the production CLI always verifies against the built-in public key of the trusted main.
+- Tests use one-time fixture keys and isolated Git repositories; they do not modify the production manifest, nor verify a real GitHub
+  Environment approval, Secrets configuration or a production release; those must be configured by the maintainer and then accepted.
+- The release-readiness check may still fail due to old-manifest drift on the current main. This flow does not describe an unsigned main
+  as releasable, and does not change the signature verification and rollback mechanisms of installed clients.
 
-## 回退
+## Rollback
 
-停用 `prepare-release` 工作流，删除 Environment Secret（由维护者执行）；
-继续使用本地既有私钥及 `npm test` 完整门禁。回退代码检查分层时恢复旧 workflow
-和 test runner。已经签名的清单仍按原公钥验证，不需要用户数据迁移。
+Disable the `prepare-release` workflow and delete the Environment Secret (performed by the maintainer);
+continue using the local existing private key and the full `npm test` gate. When rolling back the code-check layering, restore the old workflow
+and test runner. Already-signed manifests are still verified against the original public key, and no user data migration is needed.

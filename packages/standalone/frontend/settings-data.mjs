@@ -19,7 +19,7 @@ export function settingsChanged(draft, saved) {
   return Object.keys(baseline).some(key => draft[key] !== baseline[key])
 }
 
-/** 轮询可以更新基线，但不能覆盖草稿或正在保存的输入。
+/** Polling can update the baseline, but must not overwrite the draft or input being saved.
  * @param {{ saved: import('./types').ServiceSettings, draft: ReturnType<typeof settingsDraft> }} state
  * @param {import('./types').ServiceSettings} saved
  * @param {boolean} saving */
@@ -33,13 +33,13 @@ export function validateSettingsDraft(draft) {
   /** @type {Partial<Record<'defaultMaxTokens' | 'probeIntervalMinutes', string>>} */
   const errors = {}
   for (const [key, label, min, max] of [
-    ['defaultMaxTokens', '最大输出 Token', 512, 131072],
-    ['probeIntervalMinutes', '刷新间隔', 1, 1440],
+    ['defaultMaxTokens', 'Max output tokens', 512, 131072],
+    ['probeIntervalMinutes', 'Refresh interval', 1, 1440],
   ]) {
     const raw = draft[key].trim()
     const value = Number(raw)
     if (!raw || !Number.isInteger(value) || value < min || value > max) {
-      errors[key] = `${label}必须是 ${min}–${max} 的整数。`
+      errors[key] = `${label} must be an integer between ${min} and ${max}.`
     }
   }
   return {

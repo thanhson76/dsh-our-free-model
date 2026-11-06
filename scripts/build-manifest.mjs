@@ -103,9 +103,9 @@ function addFile(rel) {
 }
 
 files.sort((a, b) => a.path.localeCompare(b.path))
-// 已安装旧版用户必须能读取发布清单，限制不能只在新版升级器里检查。
+// Users on installed legacy versions must be able to read the release manifest, so the limits cannot be checked only in the new upgrader.
 if (files.length > 80 || files.some(file => file.size > 4 * 1024 * 1024)) {
-  throw new Error('发布内容超出旧版升级器预算：最多 80 个文件，每个最多 4 MiB；先构建兼容资源')
+  throw new Error('Release contents exceed the legacy upgrader budget: at most 80 files, each at most 4 MiB; build the compatibility assets first')
 }
 
 let previous

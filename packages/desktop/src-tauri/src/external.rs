@@ -2,7 +2,7 @@ use tauri::Url;
 
 pub fn open_external(url: &Url) -> Result<(), String> {
     if !matches!(url.scheme(), "http" | "https") || !url.username().is_empty() || url.password().is_some() {
-        return Err("仅支持打开 HTTP 或 HTTPS 链接".into());
+        return Err("Only HTTP or HTTPS links can be opened".into());
     }
     #[cfg(windows)]
     {
@@ -14,13 +14,13 @@ pub fn open_external(url: &Url) -> Result<(), String> {
         let verb: Vec<u16> = std::ffi::OsStr::new("open").encode_wide().chain(Some(0)).collect();
         let address: Vec<u16> = std::ffi::OsStr::new(url.as_str()).encode_wide().chain(Some(0)).collect();
         let result = unsafe { ShellExecuteW(std::ptr::null_mut(), verb.as_ptr(), address.as_ptr(), std::ptr::null(), std::ptr::null(), 1) };
-        if result <= 32 { return Err("无法打开系统浏览器，请复制链接后手动打开".into()); }
+        if result <= 32 { return Err("Could not open the system browser; please copy the link and open it manually".into()); }
         Ok(())
     }
     #[cfg(not(windows))]
     {
         let launcher = if cfg!(target_os = "macos") { "open" } else { "xdg-open" };
-        std::process::Command::new(launcher).arg(url.as_str()).spawn().map(|_| ()).map_err(|_| "无法打开系统浏览器".into())
+        std::process::Command::new(launcher).arg(url.as_str()).spawn().map(|_| ()).map_err(|_| "Could not open the system browser".into())
     }
 }
 

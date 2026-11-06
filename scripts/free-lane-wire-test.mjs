@@ -175,13 +175,13 @@ console.log('\n=== 5. the User-Agent is the canonical v2 token, whatever the hos
   check('no v1 request header went out', 'x-opencode-request' in sent.headers, false)
 }
 
-console.log('\n=== 6. 目录请求与推理请求使用同一串 v2 UA ===')
+console.log('\n=== 6. Catalog and inference requests use the same v2 UA string ===')
 {
   // The host still passes an attribution UA (its API is unchanged); the v2
   // fingerprint means this lane cannot put it on the wire.
   const attributionUserAgent = 'our-free-model-standalone/2.3.0'
   await getJson('/inference/v1/models', { attributionUserAgent })
-  check('目录请求使用 v2 指纹 UA', seen.at(-1).headers['user-agent'], up.CLIENT_UA)
+  check('the catalog request uses the v2 fingerprint UA', seen.at(-1).headers['user-agent'], up.CLIENT_UA)
   await postStreamed({
     path: up.endpointFor('mimo-v2.6-flash-free'),
     body: { model: 'mimo-v2.6-flash-free', messages: [{ role: 'user', content: 'ping' }], stream: true },
@@ -190,10 +190,10 @@ console.log('\n=== 6. 目录请求与推理请求使用同一串 v2 UA ===')
     onData: () => {},
     timeoutMs: 5000,
   })
-  check('推理请求使用同一串', seen.at(-1).headers['user-agent'], up.CLIENT_UA)
+  check('the inference request uses the same string', seen.at(-1).headers['user-agent'], up.CLIENT_UA)
   const unrelated = 'other-client/3.0 (+https://example.com/our-free-model-standalone)'
   await getJson('/inference/v1/models', { attributionUserAgent: unrelated })
-  check('任何归属串都不再改变线上 UA', seen.at(-1).headers['user-agent'], up.CLIENT_UA)
+  check('no attribution string changes the on-the-wire UA anymore', seen.at(-1).headers['user-agent'], up.CLIENT_UA)
 }
 
 console.log('\n=== 7. an empty 5xx body names the hop instead of saying "HTTP 502" (issue #549) ===')
@@ -254,7 +254,7 @@ console.log('\n=== 7. an empty 5xx body names the hop instead of saying "HTTP 50
   scriptedReply = null
 }
 
-console.log('\n=== 8. 空闲时钟只由真数据上弦，不被 keepalive 注释帧续命（#460）===')
+console.log('\n=== 8. The idle clock is wound only by real data, not kept alive by keepalive comment frames (#460) ===')
 {
   // SSE defines a comment line (`: ping`) as something to ignore. A gateway that
   // pings every 10–15s to hold the socket open therefore used to keep a wedged,

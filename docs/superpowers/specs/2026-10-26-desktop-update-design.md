@@ -1,17 +1,17 @@
-# 桌面内置更新设计
+# Desktop built-in update design
 
-用户已确认完整流程：检查版本、下载校验、退出安装并重启。界面沿用现有桌面卡片、按钮、状态提示，左侧管理区新增「应用更新」独立栏目。
+The user has confirmed the full flow: check the version, download and verify, quit to install and restart. The interface reuses the existing desktop cards, buttons and status prompts, and a new separate "App updates" section is added to the management area on the left.
 
-## 流程与边界
+## Flow and boundaries
 
-展示桌面真实版本、最新桌面版本、更新说明、下载进度、检查时间与错误状态。只选择本仓库正式 Release 中适配 Windows x64 的安装包，跳过仅插件发布、草稿、预发布和更低版本。检查与下载通过已鉴权的本机管理接口执行；安装与退出只由绑定当前管理窗口来源的原生 IPC 执行，浏览器访问不能安装或关闭桌面应用。
+Show the desktop's real version, the latest desktop version, the update notes, download progress, check time and error state. Only select the installer matching Windows x64 from this repository's official Releases, skipping plugin-only releases, drafts, pre-releases and lower versions. Checking and downloading run through the authenticated local management interface; installation and quitting are performed only by native IPC bound to the origin of the current management window, and browser access cannot install or close the desktop app.
 
-下载限定官方 GitHub HTTPS 来源与官方资源重定向；从同一发布的 SHA256SUMS 读取预期摘要，限流式下载大小及时间，校验后原子写入独立更新缓存。安装前由原生代码再次校验固定缓存文件，不接受前端传入 URL、路径或命令。这里沿用桌面端官方 GitHub Release 的信任模型，SHA256SUMS 用于内容一致性校验；不将其声称为独立数字签名，也不改插件的 Ed25519 更新信任链。
+Downloads are limited to official GitHub HTTPS sources and official asset redirects; the expected digest is read from the SHA256SUMS of the same release, the download is throttled in size and time, and after verification it is written atomically to a separate update cache. Before installation, the native code verifies the fixed cache file again and accepts no URL, path or command passed in from the front end. This follows the desktop's official GitHub Release trust model, with SHA256SUMS used for content-consistency verification; it is not claimed to be an independent digital signature, and the plugin's Ed25519 update trust chain is not changed.
 
-用户点击「退出并安装」后，先停止自有后台服务，再由隐藏的交接进程等待旧进程退出、运行官方 NSIS 安装器并按其重启参数重新打开应用。若原生交接无法启动则恢复服务并报错；下载或校验失败不得退出应用。保留用户配置、账号和统计。
+After the user clicks "Quit and install", its own background service is stopped first, and then a hidden handover process waits for the old process to exit, runs the official NSIS installer and reopens the app using its restart parameters. If the native handover cannot start, the service is restored and an error is reported; a failed download or verification must not quit the app. User configuration, accounts and statistics are preserved.
 
-当前正式桌面产物为 Windows x64，其他平台显示支持情况，不误用插件包或其他架构。已有无更新栏目的桌面版本需先手动安装一次含该功能的版本。本任务实现和验证功能，不自动修改已发布的 2.7.2 插件资源或公开发布新桌面安装包。
+The current official desktop artefact is Windows x64; other platforms show their support status and do not misuse the plugin package or another architecture. Existing desktop versions without the update section must first manually install a version containing that feature once. This task implements and verifies the feature; it does not automatically modify the already-published 2.7.2 plugin assets or publicly release a new desktop installer.
 
-## 验收
+## Acceptance
 
-后端回归覆盖插件专用 Release 跳过、版本比较、平台匹配、校验失败、超限、重定向、重复操作和缓存恢复。前端检查加载、无更新、发现更新、下载进度、校验失败、准备安装及浏览器限制，取得沿用现有样式的实际截图。验证原生窗口来源限制、路径与摘要校验、服务退出和安装参数；编译 Rust 与前端，运行适用回归，不执行会覆盖用户现有安装的真实安装器。
+Backend regression covers plugin-only Release skipping, version comparison, platform matching, verification failure, exceeding limits, redirects, repeated operations and cache recovery. The front end checks loading, no update, update found, download progress, verification failure, ready to install and browser restrictions, and captures actual screenshots reusing the existing styling. Verify the native window origin restriction, path and digest verification, service shutdown and install parameters; compile the Rust and the front end, run the applicable regressions, and do not run a real installer that would overwrite the user's existing installation.

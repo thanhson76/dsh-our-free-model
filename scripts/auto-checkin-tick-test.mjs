@@ -1,8 +1,10 @@
 /**
- * 跨天巡检：常驻进程过了零点也要补一轮签到。
+ * Cross-day inspection: a resident process that passes midnight must still
+ * make up a check-in round.
  *
- * 只测「什么时候该叫 runIfDue」，不碰真实渠道 —— `claim()` 用替身并计数，
- * 断言的是可观测的调用次数，而不是内部实现。
+ * Only tests "when runIfDue should be called", without touching real
+ * channels — `claim()` is a stub that counts calls, and the assertions are
+ * on the observable call counts rather than the internal implementation.
  */
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
@@ -16,8 +18,10 @@ const kernel = new URL('./lib/channel-pack-kernel.mjs', import.meta.url).href
 const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'ofm-checkin-tick-'))
 process.env.DSH_CHANNEL_PACK_HOME = scratch
 
-// 用 typescript 的 transpileModule 而不是 Node 内置 strip：后者不支持构造函数参数
-// 属性（依赖链里的 channel-pack-store 就用了），会直接抛 ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX。
+// Use typescript's transpileModule rather than Node's built-in strip: the
+// latter does not support constructor parameter properties (which
+// channel-pack-store in the dependency chain uses) and throws
+// ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX outright.
 const ts = (await import('typescript')).default
 
 registerHooks({
@@ -56,7 +60,7 @@ const EMPTY_DOC = () => ({
   channels: [], todayDate: '', today: [], dismissedRunAt: 0,
 })
 
-/** UTC+8 的某个时刻 → 毫秒时间戳（避免手算时区）。 */
+/** A moment in UTC+8 → a millisecond timestamp (avoids hand-computing time zones). */
 const utc8 = (date, hour = 12) => Date.parse(`${date}T00:00:00+08:00`) + hour * 3_600_000
 
 function harness({ doc = {}, clock = utc8('2026-10-27', 16) } = {}) {
@@ -73,7 +77,7 @@ function harness({ doc = {}, clock = utc8('2026-10-27', 16) } = {}) {
     },
     claim: async provider => {
       state.claims.push(provider)
-      // coversToday=false → 不记 lastDate，正好用来观察退避
+      // coversToday=false → lastDate is not recorded, which is exactly what lets us observe the backoff
       return { ok: true, value: { summary: { claimed: 1, coversToday: false }, accounts: [] } }
     },
     delayMs: 0,
@@ -87,24 +91,24 @@ function harness({ doc = {}, clock = utc8('2026-10-27', 16) } = {}) {
 
 const settle = () => new Promise(resolve => setImmediate(resolve))
 
-await check('start() 挂上跨天巡检，间隔取自 tickMs', async () => {
+await check('start() installs the cross-day inspection, with the interval taken from tickMs', async () => {
   const { checkin, timers } = harness()
   checkin.start()
-  assert.ok(timers.tick !== null, 'start() 必须排定巡检')
+  assert.ok(timers.tick !== null, 'start() must schedule the inspection')
   assert.equal(timers.tick.ms, 1_000)
   checkin.stop()
 })
 
-await check('stop() 取消巡检，不留下悬挂定时器', async () => {
+await check('stop() cancels the inspection and leaves no dangling timer', async () => {
   const { checkin, timers } = harness()
   checkin.start()
   const scheduled = timers.tick
   checkin.stop()
-  assert.equal(scheduled.cancelled, true, 'stop() 必须真的取消巡检')
+  assert.equal(scheduled.cancelled, true, 'stop() must actually cancel the inspection')
   assert.equal(timers.tick, null)
 })
 
-await check('tickMs=0 时不排巡检（宿主不需要常驻）', async () => {
+await check('tickMs=0 schedules no inspection (the host does not need to stay resident)', async () => {
   let scheduled = null
   const checkin = createAutoCheckin({
     store: { load: EMPTY_DOC, save() {}, flush() {} },
@@ -116,11 +120,11 @@ await check('tickMs=0 时不排巡检（宿主不需要常驻）', async () => {
     warn() {},
   })
   checkin.start()
-  assert.equal(scheduled, null, 'tickMs=0 表示关闭巡检')
+  assert.equal(scheduled, null, 'tickMs=0 means the inspection is disabled')
   checkin.stop()
 })
 
-await check('今天已经跑成过 → 巡检不重复打上游', async () => {
+await check('already ran successfully today → the inspection does not hit upstream again', async () => {
   const { checkin, timers, state } = harness({
     doc: { lastDate: '2026-10-27', lastAt: utc8('2026-10-27', 9) },
     clock: utc8('2026-10-27', 16),
@@ -129,11 +133,11 @@ await check('今天已经跑成过 → 巡检不重复打上游', async () => {
   state.clock = utc8('2026-10-27', 20)
   timers.tick.fn()
   await settle()
-  assert.deepEqual(state.claims, [], '当天已成功，巡检不得再调 claim')
+  assert.deepEqual(state.claims, [], 'already succeeded today, so the inspection must not call claim again')
   checkin.stop()
 })
 
-await check('跨天后巡检补跑一轮', async () => {
+await check('after the day rolls over, the inspection makes up a round', async () => {
   const { checkin, timers, state } = harness({
     doc: { lastDate: '2026-10-26', lastAt: utc8('2026-10-26', 9) },
     clock: utc8('2026-10-27', 1),
@@ -142,27 +146,28 @@ await check('跨天后巡检补跑一轮', async () => {
   state.clock = utc8('2026-10-28', 1)
   timers.tick.fn()
   await settle()
-  assert.deepEqual(state.claims, ['fixture'], '进入新的一天后必须补跑')
+  assert.deepEqual(state.claims, ['fixture'], 'entering a new day must trigger a make-up run')
   checkin.stop()
 })
 
-await check('今天试过但失败 → 退避期内不再打上游', async () => {
+await check('tried today but failed → no more upstream calls during the backoff window', async () => {
   const start = utc8('2026-10-27', 9)
   const { checkin, timers, state } = harness({ clock: start })
   checkin.start()
   await settle()
-  // start() 的 delayMs=0 立刻跑了一轮；claim 返回 coversToday=false，
-  // 所以 lastDate 仍为空、lastAt 停在 09:00 —— 正是「今天试过但失败」的形态。
-  assert.deepEqual(state.claims, ['fixture'], '前提：已经试过一轮')
+  // start() with delayMs=0 ran a round immediately; claim returned
+  // coversToday=false, so lastDate is still empty and lastAt stays at
+  // 09:00 — exactly the shape of "tried today but failed".
+  assert.deepEqual(state.claims, ['fixture'], 'precondition: one round has already been tried')
   const tried = state.claims.length
   state.clock = start + 10 * 60_000
   timers.tick.fn()
   await settle()
-  assert.equal(state.claims.length, tried, '退避期内（<1h）不应重试')
+  assert.equal(state.claims.length, tried, 'no retry during the backoff window (<1h)')
   checkin.stop()
 })
 
-await check('过了退避下限 → 巡检允许重试', async () => {
+await check('past the backoff floor → the inspection may retry', async () => {
   const start = utc8('2026-10-27', 9)
   const { checkin, timers, state } = harness({ clock: start })
   checkin.start()
@@ -171,11 +176,11 @@ await check('过了退避下限 → 巡检允许重试', async () => {
   state.clock = start + AUTO_CHECKIN_RETRY_MS + 60_000
   timers.tick.fn()
   await settle()
-  assert.equal(state.claims.length, tried + 1, '超过 1 小时后应允许重试')
+  assert.equal(state.claims.length, tried + 1, 'a retry should be allowed after more than 1 hour')
   checkin.stop()
 })
 
-await check('关闭自动签到时巡检不请求，重新启用后正常执行', async () => {
+await check('when automatic check-in is off the inspection makes no requests, and it runs normally after re-enabling', async () => {
   const { checkin, timers, state } = harness({ doc: { enabled: false } })
   checkin.start()
   timers.tick.fn()
@@ -186,7 +191,7 @@ await check('关闭自动签到时巡检不请求，重新启用后正常执行'
   checkin.stop()
 })
 
-await check('渠道枚举异常也受退避保护，不因未落盘结果而反复重试', async () => {
+await check('channel enumeration errors are also protected by backoff, so unpersisted results do not cause repeated retries', async () => {
   const start = utc8('2026-10-27', 9)
   const { checkin, timers, state } = harness({ clock: start })
   state.listFailure = true
@@ -204,10 +209,10 @@ await check('渠道枚举异常也受退避保护，不因未落盘结果而反�
   checkin.stop()
 })
 
-await check('默认常量符合设计（巡检 2.5h、退避 1h）', async () => {
+await check('the default constants match the design (inspection 2.5h, backoff 1h)', async () => {
   assert.equal(AUTO_CHECKIN_TICK_MS, 150 * 60 * 1000)
   assert.equal(AUTO_CHECKIN_RETRY_MS, 60 * 60 * 1000)
 })
 
-console.log(`\n${checks} 项跨天巡检检查通过`)
+console.log(`\n${checks} cross-day inspection checks passed`)
 fs.rmSync(scratch, { recursive: true, force: true })

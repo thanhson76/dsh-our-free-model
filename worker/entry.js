@@ -1,20 +1,23 @@
 /**
- * EAC 看板侧边栏入口注入脚本 — 由网关在 {mount}/entry.js 提供，nginx 会把它
- * 注入到 New API 面板的每个页面（</body> 前）。
+ * EAC dashboard sidebar entry injection script — served by the gateway at
+ * {mount}/entry.js, which nginx injects into every page of the New API panel
+ * (before </body>).
  *
- * 它做的事只有一件：等 New API 的管理员侧边栏渲染出来，在「管理员」分组的
- * 「系统信息」后面克隆一份条目，改名为「EAC 看板」，指向 /eac/stats。克隆的
- * 是游离 DOM（不接 React 事件），点击走原生跳转；若面板更新导致条目被
- * React 重渲染移除，观察器会重新补上。没有任何密钥内嵌。
+ * It does exactly one thing: wait for the New API admin sidebar to render,
+ * then clone the entry after "System Info" in the "Admin" group, rename it
+ * to "EAC Dashboard" and point it at /eac/stats. The clone is detached DOM
+ * (not wired to React events) and clicks follow a native navigation; if a
+ * panel update causes React to re-render and remove the entry, the observer
+ * adds it back. No secret is embedded.
  */
 (function () {
-  if (location.pathname.indexOf('/eac/') === 0) return // 看板自身不再注入
+  if (location.pathname.indexOf('/eac/') === 0) return // do not inject into the dashboard itself
   var HREF = '/eac/stats'
   try {
     if (document.currentScript && document.currentScript.src) {
       HREF = new URL('../stats', document.currentScript.src).pathname
     }
-  } catch (e) { /* 保持默认路径 */ }
+  } catch (e) { /* keep the default path */ }
   var done = false
 
   function textLeaf(el) {
@@ -42,7 +45,7 @@
     else clone.addEventListener('click', function () { location.href = HREF })
     clone.style.cursor = 'pointer'
     var leaf = textLeaf(clone)
-    if (leaf) leaf.textContent = 'EAC 看板'
+    if (leaf) leaf.textContent = 'EAC Dashboard'
     anchor.parentElement.insertBefore(clone, anchor.nextSibling)
     done = true
   }

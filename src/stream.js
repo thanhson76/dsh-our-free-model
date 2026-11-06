@@ -494,10 +494,10 @@ export function windowTokens(usage, sawReasoning) {
  * @param {'chat'|'messages'|'responses'} wire
  * @param {Map<string, string>} renameMap - fingerprint spelling -> caller spelling
  * @param {() => number} [now] - clock stamping the first delivered delta
- * @param {object} [options] - 本次读取的索引与续写检查点限制
- * @param {number} [options.startIndex=0] - 新块的起始索引
- * @param {number} [options.checkpointLimit=131072] - 推理检查点的最大字符串长度
- * @param {(snapshot: object) => void} [options.onState] - 发布本次读取的已知状态
+ * @param {object} [options] - index and continuation-checkpoint limits for this read
+ * @param {number} [options.startIndex=0] - starting index for new blocks
+ * @param {number} [options.checkpointLimit=131072] - maximum string length of the reasoning checkpoint
+ * @param {(snapshot: object) => void} [options.onState] - publish the known state of this read
  * @param {() => void} [options.onProgress] - Meaningful tool metadata arrived before arguments.
  * @yields {object} harness StreamChunk
  * @returns {Promise<{ usage: object, finish?: string, sawFinish: boolean, sawUsage: boolean, sawToolCall: boolean, sawReasoning: boolean, firstDeltaAt?: number, nextIndex: number, reasoningText: string, checkpointTruncated: boolean }>}

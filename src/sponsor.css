@@ -1,4 +1,4 @@
-/* 赞助页面与每日公告共用排版，主题只改变材质和色彩。 */
+/* Shared layout for the sponsor page and the daily notice; themes only change material and colors. */
 .ofm-sponsor {
   --sp-ink: var(--dsw-alias-label-primary, #293240);
   --sp-muted: var(--dsw-alias-label-secondary, #657080);

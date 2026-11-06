@@ -135,7 +135,7 @@ await check('a CRLF working tree describes the same release', () => {
   const copy = fs.mkdtempSync(path.join(os.tmpdir(), 'ofm-crlf-'))
   fs.cpSync(repo, path.join(copy, 'repo'), {
     recursive: true,
-    // 排除构建缓存，避免把桌面 target、运行时和发布包带进换行测试。
+    // Exclude build caches, so the desktop target, runtime and release package are not brought into the line-ending test.
     filter: source => !/[\\/](node_modules|\.git|\.verify|target|dist|resources|\.node-license-cache)([\\/]|$)/.test(source),
   })
   const root = path.join(copy, 'repo')

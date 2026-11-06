@@ -1,23 +1,23 @@
-# Issue 590：本机验证与视觉特效开关
+# Issue 590: Local Verification and the Visual Effects Toggle
 
-## 已确认范围
+## Confirmed Scope
 
-用户要求在本机实测占用，修复后以相同条件复测；鱼缸功能保留，其他视觉特效提供一键开关。
+The user asked for resource usage to be measured on this machine, then re-measured under the same conditions after the fix; the aquarium feature is kept, and the other visual effects get a one-click toggle.
 
-## 设计与假设
+## Design and Assumptions
 
-- 插件设置页顶部增加“视觉特效”开关，默认关闭；开启后恢复原视觉风格，立即生效。
-- 选择仅保存在当前浏览器的 localStorage，不修改账号、模型、网关和凭据配置。
-- 关闭时不创建全屏光斑，取消鱼缸之外的模糊、循环动画、装饰扫光及数字滚动；鱼缸水位、状态、标签及可见时的鱼群与波浪保留。
-- 页面隐藏或离开可视区域时暂停 CSS 动画；鱼缸水位为零或鱼缸滚出视口时暂停其不可见动画，有水且可见时恢复；系统“减少动态效果”优先。
-- 不新增依赖；使用原 React、CSS 和浏览器 API，存储不可用时仍可操作。
-- 性能目标是降低同机同页静置时的渲染成本，不对另一型号 GPU 的占用百分比作保证。
-- 本机 GPU 计数是整个设备的利用率；同时记录 DSH 进程组 CPU/RSS 和 WindowServer CPU，保持其他应用状态稳定，并标明归因限制。
+- A "Visual effects" toggle is added at the top of the plugin settings page, off by default; turning it on restores the original visual style, taking effect immediately.
+- The choice is stored only in the current browser's localStorage; it does not modify account, model, gateway or credential configuration.
+- When off, no full-screen light spots are created, and blur, looping animations, decorative sweeps and number rolling outside the aquarium are removed; the aquarium's water level, status, labels, and the fish and waves when visible, are kept.
+- CSS animations pause when the page is hidden or leaves the visible area; the aquarium's invisible animations pause when its water level is zero or it scrolls out of the viewport, and resume when there is water and it is visible; the system's "reduce motion" setting takes precedence.
+- No new dependencies; the existing React, CSS and browser APIs are used, and everything remains operable when storage is unavailable.
+- The performance goal is to lower rendering cost while the same page sits idle on the same machine; no guarantee is made about utilisation percentages on a different GPU model.
+- The local GPU counter is whole-device utilisation; the DSH process group's CPU/RSS and WindowServer CPU are recorded at the same time, other applications are kept in a stable state, and the attribution limits are stated.
 
-## 取舍记录
+## Trade-off Record
 
-选择默认关闭装饰特效并提供恢复开关，满足用户保留鱼缸和可切换外观的要求。单纯依赖系统减少动态效果不能取消背景模糊；直接删除全部动画会丢失用户要求保留的鱼缸体验。
+Decorative effects are off by default with a toggle to restore them, meeting the user's requirement to keep the aquarium and a switchable appearance. Relying solely on the system's reduce-motion setting cannot remove the background blur; deleting all animation outright would lose the aquarium experience the user asked to keep.
 
-## 验证
+## Verification
 
-记录改动前、特效关闭和特效开启的本机同页静置样本；检查开关即时变化、重载记忆、鱼缸内容、系统减少动态效果、存储异常以及原业务回归。用户未请求发布新版本，本轮不自动发布。
+Record idle samples of the same page on this machine before the change, with effects off and with effects on; check the toggle's immediate effect, persistence across reloads, the aquarium content, the system's reduce-motion setting, storage failures and regression of the original features. The user did not request a new release, so this round does not release one automatically.

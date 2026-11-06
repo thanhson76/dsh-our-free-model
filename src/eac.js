@@ -273,7 +273,7 @@ function headersFor(credential, method, fullUrl, body) {
     // Absent before login; the gateway then answers 401 AuthorizationRequired,
     // which the settings page turns into a login prompt. Sent on listings too
     // so a gated listing needs no second wire shape.
-    // 显式传入 null 也必须隔离：独立应用未登录时不能回退读取 DSH 授权。
+    // An explicitly passed null must also be isolated: when the standalone app is not logged in, it must not fall back to reading the DSH authorization.
     const userToken = Object.hasOwn(credential, 'userToken') ? credential.userToken : laneUserToken()
     return userToken === null ? signed : { ...signed, 'x-ofm-user': userToken }
   }

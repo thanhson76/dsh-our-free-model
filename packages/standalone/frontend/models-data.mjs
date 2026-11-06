@@ -1,4 +1,4 @@
-/** 筛选只影响当前视图，不改变模型开关或服务端目录。 */
+/** Filtering affects only the current view; it does not change model toggles or the server-side catalog. */
 export function filterModels(catalog, { search = '', channel = 'all', capability = 'all', availability = 'all', access = 'all' }) {
   const query = search.trim().toLocaleLowerCase()
   return catalog.filter(model =>

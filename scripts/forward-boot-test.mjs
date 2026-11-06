@@ -7,7 +7,7 @@
  * listing and then stalls on the pings holds the whole chain until the roster
  * gives up. While it is held, `forward.enabled` is true in the settings file and
  * the settings page says so, yet nothing is listening — the port only comes up
- * when the user clicks 应用, whose POST calls `syncForward()` on its own.
+ * when the user clicks Apply, whose POST calls `syncForward()` on its own.
  *
  * A listener answers a local socket and depends on nothing that goes out, so it
  * is started before the round that does. This suite boots a generation whose
@@ -146,7 +146,7 @@ try {
   process.env.DSH_HOME = previousHome
 }
 
-// 相对 DSH_HOME 仍应读取原目录，核心接收到的路径须由插件入口归一化。
+// A relative DSH_HOME should still read the original directory; the path the core receives must be normalized by the plugin entry.
 const originalCwd = process.cwd()
 const originalDshHome = process.env.DSH_HOME
 const relativeDataDir = path.join(scratch, 'relative-dsh', 'our-free-model')
@@ -159,11 +159,11 @@ try {
   process.chdir(scratch)
   process.env.DSH_HOME = './relative-dsh'
   apply(relativeCtx, { distribution: 'managed' })
-  check('相对 DSH_HOME 可以启动并读取原目录的设置',
+  check('a relative DSH_HOME can start and read the settings of the original directory',
     relativeCtx.__captured.adapters[0]?.adapter.deps.state().settings.forwardKey,
     'relative-home-key')
 } catch (error) {
-  check(`相对 DSH_HOME 可以启动（${error.message}）`, false, true)
+  check(`a relative DSH_HOME can start (${error.message})`, false, true)
 } finally {
   for (const disposer of relativeCtx.__disposers.reverse()) disposer()
   process.chdir(originalCwd)
@@ -172,7 +172,7 @@ try {
 
 await stub.close()
 const cleanupTarget = fs.realpathSync(scratch)
-if (!cleanupTarget.startsWith(fs.realpathSync(os.tmpdir()) + path.sep)) throw new Error('临时目录不在预期清理范围内')
+if (!cleanupTarget.startsWith(fs.realpathSync(os.tmpdir()) + path.sep)) throw new Error('The temp directory is outside the expected cleanup scope')
 fs.rmSync(cleanupTarget, { recursive: true, force: true })
 console.log(failures === 0 ? '\nforward-boot: the port never waits on the network' : `\n${failures} check(s) failed`)
 process.exitCode = failures === 0 ? 0 : 1

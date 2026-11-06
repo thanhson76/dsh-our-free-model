@@ -23,17 +23,17 @@ struct ServiceState {
 
 #[tauri::command]
 async fn install_desktop_update(app: tauri::AppHandle, window: tauri::WebviewWindow) -> Result<(), String> {
-    if !cfg!(windows) { return Err("当前仅支持 Windows 桌面安装更新".into()); }
+    if !cfg!(windows) { return Err("Desktop install updates are currently supported on Windows only".into()); }
     let data_dir = {
         let state = app.state::<ServiceState>();
-        let guard = state.process.lock().map_err(|_| "服务状态不可用")?;
-        let process = guard.as_ref().ok_or("桌面服务未启动")?;
-        let expected: tauri::Url = process.management_url.parse().map_err(|_| "管理地址无效")?;
-        let actual = window.url().map_err(|_| "无法确认调用窗口")?;
-        if window.label() != "main" || actual.origin() != expected.origin() { return Err("仅允许当前桌面管理窗口安装更新".into()); }
+        let guard = state.process.lock().map_err(|_| "Service state unavailable")?;
+        let process = guard.as_ref().ok_or("The desktop service is not running")?;
+        let expected: tauri::Url = process.management_url.parse().map_err(|_| "Invalid management address")?;
+        let actual = window.url().map_err(|_| "Cannot confirm the calling window")?;
+        if window.label() != "main" || actual.origin() != expected.origin() { return Err("Only the current desktop management window may install updates".into()); }
         process.data_dir().to_owned()
     };
-    if app.state::<ServiceState>().updating.compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst).is_err() { return Err("安装交接已在进行".into()); }
+    if app.state::<ServiceState>().updating.compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst).is_err() { return Err("An install handoff is already in progress".into()); }
     let owned = app.clone();
     let result = tauri::async_runtime::spawn_blocking(move || {
         let verified = update::prepare(&data_dir, env!("CARGO_PKG_VERSION"))?;
@@ -48,7 +48,7 @@ async fn install_desktop_update(app: tauri::AppHandle, window: tauri::WebviewWin
         }
         owned.exit(0);
         Ok(())
-    }).await.unwrap_or_else(|_| Err("安装交接任务未完成".to_string()));
+    }).await.unwrap_or_else(|_| Err("The install handoff task did not complete".to_string()));
     if result.is_err() { app.state::<ServiceState>().updating.store(false, Ordering::SeqCst); }
     result
 }
@@ -68,7 +68,7 @@ fn start_service(app: &tauri::AppHandle) -> Result<String, String> {
     let resources = if cfg!(debug_assertions) {
         std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("resources")
     } else {
-        app.path().resource_dir().map_err(|_| "无法定位安装资源")?
+        app.path().resource_dir().map_err(|_| "Cannot locate the install resources")?
     };
     let node = if cfg!(target_os = "windows") {
         resources.join("runtime/node.exe")
@@ -77,21 +77,21 @@ fn start_service(app: &tauri::AppHandle) -> Result<String, String> {
     };
     let host = resources.join("service/packages/desktop/service-host.mjs");
     if !node.is_file() || !host.is_file() {
-        return Err("安装资源不完整，请重新安装桌面程序".into());
+        return Err("The install resources are incomplete; please reinstall the desktop application".into());
     }
     let data_dir = std::env::var_os("OFM_HOME")
         .map(std::path::PathBuf::from)
         .or_else(|| dirs::home_dir().map(|home| home.join(".our-free-model")))
-        .ok_or("无法确定服务数据目录")?;
+        .ok_or("Cannot determine the service data directory")?;
     let state = app.state::<ServiceState>();
-    // 与退出共用锁：退出必须等正在启动的子进程完成交接后再清理。
-    let mut guard = state.process.lock().map_err(|_| "服务状态不可用")?;
+    // Shares a lock with exit: exit must wait for a starting child process to finish its handoff before cleaning up.
+    let mut guard = state.process.lock().map_err(|_| "Service state unavailable")?;
     if state.stopping.load(Ordering::SeqCst) {
-        return Err("应用正在退出".into());
+        return Err("The application is exiting".into());
     }
     let process = ServiceProcess::start(&node, &host, &data_dir)?;
     if state.stopping.load(Ordering::SeqCst) {
-        return Err("应用正在退出".into());
+        return Err("The application is exiting".into());
     }
     let address = process.management_url.clone();
     *guard = Some(process);
@@ -109,7 +109,7 @@ fn stop_service(app: &tauri::AppHandle) {
 }
 
 fn show_main(app: &tauri::AppHandle, address: &str) -> tauri::Result<()> {
-    let url: tauri::Url = address.parse().expect("服务握手已校验 URL");
+    let url: tauri::Url = address.parse().expect("the service handshake already validated the URL");
     let origin = url.origin().ascii_serialization();
     let mut capability = CapabilityBuilder::new("desktop-service-window")
         .window("main")
@@ -168,11 +168,11 @@ pub fn run() {
                 .title("Our Free Model").inner_size(400.0, 300.0).center()
                 .resizable(false).decorations(false).always_on_top(true).skip_taskbar(true)
                 .build()?;
-            let show = MenuItem::with_id(app, "show", "打开面板", true, None::<&str>)?;
-            let quit = MenuItem::with_id(app, "quit", "退出", true, None::<&str>)?;
+            let show = MenuItem::with_id(app, "show", "Open panel", true, None::<&str>)?;
+            let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
             let menu = Menu::with_items(app, &[&show, &quit])?;
             TrayIconBuilder::new()
-                .icon(app.default_window_icon().expect("已配置应用图标").clone())
+                .icon(app.default_window_icon().expect("an application icon is configured").clone())
                 .menu(&menu).tooltip("Our Free Model")
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "show" => show_existing(app), "quit" => app.exit(0), _ => {}
@@ -185,21 +185,21 @@ pub fn run() {
                         }
                     }
                 }).build(app)?;
-            // 后端握手放在后台，让启动窗口能继续绘制。
+            // The backend handshake runs in the background so the splash window can keep drawing.
             let handle = app.handle().clone();
             std::thread::spawn(move || {
                 let result = start_service(&handle);
                 let window_handle = handle.clone();
-                // 在主线程串行处理窗口创建和退出，防止退出后重新创建窗口。
+                // Window creation and exit are handled serially on the main thread, so no window is recreated after exit.
                 let _ = handle.run_on_main_thread(move || {
                 let handle = window_handle;
                 if handle.state::<ServiceState>().stopping.load(Ordering::SeqCst) { return; }
-                let result = result.and_then(|address| show_main(&handle, &address).map_err(|_| "无法打开管理窗口".into()));
+                let result = result.and_then(|address| show_main(&handle, &address).map_err(|_| "Cannot open the management window".into()));
                 if let Err(message) = result {
                     stop_service(&handle);
                     let message = serde_json::to_string(&message).unwrap();
                     let _ = WebviewWindowBuilder::new(&handle, "main", WebviewUrl::App("error.html".into()))
-                        .title("Our Free Model — 启动失败").inner_size(620.0, 300.0).center()
+                        .title("Our Free Model — Startup failed").inner_size(620.0, 300.0).center()
                         .initialization_script(format!("document.addEventListener('DOMContentLoaded',()=>{{document.getElementById('reason').textContent={message};}})"))
                         .build();
                 }
@@ -213,7 +213,7 @@ pub fn run() {
                 if window.label() == "main" { api.prevent_close(); let _ = window.hide(); }
             }
         })
-        .build(tauri::generate_context!()).expect("无法构建桌面应用")
+        .build(tauri::generate_context!()).expect("Cannot build the desktop application")
         .run(|app, event| {
             if matches!(event, tauri::RunEvent::ExitRequested { .. } | tauri::RunEvent::Exit) {
                 app.state::<ServiceState>().stopping.store(true, Ordering::SeqCst);

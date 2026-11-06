@@ -1,784 +1,867 @@
 <div align="center">
-  <img src="icon.svg" alt="Our Free Model — DeepSeek Harness 免费模型插件" width="120">
+  <img src="icon.svg" alt="Our Free Model — free model provider plugin for DeepSeek Harness" width="120">
 
 # dsh-our-free-model
 
-**简体中文** | [English](README_EN.md)
+[简体中文](README_ZH.md) | **English**
 
-  <img alt="许可证" src="https://img.shields.io/badge/license-MIT-263146?style=flat-square">
-  <img alt="零依赖" src="https://img.shields.io/badge/dependencies-zero-4b6fff?style=flat-square">
-  <img alt="无构建步骤" src="https://img.shields.io/badge/build%20step-none-7da1de?style=flat-square">
-  <img alt="适配内核" src="https://img.shields.io/badge/dsh-0.1.5--0.1.7--rc.2-2f6f4f?style=flat-square">
-  <img alt="状态" src="https://img.shields.io/badge/status-beta-f0a441?style=flat-square">
+  <img alt="license" src="https://img.shields.io/badge/license-MIT-263146?style=flat-square">
+  <img alt="zero dependencies" src="https://img.shields.io/badge/dependencies-zero-4b6fff?style=flat-square">
+  <img alt="build step" src="https://img.shields.io/badge/build%20step-none-7da1de?style=flat-square">
+  <img alt="dsh kernels" src="https://img.shields.io/badge/dsh-0.1.5--0.1.7--rc.2-2f6f4f?style=flat-square">
+  <img alt="status" src="https://img.shields.io/badge/status-beta-f0a441?style=flat-square">
   <br>
-  <a href="https://trendshift.io/repositories/261203"><img alt="GITHUB TRENDING 第 1 名，日榜仓库" src="docs/images/trendshift-daily-laurel-gold.svg" width="250" height="55"></a>
-  <a href="https://trendshift.io/weekly?language=JavaScript"><img alt="Trendshift JavaScript 周榜第 1 名（2026-10-05 至 2026-10-11，更新中）" src="docs/images/trendshift-weekly-2026-10-11-first-gold.svg" width="250" height="55"></a>
+  <a href="https://trendshift.io/repositories/261203"><img alt="GITHUB TRENDING #1, Repository Of The Day" src="docs/images/trendshift-daily-laurel-gold.svg" width="250" height="55"></a>
+  <a href="https://trendshift.io/weekly?language=JavaScript"><img alt="Trendshift JavaScript Weekly #1 (October 5-11, 2026; ranking in progress)" src="docs/images/trendshift-weekly-2026-10-11-first-gold.svg" width="250" height="55"></a>
   <br>
-  <sub>Trendshift JavaScript 周榜第 1 · 2026-10-05 至 2026-10-11 · 更新中，截至 2026-10-11</sub>
+  <sub>Trendshift JavaScript Weekly #1 · October 5-11, 2026 · Ranking in progress, as of October 11, 2026</sub>
 
 </div>
 
 <div align="center">
 
-> 你只需在 dsh 里装上这个插件，无需登录、注册、填 API Key 或任何其它操作，
-> 就能用上包括 DeepSeek V4.1 Flash、Kimi K3 在内的前沿模型——完全免费，不限量。
+> All you do is install this plugin in dsh — no login, no sign-up, no API key, no other
+> step of any kind. The frontier models are simply there, DeepSeek V4.1 Flash and
+> Kimi K3 among them. Completely free, with no usage cap.
 >
-> *All you do is install this plugin in dsh: no login, no sign-up, no API key, nothing
-> else. The frontier models are just there — DeepSeek V4.1 Flash, Kimi K3 and the rest.
-> Free, with no usage cap.*
 >
-> 模型清单跟随上游刷新，可用性由**你自己这台机器的网络出口**实测得出，
-> 思考强度下发的是真实预算而不是提示词，另附一个 OpenAI 兼容的本地转发端口。
+> The roster follows upstream, availability is measured from **your own** network
+> egress, the thinking-effort control sends a real budget instead of a prompt hint, and
+> a local OpenAI-compatible forward port comes included.
 >
-> 纯插件挂载：不改内核、无构建步骤、零依赖。
+> It mounts as a pure plugin: no core changes, no build step, zero dependencies.
 
 </div>
 
 ---
 
-## 交流群
+## Community
 
 <div align="center">
-  <img src="docs/images/qq-group-386179533.png" alt="ai技术交流学习群入群二维码（群号：386179533）" width="300">
+  <img src="docs/images/qq-group-386179533.png" alt="QR code for ai技术交流学习群 (QQ group: 386179533)" width="300">
   <br>
-  <b>QQ 群：386179533（ai技术交流学习群）</b>
+  <b>QQ group: 386179533 (ai技术交流学习群)</b>
   <br>
-  扫码或搜索群号加入群聊，一起交流插件使用心得、反馈问题与分享玩法。
+  Scan the QR code or search for the group number to join, discuss the plugin, report issues and share tips.
 </div>
 
 ---
 
-## 亮点
+## Highlights
 
-- **开箱即用，无配置环节**——不需要账号、不需要 Key、不需要在后台申请配额。
-- **上游来源公开透明**——免费车道来源为 [OpenCode 的 Zen 网关](https://opencode.ai)，Kilo 渠道来源为 [Kilo AI 的公共网关](https://kilo.ai)，均直连、不经任何第三方中转。请求由谁处理、数据发往何处，见「上游是哪些源」与「免责声明」。
-- **清单跟随上游**——模型集合、上下文长度与能力在每次刷新时向上游重新拉取，插件内不保存静态快照。
-- **选择器只广播可用的模型**——上游清单已声明但网关明确拒绝路由的模型（返回 `Model is unavailable`、或 404 找不到该 id）从下拉框移除，仅在设置页保留记录并注明拒因；网关自身故障（5xx）、配额限制（429）、超时与断网不属于对模型的判定，一律保持可达；被地区策略拦截的模型归入 region-limited 分组。整轮探测全部被拒时同样保留，选择器不会为空。
-- **公告中心 + 实时推送**——仓库维护者在仓库中编辑 JSON 并推送后，所有已安装实例最迟在一个轮询周期内收到；正文为白名单约束下的 HTML，支持图文排版；`urgent` 级别触发全屏弹窗；可选系统级通知。
-- **应用内升级**——设置页一键升级：下载 → SHA-256 校验 → 备份 → 原子替换 → 校验回读 → 热重载，任一步失败自动回滚至上一版本。
-- **热重载**——升级与代码变更即时生效，无需重启应用；也可在设置页手动触发，或启用文件监视自动重载。
-- **按响应体形状判定流式响应**——网关在高负载下会以 `application/json` 的 content-type 返回完整的 SSE 帧序列。插件按响应体形状判定，并将已嗅探的字节重新注入流，既不会导致整轮失败，也不会因 header 与实际内容不符而将可用模型判为不可用。
-- **思考强度实际生效**——两类模型两种控制：声明了思考档位的模型（如 DeepSeek V4.1 Flash、GLM 5.3 Flash）给出它自己的档位菜单（Off / Low / High / Max 等），选中值按原值下发到上游 `reasoning_effort`，上游会校验该字段、集合外的取值直接 400；没有档位菜单的模型（MiMo V2.6 等）走预算阶梯——Light / Balanced / Deep 对应输出 token 预算 2 048 / 8 192 / 模型上限，思考不可关闭的模型三档整体翻倍为 4 096 / 16 384 / 模型上限，因为思考与正文共享同一输出额度。两者都逐次调用留痕，设置页每张模型卡均标注档位或该档实际下发的上限（详见「思考强度：档位菜单与预算阶梯」）。
-- **不依赖浏览器界面**——插件仅将 llm 作为硬依赖，在没有 web server 的 composition（如 dsh-tui）中同样完成启动并输出模型；看板模块挂载在独立的 fiber 上，待 webServer 就绪后再注册路由，因此既不会阻塞模型车道，也不会因插件先于 web 服务加载而永久丢失设置页。
-- **用量看板，数据全部留在本机**——Token 热力图、总量曲线（支持总计与单模型视图）、输出速度与首字延迟逐次采样。不上传任何数据。
-- **OpenAI 兼容转发端口**——本机其它工具通过 base URL 与 Key 即可调用这些模型。Chat 历史中 assistant 的字符串 `reasoning_content` 会随工具后续请求保留，包括显式空字符串；缺失字段不会被补造。
-- **EAC 渠道（桌面端专属）**——在 DeepSeek Harness 桌面端与 DSHEAC AIO 桌面端中自动解锁一条协付通道，模型以 EAC 前缀显示（如 EAC DeepSeek V4.1 Flash）；凭据加密密封，由宿主指纹闸门把守；该渠道在服务器侧校验 GitHub 授权（登录并 star 本仓库）后才放行对话；在命令行及其它宿主中该通道完全不存在。详见「EAC 渠道」。
-- **Kilo 渠道（免密免费池）**——内置 Kilo AI 公共网关的免费模型池（`isFree` 清单实时拉取，含 `kilo-auto/free` 自动路由），无需任何账号或 Key；模型卡带 Kilo 徽章。思考强度与 EAC 渠道同款：模型自身的档位菜单（Off / Low / Medium / High，默认 High），经网关统一的 `reasoning` 参数真实下发——Off 已逐家族实测将思考归零（nemotron、ling、dots、poolside、apodex、cohere）；stepfun 与 liquid 端点强制思考（对关闭请求返回 400）、两个自动路由不透传关闭，这些模型的菜单不含 Off 档。该池由上游免费提供，上游会在其模型卡中声明 prompt 可能被记录用于改进服务——请勿发送敏感内容，详见「免责声明」。
-- **聚合渠道，自带 Key**——设置页新增一页，把第三方端点接进同一条模型清单：注册表内置 76 家提供商（NVIDIA NIM、OpenRouter、Groq、Cerebras、SambaNova、Gemini、DeepSeek、Mistral、Together、Fireworks、SiliconFlow、Nebius、Chutes、Hugging Face、Cloudflare、Z.ai、Kimi、MiniMax、QwenCloud/Alibaba、Bedrock、Vertex、Vercel AI Gateway、Azure OpenAI、FleetRelay Gateway，以及无需账号的 Ollama、LM Studio、llama.cpp），写入 Key（本机免账号的提供商不需要）后其模型即以 `provider/model` 出现在选择器里，也可经本地网关调用。Key 只写入本机 0600 的 settings.json，API 只回显 `hasKey` 与 `…abcd` 指纹；每家可单独启停、测试（列表探测，不花一次生成）、发现模型、覆盖 Base URL 与模型清单。OAuth 与 ADC 认证的提供商照常列出，但标注为不可驱动。
-- **省 Token**——三件事：工具输出压缩（RTK）在请求发出前就地重写 `tool_result`（git diff / status / log、grep、find、ls、tree、构建日志、编号转储、搜索清单、重复日志行），实测 40 KB 的 `git diff` 移除 90% 的字节且模型仍能就它作答；提示词瘦身有 caveman 与 ponytail 两族、默认全关；另有五个不占用上游请求的本地应答。设置页用与用量图表同一批统计行显示压缩前后字节、节省比例、压缩块数与统计调用数。
-- **路由（降级链）**——把任意车道的模型串成一条命名链，以 `combo:<name>` 作为虚拟模型出现在选择器与网关上；`fallback` 固定从链首开始，`round-robin` 轮换起点并连续 N 轮粘滞。链接在输出任何正文之前失败会被整段丢弃，切换对调用方不可见；思考增量不算正文，因此「想了很久才撞上配额墙」正是降级最有价值的场景。
-- **本地网关原生说 Anthropic**——新增 `POST /v1/messages`（流式与非流式，含 thinking / tool_use 块、真实 stop_reason 与流内 error 事件）与 `POST /v1/messages/count_tokens`（本地估算）；`/v1/models` 广播全部车道，含聚合行与链路。网关页新增「接入客户端」分区，按实际绑定的端口与真实要求的密钥生成 Claude Code、Codex、OpenAI SDK、Anthropic SDK、curl 与局域网的可复制配方。
-- **接口具备鉴权围栏**——插件 HTTP 路由优先级高于内核 `/api`，因此内置与内核一致的信任检查（优先复用 composition 的 connection 服务，缺失时退回结构化围栏）。
-- **十个账号渠道，一体接入**——LobsterAI（有道）、Qoder / Qoder 中国版（阿里系）、TRAE（字节）、Cline、Loomy（讯飞）、Raccoon（商汤）、MiniMax Code、ZCode（智谱）、Gemini（Google Code Assist）十个账号渠道开箱即用，外加 Kilo 免费车道与原匿名免费通道；OpenCode 账号渠道在本插件中默认停用。各渠道的登录流程、账号池、每日积分领取、模型黑名单与其本地 OpenAI 网关（Chat Completions + Responses，默认 `127.0.0.1:8326`）原样挂载与运行；凭据只写入宿主凭据库，浏览器永远拿不到明文。
-- **视觉特效按需开启**——设置页顶部“视觉特效”开关默认关闭，鱼缸和业务功能始终保留；开启后恢复背景光晕、毛玻璃与装饰动画，选择仅保存在当前浏览器。
-- **十一页毛玻璃界面**——设置页顶部导航扩为十一个页面：原有六页（**免费模型**（鱼缸水位 = 可用模型占比）、**EAC 模型**（鱼缸水位 = 协付池压力）、**白嫖模型接入**（十张渠道卡：登录、账号、模型开关、一键领取积分）、**数据看板**（今日/全部 Token 消耗、平均生成速度、缓存命中率、成功率，账号透视与模型性能表、最近请求总览）、**运行日志**（逐请求明细：结果、耗时、首字、速度、Token 细分，失败原因悬停可见）与**网关设置**（网关开关/端点/密钥；局域网转发中继：监听地址、端口与独立中继密钥）），新增**聚合渠道**（提供商注册表、Key、测试、发现模型、Base URL 与模型清单覆盖）、**省 Token**（压缩开关、两族提示词档位、五个本地应答与节省统计）、**路由**（降级链编辑器）、**插件升级**（版本检查、一键升级与热重载）与**推荐项目**（EAC-Desktop / EAC-Pack / EAC-design-world 三张卡片：简介、直达链接与 Star 按钮，Star / Fork / 最近提交数实时取自 GitHub，取不到就整块不显示）五页；网关设置页另增「接入客户端」分区。页面切换与卡片入场为 150–250 ms 短动效，`prefers-reduced-motion` 下整体关闭。每页都有直达 GitHub 仓库的 Star 按钮。
-- **局域网转发中继**——渠道网关本身只监听本机（上游的安全选择）；本插件提供自己的转发门：调用方用插件签发与轮换的中继密钥，转发跳由宿主换用网关凭据（凭据不出宿主进程），仅放行 `/v1/*` 模型接口并带环路保护。
+- **Nothing to configure** — install, restart, pick a model. No account, no key, no quota dashboard to register on.
+- **The upstreams are named** — the free lane is OpenCode's Zen gateway at `https://opencode.ai`, and the Kilo channel is Kilo AI's public gateway at `https://kilo.ai`; both are dialled directly, with no third party relaying your traffic. Who serves your requests, and where your data goes, is spelled out in [Where the models come from](#where-the-models-come-from) and the [Disclaimer](#disclaimer).
+- **A roster that tracks upstream** — model set, context length and capabilities are re-fetched on every refresh rather than frozen into the plugin.
+- **The picker offers only what actually answers** — a model the upstream listing names but the gateway refuses to route outright (`Model is unavailable`, a 404 for that id) leaves the dropdown and stays visible in the settings page with its refusal recorded. Everything that is *not* a statement about the model keeps its model reachable: a 5xx from the gateway, a 429 quota window, a timeout or a dropped connection. Region-gated ones move to their own `region-limited` group. If a whole round refuses everything, nothing is hidden: the picker never goes empty.
+- **Announcement center with live push** — the repository owner edits one JSON file and pushes; every installation receives it within one poll cycle. Bodies are HTML rendered through a strict allowlist; `urgent` items open a full-screen modal; optional OS-level notifications.
+- **In-app upgrades** — one click in the settings page: download → SHA-256 verification → backup → atomic replace → read-back verification → hot reload, with automatic rollback if any step fails.
+- **Hot reload** — upgrades and code changes take effect immediately, no app restart; also available as a manual button and an optional file watcher.
+- **Region-aware, per egress** — models gated by geography are separated into their own `region-limited` group instead of failing mid-turn. Switch your network exit and the next probe reclassifies them automatically.
+- **The body decides what it is, not the header** — under load this gateway answers 200 with a JSON `Content-Type` over a perfectly ordinary SSE frame stream. The plugin sniffs the first bytes and replays them into the stream, so the turn keeps streaming instead of being thrown away — and a working model is never demoted to `unavailable` because one header lied.
+- **Thinking effort that actually binds** — two kinds of model, two kinds of control. A model that declares thinking levels (DeepSeek V4.1 Flash, GLM 5.3 Flash among them) gets its own level menu (Off / Low / High / Max …), and the selected level is sent as-is in the upstream `reasoning_effort` field — which this gateway validates, so a value outside the set is a 400. A model with no level menu (MiMo V2.6 among them) gets the budget ladder: `Light / Balanced / Deep` map to output-token budgets of 2 048 / 8 192 / the model's full capacity, and a model that cannot switch thinking off gets the whole ladder doubled to 4 096 / 16 384 / capacity, because there thinking and the visible answer compete for the one ceiling. Both are recorded per call, and every model card in the settings page prints either the levels or the number it will actually send (see [Thinking effort](#thinking-effort-a-level-menu-or-a-budget-ladder)).
+- **Works without a browser UI** — only `llm` is a hard dependency, so the plugin activates on a headless composition such as dsh-tui and still serves its models. The dashboard half lives on its own fiber and mounts itself when `webServer` appears, so a composition that loads plugins before its HTTP server exists still gets its settings page. Availability probing and the background loops run on plain timers.
+- **Usage dashboard, local only** — token heatmap, cumulative curve by total or per model, output speed and time-to-first-token sampled per call. Nothing is uploaded.
+- **OpenAI-compatible forward port** — expose these models to any other local tool through a base URL plus a generated API key. Assistant string `reasoning_content` fields in Chat history are preserved for tool follow-ups, including explicit empty strings; absent fields are not fabricated.
+- **EAC lane** — a co-paid lane for DSHEAC AIO and kernel-declared `desktop`, `tauri`, `web`, or `web-desktop` profiles, with models prefixed `EAC`. Its credential is sealed; host admission and server-side GitHub authorization (sign in and star the repository) remain separate requirements. Command-line profile arguments alone do not grant access.
+- **The Kilo channel (keyless free pool)** — the free model pool of Kilo AI's public gateway (the listing's `isFree` slice, fetched live, including the `kilo-auto/free` auto-router) is built in; no account, no key. Model cards carry a Kilo badge. Thinking effort works like the EAC lane: the model's own level menu (Off / Low / Medium / High, default High), sent for real through the gateway's unified `reasoning` parameter — Off was verified family by family to zero out thinking (nemotron, ling, dots, poolside, apodex, cohere); the stepfun and liquid endpoints refuse to disable thinking (HTTP 400) and the two auto-routers ignore it, so those models' menus omit the Off rung. The pool is the upstream's free offer, and its model cards state that prompts may be logged to improve their services — never send sensitive content; see the [Disclaimer](#disclaimer).
+- **The aggregate lane — your own key, 76 providers** — a new settings tab brings third-party endpoints into the same roster: the registry ships 76 providers (NVIDIA NIM, OpenRouter, Groq, Cerebras, SambaNova, Gemini, DeepSeek, Mistral, Together, Fireworks, SiliconFlow, Nebius, Chutes, Hugging Face, Cloudflare, Z.ai, Kimi, MiniMax, QwenCloud/Alibaba, Bedrock, Vertex, Vercel AI Gateway, Azure OpenAI, FleetRelay Gateway, plus the no-account Ollama, LM Studio and llama.cpp). Configuring a provider (a key for the ones that need one; the local no-account ones need none) turns each of its models into a `provider/model` row in the picker and on the local gateway. Keys stay in the local `0600` settings.json; the API echoes only `hasKey` and a `…abcd` fingerprint. Per provider: enable/disable, Test (a *listing* probe — it verifies a key without spending a generation), Discover, a base-URL override, a model-list override and Remove. OAuth/ADC providers are listed but marked not drivable here. OpenCode's keyless free pool is deliberately **not** a registry row: it requires a per-request minted session id, the v2 client User-Agent and a set of official tool declarations, which this lane's generic transport has nowhere to carry — listing it would only add a picker row that can never answer, and those ten models are served natively by the plugin's own free lane.
+- **Token savers** — three things: tool-output compaction (RTK) rewrites `tool_result` content in place before the request is sent (git diff / status / log, grep, find, ls, tree, build logs, numbered file dumps, search listings, duplicate log lines) — measured live, a 40 KB `git diff` lost 90% of its bytes and the model still answered about it; prompt shaping offers the caveman and ponytail families, every level off by default; and five local answers that never call a provider. The settings page reports bytes before/after, percent saved, blocks compacted and calls measured, from the same stats rows the usage charts read.
+- **Routing (fallback chains)** — chain models from any lane into one named chain that appears in the picker and on the gateway as the virtual model `combo:<name>`. `fallback` always starts at the head; `round-robin` rotates the starting point and stays there for N turns. A link that fails *before any answer delta* is discarded whole, so the switch is invisible to the caller — and reasoning deltas deliberately do not count as content, so "thought for a minute, then hit a quota wall" is the case failover exists for.
+- **The local gateway speaks Anthropic natively** — new `POST /v1/messages` (streaming and non-streaming, with `thinking`/`tool_use` blocks, a real `stop_reason` and an in-stream `error` event when a turn fails after the headers went out) and `POST /v1/messages/count_tokens` (a local estimate — the plugin ships no tokenizer); `/v1/models` now advertises every lane, the aggregate rows and the chains included. The gateway page's new *Connect a client* section generates copy-ready recipes — Claude Code, Codex `config.toml`, the OpenAI and Anthropic SDKs, curl, and a LAN variant when the relay is up — from the port that actually bound and the key that is actually required.
+- **Optional visual effects** — The settings header has a Visual effects switch, off by default. The aquarium and model features stay available; enabling it restores background glows, glass blur and decorative motion. The preference stays in the current browser.
+- **Eleven tabs beside the old six** — Aggregate, Token savers, Routing, Plugin upgrade and Recommended projects join Free models, EAC models, Free channels, Dashboard, Request log and Gateway; the motion pass (card rise on mount, page fade on tab switch, an animated savings meter, hover lifts) respects `prefers-reduced-motion` and collapses to one column at panel width. The Recommended-projects page carries the three companion repositories — EAC-Desktop, EAC-Pack and EAC-design-world — with a description, a direct link and a star button each, and their live star, fork and last-push numbers read from GitHub (absent, never invented, when GitHub cannot be reached).
+- **Clean names in the UI** — no mojibake, no upstream vendor strings leaking into your model picker.
 
-## 你会看到什么
+## What you get
 
-**输入框的模型选择器**
+**Composer model picker**
 
-| 分组 | 内容 |
+| Group | Contents |
 | --- | --- |
-| Our Free Model | 当前网络出口可直接使用的模型 |
-| Our Free Model · region-limited | 上游对该地区不放行的模型，保留可见但单独隔离 |
+| `Our Free Model` | Models usable from your current network exit |
+| `Our Free Model · region-limited` | Models the upstream refuses for this region, kept visible but separated |
 
-被判定为「已声明但不路由」的模型不出现在任何分组中——它们仅在设置页的「不在选择器中」分组保留记录，
-附带拒因与探测时间；后续探测重新通过后自动回到选择器。
+A model the gateway names but refuses to route appears in neither group. It stays listed under
+**Not in the picker** in the settings page, with the refusal and the probe time, and returns to
+the picker by itself as soon as a probe gets through.
 
-**设置页** 设置 → Our Free Model，包含七个分区：
+**Settings page — `Settings → Our Free Model`**, seven sections:
 
-- **模型清单**——各模型的可用性、是否支持视觉、上下文窗口、最长输出、各思考档位实际下发的输出上限、实测首字延迟，以及单次调用基准测试按钮。
-- **EAC 渠道授权**——一键发起 GitHub 登录（自动打开浏览器，无需复制粘贴）、显示登录名与 star 校验状态、重新检查、退出登录；未授权时模型卡带锁标记。免费车道的模型不受影响。
-- **公告中心**——仓库维护者推送的公告流：未读计数、紧急徽章、单条/全部标记已读、检查新公告按钮、系统通知开关。公告正文按白名单渲染 HTML。
-- **用量看板**——总览计数、17 周 Token 热力图、总量曲线（Token / 请求数切换，总计与单模型切换）、速度迷你图、按模型汇总表。
-- **本地转发**——开关、监听地址与端口、复制 base URL、显示 / 复制 / 轮换 API Key，并提供可直接执行的 curl 示例。
-- **插件设置**——总开关、是否展示地区受限模型、探测间隔、默认输出上限，以及当前探测到的出口 IP 与国家。
-- **插件升级**——当前/最新版本、检查更新、一键升级（含进度与失败原因）、最近一次升级历史、热重载按钮与文件监视开关。
-- **首次启动公告**——分 5 页（前言 / 模型清单 / 使用步骤 / 功能介绍 / 公告与升级），确认一次后不再弹出，除非文案版本号被提升。
+1. **Model roster** — per-model availability, vision vs text-only, context window, max output, the output ceiling each effort rung really sends, measured time-to-first-token, and an on-demand single-call benchmark.
+2. **EAC lane authorization** — one-click GitHub sign-in (the browser does the work; nothing to paste), the signed-in name and star verdict, a re-check button and sign-out; model cards carry a lock until authorized. The free lane is unaffected.
+2. **Announcement center** — the owner-pushed feed: unread counter, urgency badges, mark-read (single/all), check-now button, OS-notification toggle. Bodies render HTML through the allowlist.
+3. **Usage board** — headline counters, a 17-week token heatmap, a cumulative curve switchable between tokens and request counts and between total and any single model, speed sparklines, and a per-model table.
+4. **Local forward** — enable/disable, bind host and port, copy base URL, show / copy / rotate the API key, and a ready-to-run `curl` example.
+5. **Plugin settings** — master switch, whether region-limited models are exposed, probe interval, default output ceiling, plus the detected egress IP and country.
+6. **Plugin upgrade** — installed/latest version, check for updates, one-click upgrade with progress and failure reasons, last-upgrade history, hot-reload button and file-watcher switch.
 
-## 独立本地服务（开发中）
+**First-run announcement** — a five-page walkthrough (preamble, model roster, how to use, what it does, news & upgrades) that acknowledges once and never reappears until the copy version is bumped.
 
-仓库现在提供两个入口：下文安装的是 **DSH 插件**；`packages/standalone` 是
-**无需安装 DSH 的独立本地服务**。从完整源码仓库运行：
+## Install
 
-```powershell
-npm run start:standalone
-```
-
-独立服务默认使用 `~/.our-free-model` 和端口 `18900`，拥有自己的 API Key，
-不读取插件数据。支持匿名/Kilo、EAC 和十个账号渠道，提供
-Chat Completions、Responses API，以及独立网页管理（模型、统计、渠道、EAC、设置、API Key）。
-启动后打开终端打印的一次性管理链接即可使用；账号在独立页面登录，也可手动导入插件账号备份。
-启动、参数与验证见 [独立服务说明](packages/standalone/README.md)。
-独立服务的安装制品与 Release 尚未发布。
-
-## 安装
-
-> **⚠️ 不要安装 npm 上那个裸名的 `dsh-our-free-model`。**
+> **⚠️ Do not install the bare `dsh-our-free-model` package from npm.**
 >
-> npm 上的 `dsh-our-free-model` 包**不是本仓库发布的**。它由第三方打包，内容与本仓库
-> 不一致：`index.js`、`client.js` 被改动，并额外包含本仓库从未有过的
-> `src/channel-visibility.js`。装到它得不到本项目审核过的构建，也拿不到本仓库的签名
-> 清单校验与应用内升级。
+> The `dsh-our-free-model` package on npm **is not published by this repository.**
+> It is a third-party repackaging whose contents do not match this tree:
+> `index.js` and `client.js` were modified, and it ships a
+> `src/channel-visibility.js` that has never existed here. Installing it gets you
+> a build this project did not review, and you lose the signed-manifest
+> verification and in-app upgrades that this repository provides.
 >
-> 本仓库自己发布的是带 scope 的 **`@ebony-vinyl/dsh-our-free-model`**，与 Release 的
-> `dsh-our-free-model-<版本>.tgz` 同源、同版本。只想走 npm 时可以装它：
+> This repository publishes the scoped **`@ebony-vinyl/dsh-our-free-model`**, built
+> from the same tree and version as the release `dsh-our-free-model-<version>.tgz`.
+> If you prefer npm:
 >
 > ```
 > dsh plugin --profile web add @ebony-vinyl/dsh-our-free-model@2.8.0
 > ```
 >
-> 注意它的包名带 scope，因此挂载条目是 `@ebony-vinyl/dsh-our-free-model`，与下文
-> 裸包名的本地安装方式不能混用（同一个 profile 里只选一种）。
+> Its bundle id carries the scope (`@ebony-vinyl/dsh-our-free-model`), so it cannot
+> be mixed with the bare-name local install below in one profile — pick one.
 >
-> 其它渠道出现的同名包一律以本仓库为准。
+> For any same-named package from another channel,
+> this repository is the source of truth.
 
+### Command line (plain `dsh web`)
 
-**命令行（纯 dsh web）**
-
+```bash
+dsh plugin --profile web add /absolute/path/to/dsh-our-free-model
 ```
-dsh plugin --profile web add /绝对路径/dsh-our-free-model
-```
 
-安装完成后重启应用一次。`--profile` 填写实际使用的 profile 名称。
+Restart the app once. `--profile` should name the profile you actually use.
 
-**DSHEAC AIO / 桌面端：请先阅读本节**
+### DSHEAC AIO / desktop builds — read this first
 
-部分 DSHEAC AIO / 旧版桌面整合包在启动 web 服务之前会执行 profile 闸门，
-限制 profile 中的符号链接或目录 junction。若当前宿主包含该检查，可能报错：
+Some DSHEAC AIO and older desktop packs run a profile gate before starting the
+web app and restrict symlinks or directory junctions. A host with that check may report:
 
-```
+```text
 PROFILE_UPGRADE_REQUIRED: offline dependency migration is not yet available
 ```
 
-遇到该闸门时，不要使用 `link:` 依赖或 junction；使用应用内插件管理器，
-或下方的本地 tarball 安装。不同宿主的限制以自身日志和安装机制为准。
+When this gate applies, avoid `link:` dependencies and junctions. Use the in-app
+plugin manager or the local tarball workflow below. Follow the actual host's logs
+and installation contract rather than assuming every desktop shell shares this gate.
 
-以真实目录手工安装时，使用可信源码打出的本地 tarball：
+To install manually as a real directory, use a trusted local tarball:
 
-1. 创建 `<DSH_HOME>/profiles/<profile>/vendor/`，在审核过的本仓库目录运行 `npm pack --ignore-scripts --pack-destination "<DSH_HOME>/profiles/<profile>/vendor"`，或将本仓库正式发布的同版本 tarball 放入该目录。本地打包不执行 npm 发布。
-2. 在 profile 的 `package.json` 的 dependencies 中加入 `"dsh-our-free-model": "file:./vendor/dsh-our-free-model-2.8.0.tgz"`。文件名版本跟随仓库 `package.json`，不要改成同名 npm 注册表版本；再通过宿主的安装流程解析依赖。
-3. 在 dsh.profile.bundles 末尾追加 `"dsh-our-free-model"`。
+1. Create `<DSH_HOME>/profiles/<profile>/vendor/`. From the reviewed repository, run `npm pack --ignore-scripts --pack-destination "<DSH_HOME>/profiles/<profile>/vendor"`, or place an official same-version release tarball from this repository there. Local packing does not publish to npm.
+2. Add `"dsh-our-free-model": "file:./vendor/dsh-our-free-model-2.8.0.tgz"` to the profile's `package.json` dependencies, then use the host's installation flow to resolve it. Keep the filename version aligned with this repository's `package.json`; do not substitute a same-named npm registry version.
+3. Append `"dsh-our-free-model"` to `dsh.profile.bundles`.
 
-包管理器拥有这份安装的字节时，同时将 bundle config 或插件 `settings.json` 的 `distribution` 设为 `managed`，由包管理器统一更新；应用内升级、公告 feed 与热重载会停用，模型功能保留。以后更新时替换可信 tarball 并同步依赖路径，避免包管理器按旧锁文件恢复旧版本。
+When the package manager owns the installed bytes, set `distribution: 'managed'` in the bundle config or plugin `settings.json`. The package manager then handles updates; in-app upgrades, announcement polling and hot reload stand down while model access remains available. For later updates, replace the trusted tarball and update its dependency path so the old lockfile cannot restore an older copy.
 
-若手工复制发布文件，必须复制完整包，包括 `adapter/`、`src/`、`locale/` 、`vendor/magpie/` 下的元数据与许可证，以及 `vendor/channel-pack/` 下的 `pack.js`、WASM、LICENSE、NOTICE；只复制入口脚本会导致渠道加载失败。
+If copying release files manually, copy the entire package, including `adapter/`, `src/`, `locale/`, `vendor/magpie/` metadata and licenses, and `vendor/channel-pack/`'s `pack.js`, WASM, LICENSE and NOTICE. Copying only entry scripts leaves channel loading incomplete.
 
-不要再向 cordis.patch.yml 添加条目。被 dsh.profile.bundles 引用的包，其自带的
-patch 层会自动生效；两处同时注册将报错 duplicate loader entry id: our-free-model。
+> Do **not** also add an entry to `cordis.patch.yml`. A bundle referenced from
+> `dsh.profile.bundles` already applies its own patch layer, and registering it
+> twice fails with `duplicate loader entry id: our-free-model`.
 
-**整合包（托管安装）**
+#### Integration packs (managed installation)
 
-插件由整合包（EAC 整合包、Mojobox 等）安装时，更新时机与文件字节由安装方控制：
-安装时将 bundle config 设为 distribution: 'managed'（或向 settings.json 写入
-同一字段），插件的应用内升级、公告 feed 与热重载即全部停用——两个写入方同时操作
-同一安装目录只会导致目录损坏；模型 lane 不受影响。相关验收见
-scripts/offline-test.mjs；目录就绪记录（manifest 0.15 / 出处 / 许可 / 完整性）
-位于 catalog/ 下。
+When the plugin arrives through an integration pack (an EAC pack, Mojobox, …),
+the *pack* owns update timing and bytes: install with the bundle config
+`distribution: 'managed'` (or write the same field into settings.json), and the
+in-app updater, the announcement feed and the hot reload all stand down — two
+writers to one installed directory corrupt it; the model lane is unaffected.
+Acceptance lives in `scripts/offline-test.mjs`; the catalog-ready records
+(manifest 0.15 / provenance / license / integrity) are under `catalog/`.
 
-**启动桌面端前的自检**
+### Verify before launching the desktop app
 
-可直接调用桌面端自身的闸门代码进行自检：
+Run the desktop host's own gate against your profile instead of blind-retrying:
 
-```
+```bash
 node -e "
-const g = require('/sidecar/dist/lib/profile-upgrade.js');
-const app = '', profile = '/profiles/';
+const g = require('<APP_ROOT>/sidecar/dist/lib/profile-upgrade.js');
+const app = '<APP_ROOT>', profile = '<DSH_HOME>/profiles/<profile>';
 console.log(g.planProfileUpgrade(app, profile));
 g.assertProfileStartup(app, profile);
 console.log('startup gate: PASS');
 "
 ```
 
-预期输出为 status: 'compatible'、mismatches 为空数组，随后输出 PASS。
-若仅需确认 bundle 组合是否正确而不启动界面：
+Expect `status: 'compatible'`, an empty `mismatches` array, then `PASS`.
+To check bundle composition only, without booting:
 
+```bash
+DSH_HOME=<DSH_HOME> dsh --profile <profile> --dump-config | grep our-free-model
 ```
-DSH_HOME= dsh --profile  --dump-config | grep our-free-model
-```
 
-应当只出现一个 id: our-free-model。
+You should see exactly **one** `id: our-free-model` entry.
 
-**安装失败：ERR_PNPM_VIRTUAL_STORE_DIR_MAX_LENGTH_DIFF**
+### Install failure: `ERR_PNPM_VIRTUAL_STORE_DIR_MAX_LENGTH_DIFF`
 
-该问题源于目标 profile 的 pnpm 状态，与插件仓库无关（报错发生在下载插件之前）：profile 中已有的
-node_modules 由旧版 pnpm 生成，dsh 更新后内置的 pnpm 版本发生变化，pnpm 拒绝在旧参数上继续安装。
-关闭 dsh，删除该 profile 的 node_modules 与 pnpm-lock.yaml 使其重建，然后重新安装：
+This is a **pnpm state problem in the target profile, not the plugin repo** (it fires
+before the plugin is even downloaded): the profile's existing `node_modules` was
+created by an older pnpm, and after a dsh update the bundled pnpm refuses to keep
+using it. Close dsh, delete the profile's `node_modules` and `pnpm-lock.yaml` to
+let pnpm rebuild them, then install again:
 
-```
+```bash
 rd /s /q "%DSH_HOME%\profiles\web\node_modules"
 del "%DSH_HOME%\profiles\web\pnpm-lock.yaml"
 ```
 
-同时出现的 Ignoring broken lockfile 警告会随重建一同消失。
+The accompanying `Ignoring broken lockfile` warnings disappear with the rebuild.
 
-**安装失败：`git ls-remote "git+ssh://git@github.com/..."`（插件市场自动安装）**
+## Desktop installers (macOS, community build)
 
-插件市场（dsh-plugin-hub）对 git 源的自动安装会把 GitHub 地址交给 pnpm 解析，pnpm 再调用本机
-git 执行 `git ls-remote`。若本机 git 配置了 `insteadOf` 重写（常见于把 https 改写为 ssh 的
-`url."git+ssh://git@github.com/".insteadOf` 规则），或 SSH 密钥未配置，这一步会在下载任何插件
-文件之前失败。处理方式二选一：
+The dsh plugin itself needs no build. The **desktop installer** (the Our Free Model desktop shell) is officially published for Windows only; the macOS installer is a community build. The source changes are listed in [PR #421](https://github.com/Ebony-Vinyl/dsh-our-free-model/pull/421) and are fully auditable, line by line. A ready-made Apple Silicon (arm64) build is available from that PR and its community release, or you can build it yourself on a Mac (`npm --prefix packages/desktop run build`; the full pipeline lives in `.github/workflows/build-macos.yml`).
 
-- 修正本机 git 配置（`git config --global --get-regexp insteadof` 查看重写规则），保证终端里
-  `git ls-remote https://github.com/Ebony-Vinyl/dsh-our-free-model.git` 能成功；
-- 改用本地安装：从 Releases 下载发布包解压后 `dsh plugin add <解压目录>`，绕开 git 解析。
-
-**安装失败：`profile "desktop" is managed exclusively by the Electron application`**
-
-这是宿主自身的保护，不是插件问题：桌面端（Electron）的 profile 只允许桌面应用自己管理，
-命令行 `dsh plugin add` 无法写入。请在桌面端的插件管理器（设置 → 插件）里完成安装或升级；
-命令行安装仅适用于纯 web profile（`dsh web`）。
-
-## 桌面安装包（macOS，社区构建）
-
-DSH 插件本体无需构建、解压即用；**桌面安装包**（Our Free Model 桌面壳）官方目前只发布 Windows 版。macOS 版为社区构建：源码改动见 [PR #421](https://github.com/Ebony-Vinyl/dsh-our-free-model/pull/421)，可逐行审计；预打好的 Apple Silicon（arm64）包以社区 Release 的版本和校验值为准，也可以自己从源码构建（macOS 上执行 `npm --prefix packages/desktop run build`，完整流水线见 `.github/workflows/build-macos.yml`）。
-
-下载后建议先核对校验和（SHA256 见 PR / Release）：
+Verify the checksum after downloading (SHA256 is listed in the PR / release):
 
 ```bash
 shasum -a 256 ~/Downloads/Our.Free.Model_<version>_aarch64.dmg
 ```
 
-**安装后提示「已损坏」或打不开？**
+**"This app is damaged" or won't open?**
 
-社区构建没有 Apple Developer 账号签名与公证，Gatekeeper 会拦截首次启动——这不是文件真的损坏，以下几种方式任选其一：
+The community build is not signed or notarized with an Apple Developer account, so Gatekeeper blocks first launch. The file is not actually damaged — pick any one of these:
 
-1. **右键打开**：在访达中按住 Control 点按应用图标，选择「打开」，在弹窗中再次点按「打开」。
-2. **清除隔离属性**（终端）：
+1. **Right-click open**: in Finder, Control-click the app icon, choose **Open**, then confirm **Open** again in the dialog.
+2. **Remove the quarantine attribute** (Terminal):
 
    ```bash
    xattr -cr /Applications/Our\ Free\ Model.app
    ```
 
-3. **仍提示损坏时，用 sudo 清除隔离属性**（较新 macOS 对未签名应用校验更严）：
+3. **If it still says damaged, remove quarantine with sudo** (newer macOS versions are stricter about unsigned apps):
 
    ```bash
    sudo xattr -rd com.apple.quarantine "/Applications/Our Free Model.app"
    ```
 
-4. **在系统设置中放行**：打开「系统设置 → 隐私与安全性」，若出现「仍要打开」按钮，点按确认。
+4. **Allow it in System Settings**: open **System Settings → Privacy & Security** and click **Open Anyway** if the button is offered.
 
-几点说明：
+Notes:
 
-- 当前社区包为 **Apple Silicon（arm64）**；Intel 机型的 Mac 需自行从源码构建。
-- 包内自带 Node 运行时与独立服务，安装后即可使用，无需登录、无需 API Key。
-- 该包未经 Apple 签名与公证，是否信任请以上方可审计的源码改动与可复现的 CI 构建记录为准。
+- The current community build is **Apple Silicon (arm64)**; Intel Macs should build from source.
+- The bundle ships its own Node runtime and standalone service — no login, no API key.
+- The package is not signed or notarized by Apple. Trust it based on the auditable source change and the reproducible CI build record above, nothing else.
 
-## 使用说明
+## Usage
 
-**选择模型**：打开输入框的模型选择器，选择 Our Free Model 分组下的任意模型。选择结果按会话持久化。
+**Pick a model.** Open the model selector in the composer and choose anything
+under `Our Free Model`. The selection is durable per session.
 
-**调整思考强度**：同一菜单中的 Effort。声明了思考档位的模型给出它自己的档位（如 Off / Low /
-High / Max），选中值按原值下发；其余模型给 Light / Balanced / Deep 三档，档位越高思考占用的
-输出预算越多，上限为强制下发，因此档位之间存在可测量的差异。思考与可见回答共享同一输出额度，
-因此思考不可关闭的模型会将三档整体上移（设置 → Our Free Model 的模型卡上标注了每档的
-实际数值，声明档位的模型则标注档位名）。若回答被截断，可切换至更高档，或调高设置中的
-单次输出上限。
+**Change thinking depth.** The same menu exposes `Effort` with `Light`,
+`Balanced` and `Deep`. Higher levels spend more of the output budget on
+deliberation; the ceiling is enforced on the request, so the difference is
+measurable rather than cosmetic. It is **one** ceiling shared by deliberation and
+the visible answer, which is why a model that cannot switch thinking off gets
+the whole ladder doubled (the model cards in `Settings → Our Free Model` print the
+number each rung will really send). If answers keep getting cut off, move to
+`Deep`, or raise the per-call output ceiling in the settings.
 
-**供本机其它工具调用**：设置 → Our Free Model → 本地转发，启用后复制 base URL 并生成 Key。支持：
+**Serve other local tools.** `Settings → Our Free Model → Local forward`, enable
+it, then copy the base URL and generate a key. Supported routes:
 
-- GET /v1/models
-- POST /v1/chat/completions（流式与非流式）
-- POST /v1/responses
-- POST /v1/messages（流式与非流式，Anthropic Messages）
-- POST /v1/messages/count_tokens（本地估算，插件不含 tokenizer）
-
-端口被占用时插件不会静默失效：先在同一端口重试数轮（刚关闭的监听、刚删除的
-portproxy 规则通常在数百毫秒内释放），仍被占用则顺延至下一个可用端口，并在设置页标注
-"请求的 18899 不可用，实际监听 18900"，落盘的也是该实际端口。Windows 上最常见的占用
-来源是一条 netsh interface portproxy 规则（由 IP Helper 服务承载）：其对 0.0.0.0 的
-监听会导致回环绑定直接返回 EACCES（区别于 EADDRINUSE）。netsh interface portproxy show all 可列出规则，netsh interface portproxy reset 可清除规则。
-
-转发端点为全流式：除 `data:` 帧外，思考期间的静默由周期性写出的 SSE 注释帧
-（以 `:` 开头）填充，客户端的 idle 超时因此不会将"上游仍在推理"误判为"连接已断开"。思考内容按
-reasoning、reasoning_content、reasoning_text 三个字段识别——同一段思考若被上游同时
-写入两个字段只计一次——reasoning_details 数组同样识别。上游本身不流式输出思考的模型，此处
-也不会产生思考帧，详见「已知边界」。
-
-**供同一网络中的其它设备使用**：同一面板下方还提供"局域网访问"。该功能默认关闭；启用后中继绑定一个可路由地址（默认 0.0.0.0），并要求使用独立的局域网 Key——与上述本机 Key 互不通用，因此任一泄露只需轮换对应一侧，本机已配置的工具不受影响。中继将请求原样转发至本机监听，模型清单、流式行为与错误语义与本机完全一致。端口填 0 表示自动分配（本机 18899 常已被占用或被端口代理占用），启用后面板会显示实际端口与局域网地址。**局域网地址按本机网卡实时读取**：面板在开启期间每 15 秒重读一次，切换到别的网络后不必重开面板。同一台机器常同时持有多张网卡上的私网地址——路由器分配的 `192.168.x.y`，以及虚拟交换机（WSL/Hyper-V/Docker）、VPN 或隧道适配器上的地址——面板把物理网卡的地址排在前面并作为可直接复制的那一条，其余地址列在其下；中继绑定的是所有接口，但某个地址能否被同网段的另一台机器拨通，取决于该地址所属的那张网卡。启用期间，任何能够访问该主机的用户均可使用此 Key 消耗本机的免费额度，因此请仅在可信网络中启用，必要时通过防火墙限制来源网段。
-
-**重新核对地区**：点击"重新探测可用性"，将按当前出口重新执行探测。切换 VPN 状态后再执行一次，
-地区受限模型会在两个分组之间自动迁移。
-
-**接收公告**：全自动。仓库维护者推送新公告后，运行中的插件在一个轮询周期内（默认
-30 分钟，也可在公告中心点击"检查新公告"立即拉取）收到通知：普通公告弹出 toast，
-`urgent` 级别直接触发全屏弹窗，两者均会进入公告中心并保留未读标记。如需同时接收
-系统级通知，在公告中心点击"开启系统通知"。
-
-**升级插件**：设置 → Our Free Model → 插件升级 → 检查更新 → 立即升级。全流程
-在应用内完成（下载 → 校验 → 备份 → 替换 → 热重载），无需重新安装，也无需
-重启应用。升级失败会自动回滚至上一版本并给出失败原因。
-
-
-### Gemini 与 Cline 的代理连接
-
-Gemini 登录需要访问 `accounts.google.com`、`oauth2.googleapis.com`、`www.googleapis.com`，模型请求还需访问 Google Code Assist 服务。浏览器能打开授权页，只说明浏览器的网络可用，插件仍需能访问这些端点。
-
-Gemini 的登录、续期、项目探测和推理，以及 Cline 的登录、续期和推理，共用逐请求代理：优先使用已运行的插件出口代理，其次读取 `HTTP_PROXY` / `HTTPS_PROXY` / `ALL_PROXY`，最后在 Windows 读取当前用户的手动系统代理；没有代理时直连。环境代理遵守 `NO_PROXY`，系统代理遵守 `ProxyOverride`；回环请求不自动使用代理。无需为这两条渠道设置 `NODE_USE_ENV_PROXY`，也不会改动宿主的全局代理。
-
-Windows 自动检测只支持手动代理，不执行 PAC 自动配置脚本；系统设置最多缓存 30 秒。仅配置 PAC 时，请改用插件出口或环境代理。网络失败会显示所选路径及 `UND_ERR_CONNECT_TIMEOUT`、`ENOTFOUND` 等底层错误码；代理连接失败不会自动重试直连。浏览器回调未到达的授权超时仍需检查本机回调地址和端口是否可达。
-
-## 聚合渠道、省 Token、路由与本地网关
-
-### 聚合渠道：自带 Key 的 76 家提供商
-
-设置页的**聚合渠道**一页把第三方端点接进同一条模型清单。提供商注册表内置 76 家（`src/providers/registry.json`，分类为 `free | free-tier | apikey | oauth | local`），包括 NVIDIA NIM、OpenRouter、Groq、Cerebras、SambaNova、Gemini、DeepSeek、Mistral、Together、Fireworks、SiliconFlow、Nebius、Chutes、Hugging Face、Cloudflare、Z.ai、Kimi、MiniMax、QwenCloud/Alibaba、Bedrock、Vertex、Vercel AI Gateway、Azure OpenAI、FleetRelay Gateway，以及本机、无需账号的 Ollama、LM Studio、llama.cpp。注册表数据来自 free-claude-code 的提供商目录、9router 的提供商注册表，以及本项目新增的自定义中转。FleetRelay Gateway 当前公开 `deepseek-v4.1-flash-free` 与 `gpt-6-astra`；其第三方 T1 候选池尚未获分发授权，因此保持禁用。
-
-写入 Key（本机免账号的提供商不需要）后，该提供商的每个模型以 `provider/model` 成为清单行：在选择器里可选，也可经本地网关调用。三种线协议按提供商各自声明：OpenAI Chat Completions、OpenAI Responses 与 Anthropic Messages（后两者用于只提供这两种协议的上游）。
-
-Key 只写入插件自己的 0600 `settings.json`，接口永不回显——页面只显示 `hasKey` 与 `…abcd` 指纹；字段缺省表示保留已存 Key，空字符串表示清除。每家提供商提供：启用/停用、测试、发现模型、Base URL 覆盖（Azure / Cloudflare / Vertex 没有可用默认值，必须覆盖）、模型清单覆盖与移除。测试按钮是**列表探测**：它用提供商的模型列表验证 Key，不花一次生成；提供商声明没有列表接口时，按钮如实说明。OAuth 与 ADC（Google ADC）认证的提供商照常列出并标注「不可驱动」——本车道无法替它们完成交互式登录或云侧凭据流程。OpenCode 的免密免费池**不在此注册表内**：它要求每请求一枚铸造形状的会话 id、v2 客户端 User-Agent 与一组官方工具声明，本车道的通用传输没有地方承载这些，硬列进来只会是一个点不通的选择器行——这 10 个模型本来就由本插件自己的免费车道原生提供（见「免费车道」）。
-
-### 省 Token：工具输出压缩、提示词瘦身与本地应答
-
-**工具输出压缩（RTK）** 在请求发出之前就地重写 `tool_result` / `role:"tool"` 内容：git diff、git status、git log、grep、find、ls、tree、构建与包管理器日志、带行号的文件转储、Cursor 搜索清单，以及成串重复的日志行。实测：40 KB 的 `git diff` 移除 90% 的字节，模型仍就这份 diff 作出了回答。安全规则：报错的工具结果永不触碰，小于尺寸下限的内容不碰，替换结果永不大于原文，过滤器抛错时原样放行，且整条管线幂等。该压缩对全部车道生效（含本地网关），默认开启。
-
-**提示词瘦身** 有两族可选项与档位：`caveman`（电报体回复：`off/lite/full/ultra/wenyan-lite/wenyan/wenyan-ultra`）与 `ponytail`（YAGNI 最小实现：`off/lite/full/ultra`）。它们改变助手的说话方式，因此所有档位默认 `off`。注入是幂等的、按线协议进行的（chat 的 system 消息、Anthropic 的 `system`（含块数组形式，且插在最后一个 `cache_control` 之前）、Responses 的 `instructions`/input 项），并且可以撤销。
-
-**节省统计** 显示压缩前字节 → 压缩后字节、节省字节、节省比例、压缩块数与统计调用数——数据取自用量图表所用的同一批统计行。
-
-**五个本地应答**（自 free-claude-code 移植，各自独立开关，默认全开）不调用任何提供商：额度探测（`max_tokens:1` + "quota" → `Quota check passed.`）、shell 命令前缀识别（`<policy_spec>` + `Command:` → 前缀，检测到命令注入时拒绝）、会话标题生成（→ `Conversation`）、建议模式（→ 空字符串）与文件路径提取（→ `<filepaths>` 块）。它们由本地网关在进程内直接应答。
-
-### 路由：命名降级链（combo）
-
-一条命名、有序的模型 id 列表，跨全部车道，以 `combo:<name>` 出现在选择器与网关上，如同一个虚拟模型。两种策略：`fallback`（固定从链首开始）与 `round-robin`（轮换起点，连续 N 轮粘滞）。链会逐个链接尝试直到有一个产出输出；在**任何正文增量之前**失败的链接被整段丢弃，因此切换对调用方不可见。思考增量刻意不算正文——「想了一分钟，然后撞上配额墙」正是最值得降级的场景。一旦已有正文增量交付，之后的失败按正常方式结束该回合（单模型检查点恢复仍先获得它的续写尝试）。链路容量取交集（只有每个链接都支持视觉，链才声明视觉；上下文窗口取最小值），全部链接当前不可用的链会被原样保存并标注为不可用，而不是被静默丢弃。
-
-### 本地网关：原生 Anthropic 接口与接入配方
-
-新增端点 `POST /v1/messages`（流式与非流式，`message_start` / `content_block_*` / `message_delta` / `message_stop` 正确成帧，含 `thinking` 块、`tool_use` 块、真实 `stop_reason`，以及响应头发出之后才失败时的流内 `error` 事件）与 `POST /v1/messages/count_tokens`（本地估算——插件不含 tokenizer）。Claude Code 与 Anthropic 各 SDK 因此可以直接指向本插件。原有的 `/v1/chat/completions` 与 `/v1/responses` 不变，`/v1/models` 现在广播全部车道，含聚合行与链路。网关页新增「接入客户端」分区，按实际绑定的端口与真实要求的密钥生成可复制的配方：Claude Code 环境变量、Codex `config.toml`、OpenAI SDK、Anthropic SDK、curl，以及中继开启时的局域网版本。
-
-顺带修掉一个假成功：一轮只产出了一个调用方从未声明的工具调用时，过去会以干净的空成功收尾；现在会如实报告发生了什么——压缩器自己追加的 `[full diff: rtk git diff --no-compact]` 提示就可能让模型去调一个调用方没有的工具。
-
-
-## 实现结构
-
-```
-index.js Host 半身：适配器注册、清单与可用性探测、设置/用量存储、
- webServer 路由、转发端口生命周期、公告/升级/热重载接线
-adapter/ 内核接缝：全包唯一允许 import @deepseek-ai/* 的位置
- （kernel.js：attribution User-Agent，失败降级为字面量）
-src/adapter.js 结构性 LlmAdapter：providerInfo、listModels、resolveModel、
- prepareCall、stream、providerRetryPolicy
-src/upstream.js 网关身份：凭据、session/request id 铸造、工具指纹、按线协议选端点
-src/stream.js 三种线协议解码（chat / messages / responses）归一为 harness StreamChunk，
- 并做不相交的 token 计数
-src/messages.js harness 消息 -> 各线协议形态，外加工具调用配对修复
-src/effort.js 思考档位 -> 输出预算
-src/forward.js 独立的 OpenAI 兼容监听器（另含 Anthropic Messages 端点）
-src/providers/registry.json 聚合车道注册表：76 家提供商的分类、认证、线协议与端点
-src/providers/index.js 注册表读取与 provider/model 复合 id 解析
-src/aggregate.js 聚合车道：清单行、凭据解析、Key 脱敏、列表探测、按线协议发送
-src/anthropic.js /v1/messages 的 Anthropic Messages 编解码与本地 token 估算
-src/token-saver/index.js 压缩管线：提示词注入 -> 工具输出压缩，按字节留痕、失败开放
-src/token-saver/inject.js chat / messages / responses 三线的幂等注入与撤销
-src/token-saver/prompts.js caveman / ponytail 两族提示词与档位
-src/token-saver/rtk/ 工具输出过滤器：git diff/status/log、grep、find、ls、tree、
- 构建日志、编号转储、搜索清单、重复日志行
-src/local-optimize.js 五个本地应答：额度探测、命令前缀、会话标题、建议模式、文件路径
-src/combos.js 降级链：虚拟清单行、两种策略、容量取交集
-src/route/classify.js 全车道统一的失败词汇与冷却策略
-src/trust.js 插件路由的请求信任围栏（connection 服务桥 + 结构化围栏）
-src/push.js SSE 推送枢纽：公告到达、更新可用、升级完成
-src/feed.js 远程公告 feed：多源拉取、校验、缓存、到达检测
-src/updater.js 应用内升级：清单校验、SHA-256 分级校验、备份、原子替换、回滚
-src/reload.js 自热重载：镜像内核 HMR 的缓存清除 + 重导入 + 重注册 + 回滚序列
-client.js 浏览器半身：手写 ModuleLoader bundle，无构建步骤
+```text
+GET  /v1/models
+POST /v1/chat/completions        streaming and non-streaming
+POST /v1/responses
+POST /v1/messages                streaming and non-streaming (Anthropic Messages)
+POST /v1/messages/count_tokens   local estimate; the plugin ships no tokenizer
 ```
 
-几个值得了解的架构决定：
+If another program holds the port, the listener does not die: it retries the same
+port for a few rounds (a listener that just closed, or a portproxy rule that was
+just removed, frees its port within a few hundred milliseconds), then walks to the
+next free port and says so on the settings page — *requested 18899 is not available,
+listening on 18900* — and the port written back into the settings is the real one.
+On Windows the most common owner is a `netsh interface portproxy` rule (served by IP
+Helper): its listener on `0.0.0.0` makes the loopback bind fail with `EACCES` rather
+than `EADDRINUSE`. `netsh interface portproxy show all` lists the rules and
+`netsh interface portproxy reset` clears them.
 
-**一个适配器，两条 provider 路由。** harness 的模型选择器严格按 provider 路由分组，
-而清单的线格式中并不存在 group / tag / badge 字段。因此要呈现独立的 region-limited
-标题，唯一方式是再注册一条路由；又由于客户端会丢弃空分组，一旦地区限制解除，
-两个分组会自动合并为一个。
+The forward endpoint streams in full: besides the `data:` frames, a lane that is
+thinking gets periodic SSE comment frames (a `:` line), so a client's idle
+timeout cannot read "the upstream is still thinking" as "the socket is dead".
+Thinking is recognised under `reasoning`, `reasoning_content` and
+`reasoning_text` — a gateway that repeats one thought under two of them is
+counted once — and the `reasoning_details` array as well. A model whose thinking
+never streams upstream still sends no reasoning frames here; see
+[Known limitations](#known-limitations).
 
-**以结构化方式实现适配器，不 import @deepseek-ai/dsh-llm。** 内核从不执行 instanceof
-检查，因此鸭子类型即可满足。这使插件不必将依赖固定在特定内核版本上，也是同一份代码能同时
-运行于 0.1.5 与 0.1.7 的原因。
+**Serve other devices on your network.** The same panel carries a *Network
+access* section. It is off by default; switched on, the relay binds a routable
+address (`0.0.0.0` by default) and demands **a key of its own** — separate from
+the local key, so a leak on either side costs a rotation on that side only and
+the tools already wired to the local port never notice. The relay re-issues to
+the local listener, so the model roster, streaming and error semantics are the
+same ones the local port serves. A port of `0` means "pick one" (18899 is often
+already taken on a machine that runs something else); the panel then shows the
+port and the network address it settled on. While it is on, anyone who can reach
+this machine can spend its free quota with that key — enable it only on a
+network you trust, and narrow the sources with a firewall if you can.
 
-**使用自有 JSON 存储，不接入 settings seam。** settings 注册 API 在两版内核间不一致；
-私有 JSON 存储行为一致，且转发 Key 存放于 0600 权限文件中，不进入任何共享设置文档。
+**Send requests through a proxy outlet.** `Settings → Our Free Model → Egress
+proxy`. Optional and off by default — with it off, requests go direct. Two modes:
 
-**Token 压缩跑在唯一收口上，且失败开放。** 提示词注入与工具输出压缩在 payload 完成全部
-改写之后执行——指纹改名、档位补丁、密封车道的节奏提示都已落定——收口在 `payloadFor()`：
-适配器自己的派发与本地网关（它同样经适配器发起）都从这唯一一处经过，因此每条车道、每一段
-恢复请求都同样压缩。每一步都失败开放：压缩器抛错就跳过，过滤器抛错就原样放行，形态不认识
-就不动——一个请求绝不能因为一个「本来是为了让它更便宜」的环节而失败。
+- **Subscription mode**: paste a Clash/V2Ray subscription URL; the plugin spawns
+  mihomo locally (auto-detected — e.g. Clash Verge's `verge-mihomo.exe` — or set
+  the path yourself) with a built-in url-test group that re-measures every five
+  minutes and sends traffic to the fastest node, health-checking dead nodes out.
+  **The subscription URL is treated as a credential** — the path of a
+  subscription link *is* its token — so it lives at the same standard as the two
+  forward keys: kept in the local settings file, never sent with a request, and
+  never echoed in a settings payload. The panel shows the masked host only
+  (`https://host/…`); "Show" and "Copy" fetch the value from the settings page
+  itself (`GET /egress/url`), an empty input means "keep the stored address", and
+  "Clear" removes it and takes the outlet down with it.
+- **Single-proxy mode**: type an `http://` / `https://` / `socks5://` /
+  `socks5h://` proxy address and every handled request dials through it.
 
-**combo 是一条虚拟清单行，降级在适配器里解析。** 链路以 `channel:'combo'` 加一串真实模型
-id 并入合并后的清单，因此选择器照常广播它、本地网关照常按名调用它；链的展开与推进判定发生
-在适配器的 `runStream()` 内，于是两个调用方都不必知道降级这件事。
+**At rest.** mihomo has to read that address out of a config file (the plugin
+writes a throwaway `mihomo.yaml` into its data directory and spawns mihomo from
+there), so the on-disk copy stays plain text. What this treatment removes is the
+payload echo, the log line and the shoulder — not another process on the same
+machine.
 
-## 思考强度：档位菜单与预算阶梯
+Only three kinds of traffic are taken over: model inference, the model listing
+fetch, and the egress IP probe; announcements, upgrades, and the EAC lane stay
+direct so the subscription identity never mixes into the release channel.
 
-**两类模型，两种控制。**
+**Scope.** The outlet serves this plugin's opencode traffic and nothing else on
+this machine. The mihomo it spawns runs from a throwaway config of the plugin's
+own: `bind-address: 127.0.0.1` with `allow-lan: false`, no `tun:` section, no
+system proxy, no system-level proxy registration and no virtual adapter — the
+listener is a temporary free loopback port. Your browser, shell tools and other
+IDE extensions never go through it; only requests this plugin sends to the
+opencode gateway are rerouted. Single-proxy mode works the same way: the rewrite
+happens inside the plugin.
 
-声明了思考档位的模型（清单里的 `reasoning_options` 给出 `effort.values`）走**档位菜单**：
-选中的档位按原值下发到上游的 `reasoning_effort` 字段，与 EAC / Kilo 渠道同款。这是 2026-10-17
-的复测结论——早期（2026-09-24）该车道确实忽略这个字段，但现在它**会校验**：发一个集合外的
-取值直接回 `400 invalid_value` 并列出可接受集合（`none|minimal|low|medium|high|xhigh|max`），
-而思考量随档位真实变化（`deepseek-v4.1-flash-free` 三次采样中位数：none 0 / low 793 /
-high 700 / xhigh 1405 / max 1906）。因此菜单只列出该模型自己声明过的档位；模型没声明
-「关闭」档（如 GLM 5.3 Flash，其 `none` 实测关不掉思考）就不提供 Off 档。
+**Live status.** While the outlet is on, the settings page adds three lines below
+it: the current outlet (masked host · mode), the **best node** (the node url-test
+picked, with the delay that won it the rank), and **opencode access** (the last
+model-listing round trip, in seconds). Node and latency are readings, refreshed
+every 15 seconds by asking mihomo's own controller; when a reading is missing the
+line says "measuring…" and outbound traffic is unaffected.
 
-没有档位菜单的模型（清单只给 `toggle` 或 `budget_tokens`，或压根没有 `reasoning_options`）
-保留**预算阶梯**：思考强度实现为硬性输出 token 上限，该上限确实产生约束——留痕的思考 token
-随档位单调上升。对一个上游表达不了档位的模型，编一档等于谎报能力，所以这里不编。
+**What it can and cannot buy you**: per-IP rate limits and region gates move
+with the outlet; per-session rate limits and fingerprint gates do not care
+which outlet you use. Toggling the outlet re-probes on its own — a cold outlet
+needs a few seconds before it carries traffic, and the plugin waits for the new
+exit to answer before regrouping, so region-gated models follow the new exit.
+Reprobe (below) does the same on demand.
 
-模型的窗口与输出上限按 9router / models.dev 的口径取（`limit.context` / `limit.output`、
-`modalities.input`）；上游清单本身只公布 id，不含任何能力字段。
+**Re-check geography.** `Re-probe availability` re-runs availability against
+your current exit. Toggling a VPN and re-probing moves region-gated models
+between the two groups on its own.
 
-## 三个实际消耗过调试时间的内核行为
+**Receive announcements.** Everything is automatic: after the owner pushes, a
+running installation picks the item up within one poll cycle (30 minutes by
+default, or immediately via *Check for new announcements*). Regular items raise
+a toast, `urgent` items open a full-screen modal, and both land in the
+announcement center with an unread marker. Enable *OS notifications* there to
+also get system-level toasts.
 
-此处列出是因为编写 provider 插件时通常会遇到：
+**Upgrade the plugin.** `Settings → Our Free Model → Plugin upgrade` →
+*Check for updates* → *Upgrade now*. The whole flow runs inside the app
+(download → verify → backup → replace → hot reload); no reinstall, no restart.
+A failed upgrade restores the previous version and reports why.
 
-**providerRetryPolicy() 会被原样保存并使用。** 两版内核均不解析其返回值，而退避调度器读取的是
-顶层的 initialDelayMs / maxDelayMs / jitterRatio。将这三项嵌套在 backoff:{} 中，
-调度器读到 undefined，于是 undefined \* 2ⁿ = NaN，而持久会话日志会直接拒绝非有限数值——
-一个本可恢复的瞬时故障因此导致整轮对话报废。应返回已解析完毕的扁平策略。
+## The aggregate lane, token savers, routing and the local gateway
 
-**一次被中断的工具调用会永久污染该会话。** 缺少对应结果的工具调用在重放时，上游返回
-400 invalid_request_error，此后该会话中的每一次请求都会失败。本插件在发送前修复配对，
-三种线协议共用同一处修复逻辑。
+### The aggregate lane: bring your own key for 76 providers
 
-**未在 inject 中声明的服务，属性直读会抛错（与返回 undefined 不同）；而 ctx.get() 在服务
-"尚未被 provide 出来"时返回 undefined。** 这两条本轮各自触发过一次问题：将 inject 缩减为仅剩
-llm 之后，typeof ctx.interval === 'function' 直接抛出 cannot get property "timer" without inject（ctx.interval 是 timer 服务上的 mixin），插件在所有 composition 中
-均不再激活；改用 ctx.get('webServer') 后返回 undefined——原因不在于缺少 web
-server，而在于插件先于 web 半身加载——导致设置页路由全部未注册。正确做法是
-ctx.inject(deps, callback)：为所需服务开启一条独立的 fiber 使其待命，
-避免在加载瞬间做一次性判断。
+The **Aggregate** tab brings third-party endpoints into the same roster. The provider registry ships 76 entries (`src/providers/registry.json`, categorised `free | free-tier | apikey | oauth | local`): NVIDIA NIM, OpenRouter, Groq, Cerebras, SambaNova, Gemini, DeepSeek, Mistral, Together, Fireworks, SiliconFlow, Nebius, Chutes, Hugging Face, Cloudflare, Z.ai, Kimi, MiniMax, QwenCloud/Alibaba, Bedrock, Vertex, Vercel AI Gateway, Azure OpenAI, FleetRelay Gateway, and the local no-account ones — Ollama, LM Studio and llama.cpp. The data comes from free-claude-code's provider catalogue, 9router's provider registry, and the custom gateway added by this project. FleetRelay Gateway currently advertises `deepseek-v4.1-flash-free` and `gpt-6-astra`; its third-party T1 candidate is disabled pending distribution authorization.
 
-## 为什么按 body 的形状而不是 Content-Type 读响应
+Once a provider is configured (a key for the ones that need one; the local no-account ones need none), each of its models becomes a catalog row named `provider/model`: selectable in the model picker and dialable through the local gateway. A provider's own wire format decides how it is served — OpenAI Chat Completions, OpenAI Responses, or Anthropic Messages (the last two for the providers that only speak those).
 
-该车道会在高负载下以 200 + application/json 返回完整的 SSE 帧序列。旧实现依赖 header，
-于是 await response.text() 将整条流读成字符串、JSON.parse 失败、整轮报废——而该
-错误对象携带 status: 200，还会使可用性探测将完全可用的模型判为"不可路由"，
-使其在下拉框中消失一轮。当前实现先嗅探首块（≤4 KB）按形状分流，再将已读取的字节
-重新注入流中，实时性不受影响；src/http.js 的 sniffBody 为唯一判据。
+Keys live only in the plugin's own `0600` `settings.json`, and the API never echoes them: the page shows `hasKey` plus a `…abcd` fingerprint. An absent field keeps the stored key; an empty string clears it. Per provider the page offers enable/disable, a Test button, a Discover button, a base-URL override (needed for Azure, Cloudflare and Vertex, which have no usable default), a model-list override and Remove. Test is a *listing* probe — it verifies a key through the provider's model listing without spending a generation, and says so when the provider declares no listing. Providers whose auth is OAuth or ADC (Google ADC) are listed but marked *not drivable* here, because this lane cannot complete those flows.
 
-## 为什么速度那一栏会显示 —
+### Token savers: tool-output compaction, prompt shaping and local answers
 
-早期版本曾为一条实际仅 ~40 tok/s 的车道报告出 2 941 tok/s。问题不在网关——直连
-读包的探针显示 64 个帧跨越 5.6 秒，确为增量投递——而在于分子与分母度量的不是同一段
-时间：一次调用计费 422 个输出 token，其中 291 个是未流出任何帧的 reasoning token，
-它们在第一个可见 token 之前即已生成完毕，而窗口起点正是该 token。以整段
-以整段 completion 耗时除以答案文本落地所用秒数，无法反映解码速度。
+**Tool-output compaction (RTK)** rewrites `tool_result` / `role:"tool"` content in place before the request is sent: git diff, git status, git log, grep, find, ls, tree, build and package-manager logs, numbered file dumps, Cursor search listings, and runs of duplicate log lines. Measured live: a 40 KB `git diff` lost 90% of its bytes and the model still answered about the diff. The safety rules: error tool results are never touched, bodies below a size floor are left alone, the replacement is never larger than the input, a filter that throws passes the original through, and the pass is idempotent. It applies to every lane, the local gateway included, and is on by default.
 
-因此当前实现仅在"能够容纳分子的那段时间"内输出速率：windowTokens() 将未流出的
-reasoning token 从分子中剔除，decodeWindow() 拒绝过短以至于无法计时的窗口以及不真实的
-高速率，看板与模型表均改为 Σtoken / Σ秒，不再对各次速率取平均——曾有一个 1 ms
-的窗口将 26 次调用的均值抬高了三个数量级。因此答案集中在一两个大帧中落地的模型，
-不具备可测量的输出速度，该栏显示 —。
+**Prompt shaping** offers two families with levels — `caveman` (terse replies: `off/lite/full/ultra/wenyan-lite/wenyan/wenyan-ultra`) and `ponytail` (YAGNI-minimal replies: `off/lite/full/ultra`). They change how the assistant talks, so every level starts `off`. Injection is idempotent and format-aware (a system message on chat, Anthropic's `system` including the block-array form and inserted before the last `cache_control`, `instructions`/input item on Responses), and it is reversible.
 
-## 长思考截断后的自动恢复（issue #12）
+**The savings dashboard** shows bytes before → after, bytes saved, percent, blocks compacted and the number of calls measured — read from the same stats rows the usage charts use.
 
-所有模型默认启用一次有界恢复，Chat Completions、Messages、Responses 三种上游协议
-共用该行为。触发条件为：首段仅有非空思考、无正文且无工具调用，且上游在未发送正常
-结束帧的情况下直接关闭流；或上游发送了正常 stop 收尾、但同样只有思考而无正文——宿主会将
-此类「空停」回合判定为空响应，恢复流程会继续请求一次正文。以下情况不触发恢复：用户取消、
-已输出正文或工具调用的正常结束、达到输出上限、明确的上游错误。
+**Five local answers** (ported from free-claude-code, each individually switchable, all on by default) never call a provider: a quota probe (`max_tokens:1` plus "quota" → `Quota check passed.`), shell command-prefix detection (`<policy_spec>` plus `Command:` → the prefix, refusing command injection), session-title generation (→ `Conversation`), suggestion mode (→ the empty string) and filepath extraction (→ a `<filepaths>` block). The local gateway answers them in-process.
 
-插件将已收到的思考作为检查点文本，与原始输入一起发起新请求，要求直接输出整理后的回答。
-该机制基于检查点重新发起请求，与上游原生 resume 无关，也不会重放已显示的思考内容。恢复段禁用工具调用；已输出
-正文或已开始调用工具的截断回合不执行恢复，以避免内容重复或工具重复执行。
+### Routing: named fallback chains (combos)
 
-为避免重复长思考，恢复提示要求结论优先、最多 800 词；此为提示层面的约束（非硬性 token
-限制），模型可能不遵守。恢复属于降级回答，原始请求中的长篇或逐步分析可能被简化。
+A named, ordered list of model ids across every lane, which appears in the picker and on the gateway as `combo:<name>` — a virtual model. Two strategies: `fallback` (always start at the head) and `round-robin` (rotate the starting point, sticky for N turns). The chain walks its links until one produces output; a link that fails *before any content delta* is discarded whole, so the switch is invisible to the caller. Reasoning deltas deliberately do not count as content — "thought for a minute, then hit a quota wall" is the highest-value case to fail over. Once an answer delta has been delivered, a later failure ends the turn normally (the single-model checkpoint recovery still gets its continuation attempt first). Capacities are the intersection of the links (a chain advertises vision only if every link has it, and the smallest context window), and a chain whose links are all currently unavailable is stored and marked not usable rather than silently dropped.
 
-每个逻辑回合最多两次物理请求：原始请求加一次恢复。默认总时限 900 秒（15 分钟），恢复段最多
-300 秒，且受剩余总时长约束；恢复输出上限 8192 tokens，并继续受用户与模型的上限
-约束。首段已知的输出 tokens 会从原始预算中扣除，恢复预算不足 512 tokens 时不发起恢复。
-检查点最多 131072 字符，且必须通过基于文本字节的保守上下文余量估算；该估算不计算图片
-token，不等同于精确的 tokenizer 校验。超出限制即停止恢复，不会无限续接。恢复必须正常结束且
-产生非空白正文方为成功；失败返回 STREAM_CUT，宿主不会将该回合整轮重发，用户取消
-则保持 aborted / ABORTED。
+### The local gateway: a native Anthropic surface and connect recipes
 
-可通过本机 settings.json 的 streamRecovery: false 关闭恢复；也可通过对象的 enabled
-开关及数值限制收窄边界，数值只能低于或等于默认上限。默认不限制模型名单。
+Two new endpoints: `POST /v1/messages` (streaming and non-streaming, with correct `message_start` / `content_block_*` / `message_delta` / `message_stop` framing, `thinking` blocks, `tool_use` blocks, a real `stop_reason`, and an in-stream `error` event when a turn fails after the headers went out) and `POST /v1/messages/count_tokens` (a documented local estimate — the plugin ships no tokenizer). Claude Code and the Anthropic SDKs can therefore point straight at the plugin. The existing `/v1/chat/completions` and `/v1/responses` are unchanged, and `/v1/models` now advertises every lane, the aggregate rows and the chains included. A new *Connect a client* section on the gateway page renders ready-to-copy recipes generated from the port that actually bound and the key that is actually required: Claude Code environment variables, Codex `config.toml`, the OpenAI SDK, the Anthropic SDK, curl, and a LAN variant when the relay is up.
 
-用量看板将物理请求与逻辑回合分开统计。上游请求数与请求失败数按实际发出的请求次数计数；
-对话回合数、回合失败数与已恢复数按一次适配器调用的最终结果计数。例如首段中断、
-续写成功会记为 2 次上游请求、1 次请求失败，同时记为 1 个对话回合、0 次回合失败、
-1 次已恢复。每段样本仍包含恢复关联、段序号与 noUsage 等标记；通过 recoveryId
-关联各段的 noUsage 以判断缺失情况。最终上报宿主的 usage 仅汇总上游实际报告的已知值；
-缺少某段 usage 时，该值不等于整轮完整 token 总量。思考检查点不写入统计文件。
+One false success was fixed along the way: a turn whose only output was a tool call the caller never declared used to answer as a clean empty success; it now reports what happened, because the token saver's own `[full diff: rtk git diff --no-compact]` hint can make a model ask for a tool the caller does not have.
 
-升级前的旧统计仅包含物理请求记录，迁移后展示的回合数与失败数为基于这些记录的推算值，
-看板会明确标注；升级后的回合按最终结果精确记录。
-请求数、回合数与 Token 总量为累计值；速度、首帧延迟与热力图使用本机保留的历史窗口。
+## How it works
 
-已在一次真实 MiMo V2.6 Flash · Deep 请求中恢复成功；此前一次恢复曾在 480 秒
-截止时失败。这不代表全部模型均已实测，也不保证每个长思考回合都能生成答案。
-下一节列出的 v1.3.1 记录描述的是恢复功能引入前的行为。
+```text
+index.js      host half: adapter registration, catalog + availability probes,
+              settings/stats stores, webServer API routes, forward lifecycle,
+              announcement / upgrade / hot-reload wiring
+adapter/      kernel seam: the only module in the package allowed to import
+              @deepseek-ai/* (kernel.js: attribution User-Agent with a literal fallback)
+src/adapter.js  structural LlmAdapter: providerInfo, listModels, resolveModel,
+                prepareCall, stream, providerRetryPolicy
+src/upstream.js gateway identity: credentials, session/request id minting,
+                tool fingerprint, endpoint selection per wire
+src/stream.js   three wire decoders (chat / messages / responses) normalised to
+                harness StreamChunks, with disjoint token accounting
+src/messages.js harness messages -> wire shapes, plus tool-pairing repair
+src/effort.js   effort level -> output budget
+src/forward.js  standalone OpenAI-compatible listener (plus the Anthropic Messages endpoints)
+src/providers/registry.json aggregate-lane registry: 76 providers, category, auth, wire
+                format and endpoints
+src/providers/index.js registry access and provider/model composite id parsing
+src/aggregate.js aggregate lane: catalog rows, credential resolution, key redaction,
+                listing probes, per-wire posting
+src/anthropic.js Anthropic Messages codec for /v1/messages, plus the local token estimate
+src/token-saver/index.js compaction pipeline: prompt injection -> tool-output compaction,
+                byte accounting, fail-open
+src/token-saver/inject.js idempotent injection and stripping on the chat / messages /
+                responses wires
+src/token-saver/prompts.js the caveman and ponytail prompt families and their levels
+src/token-saver/rtk/ tool-output filters: git diff/status/log, grep, find, ls, tree,
+                build logs, numbered dumps, search listings, duplicate log lines
+src/local-optimize.js the five local answers: quota, prefix, title, suggestion, filepath
+src/combos.js fallback chains: virtual catalog rows, two strategies, intersected capacities
+src/route/classify.js one failure vocabulary and cooldown policy for every lane
+src/trust.js    request trust fence for the plugin's routes (connection bridge
+                + structural fallback)
+src/push.js     SSE push hub: arrivals, update availability, upgrade done
+src/feed.js     remote announcement feed: multi-source fetch, validation, cache,
+                arrival detection
+src/updater.js  in-app upgrade: manifest validation, SHA-256 checks, backup,
+                atomic replace, rollback
+src/reload.js   self hot reload: mirrors the kernel HMR sequence (cache purge,
+                re-import, re-register, rollback)
+client.js       browser half: hand-written ModuleLoader bundle, no build step
+```
 
-## 验收情况
+Design decisions worth knowing:
 
-在 Windows 环境下针对真实上游实测。本节按轮次记录，并注明每项的验证方式——仅标注
-「真实上游」与「实机点击」的条目才对应用户在界面上可见的行为。
+- **One adapter, two provider routes.** The harness groups the model picker strictly by provider route, and the catalog wire has no group/tag/badge field. Publishing a second route is therefore the only way to render a separate `region-limited` heading — and because the client drops empty groups, the two collapse into one automatically once geography stops blocking.
+- **Structural adapter, no `@deepseek-ai/dsh-llm` import.** The kernel never checks `instanceof`, so the adapter is duck-typed. This keeps the plugin from pinning itself to one kernel version and is what lets the same code run on both 0.1.5 and 0.1.7.
+- **Own JSON store instead of the settings seam.** The settings registration API differs between kernels; a private JSON store under `DSH_HOME` behaves identically on both and keeps the forward key in a `0600` file that never enters any shared settings document.
+- **The token savers run on the single choke point, and they fail open.** Prompt injection and tool-output compaction run after every other mutation has been applied — the fingerprint rename, the effort patch, the sealed lane's pacing hint — at `payloadFor()`, the one place both the adapter's own dispatch and the local gateway (which dials through the adapter) pass through, so every lane and every recovery segment is compacted. Every step fails open: a saver that throws is skipped, a filter that throws passes the original text through, an unrecognised body shape is left alone — a request must never fail over the thing that was supposed to make it cheaper.
+- **A combo is a virtual catalog row, so failover is resolved in the adapter.** A chain joins the merged catalog as `channel:'combo'` plus a list of real model ids, which is why the picker advertises it and the gateway dials it by name like any other row; the chain is expanded and advanced inside the adapter's `runStream()`, so neither caller has to know about failover.
 
-### Issue #12：验收状态
+### Thinking effort: a level menu, or a budget ladder
 
-恢复实现、离线回归与真实上游结果单独记录在
-docs/issue-12-recovery.md。合并前 review 修复了一处告警
-重复累积的缺陷并补充回归用例，recovery 99/99、truncation
-35/35、fingerprint 新增 11 项与 typecheck 均已通过；其中 12 项使用真实插件与本地 HTTP
-验证转发成功、失败、客户端断开与统计落盘。最终全量结果以技术文档为准。
-真实 MiMo Deep 首段在 304.161 秒自然 EOF，
-恢复段 32.777 秒生成 4264 字符正文，以 stop / usage / [DONE] 正常结束；共两次
-请求、336.942 秒。首段无 usage，汇总值仅为已知用量。首次 480 秒恢复失败记录
-保留在技术文档中；真实 dsh UI 与其它模型尚未逐一验收。
+Two kinds of model, two kinds of control.
 
-### 历史：v1.3.2（对应 issue #11、#13、#19、#20、#21）
+A model that declares thinking levels (its listing carries `reasoning_options`
+with `effort.values`) gets a **level menu**: the selected level is sent as-is
+in the upstream `reasoning_effort` field, the same shape the EAC and Kilo lanes
+use. That is the 2026-10-17 re-probe result — the lane did ignore the field
+back on 2026-09-24, but it now **validates** it: a value outside the set
+answers `400 invalid_value` naming the accepted set
+(`none|minimal|low|medium|high|xhigh|max`), and reasoning volume really does
+move with the level (`deepseek-v4.1-flash-free`, medians over three samples:
+none 0, low 793, high 700, xhigh 1405, max 1906). So the menu offers only the
+levels that model declares; a model whose set has no off rung (GLM 5.3 Flash,
+whose `none` does not actually stop it thinking) is not given one.
 
-| 项目 | 修复 | 验证 |
+A model with no level menu (its listing offers only `toggle` or
+`budget_tokens`, or no `reasoning_options` at all) keeps the **budget ladder**:
+effort is a hard output-token ceiling, which does bind — recorded reasoning
+tokens rise monotonically with the level. Inventing a rung the upstream cannot
+express would claim a capability the model never had.
+
+Window and output ceilings follow the 9router / models.dev convention
+(`limit.context` / `limit.output`, `modalities.input`); the upstream listing
+publishes an id and nothing else.
+
+### Three kernel behaviours that cost real debugging time
+
+These are recorded here because they will bite any provider plugin:
+
+1. **`providerRetryPolicy()` is stored verbatim.** Neither kernel resolves it, and
+   the backoff scheduler reads `initialDelayMs / maxDelayMs / jitterRatio` off the
+   **top level**. Returning them nested under `backoff` yields `undefined * 2ⁿ =
+   NaN`, and the durable session log rejects non-finite numbers — so a recoverable
+   transient failure becomes an aborted turn. Return an already-resolved, flat policy.
+2. **One interrupted tool call poisons the whole session.** A tool call with no
+   matching result replays as `400 invalid_request_error`, after which *every*
+   request in that session fails. The plugin repairs pairing before sending, on all
+   three wires.
+3. **A service you did not name in `inject` throws when read as a property, and
+   `ctx.get()` answers `undefined` for one that is merely not provided yet.** Both
+   bit this round: after `inject` was reduced to `['llm']`, `typeof ctx.interval ===
+   'function'` threw `cannot get property "timer" without inject` (`ctx.interval` is
+   a mixin over the `timer` service) and the plugin stopped activating on *every*
+   composition. Switching that one to `ctx.get('webServer')` then answered
+   `undefined` — not because the composition had no web server, but because plugins
+   load before the browser half publishes it — so the settings routes were never
+   registered and the dashboard had no data source behind a server that was busy
+   serving the app. The shape that works is `ctx.inject(deps, callback)`: give the
+   services you need their own fiber and let *it* wait, instead of guessing once at
+   load time.
+
+### Why the response is read by body shape, not by `Content-Type`
+
+Under load this lane answers 200 with `application/json` over a normal SSE frame
+stream. Trusting the header meant `await response.text()` swallowed the live stream,
+`JSON.parse` failed, and the turn was lost — and because that error carried
+`status: 200`, the availability probe read the perfectly working model as
+unroutable and dropped it from the picker for a round. The first bytes (≤4 KB) are
+now sniffed and classified, then replayed into the stream, so nothing is buffered and
+no token arrives late; `sniffBody` in `src/http.js` is the only discriminator.
+
+### Why the speed panel can say `—`
+
+An early build published 2 941 tok/s for a lane really doing ~40. The gateway was
+not at fault — a raw-read probe shows 64 frames spread over 5.6 s — but the
+numerator and the denominator described different intervals: one call billed 422
+output tokens of which 291 were reasoning that **never streamed a single frame**,
+and the window began at the first visible token anyway. Dividing the whole
+completion by the seconds the answer text took is not a decode rate.
+
+So a rate is published only over a window that can carry it: `windowTokens()`
+removes unstreamed reasoning tokens from the numerator, `decodeWindow()` rejects
+windows too short to time and rates too fast to be real, and both the panel and
+the per-model table sum tokens over sum seconds instead of averaging per-call
+ratios — one 1 ms window was enough to move a 26-call average by three orders of
+magnitude. A model whose answer lands in two frames therefore has no measurable
+output speed, and says so.
+
+### Automatic recovery after a long reasoning stream is cut (issue #12)
+
+Every model enables one bounded recovery attempt by default, across the Chat
+Completions, Messages and Responses upstream protocols. It requires a first
+stream that delivered nonempty reasoning, no answer text or tool call, and then
+either reached EOF without a normal terminal frame, or received a normal `stop`
+terminal carrying reasoning only with no answer text — a turn the host would
+classify as an empty response. Cancellation, a normal ending that already
+delivered answer text or a tool call, an output ceiling and an explicit upstream
+error do not trigger recovery.
+
+The plugin sends **one new request** containing the original input and the
+received reasoning as a text checkpoint, asking for the answer directly. This is
+not a native upstream resume, and already displayed reasoning is not replayed.
+Tools are disabled for the recovery request. A cut after answer text or a tool
+call has started is not recovered, to avoid duplicate content or execution.
+
+To avoid another long reasoning pass, the continuation prompt asks for the
+conclusion first and at most 800 words. This is a prompt instruction, not a hard
+token limit, and the model may ignore it. Recovery is a degraded answer: an
+original request for a long or step-by-step analysis may be shortened.
+
+One logical turn makes at most two physical requests: the original and one
+recovery. The default total deadline is 900 seconds (15 minutes); recovery gets
+at most 300 seconds, bounded by the remaining total time. Recovery output is
+capped at 8192 tokens and still respects the user's and model's ceilings. Known
+output tokens from the first segment are subtracted from the original budget;
+recovery does not start if fewer than 512 tokens remain. The checkpoint is
+limited to 131072 characters and must pass a conservative text-byte estimate of
+context capacity.
+That estimate does not count image tokens and is not an exact tokenizer check.
+Exceeding a limit stops recovery. Success requires a normal ending with answer
+text that is not only whitespace. Recovery failure returns `STREAM_CUT`, which
+the harness does not resend as a whole turn; user cancellation keeps
+`aborted` / `ABORTED`.
+
+Set `streamRecovery: false` in the local settings.json to disable it. An object
+can also supply an `enabled` switch and lower numeric limits; limits cannot
+exceed the defaults. There is no model allowlist.
+
+The local dashboard keeps **physical requests** and **logical turns** separate.
+Upstream requests and request failures count each HTTP request actually sent;
+conversation turns, turn failures and recovered turns count one adapter
+invocation by its final outcome. A first segment cut short and a successful
+continuation therefore show 2 upstream requests and 1 request failure, while
+remaining at 1 conversation turn with 0 turn failures and 1 recovered turn.
+Each segment still has its own sample with recovery identity, attempt index and
+`noUsage` markers. A shared `recoveryId` associates those markers to identify
+missing usage. Final usage sent to the harness sums only counts the upstream
+actually reported; if one segment has no usage report, this is not the full
+turn's token total. Reasoning checkpoints are not written to the statistics
+file.
+
+Pre-upgrade history has only physical request records, so migrated turn and
+failure counts are estimates and the dashboard labels them. Turns recorded
+after the upgrade use the final outcome and are exact.
+Requests, turns and token totals are lifetime values; speed, first-frame and
+heatmap details use the locally retained history window.
+
+One live MiMo V2.6 Flash · Deep request recovered successfully; an earlier
+attempt failed at the 480-second deadline. This does not establish live coverage
+of every model or guarantee completion of every long reasoning turn. The
+v1.3.1 records below describe behaviour before recovery was added.
+
+## Verification
+
+Tested on Windows against the live upstream. The table is kept per release round,
+and each row says which way it was checked — only the rows marked *live upstream*
+or *hands-on* are behaviour a user sees in the interface.
+
+### Issue #12: verification status
+
+Implementation, offline regression and live results are tracked separately in
+[`docs/issue-12-recovery.md`](docs/issue-12-recovery.md). Recovery 99/99,
+truncation 35/35, 11 new fingerprint checks and typecheck have passed. Twelve
+checks use the real plugin over local HTTP to verify forward success, failures,
+client disconnection and stored statistics. The technical record carries the
+final full-suite result. In a live MiMo Deep run, the first
+stream reached natural EOF at 304.161 seconds; recovery took 32.777 seconds and
+produced 4264 characters of answer text, ending with `stop`, usage and `[DONE]`.
+There were two requests over 336.942 seconds. The first segment had no usage
+report, so the summary contains only known counts. The earlier failed
+480-second attempt remains in the technical record. Real dsh UI and other
+models have not been individually accepted.
+
+### Historical: v1.3.2 (issues #11, #13, #19, #20, #21)
+
+| Item | Fix | Verification |
 | --- | --- | --- |
-| #19 自更新信任链 | 清单 Ed25519 签名（公钥 pin 在插件内，私钥不入仓）、feedUrl 与更新源彻底解耦、清单 base 只允许相对路径 | updater-test 新增签名/篡改/异钥/feedUrl 不跟随 4 组用例；release-e2e 负控改为在签名处拒绝 |
-| #19 转发口面 | localhost 绑定先执行 DNS 解析且要求结果全为回环；插件 API 请求体 1MB 上限（413）；转发非 JSON body 返回 400、未知模型返回 404 | forward-test resolveLoopbackBind 三态用例；offline-test 404 用例 |
-| #20/#21 转发下工具不可调用（#21 报告的 Unknown tool 'bash'/'read'/'grep' 正是指纹诱饵四件套：车道强制声明这些名称，模型发起调用而转发客户端未注册） | 流式 tool_calls[].index 按调用重新编号，从 0 起（不再与 reasoning 共用块索引）；指纹诱饵工具调用在转发口按块抑制（未命名块先扣留参数）；参数被截断的回合流式同样返回 length | forward-test 4 组流式/非流式用例（本地服务器 + 脚本化 lane） |
-| #20 dsh 内诱饵隐患 | stream.js 中无 index 的并行工具调用按 id 分块，裸参数续写归入前一块 | 现有 truncation/fingerprint 套件全绿 |
-| #13 达额体验 | 429 移出可重试状态码（同一回合不再自动重试三次）；探测整轮全为 429 后按 30→120 分钟指数退避（手动 reprobe/出口变化/启动轮不受限）；探测可识别 200 流内 error 帧；测速按钮调整默认档并放宽前端超时 | retry-safety-test 断言更新；probe 逻辑随 offline 套件全绿 |
-| #13 转发配额集中 | 429 不再自动重试（同上）；转发会话键维持按 user/conversation 派生（上游按会话计额，为刻意设计） | 行为不变，无新增消耗面 |
-| #11 热力图 | 格子 gap 归零、圆角收小，呈现 GitHub contribution graph 式连贯观感；布局本身已为列优先周对齐，无需改动 | client-lint 全绿 |
-| 其它 | 前端按路由放宽超时（bench 240s/升级 600s，8s 兜底仅作用于快速路由）；EventSource 断连改为退避重连（30s→5min），不再永久失效；升级完成推送会清除旧错误横幅；看板"速度"文案与最近 40 次的实现一致；store 落盘失败会在日志中记录一次 | client-lint；speed-stat 全绿 |
+| #19 self-update trust chain | Ed25519-signed manifests (public key pinned in the plugin, private key out of the repo), the update channel fully decoupled from `feedUrl`, manifest `base` restricted to relative paths | updater-test: four new cases (signature, tamper, foreign key, feedUrl not followed); release-e2e's negative control now refuses at the signature |
+| #19 forward surface | `localhost` binds resolve first and require all-loopback answers; a 1 MB cap (413) on plugin API bodies; the forward endpoint answers 400 for a non-JSON body and 404 for an unknown model | forward-test `resolveLoopbackBind` cases; offline-test 404 case |
+| #20/#21 tools unusable through the forward port (#21's `Unknown tool 'bash'/'read'/'grep'` is exactly the fingerprint decoy quartet: the lane forces those names to be declared, the model dials them, the forwarded client never registered them) | streaming `tool_calls[].index` renumbered from 0 (no longer shares the block counter with reasoning); fingerprint-decoy calls suppressed per block on the forward wire (unnamed blocks have their arguments held); a ceiling-cut turn finishes as `length` on the stream too | forward-test: four streaming/non-streaming cases against the real listener with a scripted lane |
+| #20 dsh-side decoy hazard | `stream.js` keys parallel tool calls without an `index` by call id; bare argument continuations join the preceding call | existing truncation/fingerprint suites stay green |
+| #13 quota experience | 429 removed from the retryable codes (no more three automatic retries of the same wall); a probe round answered by nothing but 429s backs the next periodic round off 30→120 minutes (manual reprobe, egress change and the boot round are exempt); the probe recognizes in-stream error frames inside a 200; the bench button uses the default effort and a realistic client timeout | retry-safety-test assertion updated; probe logic covered by the offline suites |
+| #13 concentrated forward quota | 429 no longer auto-retried (above); the forward session key stays derived from `user`/`conversation` (deliberate: the lane accounts per session) | behavior unchanged, no new spend |
+| #11 heatmap | cell gap removed and corners tightened for a GitHub contribution-graph ribbon; the layout was already column-major week-aligned | client-lint green |
+| Other | per-route client timeouts (bench 240 s, upgrade 600 s — the 8 s guard now covers only fast routes); EventSource reconnects with backoff (30 s → 5 min) instead of closing forever; a completed upgrade clears the stale error banner; the speed-scope copy now says what the panel really averages (last 40 calls); a failed store flush is logged once | client-lint; speed-stat green |
 
-全部 20 个离线套件（含新增 forward-test）与 tsc --noEmit 通过；host-selftest 需真实出网并消耗免费额度，未随本轮运行。
+All 20 offline suites (including the new `forward-test`) and `tsc --noEmit` pass; `host-selftest` costs real network and real free-lane quota, so it did not run with this round.
 
-### 历史：v1.3.1（对应 issue #8、#9、#10）
+### Historical: v1.3.1 (issues #8, #9, #10)
 
-| 项目 | 方式 | 结果 |
+| Item | How | Result |
 | --- | --- | --- |
-| 两种工具结果形状均实际送达模型 | 真实上游 host-selftest.mjs 第 2 步 | 同一模型、同一 get_weather 结果，分别按 pre-V4 的 user+tool-result 与 V4 的 role:'tool' 各发一轮：两条均 finish=stop，且模型均复述出结果中的 22°C / sunny。修改前插件对第一种形状完全无感知（src/messages.js 中从未出现 tool-result），该轮发出的请求既无工具调用也无结果 |
-| 消息形状取自实际记录（不依赖推测） | 本机全部 4 处 session 根、共 40 个 session\*.jsonl.zstd（zstd 需按帧切分后逐段解压） | tool/result 事件共出现两种形状：role:'user' 携带 tool-result 块 362 条（V1/V3 格式——AIO 6.9.3 的 v3 家目录写入 336 条，~/.dsh 的 v1 写入 26 条），V4 的 role:'tool' 27 条（v4 格式的会话副本）。两代格式均在被使用，而插件此前仅识别后者——issue #9 的判断成立，只是其描述的形状比报告者所用内核更新 |
-| 投影与配对修复 | 离线 projection-test.mjs（新增，40 条断言） | 三条线 × 两种形状：调用与其结果均落到 wire 上、按 call id 一一对应；三个并行调用各自的结果逐个送达，Messages 线合并进同一 user 轮且 tool_result 置于最前（与内核自身的 Messages 适配器同一规则）；结果中内嵌的图像不再丢失（Chat 走紧随其后的 user 轮，Messages 直接嵌入 tool_result）；同一份结果在任一线上只出现一次（按答案字节出现次数判定，不依据块类型——块类型断言无法发现重复）；无 call id 的工具答案、悬空调用、孤儿结果照旧剔除；已配对历史逐字节不被改写 |
-| pwsh 顶替 bash 槽位可被网关接受 | 真实上游 probes/shell-slot-promotion.mjs（新增） | 声明名称为 bash, glob, grep, read，其中 bash 携带 pwsh 的真实 schema、无诱饵：网关未返回 FreeTierError，finish=tool-calls，模型返回的调用被还原为 pwsh（{"command":"Get-Date"}）——即内核确实可执行。离线另有 fingerprint-test.mjs（新增，20 条）固定以下行为：不重复声明、真实 bash 优先、无 donor 时才落诱饵 |
-| 半截流不再被判定为正常结束 | 离线 truncation-test.mjs（新增 22 条） | 本地 HTTP 服务真实执行 res.end() 关闭一条无 finish token 的流 → kind=error、统计行 ok=false 且带 truncated 标记；三条线各验证一次；message_stop、response.completed 等真实结束帧不误判；有 finish 但无 usage 的行标记 noUsage，0/0 与"确无产出"自此可区分。重发策略按已流出内容区分：未流出任何 token 的截断仍为 TRANSPORT（可重试），已流出内容的截断为 STREAM_CUT（不在重试名单内，立即失败）——理由见下一行 |
-| 一次真实内核会话实测出的重试代价 | 真实内核 dsh web + 浏览器中发起的一轮 MiMo V2.6 Flash · Deep | durable 会话日志逐事件取回：llm/retry retry=1 delay=702ms code=TRANSPORT 落在 304s，retry=2 delay=1124ms 落在 608s，turn/end {kind:"error",code:"TRANSPORT"} 在 912s；stats.json 中三条 ok:false truncated:true 的 0/0 行，间隔 304s；界面呈现为「本轮运行失败」加原始语句加 TRANSPORT。即：该车道的截断由本轮长度决定，可重试代码只会将同一个五分钟重复支付三次，因此内容已流出时不再重发 |
-| 复查本轮发布，发现上述两项自身的问题 | 离线 projection-test.mjs 第 7 节、truncation-test.mjs 第 12 节，另加 tui-test.mjs 一次转发端往返 | ① Messages 线在识别 V4 的 role:'tool' 之后，将同一段结果既放入 tool_result、又保留在紧随的普通块中——文本重复两份，图像连同 base64 重复两份；当前实现在发出结果后跳过该消息自身，撤掉修复则此断言立即失败。② response.incomplete / response.failed / response.done 同样属于 Responses 线的正常收尾，此前仅识别 response.completed，导致触及输出上限的一轮被判定为"被截断"、白白消耗两次重试；当前实现仍由 status 决定 finish token，且不带原因的收尾帧不再清除前一帧已给出的 token。③ 转发端的 /v1/responses 此前无用例覆盖工具历史，现通过桩上游逐字节核对发出的 messages：调用与其结果均存在 |
-| 该车道的正常收尾形态 | 真实上游 probes/stream-terminal-frames.mjs（新增） | 逐帧抓取原始 SSE：finish_reason:"stop" → 带 usage 的帧 → data: [DONE] → {"choices":[],"cost":"0"}，两个模型一致。因此"始终未出现 finish token"确属异常，不属于该车道的另一种正常写法——这也是 #10 判定条件的依据 |
-| 真实车道上无误判 | 真实上游 host-selftest.mjs 全量 | 11 个模型探测 + 普通对话 + 两轮工具 + 三档思考 + 视觉输入，全部落到各自的正常收尾（stop / tool-calls / max-tokens），无一条被判定为截断；被地区门拦截的模型仍返回 REGION_BLOCKED |
-| 上游来源成文（#8） | 代码中全部出网目标逐条核对 | 新增「上游是哪些源」一节：opencode.ai/inference/v1/\*（推理与 /models，2026-10-14 起；原为 /zen/v1）、本仓库 feed/\*.json（raw 优先、jsDelivr 兜底）、api.ipify.org / ipinfo.io / ipapi.co（仅读取本机出口 IP 与国家码）。当前无号池、无中转 |
-| 离线套件 | npm test（18 个套件） | 全绿；新增 projection、fingerprint 两套，仍不出网、不消耗免费额度 |
+| Both tool-result vocabularies really reach the model | live upstream, `host-selftest.mjs` step 2 | Same model, same `get_weather` answer, sent once in the pre-V4 shape (`user` carrying a `tool-result` block) and once in the V4 shape (`role:'tool'`): both `finish=stop`, and both times the model repeated the `22°C / sunny` from the result. Before the fix the plugin did not recognise the first shape at all (`src/messages.js` never mentioned `tool-result`), so that request carried neither the call nor its answer |
+| The shapes are taken from records, not imagined | every session root on this machine — 40 `session*.jsonl.zstd` across four homes (zstd, which needs splitting frame by frame) | `tool/result` events appear in exactly two shapes: **362** with `role:'user'` carrying a `tool-result` block (V1/V3 format — 336 written by AIO 6.9.3's v3 home, 26 by `~/.dsh`'s v1) and **27** V4 `role:'tool'` from the v4 session copies. Both generations are in live use and the plugin read only the latter — issue #9 was right, about a kernel older than the reporter's |
+| Projection and pairing repair | offline `projection-test.mjs` (new, 40 assertions) | Three wires × two vocabularies: each call and its answer reach the wire, keyed by call id; three parallel calls each get their own answer, merged into one user turn on the Messages wire with `tool_result` first (the same rule the kernel's own adapter uses); images nested in a result survive instead of vanishing (Chat follows with a user turn, Messages nests them inside `tool_result`); **each answer appears exactly once on each wire** — counted in the bytes that go out, not by block type, because a block-type assertion cannot see a duplicate; answers with no call id, dangling calls and orphan results are still removed; already-valid history is returned byte for byte |
+| `pwsh` filling the `bash` slot is accepted upstream | live upstream, `probes/shell-slot-promotion.mjs` (new) | Declares `bash, glob, grep, read`, where `bash` carries pwsh's real schema and no decoy is added: the gateway does not answer `FreeTierError`, the turn finishes `tool-calls`, and the call comes back renamed to **`pwsh`** (`{"command":"Get-Date"}`) — a tool the kernel can actually run. Offline, `fingerprint-test.mjs` (new, 20 assertions) pins no-duplicate declarations, a real `bash` winning over the donor, and the decoy surviving only when there is nothing to promote |
+| A cut stream is no longer a completed turn | offline `truncation-test.mjs` (new, 22 assertions) | A local HTTP server really does `res.end()` a stream that never carries a finish token → `kind=error`, recorded `ok=false` and flagged `truncated`; checked on each of the three wires; genuine endings such as `message_stop` and `response.completed` are not caught; a turn that finishes without a usage frame is flagged `noUsage`, so `0/0` stops being indistinguishable from "produced nothing". **Re-sending now depends on what had already arrived**: a cut that delivered no token at all stays `TRANSPORT` (retryable), while one that had streamed content becomes `STREAM_CUT` (outside the retryable set, so the turn fails on the spot) — the reason is the next row |
+| What retries cost, measured in a real kernel session | real `dsh` web kernel, one turn sent from the browser on MiMo V2.6 Flash · Deep | Taken event by event out of the durable session log: `llm/retry retry=1 delay=702ms code=TRANSPORT` at 304 s, `retry=2 delay=1124ms` at 608 s, `turn/end {kind:"error",code:"TRANSPORT"}` at 912 s; `stats.json` holds three `ok:false truncated:true` rows of 0/0, 304 s apart; the interface showed *turn failed* with the message and the code. The cut on this lane is a function of how long the turn thinks, so a retryable code only billed the same five minutes three times over — which is why content that already streamed is not re-sent |
+| Re-reviewing this release found two defects in the above | offline `projection-test.mjs` section 7 and `truncation-test.mjs` section 12, plus one forwarded round trip in `tui-test.mjs` | (1) Once the Messages wire recognised V4's `role:'tool'`, it put the same answer inside `tool_result` *and* left it in the ordinary blocks after it — the text twice, and a returned image with its whole base64 payload twice. The message is now skipped once its result is emitted, and reverting that turns the assertion red. (2) `response.incomplete`, `response.failed` and `response.done` end that wire on purpose too; reading only `response.completed` as terminal turned a turn that hit its output ceiling into a cut stream and burned two retries on it. The status still decides the finish token, and a terminal frame naming no reason no longer erases one a previous frame gave. (3) The forwarded `/v1/responses` route had never been exercised with tool history; the outbound `messages` are now compared byte for byte against a stub gateway, call and result both present |
+| What a normal ending looks like on this lane | live upstream, `probes/stream-terminal-frames.mjs` (new) | Raw SSE captured frame by frame: `finish_reason:"stop"` → the usage frame → `data: [DONE]` → `{"choices":[],"cost":"0"}`, identically on two models. So "no finish token ever arrived" is genuinely an anomaly rather than a second normal ending — which is the basis for #10's check |
+| No false positives against the real lane | live upstream, `host-selftest.mjs`, full run | 11 models probed plus plain chat, two tool rounds, three effort rungs and vision input: every call landed on its own normal ending (`stop` / `tool-calls` / `max-tokens`), none read as truncated; the region-gated model still returns `REGION_BLOCKED` |
+| The upstream is documented (#8) | every outbound destination in the code, checked one by one | New section [Where the models come from](#where-the-models-come-from): `opencode.ai/inference/v1/*` (inference and `/models`; `/zen/v1` before 2026-10-14), this repository's `feed/*.json` (raw first, jsDelivr as fallback), and `api.ipify.org` / `ipinfo.io` / `ipapi.co` (only to read back this machine's egress IP and country code). No account pool, no relay |
+| Offline suite | `npm test` (18 suites) | Green; `projection` and `fingerprint` added, still no network and no free-lane quota spent |
 
-### 上一轮：v1.2.2（对应 issue #1–#4、#6）
+### v1.2.2 (issues #1–#4, #6)
 
-每项均注明验证方式：离线假内核不出网、真实上游指插件实际请求网关但运行于手工搭建的
-cordis context 上、真实内核则指将插件装入 dsh 后启动。三者的差异本轮已由此获得一次
-教训——见最后一行。
+Each row names how it was checked: *offline fake kernel* never leaves the machine,
+*live upstream* means the plugin really calls the gateway but runs on a
+hand-built cordis context, and *real kernel* means the plugin was installed and
+started inside dsh. The distinction cost this round a ship-blocker — see the last
+row.
 
-| 项目 | 方式 | 结果 |
+| Check | How | Result |
 | --- | --- | --- |
-| 发布清单与实物一致 | 离线 build-manifest.mjs --check + release-e2e.mjs | 26 个发布文件全部一致。修改前线上 main 的 1.2.1 清单已漂移 6 个文件（index.js、README.md、README_EN.md、src/catalog.js、src/store.js、src/upstream.js），比 issue #1 报告的 2 个更多——即提出 issue 之后再次复发。现已随版本重新生成；--check 与新增的 release-e2e.mjs（使用真实清单与真实文件完整执行一次升级，含"清单虚报 1 个字节必须被拒绝"的反向对照）均已纳入 npm test 与 CI。本轮补充修复两个同源漏洞：清单现按 LF 归一化后的字节计算（.gitattributes 为 * text=auto eol=lf，而 Windows 编辑器可将工作区写为 CRLF 且 git status 不报错——这正是 issue #1 上次的复现路径），目录收集也改为递归（旧的单层扫描会遗漏 src/lib/x.js 这类嵌套文件：npm 会安装它、清单中却没有它，而 installStaged 会将清单未列名的文件从用户机器删除）。两条各有一条常驻断言，后者还将 26 个文件全量转为 CRLF 后再执行 --check |
-| 离线套件 | npm test（14 个套件） | 14/14 通过；不出网、不消耗免费额度。套件端口取自临时端口段（固定端口在两个进程同时运行时会冲突：本轮实测——先占用 tui 的固定端口再运行该套件，请求被发送至其它进程的监听，套件一直挂起直至被 runner 超时终止、打印出的"失败详情"为六行 ok），runner 对每个套件设置 60 s 硬超时并输出挂起原因 |
-| 新增测试确实能捕获回归 | 逐条还原旧行为后重新运行 | computeMembership 的未判定模型：还原旧写法 → picker 报 Cannot read properties of undefined (reading 'state')（2 条检查失败）；postStreamed 的 Content-Type 判定：还原旧写法 → sniff 7 条检查失败。恢复后各自全绿。本轮新增的断言另执行了一轮变异测试：在临时副本中将 9 处修复逐条还原后运行对应套件，9/9 变红（逐条输出见下方"本轮复审"三行） |
-| 探测判定与选择器广播 | 真实上游 host-selftest.mjs | 清单 10 个模型 → 主分组 7 + region-limited 2，转发端口 /v1/models 同步 9 个；deepseek-v4-flash-free（Model is unavailable）移出下拉框并在设置页保留拒因；5xx/429/断网一律保持可达（issue #3 的判定不再误伤网络抖动） |
-| 未判定模型不再致命 | 离线假内核 picker-test.mjs | 清单新增一个模型、且其探测被测试挂起时，listModels 与 /summary 均正常返回，该模型 availability=unknown 且照常广播 |
-| 思考档位仍然强制生效 | 真实上游，MiMo V2.6 Flash | light 当前下发 4096：同一 prompt 下 2 980 tokens 正常 stop；修改前 light=2048 在同一 prompt 上以 length 收尾 |
-| 长回答不再被截断 | 真实上游 probes/long-answer.mjs | balanced 实际下发 max_tokens=16384，单次请求输出 10 164 tokens（19 914 字符、194 秒）后 finish=stop；同一请求在旧的 8192 档上必然以 length 结束——即 issue #2 报告的现象。设置页模型卡标注每档实际数值（默认档上限 16K，已在实际浏览器中确认） |
-| SSE 帧不再受 header 误导（issue #6） | 离线假网关 sniff-test.mjs | 200 + application/json + 响应体为 SSE 帧：正常输出 token，不报错；跨 chunk 截断的中文字符、超过 4 K 嗅探窗口的 400 帧长流、单包 JSON、空 body、HTML 等各类内容均按形状分流。同一场景在旧代码下会导致探测将可用模型判为 unavailable |
-| 无 web server 的 composition | 离线假内核 scripts/tui-test.mjs | 仅挂载 llm 时 apply() 不抛错、注册两条路由、完成一轮流式对话、转发端口启动并拒绝无 Key 请求；后台循环使用普通 unref 定时器。看板模块保持待命状态，webServer 出现后自动注册两条路由。真实 dsh-tui 尚未实机验证：本机两套内核（dsh 0.1.7 源码构建、AIO 6.9.3）均不含 tui profile |
-| 插件在真实内核中确实可安装 | 真实内核 dsh 0.1.7-rc.1 web，端口 3099 | 启动无 did not activate；/api/our-free-model/summary 返回 200（10 个模型：6 available、2 region-blocked、1 unknown、1 unavailable）、/events 启动并推送 hello；在实际浏览器中进入 设置 → Our Free Model 逐项读取到 10 张模型卡、不在选择器中 分组、思考不可关 与 默认档上限 16K 标签，控制台零报错。本轮最初版本在此步骤失败：inject 仅保留 llm 后读取 ctx.interval 抛出 cannot get property "timer" without inject，插件在所有 composition 中均不再激活 |
-| 复审发现的两个新问题 | 定向复现 + 常驻断言 | ① head 嗅探阶段被 abort 时抛出的是原生 AbortError（code 为数字 20），toFailure 无法识别从而降级为 TRANSPORT——而 TRANSPORT 位于可重试名单内，用户主动取消的回合存在被内核重试的可能；当前三条读取路径共用 classifyStreamFailure，sniff 中保留两条 abort 断言。② 提交后又修改了 src/http.js，清单再次漂移，被 --check 与新增的 release-e2e.mjs 当场捕获——门禁按设计生效，同时也说明任何改动后都需重新执行 |
-| 本轮复审：请求路径上两处"整轮丢弃/重复计费" | 本地假网关定向复现 + 常驻断言 | ① readHead 需填满 4 KB 才判定形状：一条已完成输出的短回答，只要网关未立即关闭连接，就会在嗅探窗口中等待至 deadline，随后连同已读取的帧一起被 cancel 丢弃——整轮以一个可重试的 TIMEOUT 结束，内核再次发送、额度再次消耗（复现输出为 frames delivered: 0）。当前实现在首帧识别为流后立即放行，同时不再阻塞每轮开头那 4 KB 的 token。② 流内错误的分类写入了 llmCode，而 toFailure 仅读取 code——导致每条流内拒绝都降级为可重试的 TRANSPORT（已输出 token 的回合被重发），中途的 RegionError 也永远无法触发切换出口重探。当前流内错误与错误信封统一走 classifyFailure |
-| 本轮复审：设置入口缺少类型校验 | 离线 picker-test.mjs + effort-test.mjs | probeIntervalMinutes:'abc' → Math.max(1,'abc') 为 NaN，而 setTimeout(fn, NaN) 在 Node 中等价于 1 ms：每秒执行一次全量探测。defaultMaxTokens:0（清空设置页输入框即会提交 0）→ min(容量, 0)，每轮被裁剪至 512 token，而选择器仍标注 4 K/16 K/32 K 的档位。当前数值项在 POST /settings 入口与使用处各设一道校验，非正值一律按"未设置"回落。同一批断言还固定了转发端口只能绑定回环（0.0.0.0 直接返回 400 并注明原因），以及 connection 的准入判定为逐请求读取（还原为 apply 时的一次性快照 → 该 401 断言立即失败） |
-| 本轮复审：三条"看似在测试"的套件 | 变异测试（在临时副本中逐条还原旧行为） | retry-safety-test.mjs 的四个用例全部落在"模型不在清单上"的提前返回分支（传入 model:"our-free-model/test-model-free"，而 baseModelId 仅剥离 label 不剥离路由），未发出任何请求——改为真实调用后 7 个用例逐个固定 code／是否可重试／是否触发区域重探。tui-test.mjs 的 unref 断言比较的是两个不同总体的计数（移除 120 s 循环的 unref() 后仍全绿）→ 改为按周期逐个核对。写死在套件中的端口（tui 的 18931）与另一进程争用同一端口时，表现为 180 s 静默挂起、打印出的"失败详情"为六行 ok → 端口改为取自临时端口段，runner 增加 60 s 硬超时并如实说明"该套件挂起" |
-| usage 计数正确 | 离线 retry-safety-test.mjs | 缺少 prompt_tokens_details 的 usage 不再使 inputTokens 变为 NaN；转发端口按 prompt_tokens/completion_tokens 上报，被网关拒绝的转发请求返回错误，不返回空 200。Messages 线上 message_delta 仅携带 output 一侧，旧写法会覆盖整条 usage 记录、使每个 Claude 回合的 prompt tokens 记为 0；当前改为按字段合并 |
-| 本轮复审：5xx 的原因短语不再被当作判定（issue #3 的同类回归） | 离线 sniff-test.mjs + 反向验证 | stateOf 的消息兜底匹配不检查状态码，而反向代理返回 503 的标准原因短语正是 Service Unavailable——过载的网关因此被判定为"点名拒绝该模型"，模型逐个从选择器中消失（issue #3 修复的代价从消息兜底路径再度引入）。当前该兜底仅在状态码无法代表网关意图时才生效；响应体中点名模型的（含 5xx 下的 type: ModelError）仍判定为拒绝。新增 4 条断言，还原旧实现后其中 2 条立即失败 |
+| Manifest describes the shipped files | offline, `build-manifest.mjs --check` + `release-e2e.mjs` | All 26 published files match. Before the fix, `main`'s published 1.2.1 manifest had drifted on **6** files (`index.js`, both READMEs, `src/catalog.js`, `src/store.js`, `src/upstream.js`) — one more recurrence than the 2 issue #1 reported, after the issue was filed. Regenerated with the version; `--check` and the new `release-e2e.mjs` (it installs the real release end to end, with a negative control proving a manifest that lies about one byte is refused) now run in `npm test` and in CI. This round closed two holes of the same family: digests are now computed over **LF-normalised** bytes (`.gitattributes` says `* text=auto eol=lf`, and an editor on Windows can leave the working tree CRLF while `git status` stays clean — which is exactly how issue #1 came back), and listed directories are walked **recursively** (the old one-level scan skipped `src/lib/x.js`: npm ships it, the manifest does not name it, and `installStaged` deletes whatever the manifest does not name from every installed copy). Both carry standing assertions, the first of which rewrites all 26 files to CRLF and runs `--check` |
+| Offline suites | `npm test` (14 suites) | 14/14 pass; no network, no free-lane quota spent. Suite ports come from the ephemeral range (a hard-coded port loses a race with any other process: occupying the one `tui` used to write down made its own fetch hit somebody else's listener and hang to the runner's timeout, printing six `ok` lines as the "failure detail"), and the runner puts a 60 s deadline on every suite and says so when one hangs |
+| The new tests actually bite | old behaviour patched back in, suite re-run | Reverting the `computeMembership` guard → picker fails with `Cannot read properties of undefined (reading 'state')` (2 checks); reverting the response sniff → sniff fails 7 checks. Restoring each fix turns both green again. Every assertion added this round went through the same treatment as a **mutation check**: 9 fixes reverted one at a time in throwaway copies, 9/9 turned their suite red |
+| Probe verdicts → what the picker advertises | live upstream, `host-selftest.mjs` | 10 listed models → 7 on the main route plus 2 under `region-limited`, and the forward port's `/v1/models` follows at 9; `deepseek-v4-flash-free` (`Model is unavailable`) left the dropdown with its refusal recorded in the settings page. 5xx / 429 / dropped connections all keep their model |
+| A model with no verdict is survivable | offline fake kernel, `picker-test.mjs` | With a newly listed model whose probe the test holds open, `listModels` and `/summary` both answer, the model is advertised and reads `availability=unknown` |
+| Rungs still enforced | live upstream, MiMo V2.6 Flash | `light` now sends 4096 and the same prompt finished `stop` at 2 980 tokens; before the change `light` (2048) ended that same prompt with `length` |
+| Long answers stop being cut | live upstream, `probes/long-answer.mjs` | `balanced` sent `max_tokens=16384`; the request produced **10 164** output tokens (19 914 characters, 194 s) and finished `stop`. The old 8192 ceiling cut the same turn with `length` — the symptom in issue #2. The model cards print each rung's real number (`Default ceiling 16K`), read in the browser |
+| The body decides, not the header (issue #6) | offline fake gateway, `sniff-test.mjs` | A 200 with `application/json` over SSE frames streams normally with no error; a Chinese character split across chunks, a 400-frame stream past the 4 K sniff window, a single JSON body, an empty body and an HTML junk body all route by shape. On the old code that same response also made the probe report a working model as `unavailable` |
+| Composition with no web server | offline fake kernel, `scripts/tui-test.mjs` | With only `llm` mounted, `apply()` does not throw, both routes register, a full streamed turn completes, the forward port comes up and rejects keyless requests, and the background loops run on plain unref'd timers. The dashboard half waits, and mounts both routes the moment `webServer` appears. **Not yet verified on a real dsh-tui**: neither kernel on this machine (source build 0.1.7-rc.1, AIO 6.9.3) ships a tui profile |
+| The plugin really installs and runs | **real kernel**, dsh 0.1.7-rc.1 web on port 3099 | No `did not activate` in the startup log; `/api/our-free-model/summary` 200 (10 models: 6 available, 2 region-blocked, 1 unknown, 1 unavailable), `/events` streams its hello; in the browser `Settings → Our Free Model` renders the 10 cards, the *Not in the picker* group, the `Thinking always on` and `Default ceiling 16K` tags, with an empty console. The first cut of this round **failed here**: with `inject` reduced to `['llm']`, reading `ctx.interval` threw `cannot get property "timer" without inject` and the plugin stopped activating on every composition |
+| Two new problems the review itself caught | targeted repro + standing assertions | (1) Aborting during the head sniff threw the raw `AbortError` (numeric `code` 20), which `toFailure` cannot recognise and downgrades to `TRANSPORT` — a retryable code, i.e. a hole where a turn the user cancelled could be retried. All three read paths now share `classifyStreamFailure`, and sniff carries two abort assertions. (2) After committing, another `src/http.js` edit drifted the manifest, and `--check` plus the new `release-e2e.mjs` failed it on the spot - the gate works, and it is also the reminder that any edit means re-running it |
+| This round, on the request path: two ways to lose or double-pay a turn | local fake gateway, targeted repro + standing assertions | (1) `readHead` filled its whole 4 KB window before deciding what the body was, so a **short answer the gateway had already finished typing** sat in the sniff until the deadline and was then discarded with the cancel — a completed turn reported as a retryable `TIMEOUT`, which the harness sends again and the lane pays for twice (the repro prints `frames delivered: 0`). The body is now allowed to declare itself a stream on the first frame, which also stops withholding the first 4 KB of every answer. (2) In-stream errors were classified into `llmCode`, and `toFailure` reads `code` — so every refusal inside a stream arrived as retryable `TRANSPORT` (re-sending a turn whose partial answer had already been forwarded), and a mid-turn `RegionError` could never reach the egress re-probe. In-stream errors now go through the same `classifyFailure` as an error envelope |
+| This round, at the settings boundary | offline, `picker-test.mjs` + `effort-test.mjs` | `probeIntervalMinutes:'abc'` made `Math.max(1,'abc')` = NaN, and Node treats `setTimeout(fn, NaN)` as 1 ms — a full catalog probe every second. `defaultMaxTokens:0` (which is what clearing the settings-page field posts) became `min(capacity, 0)`, cutting every turn to the 512-token floor while the picker went on printing its 4 K/16 K/32 K ladder. Numbers are now coerced both where they are written and where they are read, and a non-positive value means "unset". The same assertions pin the forward listener to a loopback bind (`0.0.0.0` is refused with a 400 that says why) and pin that `connection` admission is read **per request**: patch the snapshot back in and the late-mount 401 check goes red on the spot |
+| This round, three suites that only looked like tests | mutation check (revert one fix per throwaway copy) | `retry-safety-test.mjs`'s four cases all landed on the "model not on this route" early return — it passed `model:"our-free-model/test-model-free"`, and `baseModelId` strips a label, not a route — so the suite had never sent a request; against real calls its 7 cases now pin the code, whether it may be retried, and whether the region re-probe fired. `tui-test.mjs` compared the *counts* of two different populations, so deleting the 120 s loop's `unref()` stayed green; it now checks each period individually. And the hard-coded port in `tui` became an ephemeral one after it hung for 180 s against somebody else's listener |
+| Usage accounting | offline, `retry-safety-test.mjs` | A `usage` object without `prompt_tokens_details` no longer computes `inputTokens: NaN`; the forward port answers in `prompt_tokens/completion_tokens` and reports a refused turn as an error instead of an empty 200. On the Messages wire `message_delta` carries only the output side, and the old whole-record overwrite zeroed the prompt tokens of every Claude turn; records are now merged field by field |
+| This round: a 5xx reason phrase is no longer read as a verdict (the same regression issue #3 was about) | offline, `sniff-test.mjs` + revert check | `stateOf` matched its message fallback without regard for the status, and "Service Unavailable" is the reason phrase every reverse proxy answers a 503 with — so an overloaded gateway was read as the gateway naming each model refused, and those models left the picker one at a time (the cost issue #3 removed, back through the message fallback). The fallback now only speaks when the status has not already answered for the gateway; a body that names the model — including `type: ModelError` under a 5xx — is still a refusal. Four new assertions, two of which go red the moment the old implementation is restored |
 
-### 上一轮：v1.1.2（公告、升级、热重载与信任围栏）
+### v1.1.2 (announcements, in-app upgrades, hot reload, trust fence)
 
-全部新能力均经过实际操作验证，包括在浏览器与 DSHEAC AIO 桌面窗口中的逐项点击：
+Every v1.1.2 capability was **operated for real**, including click-through in a
+browser and inside the DSHEAC AIO desktop window:
 
-| 项目 | 结果 |
+| Check | Result |
 | --- | --- |
-| dsh 0.1.7-rc.1（源码构建） | 启动无报错；选择器两个分组正确；多轮工具调用完成 |
-| dsh 0.1.5-rc.2（DSHEAC AIO 6.9.3 内核） | 启动无报错；与已安装的其它第三方插件共存 |
-| EAC 启动闸门 | 安装时与应用内升级后各执行一次：compatible / PASS |
-| 模型可调用性 | 10 个清单模型全部可达（该轮行为：探测失败/暂不可用的模型也保留在选择器中；自 v1.2.2 起不再广播判定为不可用的模型）；real chat、多轮工具、视觉输入在两套内核中通过 |
-| 真实 harness 对话 | dsh web 与 AIO 桌面端各完成一轮真实对话并收到回复 |
-| 公告 feed | 在本地"仓库服务器"推送新公告 → 运行中的两端在一个轮询周期内收到 |
-| 公告中心 UI | 4 条公告渲染（粗体/代码/链接/列表）、紧急红色徽章、未读标记、单条/全部已读 |
-| 紧急公告 | urgent 推送触发全屏弹窗，点击"知道了"即写入已确认状态 |
-| Toast + 系统通知 | 新公告实时 toast；桌面端 window.Notification 通道存在（WebView2 权限策略拒绝授权时 UI 如实提示） |
-| 应用内升级 | dsh web 与 AIO 桌面端各完成一次 1.1.0 → 1.1.2 升级：23 个文件下载、SHA-256 校验、备份、替换、热重载；升级后 /meta 立即上报新版本 |
-| 升级安全性 | 哈希不匹配 → staging 丢弃、已安装包不变、历史记录标记失败；升级产物通过 EAC 闸门并完整重启加载 |
-| 热重载 | 按钮、API 两种入口；ESM 缓存清除 + 重注册 + 回滚序列；generation 递增、客户端通过 localStorage 提示一次 |
-| 客户端 bundle 热更 | 替换 client.js 后浏览器端由内核 client-hmr 自动重载（实测两次） |
-| 信任围栏 | 非 loopback Host / 跨站 sec-fetch-site / 异源 Origin 一律 403；无 cookie 的回环请求 401（与内核 /api 一致） |
-| SSE 推送 | hello/announcements/update/upgraded 事件实测通过；热重载后自动重连 |
-| 思考强度传递 | light/balanced/deep 三档实测：reasoning 2048（被预算截断）/ 3386 / 3522，输出单调上升 |
-| 地区门 | 受限模型返回 REGION_BLOCKED 并保留在自身分组 |
-| 转发端口 | /v1/models、流式与非流式 /v1/chat/completions；无 Key 请求被拒 401 |
-| 界面文案 | 无乱码；上游厂名仅出现在仓库文档与公告正文两处——#8 要求的披露需要一个用户可见的位置，公告即说明位。模型选择器、设置页与报错文案中始终不出现 |
-| 未验证部分如实说明 | OS 级通知的最终视觉呈现未逐像素确认——AIO 桌面端的 WebView2 权限策略拒绝了 Notification.requestPermission()（插件的 Tauri 通知通道存在，纯浏览器路径可用，被拒时设置页如实显示"需要在系统/浏览器 设置中手动恢复"）；AIO 对内置插件存在报告式静态启发扫描（TROJAN_EXFIL_ENV 会对 src/upstream.js 的 env+URL 邻近模式记录一条报告日志），仅记录不改动文件 |
+| `dsh` 0.1.7-rc.1 (source build) | Boots clean; picker shows both groups; multi-round tool calling completes |
+| `dsh` 0.1.5-rc.2 (DSHEAC AIO 6.9.3 kernel) | Boots clean alongside the other installed third-party plugins |
+| EAC startup gate | Run at install time **and after the in-app upgrade**: `compatible` / `PASS` |
+| Model reachability | All 10 catalog models stayed invocable (behaviour at that round: even probe-failed ones remained in the picker; since v1.2.2 a model judged unroutable is not advertised); real chat, multi-round tools and vision input pass on both kernels |
+| Real harness conversation | One real turn completed and answered in both dsh web and the AIO desktop window |
+| Announcement feed | New items pushed on a local "repository server" arrived within one poll cycle on both surfaces |
+| Announcement center UI | 4 items rendered (bold/code/links/lists), urgency badge, unread dots, mark-read single/all |
+| Urgent announcement | An `urgent` push opened the full-screen modal; acknowledging persisted |
+| Toast + OS notifications | Live toast on arrival; the desktop `window.Notification` channel exists (when the WebView2 permission policy denies the request, the UI says so) |
+| In-app upgrade | 1.1.0 → 1.1.2 completed on both dsh web and AIO: 23 files downloaded, SHA-256 verified, backed up, replaced, hot-reloaded; `/meta` reported the new version immediately |
+| Upgrade safety | A hash mismatch discards staging, leaves the installed package untouched and logs the failure; upgraded artifacts pass the EAC gate and a full restart |
+| Hot reload | Button and API entry points; ESM cache purge + re-register + rollback sequence; `generation` increments, client notices once via localStorage |
+| Client bundle hot swap | Replacing `client.js` reloaded the browser bundle automatically via the kernel's client-hmr (observed twice) |
+| Trust fence | Non-loopback Host / cross-site `sec-fetch-site` / foreign `Origin` all 403; cookieless loopback requests 401 (same as the kernel's `/api`) |
+| SSE push | `hello`/`announcements`/`update`/`upgraded` events verified; EventSource reconnects after a hot reload |
+| Effort propagation | light/balanced/deep measured live: reasoning 2048 (budget-truncated) / 3386 / 3522, output rising monotonically |
+| Region gating | Region-blocked model surfaces as `REGION_BLOCKED` and stays in its own group |
+| Forward listener | `/v1/models`, streaming and non-streaming `/v1/chat/completions`, unauthenticated requests rejected `401` |
+| UI strings | No mojibake; the upstream vendor name appears in exactly two places — the repository docs and the announcement body, since #8's disclosure needs a place a user can actually see. The model picker, the settings page and error copy still never name it |
+Not verified, so stated plainly: the **final OS-level notification rendering**
+was not visually confirmed — the AIO build's WebView2 permission policy denies
+`Notification.requestPermission()` (the plugin's Tauri notification channel is
+present, the plain-browser path works, and the settings page says plainly that
+permission was denied). The AIO guard also runs a report-only heuristic scan
+that logs one finding for the `env`-adjacent-URL pattern in `src/upstream.js`;
+it never touches files.
 
-## 已知边界
+## Known limitations
 
-"不限量"指不存在额度体系：无需充值、不按 token 计费、没有套餐与用量面板。但该车道按 session 统计速率，短时间内打满会返回 429。插件将该模型标记为"已达限额"，不做隐藏，下一轮探测自动恢复。
+- **"No usage cap" means no cap to buy.** There is no balance, no plan and no per-token billing; the lane is metered by session rate, though, and hammering it surfaces as `429`. The plugin marks the model *quota reached* rather than hiding it, and the next probe clears the state.
+- **Upstream sessions are per-conversation.** Each conversation is pinned to one stable upstream session (the mapping is persisted in the data directory's `session-map.json`), so concurrent conversations never share upstream state. Turns that arrive without a conversation id (some host call shapes, local-gateway requests with no `user`/`conversation`) fall back to a reserved `global` session shared by all such turns, including their KV cache — run parallel sensitive conversations through a call shape that carries a conversation id; the plugin logs a one-time warning for the first id-less turn. The free lane meters quota per session, so a fresh session per id-less request is not an option — that is the cost of the quota model. Aggregate-lane requests additionally carry an `x-session-id` header so a provider that keeps per-session state cannot merge concurrent conversations on the same key; the EAC lane deliberately sends no session header, because its shared-pool admission gate does not recognize the free lane's session fingerprint.
+- **Some upstream models are slow.** `nemotron-3.5-lightning-free` measured over 30 s to first token in one run. That is upstream latency, and the dashboard reports it rather than hiding it.
+- **Output speed is sometimes `—`.** A model that answers in one or two large frames, or whose thinking never streams, has no window worth dividing. The panel says so instead of publishing the model's thinking time as decoding speed.
+- **Thinking is a silent wait, and it shares the output budget.** `mimo-v2.6-flash-free` measured 60–70 s of silence while the lane billed 3024 reasoning tokens and streamed not one reasoning frame; such a turn ends as `stop` with nothing visible, which clients report as an empty response. The forward endpoint and the LAN relay keep the connection alive with heartbeats — but that protects the connection, not the timeout: the SSE parser skips comment frames, and pi-ai's idle watchdog (`streamIdleTimeoutMs`, default 300 s) resets only when real content frames arrive, so a stall past 300 s on the wire still fails (issue #34). Only the caller can give it **budget**: raise the per-call output ceiling past 16k, or use a model the catalogue marks `reasoning: false`.
+- **Automatic recovery has request, time and context limits.** It handles only reasoning-only EOF and reasoning-only silent stops (a normal `stop` ending with no answer text) and adds at most one request. Answer text, tool calls, cancellation and explicit errors exclude recovery. A checkpoint request cannot preserve internal upstream state that was never sent, and success is not guaranteed. Usage with a missing report is only the known part.
+- **Capabilities are what probes can confirm.** Anything the public listing and a live probe do not evidence is left unlabelled.
+- **Source is plain JavaScript.** It has to be, to load as a local plugin. Anyone with the folder can read the gateway logic; treat that as an accepted property of this distribution form, not as something obfuscation would fix.
+- **Desktop installs need a real directory**, for the reason given in [Install](#install).
+- **Upgrade and hot-reload trust boundary**: as of v1.3.2 the in-app upgrader's trust root is the Ed25519 public key pinned inside the plugin, not "HTTPS to the repository" — a manifest must carry the release key's signature before anything is installed, so a poisoned mirror (jsDelivr included) fails the upgrade instead of executing code. Whoever holds the **release private key** can push arbitrary code, the same trust model as whoever can push the repository, but a repository account takeover is now a failed-upgrade outage for every user rather than a direct RCE. File integrity is enforced by signature + SHA-256 manifest; content safety by the client-side allowlist renderer and the host's plugin isolation.
+- **The AIO build's WebView2 permission policy may deny notification permission** (measured `denied` on this machine). The announcement center says so plainly; plain-browser access to dsh web is unaffected.
+- **The forward port is not required to be 18899.** When the port is taken the listener moves to the next free one and writes that port back into the settings (the settings page carries the note). That is deliberate: a port change beats a forward listener that silently stays down. Which process holds the port is the operating system's answer to give; the plugin only reports what it said.
+- **The plugin routes' auth depends on the composition**: with a connection service mounted (dsh web, the AIO desktop) it matches the kernel's `/api` (the app's own cookie/token); in minimal compositions without one, a structural fence applies (loopback + same-origin), and other local processes can still reach the routes — the same behaviour the kernel has in those compositions. **This covers `/forward/key` and `/forward/lan/key` too**: in such a composition any local process can fetch both keys with one request and spend the machine's free quota from another machine. Treat the two keys as local-process-readable files there (same trust level as `settings.json`), or mount a connection service at deploy time when you need more isolation.
 
-上游会话按对话隔离：每个对话固定映射到一枚稳定的上游会话（映射落盘在数据目录的 session-map.json），并发的不同对话各自持有独立会话，互不共享上游状态。没有携带会话 id 的回合（部分宿主调用形态、本地网关未给出 user/conversation 的请求）会并入一枚保留的 global 会话，与其它无 id 回合共享上游状态（含 KV 缓存）——并行运行多个敏感对话时，请使用带会话 id 的调用形态；插件对首个无 id 回合会输出一条一次性警告（免费车道额度按会话计费，无法为每个无 id 请求铸新会话，这是该配额模型的代价）。聚合车道的请求额外携带 x-session-id 会话头，使按会话维护状态的提供商不会把同一 Key 上的并发对话混在一起；EAC 车道按设计不发送会话头——其共享号池的准入门禁不识别免费车道的会话指纹。
+## Development
 
-部分模型上游本身延迟较高。nemotron-3.5-lightning-free 曾实测首字延迟超过 30 秒。此为上游延迟，看板会如实显示。
-
-输出速度有时会显示 —。答案集中在一两个大帧中落地、或思考过程根本不流式返回的模型，不存在可用于计算的时间窗。看板宁可留空，也不会将"思考耗时"计入"输出速度"。
-
-思考过程为静默等待，且与正文共享输出预算。实测 mimo-v2.6-flash-free 可在思考阶段静默 60–70 秒，期间上游计费 3024 个 reasoning token 但不发送任何思考帧；此类回合会以 stop 收尾而正文为空，客户端容易报告"空响应"。转发端点与局域网中继通过心跳保持连接，但心跳维持的是连接，不能解决超时问题：注释帧会被 SSE 解析器跳过，pi-ai 的空闲看门狗（streamIdleTimeoutMs，默认 300 秒）仅在读到真实内容帧时重置，链路滞留超过该值仍会以 TIMEOUT 失败（实测时间线见 issue #34）。预算只能由调用方给出：将单次输出上限提升至 16k 以上，或改用模型卡中标注 reasoning: false 的模型。
-
-自动恢复存在次数、时间与上下文边界。仅恢复纯思考 EOF 与纯思考空停（正常 stop 收尾但无正文），最多追加一次请求；已输出正文、工具调用、用户取消与明确错误不触发恢复。该机制基于检查点重新发起请求，无法保留上游未发出的内部状态，且不保证成功。缺失 usage 时的用量仅为已知部分。
-
-能力标注以探测可证明者为限。公开清单与实测均无法取得证据的，不予标注。
-
-源码为明文 JavaScript。作为本地插件必须如此。能够访问该目录的人员即可读懂网关逻辑——请将其视为该分发形态的固有属性，混淆无法解决该问题。
-
-桌面端安装需要真实目录，原因见安装一节。
-
-升级与热重载的信任边界：应用内升级的信任根自 v1.3.2 起为插件内 pin 的 Ed25519 公钥，不再依赖"HTTPS 到仓库"——清单必须携带发布私钥签名方可安装，镜像（含 jsDelivr）被投毒只会导致升级失败，不会执行其中的代码。持有发布私钥者可推送任意代码，这在信任模型上与"可推送仓库者"等同，但将"仓库账号被接管"从直接 RCE 降级为"所有用户升级失败"。文件层面的完整性由签名与 SHA-256 清单双重保障，代码层面的安全由客户端白名单 HTML 渲染器与宿主的插件隔离承担。
-
-DSHEAC AIO 的 WebView2 权限策略可能拒绝通知授权（本机实测 denied）。被拒时公告中心的开关会如实提示；通过纯浏览器访问 dsh web 不受影响。
-
-转发端口不要求固定占用 18899。端口被占用时监听顺延至下一个可用端口，并将实际端口写回设置（设置页给出提示）。此为有意设计：宁可更换端口，也不让本地转发静默停摆；占用方由操作系统错误码决定，插件仅如实转述。
-
-插件接口的鉴权级别取决于 composition：挂载了 connection 服务的 composition（dsh web、AIO 桌面端）下与内核 /api 同级（需要应用自身的 cookie/token）；不含 connection 服务的极简 composition 退回结构化围栏（loopback + 同源检查），本机其它进程仍可访问——与内核在同类 composition 下的行为一致。该说明同样适用于 /forward/key 与 /forward/lan/key：在这类 composition 下，本机任意进程通过一次请求即可取得转发 Key 与局域网 Key，再从其它机器消耗本机的免费额度。使用这类 composition 时，这两把 Key 应视作本机进程可读文件（与 settings.json 同一信任级别），如需更强隔离请在部署时挂载 connection 服务。
-
-## 开发
-
-```
-npm test # 以下全部离线套件 + 清单一致性检查，一条命令
-node scripts/client-lint.mjs # 浏览器半身：文案键与样式键双向覆盖、bundle 可执行
-node scripts/retry-safety-test.mjs # 交给内核的失败对象、退避策略与 usage 计数必须可持久化
-node scripts/speed-stat-test.mjs # 任何一次调用都不得被平均成虚假的 tok/s
-node scripts/sanitize-test.mjs # 公告 HTML 白名单渲染器：XSS 语料必须全部被丢弃
-node scripts/trust-test.mjs # 插件路由的请求信任围栏
-node scripts/feed-test.mjs # 公告 feed：解析、故障转移、缓存、到达检测（本地 HTTP 服务器）
-node scripts/updater-test.mjs # 应用内升级：清单校验、SHA-256、备份/回滚（本地 HTTP 服务器）
-node scripts/effort-test.mjs # 档位模型下发 reasoning_effort、预算模型下发 max_tokens，且与留痕档位一致
-node scripts/sniff-test.mjs # 200 响应按 body 形状分流：SSE 帧、单包 JSON、空 body、跨 chunk 多字节、中途 abort
-node scripts/release-e2e.mjs # 使用真实 feed/manifest.json 执行一次升级，并验证虚报字节的清单会被拒绝
-node scripts/picker-test.mjs # 选择器只广播可用的模型，且永不广播空集合
-node scripts/tui-test.mjs # 无 web server 的 composition 中插件仍能启动并输出模型
-node scripts/host-selftest.mjs # Host 半身端到端，会真实出网
-node scripts/build-manifest.mjs # 发布：重新生成 feed/manifest.json（发布文件哈希清单）
+```bash
+npm test                            # every offline suite below, plus the manifest check
+node scripts/client-lint.mjs        # browser half: copy/style key coverage, bundle executes
+node scripts/sanitize-test.mjs      # announcement HTML allowlist renderer vs an XSS corpus
+node scripts/trust-test.mjs         # request trust fence for the plugin's routes
+node scripts/feed-test.mjs          # announcement feed: parsing, failover, cache, arrivals
+node scripts/updater-test.mjs       # in-app upgrade: manifests, SHA-256, backup/rollback
+node scripts/build-manifest.mjs     # release: regenerate feed/manifest.json
+node scripts/retry-safety-test.mjs  # failures, retry policy and usage counts are durable-log safe
+node scripts/speed-stat-test.mjs    # no call can average its way into a fake tok/s
+node scripts/effort-test.mjs        # a rung is the max_tokens that goes out, and is recorded as itself
+node scripts/sniff-test.mjs         # a 2xx body is read by shape: SSE frames, single JSON, empty, split mid-codepoint, abort
+node scripts/release-e2e.mjs        # upgrade against the real manifest, and prove a lying one is refused
+node scripts/picker-test.mjs        # only usable models are advertised, and the picker never goes empty
+node scripts/tui-test.mjs           # the plugin activates and serves with no web server in the composition
+node scripts/host-selftest.mjs      # host half end to end against the live upstream
 ```
 
-发布清单必须使用发布私钥签名（--key  或 OFM_MANIFEST_KEY 环境变量），
-未签名清单会被构建器直接拒绝——应用内升级自 v1.3.2 起仅安装能与插件内公钥验签通过的
-清单。私钥不进入仓库、不进入任何分发物；更换密钥等同于更换信任根，需同时修改 src/updater.js
-中 pin 的公钥并执行一轮完整发布流程。
+Release manifests must be signed with the release private key (`--key <pem-path>`
+or the `OFM_MANIFEST_KEY` environment variable); the builder refuses to write an
+unsigned one — the in-app upgrader installs only manifests whose signature
+matches the public key pinned in the plugin, as of v1.3.2. The private key lives
+in neither the repository nor any artifact; rotating it means rotating the trust
+root: change the pinned key in `src/updater.js` and cut a full release.
 
-scripts/probes/ 为逆向过程中的一次性取证脚本——能力矩阵、地区门、
-reasoning_effort 无效性采样、预算方言、悬空工具调用、工具名字符集规则、
-原始读包时刻（batch-delivery）、逐帧到达与 usage 对照（decode-window）、
-长回答是否会被额度截断（long-answer）。
-其中六个基于本插件自身代码，可在仓库根目录直接执行
-（node scripts/probes/pairing-repair.mjs）；其余借助第三方 SSE 客户端直连上游，
-模块路径按该仓库结构编写，因此仅作为取证记录保留，不可作为测试套件使用。
-这些脚本均未接入 npm test，属于取证记录，不属于测试套件；npm test 执行的是上述不需要
-出网、不消耗免费额度的离线检查。
+`scripts/probes/` holds the one-off evidence scripts behind the findings report —
+capability matrix, region gate, the `reasoning_effort` no-op sampling, budget
+dialects, dangling tool calls, tool-name charset rules, raw read timestamps
+(`batch-delivery`), per-frame arrival against final usage (`decode-window`),
+and whether a long answer survives its ceiling (`long-answer`). Six of them
+exercise this plugin's own code and run from the repo root
+(`node scripts/probes/pairing-repair.mjs`); the rest reach the upstream through a
+third-party SSE client and assume that checkout's module paths, so they are
+recorded as evidence rather than offered as a test suite. None of them is wired
+into `npm test`, which runs the offline checks above — no network, no free-lane
+quota spent.
 
-需要 Node ^22.19.0 || >=24.0.0。无安装步骤、无依赖。
+Requires Node `^22.19.0 || >=24.0.0`. No install step, no dependencies.
 
-```
-npm run typecheck # tsc --noEmit，严格检查 adapter/ 接缝（可选：需要 typescript）
-```
+## Where the models come from
 
-## EAC 渠道（桌面端专属）
+Two public keyless upstreams, both dialled directly with no third party in the
+middle; the fourth destination (the EAC lane) is your own or the maintainer's
+deployed gateway, covered in its own section.
 
-除免费车道外，插件内置一条协付渠道（EAC）。宿主识别支持以下运行方式：
+**The free lane: OpenCode's key-free gateway**, `https://opencode.ai/inference/v1/*`
+(moved there from `/zen/v1` on 2026-10-14; the old path answers 403 FreeTierError
+for every free model). Every fact lives in `src/upstream.js`, and each one was
+checked by direct request against the live gateway (paths and fingerprint:
+2026-10-14 / 10-16):
 
-DSHEAC AIO（Tauri 壳）：内核路径、内嵌 node、web-desktop profile 三重信号同时命中才解锁；
-
-DeepSeek Harness 桌面端（Electron 壳）与 DSH Tauri：使用内核提供的 `desktop` 或 `tauri` profile 上下文；仅有命令行参数不作为通过依据。
-
-内核声明的 `web` / `web-desktop` profile 同样支持该渠道。未通过宿主识别时，不展示渠道、不发请求；通过识别后仍需满足独立的 GitHub 授权要求。
-
-显示规则：模型名仅显示模型本名并带渠道前缀，如 EAC DeepSeek V4.1 Flash、EAC Kimi K3；设置页的模型卡上另有独立的 EAC 渠道徽章。
-
-加密密封：渠道凭据与端点从不以可读形式出现在插件中——它们仅以 AES-256-GCM 密文存在，解密密钥由分散在两个文件中的三片掩码分片在解锁时即时派生；非授权宿主不进入派生路径，密文对搜索引擎与字符串扫描而言仅为噪声。
-
-凭据不落盘、不出进程：解锁按请求即时发生，明文仅存在于构造请求的那一帧中，不写入文件、不进入日志、不出现在任何 API 响应或错误消息中。
-
-签名网关（推荐形态）：worker/ 目录附带一个 Cloudflare Worker 网关——插件密封的仅有网关地址与 HMAC 签名密钥，请求按 时间戳 + HMAC-SHA256(方法/路径/ body 摘要) 签名，中继的真实 key 仅存放于 Worker 的环境变量中；防重放时间窗、模型白名单、可选按 IP 限速均在网关执行，签名密钥泄露只需在网关侧轮换即可全体吊销。部署与轮换见 worker/README.md。
-
-**GitHub 授权闸门**：自建网关（宝塔 Node 形态）另带一道按人计的授权闸门——对话请求除签名外还需携带一枚**专属令牌**，而令牌只发给「用 GitHub 登录 + 已 star 本仓库」的账号。登录全程在浏览器里完成：设置页「EAC 渠道授权」一键发起，网关回调页确认 star 状态后签发令牌，插件自动领取，无需复制粘贴；未 star 时页面会给出 ⭐ 按钮与「我已 star，重新检查」，不必重新登录。网关默认每 12 小时用保存的授权复查一次 star，取消 star 即在复查窗口内吊销令牌；GitHub 侧不可达时保留既有判定，不会误伤已授权用户。网关只申请 `read:user` 最小权限，授权仅用于 star 复查。免费车道（opencode）不经过网关，完全不受影响。
-
-## 上游是哪些源
-
-两条公开免密来源，均直连、不经任何第三方中转；另有第四条出网目标为自建网关（EAC 渠道，见其专节）。
-
-**免费车道：OpenCode 的免密网关，https://opencode.ai/inference/v1/\***（2026-10-14 从
-`/zen/v1` 迁到这里；旧路径对免费模型一律 403 FreeTierError）。
-具体到代码——src/upstream.js 中每一条均通过直接请求核对（路径与指纹：2026-10-14 / 10-16）：
-
-| 用途 | 目标 | 携带何种凭据 |
+| What | Where | Credentials sent |
 | --- | --- | --- |
-| 推理请求 | POST …/inference/v1/chat/completions、…/inference/v1/responses、…/inference/v1/messages（按模型分流，见 endpointFor） | Authorization: Bearer public——该车道本身即为公开免密额度，插件中不含任何属于你的密钥 |
-| 模型清单 | GET …/inference/v1/models | 同上 |
-| 公告与升级清单 | 本仓库的 feed/\*.json：raw.githubusercontent.com 优先，cdn.jsdelivr.net 兜底 | 无 |
-| 出口地区判定 | api.ipify.org / ipinfo.io / ipapi.co，仅用于读取本机公网 IP 与国家码 | 无 |
+| Inference | `POST …/inference/v1/chat/completions`, `…/inference/v1/responses`, `…/inference/v1/messages` (per model, see `endpointFor`) | `Authorization: Bearer public` — this lane is a public, key-free allowance; the plugin holds no secret of yours |
+| Model list | `GET …/inference/v1/models` | same |
+| Announcements and the update manifest | this repository's `feed/*.json`: `raw.githubusercontent.com` first, `cdn.jsdelivr.net` as fallback | none |
+| Egress region check | `api.ipify.org` / `ipinfo.io` / `ipapi.co`, only to read back your own public IP and country code | none |
 
-**Kilo 渠道：Kilo AI 的公共网关，https://api.kilo.ai/api/gateway**（2026-10-06 接入）。
-代码在 src/kilo.js，每一条均于接入当日通过直接请求核对：
+**The Kilo channel: Kilo AI's public gateway**, `https://api.kilo.ai/api/gateway`
+(added 2026-10-06). The code is `src/kilo.js`; each row was checked by direct
+request on the day it was wired in:
 
-| 用途 | 目标 | 携带何种凭据 |
+| What | Where | Credentials sent |
 | --- | --- | --- |
-| 推理请求 | POST …/api/gateway/chat/completions（OpenAI Chat Completions 兼容，SSE 流式） | **无**——该网关的免费池（清单中 `isFree: true` 的模型，含 kilo-auto/free 自动路由）不需任何账号、Key 或登录态 |
-| 模型清单 | GET …/api/gateway/models | 无 |
+| Inference | `POST …/api/gateway/chat/completions` (OpenAI Chat Completions compatible, SSE streaming) | **none** — the gateway's free pool (the listing's `isFree: true` models, including the `kilo-auto/free` auto-router) needs no account, key or login state |
+| Model list | `GET …/api/gateway/models` | none |
 
-关于隐私与信任，说明如下：
+On privacy and trust, plainly:
 
-没有号池、没有中转、没有二道贩子。上表即为本插件全部出网目标；npm test 的离线套件完全不出网（共享测试脚手架会把两条免密来源都默认指向已关闭的本机端口，杜绝任何套件"顺带"打到真实网关），仅 scripts/host-selftest.mjs 与 scripts/probes/ 会主动请求这些地址，且需手动运行。若将来引入新的来源，本节会先于功能更新，不会默认将流量分配给第三方。
+- **No account pool, no relay, no reseller.** The tables above are the complete
+  set of destinations the plugin can contact. `npm test` touches no network at
+  all — the shared test scaffolding points both keyless upstreams at closed
+  loopback ports by default, so no suite can "incidentally" reach a real gateway —
+  and the only things that do are `scripts/host-selftest.mjs` and
+  `scripts/probes/`, which you run by hand. If another source is ever added, this
+  section is updated before the feature is.
+- **Your prompts, tool results and any attached images go to the upstream that
+  serves the model you picked, as an ordinary inference request** — the same as
+  calling any model API. Nothing else leaves the machine: the usage dashboard's
+  data, settings and the forwarding key all stay in `DSH_HOME/our-free-model/`.
+- **Key-free is not unmanaged.** The free lane fingerprints clients through
+  `x-opencode-*` headers, accounts free usage per session, answers 403 for a
+  disallowed region and 429 once the allowance is spent. **Kilo's free pool
+  states on its model cards that prompts may be logged by the upstream provider
+  and used to improve their services** (verbatim from the `kilo-auto/free` card:
+  "Prompts may be logged by the upstream provider and used to improve their
+  services. Not suitable for production or sensitive data workloads."). The model
+  set and the quota policy belong to the upstream and can change at any time; all
+  the plugin can do is withdraw an unavailable model from the picker and say why.
+- This section is repository documentation. Inside the app — picker, settings
+  page, error copy — the upstreams' names still do not appear (the convention is
+  recorded under [Verification](#verification)), except that the Kilo badge's
+  tooltip does say prompts may be logged — that is information you need while
+  choosing a model.
 
-你的 prompt、工具结果与随附图像会作为正常推理请求发送至所选模型对应的上游——与调用任何模型 API 相同。除此之外插件不上传任何内容：用量看板数据、设置、转发 Key 均只落在本机 DSH_HOME/our-free-model/。
 
-免密不等于无人管理：免费车道通过 x-opencode-\* 指纹识别客户端、按会话统计免费额度，会因地区返回 403、因超量返回 429。**Kilo 免费池在其模型卡中明确声明：prompt 可能被上游提供方记录，并用于改进其服务**（原文见 kilo-auto/free 模型卡："Prompts may be logged by the upstream provider and used to improve their services. Not suitable for production or sensitive data workloads."）。模型集合与额度政策由上游决定，随时可能变更；插件仅能如实将不可用的模型从选择器中移除。
+## Disclaimer
 
-本节属于仓库文档。应用内的选择器、设置页与报错文案中仍不出现上游厂名（该约定见验收情况一节），但 Kilo 渠道的模型卡徽章悬停提示会告知"prompt 可能被上游记录"——这是选择模型时需要知道的信息。
-## 免责声明
+- **This plugin is a client, not a model provider.** Every model response is
+  generated and delivered by the third-party upstreams named above (OpenCode's
+  Zen gateway, Kilo AI's public gateway, and the EAC gateway you or the
+  maintainer deploy); the plugin hosts, modifies and filters none of it. Models
+  can produce wrong, outdated or biased content — verify before you rely on it.
+- **Free does not mean unlimited, and it does not mean private.** The free
+  allowances are the upstreams' unilateral offer and can be throttled, priced or
+  withdrawn at any time; Kilo's free pool states that prompts may be logged and
+  used to improve their services. **Never send passwords, keys, personal data,
+  trade secrets, or anything you would not hand to a third party through this
+  plugin's free lanes**; for production and sensitive work, use your own paid
+  API.
+- **You agree to the upstreams' terms by using them.** Using a channel means you
+  accept that upstream's terms of service and usage policy; throttling, bans or
+  other consequences of violating them are yours to own. The plugin makes no
+  promise about any upstream's availability, accuracy or continuity.
+- **The EAC lane is a shared, co-paid offer.** Its gateway is deployed by the
+  repository maintainer and unlocked by a GitHub login plus a star; it is for
+  authorized users only. Do not try to bypass the gate, resell, or share access —
+  abuse tightens the lane for everyone.
+- **The plugin is not affiliated with, nor endorsed by, any of the upstreams.**
+  Vendor names and trademarks belong to their owners and are cited only to name
+  the source.
 
-- **本插件是一个客户端，不是模型服务方。** 所有模型响应均由上述第三方上游（OpenCode Zen 网关、Kilo AI 公共网关、以及你自己部署的 EAC 网关）生成并传输；插件不托管、不修改、不过滤任何模型输出。模型可能产出错误、过时或有偏颇的内容，请自行核实后再使用。
-- **免费不等于无限，也不等于私有。** 免费额度由上游单方面提供，随时可能限流、收费或下线；Kilo 免费池明确声明 prompt 可能被上游记录并用于改进服务。**请勿通过本插件的免费车道发送密码、密钥、个人身份信息、商业机密或任何你不愿第三方处理的内容**；生产与敏感场景请使用你自己的付费 API。
-- **上游条款由你遵守。** 使用各渠道即表示你同意对应上游的服务条款与用量政策；因违反上游政策导致的限流、封禁或其它后果由使用者自行承担。插件不对任何上游的可用性、准确性或连续性作任何承诺。
-- **EAC 渠道为协付性质。** 该渠道的凭据与网关由仓库维护者部署（GitHub 登录 + star 仓库解锁），仅限授权用户使用；请勿尝试绕过授权闸门，勿转售或共享渠道访问权——滥用会导致全体用户的通道被收紧。
-- **本插件与上述任何上游厂商无隶属或背书关系。** 各厂商名称与商标归其各自所有者所有，仅在说明来源时引用。
+## Security and privacy
 
-## 安全与隐私
+- All state lives in `DSH_HOME/our-free-model/`; usage and settings stay local, nothing is uploaded.
+- **The aggregate lane's keys never leave the machine.** They are written only into the plugin's own `0600` `settings.json`, requests go only to the provider you configured, and the plugin's API echoes `hasKey` plus a `…abcd` fingerprint rather than the key itself; the Test and Discover probes redact the credential out of anything a provider answers back.
+- The forward listener binds a **loopback address only**, `127.0.0.1` by default, and rejects keyless requests. Widening it to a routable interface is refused: `POST /settings` answers 400 with the reason, and on a composition with no web server a hand-written `settings.json` simply does not start the listener. That traffic is spent from this machine's free lane; one string in a settings file should not put a whole subnet on it.
+- **Network access is a second door, not a relaxation of the rule above.** The local listener still binds loopback only and still refuses a routable address; reaching another machine takes an explicit switch, and then **every** request must carry the network key — `/` and `/health` included, unlike the local listener, because an unauthenticated liveness answer tells the whole subnet that this machine is here and proxying. The relay carries five whitelisted paths (`/v1/models`, `/v1/chat/completions`, `/v1/responses`, `/v1/messages`, `/v1/messages/count_tokens`, each also accepted without its `/v1` prefix) and is not a general proxy for whatever else answers on loopback; it swaps the network key for the local one at the door, so the two are never interchangeable; a request that already carries the relay's hop marker is refused with `508`, so a relay port equal to the local one cannot spin. The network key is minted by `crypto`, compared with `timingSafeEqual`, stored in the same `0600` file, and rotated on its own from the panel.
 
-所有状态写入 DSH_HOME/our-free-model/；用量与设置仅落在本机，不上传至任何位置。
+- **Network access is a second door, not a relaxation of the rule above.** The local listener still binds loopback only and still refuses a routable address; reaching another machine takes an explicit switch, and then **every** request must carry the network key — `/` and `/health` included, unlike the local listener, because an unauthenticated liveness answer tells the whole subnet that this machine is here and proxying. The relay carries three whitelisted paths (`/v1/models`, `/v1/chat/completions`, `/v1/responses`) and is not a general proxy for whatever else answers on loopback; it swaps the network key for the local one at the door, so the two are never interchangeable; a request that already carries the relay's hop marker is refused with `508`, so a relay port equal to the local one cannot spin. The network key is minted by `crypto`, compared with `timingSafeEqual`, stored in the same `0600` file, and rotated on its own from the panel. **The address to dial is re-read from this machine's interfaces** — the panel polls it every 15 s while the relay is on, so a laptop that changed networks, woke from sleep or brought a VPN up is not told where it used to be. A machine commonly holds several private addresses at once (the router's `192.168.x.y`, plus whatever a virtual switch, tunnel or VPN adapter has), so the physical interface leads and is the address the panel offers to copy, with the others listed below it; the relay binds every interface, but whether a given address answers from another machine depends on the network that adapter is on.
+- **The EAC lane's per-user gate lives server-side.** The plugin carries only a shared signing secret, and any install can extract it — so the one place a per-person gate can actually hold is the gateway in front of the relay credential. A chat turn needs a token minted after a GitHub sign-in verified to have starred the repository; the star is re-checked on a configurable window (12 h by default), a removed star revokes at the next sweep, tokens are revocable at any time, and per-account rate and concurrency ceilings bound a shared token. The relay key never reaches the plugin, and the token never reaches the browser — the settings page sees a login name and a verdict.
+- The forward key is minted at runtime by `crypto`, compared with `timingSafeEqual`, and stored in a `0600` file. No hardcoded credential ships in this repository. `/` and `/health` answer ahead of the key check because they are liveness probes — they answer only "is it there"; the model roster requires the key.
+- The plugin's HTTP routes carry a **request trust fence** (fixed in v1.1): the plugin's `/api/our-free-model` prefix outranks the kernel's `/api` in webServer's longest-prefix dispatch and used to bypass kernel auth. Every request now goes through the composition's `connection` admission first (exactly the kernel's `/api` check: cookie/token); compositions without a connection service fall back to a structural fence — loopback Host, cross-site `sec-fetch-site` refused, `Origin`/`Referer` must match the Host authority and port, and a **missing or empty Host is refused too** (fail closed; there is no fallback to the socket's local address). Measured: foreign Host/Origin 403, cookieless loopback 401. `connection` is resolved per request, because the browser half provides it only after plugins load — reading it once at apply time silently degrades the fence to its structural layer for the life of the process.
+- **Announcement HTML renders through a strict client-side allowlist**: `scripts/sanitize-test.mjs` runs an XSS corpus (script injection, event handlers, `javascript:`/`data:` URLs, iframe/svg/form, style injection, mangled tags) and asserts all of it is dropped; nothing ever reaches an `innerHTML` sink. The feed URL is user-overridable, so the renderer treats feed content as untrusted.
+- **The in-app upgrade integrity chain (signed as of v1.3.2)**: manifest Ed25519 signature verification (public key pinned in `src/updater.js`; unsigned or unverified manifests are refused outright, so no mirror can serve an installable forgery) → manifest validation (semver, path traversal, hash shape, `base` restricted to manifest-relative paths) → per-file SHA-256 + byte size on download → read-back verification of staging → read-back verification after install → backup restore on any failure. The manifest is re-fetched immediately before installing so a stale one can never vouch for different bytes. Boundaries in [Known limitations](#known-limitations).
+- **The update channel is fully decoupled from `feedUrl`** (v1.3.2): the setting redirects the announcement feed only, never the upgrade manifest — previously one settings value could point the update channel at any server with self-consistent hashes, turning "wrote a config field" into "executed arbitrary code in the host process". The announcement override itself is now restricted to https (loopback http excepted, so a locally-hosted mirror and the test suites still work) and may not carry credentials. **The target host is not restricted**: any https address may serve as `feedUrl`, and the plugin polls it on the `feedPollMinutes` period — so in a composition without a connection service (see the auth note above), a local caller who can edit settings can point the process at any external address indefinitely. This is trusted the same way as the plugin's other outbound calls: someone who can write `settings.json` can already install code.
+- **The forward listener binds loopback by resolution, not by spelling** (v1.3.2): a hostname such as `localhost` is resolved with `dns.lookup` first and every answer must be loopback; the listener binds the resolved IP — so a hosts file or enterprise DNS pointing `localhost` at a routable interface can no longer pass the check while the listener hands the lane to the subnet.
+- Uninstalling removes the bundle entry; the plugin leaves no patches behind. Its data directory is plain JSON you can delete.
 
-聚合车道的 Key 同样不出本机：它只写入插件自己的 0600 `settings.json`，请求只发往你自己配置的那家提供商，插件接口只回显 `hasKey` 与 `…abcd` 指纹，从不回显 Key 本身；测试与发现模型两次探测也把回包中的 Key 一律脱敏。
+## License
 
-转发监听仅绑定回环地址，默认 127.0.0.1，无 Key 请求一律拒绝。将地址改为可路由接口会被直接拒绝（POST /settings 返回 400 并注明原因；在无 web server 的 composition 中手工写入 settings.json 同样不会启动监听）——该端口的流量消耗的是本机这条免密车道，不应由一个字符串决定是否向整个子网开放。
+MIT — see [LICENSE](LICENSE).
 
-局域网访问是另开的一扇门，并不放宽上述规则：本机监听仍只绑回环、修改地址仍被拒绝；需要跨机器使用时必须显式启用"局域网访问"，中继绑定可路由地址，且每个请求都需携带局域网 Key——连 /、/health 这类存活探针也一并鉴权（仅本机监听免 Key 应答存活探测），否则一个未鉴权的应答等同于向整个子网宣告"该主机正在代理"。中继仅转发 /v1/models、/v1/chat/completions、/v1/responses、/v1/messages、/v1/messages/count_tokens 五条白名单路径（各自的去 /v1 写法同样放行），不代理任意 loopback 服务；入口处将局域网 Key 换为本机 Key，因此两把 Key 互不通用；携带跳数标记的请求直接拒绝（508），因此端口即使配置为本机监听的同一端口也不会自环。局域网 Key 同样由 crypto 生成、以 timingSafeEqual 比对、存放于同一 0600 文件中，可在面板上单独轮换。
-
-转发 Key 由 crypto 运行时生成、以 timingSafeEqual 比对、存放于 0600 权限文件中。本仓库不含任何硬编码凭据。/ 与 /health 为存活探针，先于 Key 检查应答，但仅回答"是否在线"，获取模型清单仍需 Key。
-
-插件的 HTTP 路由带请求信任围栏（自 v1.1 修复）：插件的 /api/our-free-model 前缀在 webServer 的最长前缀分发下优先于内核 /api，曾绕过内核鉴权。当前每个请求先经由 composition 的 connection 服务准入（与内核 /api 完全同级的 cookie/token 校验）；connection 缺失的 composition 退回结构化围栏——loopback Host、拒绝跨站 sec-fetch-site、Origin/Referer 必须与 Host 同源同端口，Host 缺失或为空也拒绝（fail closed，不回退至 socket 本地地址）。实测结果：异源 Host/Origin 返回 403，无 cookie 的回环请求返回 401。connection 为逐请求获取，因为浏览器半身要到插件加载之后才将其 provide 出来——若在 apply 时以快照方式读取一次，围栏会在整个进程周期内退化为结构化那一层（本轮将该读取改回快照后，picker-test 的 401 断言立即失败）。
-
-公告 HTML 在客户端经严格白名单渲染：scripts/sanitize-test.mjs 使用 XSS 语料（脚本注入、事件属性、javascript:/data: URL、iframe/svg/form、样式注入、畸形标签）验证全部被丢弃；不经过任何 innerHTML sink。公告源的 feedUrl 可被用户指向任意 URL，因此渲染器按不可信输入处理。
-
-应用内升级的完整性链（v1.3.2 加签）：清单 Ed25519 签名验证（公钥 pin 在 src/updater.js，无签名或验签失败的清单直接拒绝，未签名镜像不会被安装）→ 清单校验（semver、路径逃逸、哈希格式、base 必须为清单相对路径）→ 下载时逐文件校验 SHA-256 与字节数 → staging 回读校验 → 安装后回读校验 → 任一步失败即恢复备份；安装前强制重新拉取清单，杜绝陈旧清单。文件与代码边界见已知边界一节。
-
-更新通道与 feedUrl 彻底解耦（v1.3.2）：feedUrl 仅重定向公告 feed，永不再重定向升级清单——此前一个设置项即可将升级源指向任意服务器并配以自配平的哈希，等同于将"修改一个设置值"升级为"在宿主进程中执行任意代码"。公告 override 本身也收紧为仅 https（回环 http 除外，本机镜像与测试仍可用）且不得内嵌凭据。目标域不受限制：任何 https 地址均可作为 feedUrl，插件按 feedPollMinutes 的间隔轮询——因此在不含 connection 服务的 composition 中（见上文鉴权说明），能够修改设置的本机调用者可让进程持续请求任意外部地址。这与插件的其余外联一样按"设置即信任"对待：能够修改 settings.json 的人本来就能安装代码。
-
-转发监听仅绑回环地址，且按解析结果绑定（v1.3.2）：localhost 这类主机名先经 dns.lookup 解析、全部结果均为回环才放行，绑定使用解析出的 IP——当 hosts 文件或企业 DNS 将 localhost 指向可路由接口时，校验与监听不再各自为政。
-
-卸载只需移除 bundle 条目，插件不留任何补丁；其数据目录为纯 JSON，可直接删除。
-
-## 许可证
-
-MIT，见 LICENSE。
-
-本项目为独立插件，与任何模型提供方无隶属、认可或赞助关系。使用该插件访问免费额度受各提供方
-自身条款约束；在超出个人机器的场景中部署前，请先确认这些条款。
-
-## Star 趋势
-
-图表由 Star History 自动更新，无需手动提交图片。受服务缓存（当前为 24 小时）和 GitHub 图片缓存影响，显示可能延迟，并非秒级实时；点击图表可查看在线趋势。
-
-<a href="https://www.star-history.com/?type=date&amp;repos=Ebony-Vinyl%2Fdsh-our-free-model">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Ebony-Vinyl/dsh-our-free-model&amp;type=Date&amp;theme=dark" />
-    <img alt="dsh-our-free-model 的 GitHub Star 增长趋势" src="https://api.star-history.com/svg?repos=Ebony-Vinyl/dsh-our-free-model&amp;type=Date" />
-  </picture>
-</a>
+This project is an independent plugin and is not affiliated with, endorsed by, or
+sponsored by any model provider. Using it to reach free tiers is subject to those
+providers' own terms; check them before deploying anywhere beyond your own machine.

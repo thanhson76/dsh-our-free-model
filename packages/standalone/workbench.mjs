@@ -91,9 +91,9 @@ export function prepareClientLaunch({ client, profileDir, baseUrl, key, env = pr
   const launchEnv = { ...env }
   const args = []
   if (client.mode === 'native' || client.nativeOnly) return { executable: client.executable, args, env: launchEnv, cwd: client.cwd }
-  if (!client.model) throw error('请选择要使用的模型')
+  if (!client.model) throw error('Select the model to use')
   const base = new URL(baseUrl)
-  if (!['127.0.0.1', 'localhost', '[::1]'].includes(base.hostname)) throw error('客户端只能连接本机网关')
+  if (!['127.0.0.1', 'localhost', '[::1]'].includes(base.hostname)) throw error('Clients can only connect to the local gateway')
   const endpoint = base.origin
   fs.mkdirSync(profileDir, { recursive: true, mode: 0o700 })
   if (client.id === 'codex' || client.id === 'codex-desktop') {
@@ -167,7 +167,7 @@ export function prepareClientLaunch({ client, profileDir, baseUrl, key, env = pr
 export function resolveClientExecutable(plan, id, { platform = process.platform, nodePath = process.execPath } = {}) {
   if (platform !== 'win32' || /\.exe$/i.test(plan.executable)) return plan
   const packageName = { codex: '@openai/codex', claude: '@anthropic-ai/claude-code', gemini: '@google/gemini-cli' }[id]
-  if (!packageName || !/\.(cmd|bat)$/i.test(plan.executable)) throw error('此客户端需要 EXE 或受支持的 npm 启动器')
+  if (!packageName || !/\.(cmd|bat)$/i.test(plan.executable)) throw error('This client needs an EXE or a supported npm launcher')
   const shimDirectory = path.dirname(plan.executable)
   for (const packageRoot of [path.join(shimDirectory, 'node_modules', packageName), path.resolve(shimDirectory, '..', packageName)]) {
     const manifest = path.join(packageRoot, 'package.json')
@@ -186,7 +186,7 @@ export function resolveClientExecutable(plan, id, { platform = process.platform,
     if (/\.exe$/i.test(file)) return { ...plan, executable: file }
     if (/\.(?:js|mjs|cjs)$/i.test(file)) return { ...plan, executable: nodePath, args: [file, ...plan.args] }
   }
-  throw error('无法解析 npm 启动器，请选择对应客户端的可执行文件', 409)
+  throw error('Cannot resolve the npm launcher; select the executable for this client', 409)
 }
 
 export function createWorkbench({ dataDir, info, modelRows, key, home = os.homedir(), env = process.env, platform = process.platform, spawnImpl = spawn, terminalLaunch = launchClientTerminal }) {
@@ -194,7 +194,7 @@ export function createWorkbench({ dataDir, info, modelRows, key, home = os.homed
   let settings = {}
   if (fs.existsSync(file)) {
     settings = JSON.parse(fs.readFileSync(file, 'utf8'))
-    if (!settings || typeof settings !== 'object' || Array.isArray(settings)) throw new Error('客户端配置文件无效')
+    if (!settings || typeof settings !== 'object' || Array.isArray(settings)) throw new Error('The client configuration file is invalid')
   }
   const owned = new Map()
   const launching = new Set()
@@ -206,7 +206,7 @@ export function createWorkbench({ dataDir, info, modelRows, key, home = os.homed
   const definition = id => CLIENTS.find(client => client.id === id)
   const clientFor = id => {
     const source = definition(id)
-    if (!source) throw error('未知客户端')
+    if (!source) throw error('Unknown client')
     const configured = settings[id] ?? {}
     const executable = configured.executable || findExecutable(source, env, platform, home)
     return {
@@ -218,31 +218,31 @@ export function createWorkbench({ dataDir, info, modelRows, key, home = os.homed
   }
   function clients() { return CLIENTS.map(row => clientFor(row.id)) }
   function validatedPatch(patch) {
-    if (!patch || typeof patch !== 'object' || Array.isArray(patch)) throw error('客户端设置无效')
+    if (!patch || typeof patch !== 'object' || Array.isArray(patch)) throw error('Invalid client settings')
     const previous = clientFor(patch.id)
-    if (owned.has(patch.id) || launching.has(patch.id)) throw error('请先关闭此客户端再修改配置', 409)
+    if (owned.has(patch.id) || launching.has(patch.id)) throw error('Close this client before changing its configuration', 409)
     const next = { ...settings[patch.id] }
     for (const name of Object.keys(patch)) {
-      if (!['id', 'executable', 'cwd', 'model', 'mode'].includes(name)) throw error('不支持的客户端设置')
+      if (!['id', 'executable', 'cwd', 'model', 'mode'].includes(name)) throw error('Unsupported client setting')
     }
     for (const field of ['executable', 'cwd', 'model']) {
       if (patch[field] === undefined) continue
-      if (typeof patch[field] !== 'string' || patch[field].length > 4096 || /[\0\r\n]/.test(patch[field])) throw error('客户端设置无效')
+      if (typeof patch[field] !== 'string' || patch[field].length > 4096 || /[\0\r\n]/.test(patch[field])) throw error('Invalid client settings')
       next[field] = patch[field].trim()
     }
     if (patch.mode !== undefined) {
-      if (!['native', 'gateway'].includes(patch.mode)) throw error('请选择有效的启动模式')
-      if (previous.nativeOnly && patch.mode !== 'native') throw error('此管理器使用自身配置启动')
+      if (!['native', 'gateway'].includes(patch.mode)) throw error('Select a valid launch mode')
+      if (previous.nativeOnly && patch.mode !== 'native') throw error('This manager launches with its own configuration')
       next.mode = patch.mode
     }
-    if (next.executable && (!path.isAbsolute(next.executable) || !regular(next.executable))) throw error('可执行文件不存在，请填写绝对路径')
-    if (platform === 'win32' && next.executable && !/\.(exe|cmd|bat)$/i.test(next.executable)) throw error('请选择 EXE 或命令启动器')
-    if (next.cwd && (!path.isAbsolute(next.cwd) || !directory(next.cwd))) throw error('工作目录不存在，请填写绝对路径')
+    if (next.executable && (!path.isAbsolute(next.executable) || !regular(next.executable))) throw error('The executable does not exist; enter an absolute path')
+    if (platform === 'win32' && next.executable && !/\.(exe|cmd|bat)$/i.test(next.executable)) throw error('Select an EXE or command launcher')
+    if (next.cwd && (!path.isAbsolute(next.cwd) || !directory(next.cwd))) throw error('The working directory does not exist; enter an absolute path')
     return next
   }
   function saveBatch(patches) {
     if (!Array.isArray(patches) || patches.length > CLIENTS.length || patches.some(row => !row || typeof row !== 'object')
-      || new Set(patches.map(row => row.id)).size !== patches.length) throw error('客户端配置批次无效')
+      || new Set(patches.map(row => row.id)).size !== patches.length) throw error('Invalid client configuration batch')
     const updated = { ...settings }
     for (const patch of patches) updated[patch.id] = validatedPatch(patch)
     privateWrite(file, JSON.stringify(updated, null, 2) + '\n')
@@ -254,14 +254,14 @@ export function createWorkbench({ dataDir, info, modelRows, key, home = os.homed
     return clientFor(patch.id)
   }
   async function launch({ id }) {
-    if (disposed) throw error('工作台正在停止', 503)
-    if (launching.has(id) || owned.has(id)) throw error('客户端已经启动', 409)
+    if (disposed) throw error('The workbench is stopping', 503)
+    if (launching.has(id) || owned.has(id)) throw error('The client is already running', 409)
     const client = clientFor(id)
-    if (!client.installed) throw error('尚未找到客户端，请先安装或设置可执行文件路径', 409)
-    if (!directory(client.cwd)) throw error('工作目录不存在', 409)
+    if (!client.installed) throw error('The client was not found; install it or set the executable path first', 409)
+    if (!directory(client.cwd)) throw error('The working directory does not exist', 409)
     if (client.mode === 'gateway') {
-      if (info().enabled === false) throw error('本地推理服务已暂停', 409)
-      if (!modelRows().some(row => row.id === client.model)) throw error('所选模型当前不可用，请重新选择', 409)
+      if (info().enabled === false) throw error('The local inference service is paused', 409)
+      if (!modelRows().some(row => row.id === client.model)) throw error('The selected model is currently unavailable; select another one', 409)
     }
     launching.add(id)
     const launchController = new AbortController()
@@ -281,7 +281,7 @@ export function createWorkbench({ dataDir, info, modelRows, key, home = os.homed
         const handle = await terminalLaunch(resolveClientExecutable(plan, id, { platform }), {
           platform, env, profileDir: path.join(dataDir, 'clients', id), signal: launchController.signal,
         })
-        if (disposed) { await handle.dispose(); throw error('工作台正在停止', 503) }
+        if (disposed) { await handle.dispose(); throw error('The workbench is stopping', 503) }
         const ownedTerminal = { terminal: handle, pid: handle.pid }
         owned.set(id, ownedTerminal)
         history.set(id, { lastLaunchedAt: Date.now() })
@@ -299,7 +299,7 @@ export function createWorkbench({ dataDir, info, modelRows, key, home = os.homed
         }, 1500)
         timer.unref?.()
         terminalChecks.set(id, timer)
-        return { ok: true, pid: handle.pid, message: `已启动 ${client.name}` }
+        return { ok: true, pid: handle.pid, message: `Started ${client.name}` }
       }
       const child = spawnImpl(plan.executable, plan.args, { cwd: plan.cwd, env: plan.env, windowsHide: true, shell: false, stdio: 'ignore' })
       await new Promise((resolve, reject) => { child.once('spawn', resolve); child.once('error', reject) })
@@ -309,16 +309,16 @@ export function createWorkbench({ dataDir, info, modelRows, key, home = os.homed
       child.once('exit', release)
       child.once('error', release)
       child.unref?.()
-      return { ok: true, pid: child.pid, message: `已启动 ${client.name}` }
+      return { ok: true, pid: child.pid, message: `Started ${client.name}` }
     } catch (failure) {
-      history.set(id, { error: '启动失败，请检查客户端路径与安装状态' })
-      throw failure.statusCode ? failure : error('启动失败，请检查客户端路径与安装状态', 500)
+      history.set(id, { error: 'Launch failed; check the client path and installation state' })
+      throw failure.statusCode ? failure : error('Launch failed; check the client path and installation state', 500)
     } finally { launching.delete(id); launchControllers.delete(id) }
   }
   async function stop({ id }) {
     clientFor(id)
     const child = owned.get(id)
-    if (!child) throw error('该客户端没有由本工作台启动的进程', 409)
+    if (!child) throw error('This client has no process started by this workbench', 409)
     if (child.terminal) {
       await child.terminal.stop()
       if (owned.get(id) === child) owned.delete(id)
@@ -329,7 +329,7 @@ export function createWorkbench({ dataDir, info, modelRows, key, home = os.homed
     if (platform === 'win32' && spawnImpl === spawn) {
       const taskkill = path.win32.join(env.SystemRoot ?? 'C:\\Windows', 'System32', 'taskkill.exe')
       try { await runFile(taskkill, ['/PID', String(child.pid), '/T', '/F'], { timeout: 10000, windowsHide: true }) }
-      catch { if (owned.get(id) === child) throw error('无法停止客户端，请检查进程状态', 500) }
+      catch { if (owned.get(id) === child) throw error('Cannot stop the client; check the process state', 500) }
     } else child.kill()
     return { ok: true }
   }

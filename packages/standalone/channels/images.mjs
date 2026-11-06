@@ -1,6 +1,6 @@
 import crypto from 'node:crypto'
 
-/** 图片只在本次请求内存中存活，无任意路径读取或远程图片下载。 */
+/** Images live only in memory for the current request; there is no arbitrary-path reading or remote image downloading. */
 export const attachments = {
   async saveImage({ data, mediaType }) {
     const bytes = Buffer.from(data)
@@ -33,12 +33,12 @@ export const attachments = {
         width = (bits & 0x3fff) + 1; height = ((bits >>> 14) & 0x3fff) + 1
       }
     }
-    if (type !== mediaType || !width || !height) throw new Error('图片类型与字节不符，或缺少有效尺寸')
-    if (width > 8192 || height > 8192 || bytes.length > 20 * 1024 * 1024) throw new Error('图片超出尺寸或大小限制')
+    if (type !== mediaType || !width || !height) throw new Error('The image type does not match its bytes, or it has no valid dimensions')
+    if (width > 8192 || height > 8192 || bytes.length > 20 * 1024 * 1024) throw new Error('The image exceeds the dimension or size limit')
     return { attachmentId: `sha256:${crypto.createHash('sha256').update(bytes).digest('hex')}`, mediaType, width, height, bytes: bytes.length, data }
   },
   async readImage(ref) {
-    if (!(ref?.data instanceof Uint8Array)) throw new Error('图片引用不属于当前请求')
+    if (!(ref?.data instanceof Uint8Array)) throw new Error('The image reference does not belong to the current request')
     return { data: ref.data, ref }
   },
 }

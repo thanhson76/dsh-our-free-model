@@ -25,31 +25,31 @@ pub struct VerifiedUpdate {
 pub fn prepare(data_dir: &Path, current: &str) -> Result<VerifiedUpdate, String> {
     let directory = data_dir.join("desktop-updates");
     if fs::symlink_metadata(&directory)
-        .map_err(|_| "尚未下载更新")?
+        .map_err(|_| "No update has been downloaded yet")?
         .file_type()
         .is_symlink()
     {
-        return Err("更新缓存不能是符号链接".into());
+        return Err("The update cache must not be a symbolic link".into());
     }
     let ready = directory.join("ready.json");
     if !fs::symlink_metadata(&ready)
-        .map_err(|_| "请先下载并校验更新")?
+        .map_err(|_| "Download and verify the update first")?
         .is_file()
     {
-        return Err("更新记录不是普通文件".into());
+        return Err("The update record is not a regular file".into());
     }
     let mut bytes = Vec::new();
     fs::File::open(&ready)
-        .map_err(|_| "无法读取更新记录")?
+        .map_err(|_| "Cannot read the update record")?
         .take(16385)
         .read_to_end(&mut bytes)
-        .map_err(|_| "无法读取更新记录")?;
+        .map_err(|_| "Cannot read the update record")?;
     if bytes.len() > 16384 {
-        return Err("更新记录过大".into());
+        return Err("The update record is too large".into());
     }
-    let record: Receipt = serde_json::from_slice(&bytes).map_err(|_| "更新记录格式无效")?;
-    let version = semver::Version::parse(&record.version).map_err(|_| "更新版本格式无效")?;
-    let current = semver::Version::parse(current).map_err(|_| "当前版本格式无效")?;
+    let record: Receipt = serde_json::from_slice(&bytes).map_err(|_| "Invalid update record format")?;
+    let version = semver::Version::parse(&record.version).map_err(|_| "Invalid update version format")?;
+    let current = semver::Version::parse(current).map_err(|_| "Invalid current version format")?;
     if record.schema_version != 1
         || version <= current
         || !version.pre.is_empty()
@@ -62,34 +62,34 @@ pub fn prepare(data_dir: &Path, current: &str) -> Result<VerifiedUpdate, String>
             .bytes()
             .all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c))
     {
-        return Err("更新记录不符合安装条件".into());
+        return Err("The update record does not meet the installation conditions".into());
     }
     let installer = directory.join(format!("installer-{}.exe", record.sha256));
-    let metadata = fs::symlink_metadata(&installer).map_err(|_| "安装包不存在，请重新下载")?;
+    let metadata = fs::symlink_metadata(&installer).map_err(|_| "The installer does not exist; please download it again")?;
     if !metadata.is_file() || metadata.len() != record.size {
-        return Err("安装包大小不匹配，请重新下载".into());
+        return Err("The installer size does not match; please download it again".into());
     }
-    let canonical_directory = directory.canonicalize().map_err(|_| "更新目录无效")?;
-    let canonical_data = data_dir.canonicalize().map_err(|_| "数据目录无效")?;
+    let canonical_directory = directory.canonicalize().map_err(|_| "Invalid update directory")?;
+    let canonical_data = data_dir.canonicalize().map_err(|_| "Invalid data directory")?;
     if canonical_directory.parent() != Some(canonical_data.as_path()) {
-        return Err("更新目录越界".into());
+        return Err("The update directory is out of bounds".into());
     }
-    let installer = installer.canonicalize().map_err(|_| "安装包路径无效")?;
+    let installer = installer.canonicalize().map_err(|_| "Invalid installer path")?;
     if installer.parent() != Some(canonical_directory.as_path()) {
-        return Err("安装包路径越界".into());
+        return Err("The installer path is out of bounds".into());
     }
-    let mut file = fs::File::open(&installer).map_err(|_| "无法读取安装包")?;
+    let mut file = fs::File::open(&installer).map_err(|_| "Cannot read the installer")?;
     let mut digest = Sha256::new();
     let mut buffer = [0u8; 64 * 1024];
     loop {
-        let count = file.read(&mut buffer).map_err(|_| "无法校验安装包")?;
+        let count = file.read(&mut buffer).map_err(|_| "Cannot verify the installer")?;
         if count == 0 {
             break;
         }
         digest.update(&buffer[..count]);
     }
     if format!("{:x}", digest.finalize()) != record.sha256 {
-        return Err("安装包校验失败，当前应用未被修改".into());
+        return Err("Installer verification failed; the current application was not modified".into());
     }
     Ok(VerifiedUpdate {
         installer,
@@ -104,7 +104,7 @@ fn quote(value: &str) -> String {
 
 fn quote_path(value: &Path) -> String {
     let raw = value.to_string_lossy();
-    // canonicalize 的 Windows 扩展前缀不能直接交给 ShellExecute/Start-Process。
+    // The Windows extended prefix produced by canonicalize cannot be handed directly to ShellExecute/Start-Process.
     let friendly = if let Some(rest) = raw.strip_prefix(r"\\?\UNC\") {
         format!(r"\\{}", rest)
     } else if let Some(rest) = raw.strip_prefix(r"\\?\") {
@@ -127,7 +127,7 @@ try {{
   $installed=Start-Process -FilePath {installer} -ArgumentList @('/S','/R','/UPDATE') -WindowStyle Hidden -Wait -PassThru
   if ($installed.ExitCode -ne 0 -and $installed.ExitCode -ne 3010) {{ throw 'installer failed' }}
 }} catch {{
-  Set-Content -LiteralPath {result} -Value '{{"ok":false,"error":"更新安装未完成，已尝试重新打开原应用，请重新检查更新。"}}' -Encoding UTF8
+  Set-Content -LiteralPath {result} -Value '{{"ok":false,"error":"The update installation did not complete. The original application was reopened; please check for updates again."}}' -Encoding UTF8
   if (Test-Path -LiteralPath {current_exe}) {{ Start-Process -FilePath {current_exe} -WindowStyle Normal }}
 }}
 "#,
@@ -147,15 +147,15 @@ pub fn handoff(update: VerifiedUpdate) -> Result<(), String> {
         process::{Command, Stdio},
         time::{Duration, Instant, SystemTime, UNIX_EPOCH},
     };
-    let executable = std::env::current_exe().map_err(|_| "无法定位当前程序")?;
+    let executable = std::env::current_exe().map_err(|_| "Cannot locate the current program")?;
     let nonce = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .map_err(|_| "系统时钟无效")?
+        .map_err(|_| "Invalid system clock")?
         .as_nanos();
     let ack = update.directory.join(format!("handoff-{nonce}.txt"));
     let script = helper_script(&update, &executable, std::process::id(), &ack);
     let powershell =
-        PathBuf::from(std::env::var_os("SystemRoot").ok_or("无法定位系统 PowerShell")?)
+        PathBuf::from(std::env::var_os("SystemRoot").ok_or("Cannot locate the system PowerShell")?)
             .join("System32/WindowsPowerShell/v1.0/powershell.exe");
     let mut helper = Command::new(powershell)
         .args([
@@ -171,7 +171,7 @@ pub fn handoff(update: VerifiedUpdate) -> Result<(), String> {
         .stdout(Stdio::null())
         .stderr(Stdio::null())
         .spawn()
-        .map_err(|_| "无法启动安装交接进程")?;
+        .map_err(|_| "Cannot start the install handoff process")?;
     let deadline = Instant::now() + Duration::from_secs(5);
     let ready = loop {
         if fs::read_to_string(&ack)
@@ -182,7 +182,7 @@ pub fn handoff(update: VerifiedUpdate) -> Result<(), String> {
         }
         if helper
             .try_wait()
-            .map_err(|_| "无法确认安装交接进程")?
+            .map_err(|_| "Cannot confirm the install handoff process")?
             .is_some()
             || Instant::now() >= deadline
         {
@@ -194,14 +194,14 @@ pub fn handoff(update: VerifiedUpdate) -> Result<(), String> {
     if !ready {
         let _ = helper.kill();
         let _ = helper.wait();
-        return Err("安装交接未就绪，应用保持运行".into());
+        return Err("The install handoff is not ready; the application keeps running".into());
     }
     Ok(())
 }
 
 #[cfg(not(windows))]
 pub fn handoff(_: VerifiedUpdate) -> Result<(), String> {
-    Err("当前仅支持 Windows 桌面安装更新".into())
+    Err("Desktop install updates are currently supported on Windows only".into())
 }
 
 #[cfg(test)]
@@ -228,7 +228,7 @@ mod tests {
         assert!(prepare(&dir, "2.7.1").is_ok());
         assert!(prepare(&dir, "2.7.3").is_err());
         fs::write(&installer, vec![0; bytes.len()]).unwrap();
-        assert!(prepare(&dir, "2.7.1").unwrap_err().contains("校验失败"));
+        assert!(prepare(&dir, "2.7.1").unwrap_err().contains("verification failed"));
         let mut injected = receipt;
         injected["path"] = serde_json::json!("C:/outside.exe");
         fs::write(cache.join("ready.json"), injected.to_string()).unwrap();

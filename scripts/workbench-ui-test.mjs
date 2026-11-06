@@ -30,8 +30,8 @@ try {
   }
   const nav = async name => {
     const advertisement = page.locator('dialog.ofm-sponsor[open]')
-    if (await advertisement.count()) await advertisement.getByRole('button', { name: /收起|关闭/ }).first().click()
-    await page.getByRole('navigation', { name: '管理导航' }).getByRole('button', { name, exact: true }).click()
+    if (await advertisement.count()) await advertisement.getByRole('button', { name: /Collapse|Close/ }).first().click()
+    await page.getByRole('navigation', { name: 'Management navigation' }).getByRole('button', { name, exact: true }).click()
   }
   const api = async (endpoint, body) => page.evaluate(async ({ endpoint, body }) => {
     const response = await fetch('/api/management' + endpoint, {
@@ -40,30 +40,30 @@ try {
     })
     return { status: response.status, body: await response.json() }
   }, { endpoint, body })
-  await page.getByRole('navigation', { name: '管理导航' }).waitFor()
+  await page.getByRole('navigation', { name: 'Management navigation' }).waitFor()
   const runningSummary = await api('/summary')
   assert.equal(runningSummary.body.networkMode, 'fixture', 'UI fixture verification requires the isolated preview service')
   for (const account of (await api('/subscriptions')).body.accounts) {
     if (account.label === 'UI fixture subscription') await api('/subscriptions/remove', { id: account.id })
   }
   await check('all provider presets render before credentials are configured', async () => {
-    await nav('聚合渠道')
+    await nav('Aggregate channels')
     await page.locator('.pd-row').first().waitFor()
     const result = await api('/providers')
     assert.equal(result.status, 200)
     assert.equal(result.body.registry.length, 76)
-    assert.ok(await page.getByText('未连接', { exact: true }).count() > 0)
+    assert.ok(await page.getByText('Not connected', { exact: true }).count() > 0)
     await page.screenshot({ path: path.join(outputDir, 'providers-desktop.png'), fullPage: true })
   })
   await check('provider search and editor operate on real management API', async () => {
-    const search = page.getByRole('textbox', { name: /搜索/ })
+    const search = page.getByRole('textbox', { name: /Search/ })
     await search.fill('DeepSeek')
     await page.waitForFunction(() => document.querySelectorAll('.pd-row').length === 1)
     assert.equal(await page.locator('.pd-row').count(), 1)
-    await page.getByRole('button', { name: '连接', exact: true }).click()
+    await page.getByRole('button', { name: 'Connect', exact: true }).click()
     await page.getByRole('dialog').waitFor()
     await page.getByRole('dialog').getByLabel('API Key', { exact: true }).fill('fixture-workbench-key')
-    await page.getByRole('dialog').getByRole('button', { name: /保存|连接/ }).last().click()
+    await page.getByRole('dialog').getByRole('button', { name: /Save|Connect/ }).last().click()
     await page.waitForFunction(async () => {
       const value = await (await fetch('/api/management/providers')).json()
       return value.configured.deepseek?.hasKey === true
@@ -84,16 +84,16 @@ try {
     assert.equal(JSON.stringify(account.body).includes('fixture-subscription-key'), false)
     const summary = await api('/summary')
     assert.ok(summary.body.catalog.some(model => model.id === `subscription:${row.id}/ui-model`))
-    await nav('客户端与订阅')
+    await nav('Clients and subscriptions')
     await page.getByText('UI fixture subscription', { exact: true }).waitFor()
-    assert.ok(await page.getByText(/未知|未查询/).count() > 0)
+    assert.ok(await page.getByText(/Unknown|Not queried/).count() > 0)
     await page.screenshot({ path: path.join(outputDir, 'agents-desktop.png'), fullPage: true })
     await api('/subscriptions/remove', { id: row.id })
     assert.ok(!(await api('/summary')).body.catalog.some(model => model.id === `subscription:${row.id}/ui-model`))
   })
   await check('EAC router shows retained channels and no removed providers', async () => {
     await nav('EAC router')
-    await page.getByLabel('搜索渠道').waitFor()
+    await page.getByLabel('Search channels').waitFor()
     assert.equal(await page.getByRole('heading', { name: 'EAC router', exact: true }).count(), 1)
     const names = await page.locator('.channel-directory-row h2, .provider-card h2').allTextContents()
     assert.ok(names.length >= 10)
@@ -108,30 +108,30 @@ try {
     for (const profile of existing.profiles) {
       if (profile.name === 'UI client profile') await api('/library/profiles/remove', { id: profile.id })
     }
-    await nav('资源库')
-    await page.getByRole('button', { name: '新建资源', exact: true }).first().click()
+    await nav('Library')
+    await page.getByRole('button', { name: 'New resource', exact: true }).first().click()
     const editor = page.getByRole('dialog')
-    await editor.getByLabel('名称', { exact: true }).fill('UI review instructions')
+    await editor.getByLabel('Name', { exact: true }).fill('UI review instructions')
     await editor.getByRole('combobox').selectOption('prompt')
-    await editor.getByLabel('Markdown 内容', { exact: true }).fill('Read the existing project conventions before making changes.')
-    await editor.getByRole('button', { name: '保存资源', exact: true }).click()
+    await editor.getByLabel('Markdown content', { exact: true }).fill('Read the existing project conventions before making changes.')
+    await editor.getByRole('button', { name: 'Save resource', exact: true }).click()
     await page.getByText('UI review instructions', { exact: true }).waitFor()
     let resource = (await api('/library')).body.resources.find(row => row.name === 'UI review instructions')
     assert.ok(resource?.enabled)
-    await page.getByRole('switch', { name: '启用资源 UI review instructions', exact: true }).click()
+    await page.getByRole('switch', { name: 'Enable resource UI review instructions', exact: true }).click()
     await page.waitForFunction(async () => {
       const value = await (await fetch('/api/management/library')).json()
       return value.resources.some(row => row.name === 'UI review instructions' && !row.enabled)
     })
-    await page.getByRole('tab', { name: /配置方案/ }).click()
-    await page.getByRole('button', { name: '保存当前配置', exact: true }).first().click()
+    await page.getByRole('tab', { name: /Profiles/ }).click()
+    await page.getByRole('button', { name: 'Save current configuration', exact: true }).first().click()
     await page.getByRole('dialog').getByRole('textbox').fill('UI client profile')
-    await page.getByRole('dialog').getByRole('button', { name: /保存/ }).last().click()
+    await page.getByRole('dialog').getByRole('button', { name: /Save/ }).last().click()
     await page.getByText('UI client profile', { exact: true }).waitFor()
     const profile = (await api('/library')).body.profiles.find(row => row.name === 'UI client profile')
     assert.ok(profile?.clients.length === 6)
-    await page.getByRole('button', { name: '应用', exact: true }).first().click()
-    await page.getByText(/配置方案.*已应用|已应用.*配置|配置方案已生效/).first().waitFor()
+    await page.getByRole('button', { name: 'Apply', exact: true }).first().click()
+    await page.getByText(/Profile.*applied|Profile applied/).first().waitFor()
     await page.screenshot({ path: path.join(outputDir, 'library-profiles.png'), fullPage: true })
     assert.equal((await api('/library/resources/remove', { id: resource.id })).status, 200)
     assert.equal((await api('/library/profiles/remove', { id: profile.id })).status, 200)
@@ -139,15 +139,15 @@ try {
   await check('routing editor saves ordered members and previews actual group capacity', async () => {
     const list = (await api('/routing')).body
     for (const group of list.combos) if (group.name === 'UI routing group') await api('/routing/remove', { id: group.id })
-    await nav('路由组')
-    await page.getByRole('button', { name: '新建路由组', exact: true }).first().click()
+    await nav('Routing groups')
+    await page.getByRole('button', { name: 'New routing group', exact: true }).first().click()
     const dialog = page.getByRole('dialog')
-    await dialog.getByRole('textbox', { name: /名称|路由组名称/ }).first().fill('UI routing group')
-    await dialog.getByRole('combobox', { name: '选择策略', exact: true }).selectOption('smart')
-    await dialog.getByRole('button', { name: /^添加成员 / }).first().click()
-    await dialog.getByRole('button', { name: /预览/ }).first().click()
-    await dialog.getByText(/上下文/).first().waitFor()
-    await dialog.getByRole('button', { name: '保存路由组', exact: true }).click()
+    await dialog.getByRole('textbox', { name: /Name|Routing group name/ }).first().fill('UI routing group')
+    await dialog.getByRole('combobox', { name: 'Select strategy', exact: true }).selectOption('smart')
+    await dialog.getByRole('button', { name: /^Add member / }).first().click()
+    await dialog.getByRole('button', { name: /Preview/ }).first().click()
+    await dialog.getByText(/Context/).first().waitFor()
+    await dialog.getByRole('button', { name: 'Save routing group', exact: true }).click()
     await page.getByText('UI routing group', { exact: true }).waitFor()
     const group = (await api('/routing')).body.combos.find(row => row.name === 'UI routing group')
     assert.equal(group.strategy, 'smart')
@@ -159,19 +159,19 @@ try {
     ['desktop', { width: 1440, height: 1000 }], ['mobile', { width: 390, height: 844 }], ['narrow', { width: 320, height: 740 }],
   ]) {
     await page.setViewportSize(viewport)
-    for (const title of ['客户端与订阅', '聚合渠道', 'EAC router', '资源库', '路由组']) {
+    for (const title of ['Clients and subscriptions', 'Aggregate channels', 'EAC router', 'Library', 'Routing groups']) {
       await check(`${title} ${name} fits viewport`, async () => {
         await nav(title)
         await page.waitForTimeout(250)
         assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${title} overflow`)
-        await page.screenshot({ path: path.join(outputDir, `${title === '聚合渠道' ? 'providers' : title === 'EAC router' ? 'router' : title === '资源库' ? 'library' : title === '路由组' ? 'routing' : 'agents'}-${name}.png`), fullPage: true })
+        await page.screenshot({ path: path.join(outputDir, `${title === 'Aggregate channels' ? 'providers' : title === 'EAC router' ? 'router' : title === 'Library' ? 'library' : title === 'Routing groups' ? 'routing' : 'agents'}-${name}.png`), fullPage: true })
       })
     }
   }
   await check('dark workbench headings and controls remain quiet and readable', async () => {
     await page.setViewportSize({ width: 1440, height: 1000 })
     await page.evaluate(() => { document.documentElement.dataset.theme = 'dark' })
-    await nav('客户端与订阅')
+    await nav('Clients and subscriptions')
     await page.locator('.wb-client').first().waitFor()
     const style = await page.locator('.wb-heading h1').evaluate(element => ({
       before: getComputedStyle(element, '::before').content,

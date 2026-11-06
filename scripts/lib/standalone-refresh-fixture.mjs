@@ -1,4 +1,4 @@
-/** 仅管理刷新测试的 Worker 装载：保留真实目录收集逻辑，替换账号适配器。 */
+/** Worker loaded only by the management refresh test: keeps the real catalog collection logic and replaces the account adapters. */
 import { registerHooks } from 'node:module'
 
 const business = new URL('../../packages/standalone/channels/business.mjs', import.meta.url).href

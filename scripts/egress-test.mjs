@@ -411,7 +411,7 @@ async function main() {
   check(echoJson.headers?.['x-ofm-egress-key'] === undefined, 'the relay key stops at the relay too')
   check(socks5a.server.lastTarget.host === '127.0.0.1' && socks5a.server.lastTarget.port === targetPort, 'socks5 dialed the real target')
 
-  // 原生 Request 与 URL 调用一样保留请求体、路径和认证头。
+  // Like the URL call, the native Request keeps the request body, path and authorization header.
   const requestBody = '{ "request": true, "spacing": "preserved" }'
   const request = new Request(`${base}/request`, {
     method: 'POST', body: requestBody, headers: { authorization: 'Bearer fixture-request' },

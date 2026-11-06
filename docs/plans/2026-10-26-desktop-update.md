@@ -1,7 +1,7 @@
-# 桌面内置更新实施计划
+# Desktop Built-in Update Implementation Plan
 
-1. 实现固定官方发布源的桌面更新管理器，并接入现有鉴权和同源管理接口。
-2. 增加原生安装交接命令：来源校验、固定缓存与摘要复核、服务退出、安装与重启；不提供任意命令或路径执行接口。
-3. 在左侧管理区增加应用更新页面，复用已有 UI 原语和设置卡片样式。
-4. 编写实际行为回归，验证下载与失败状态、安装交接及前端状态；运行类型、Rust 和适用完整检查，生成真实截图。
-5. 分批中文提交，提供可审查结果；不因本任务自动公开发布桌面版。
+1. Implement a desktop update manager pinned to the official release source, and wire it into the existing authentication and same-origin management API.
+2. Add a native install handoff command: source validation, pinned cache and digest re-verification, service exit, install and restart; no arbitrary command or path execution interface.
+3. Add an app update page in the left-hand management area, reusing the existing UI primitives and settings card styles.
+4. Write behavioural regression tests covering download and failure states, the install handoff and frontend state; run the type, Rust and applicable full checks, and produce real screenshots.
+5. Commit in batches, in Chinese, with reviewable results; this task does not by itself publicly release the desktop build.

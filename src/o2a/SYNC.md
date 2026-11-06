@@ -1,91 +1,127 @@
-# src/o2a — opencode2api 移植与同步手册
+# src/o2a — opencode2api porting and synchronization manual
 
-本目录是 [opencode2api](https://github.com/jasonxu114514/opencode2api) 网关里
-**匿名免费道（free tier / anonymous lane）请求整形**的 JavaScript 移植。上游每
-发布一个新版本，按本手册逐文件对照移植即可，不需要重新考古。
+This directory is a JavaScript port of the **anonymous free lane (free tier /
+anonymous lane) request shaping** in the
+[opencode2api](https://github.com/jasonxu114514/opencode2api) gateway. Each
+time upstream releases a new version, port it file by file following this
+manual; there is no need to redo the archaeology.
 
-- 当前镜像版本：`src/o2a/version.js` 里的 `O2A_VERSION` / `O2A_COMMIT`
-- 移植日期：2026-10-31（v1.4.6，commit `58f56676ba1438adb30604b889bf36db2a1542a1`）
-- 上游发布页：https://github.com/jasonxu114514/opencode2api/releases
+- Current mirrored version: `O2A_VERSION` / `O2A_COMMIT` in `src/o2a/version.js`
+- Porting date: 2026-10-31 (v1.4.6, commit `58f56676ba1438adb30604b889bf36db2a1542a1`)
+- Upstream releases page: https://github.com/jasonxu114514/opencode2api/releases
 
-## 1. 文件对照表（Go → JS）
+## 1. File mapping table (Go → JS)
 
-| 上游文件（`internal/…`） | 本目录 | 内容 |
+| Upstream file (`internal/…`) | This directory | Contents |
 |---|---|---|
-| `identity/request.go` | `identity.js` | 会话铸造：`bootNonce`（进程盐）、`CanonicalSessionID`（慢钟时间戳 + 降序编码）、`isOfficialSessionID`、`RandomProjectID`、base62。JS 侧新增 `sessionTimestampMs`（把会话内嵌时间戳解出来，供持久层做时效重铸）。 |
-| `protocol/tools.go` | `tool-renames.js` | `clint_<sha256[:12]>` 不透明改名、`ToolRenames`（正反映射 + 大小写/分隔符折叠解析 `Resolve`）、冲突 `_2` 后缀。 |
-| `gateway/toolshape.go` | `toolshape.js` | `renameAndCompleteTools`（全部客户工具改名 + 追加官方 13 工具集）、`rewriteToolReferences`（tool_choice / 历史 tool_calls / tool_use / input 调用行 / function_call / allowed_tools 同步改名）、legacy `functions` 转换。 |
-| `gateway/toolshape.go`（资产） | `official-tools.js` + `assets/opencode_tools.json` | 官方 2.x 工具集（捕获自官方 CLI，逐字）、`strict:false`（chat 线）、Windows 主机 shell 描述改写、`renamableToolName`（Responses/Messages 内建工具跳过）。 |
-| `gateway/opencode_prompt.go`（资产） | `official-prompt.js` + `assets/opencode_prompt_v2.txt` | 官方 CLI 系统提示（base + `<env>` + skills）、marker 判重、三条线注入。 |
-| `gateway/upstream.go`（body 部分） | `gateway-body.js` | `ensureAnonymousChatUsage`（`stream_options.include_usage`）、`ensureV2CompletionLimit`（`max_completion_tokens: 32000`）。 |
-| `gateway/upstream.go`（header 部分） | `headers.js` | `setV2Headers` 四会话头 + 40-hex `x-opencode-project`（`projectID`：`global`/git commit 直通，其余哈希成 40-hex）、`anthropic-beta` 头、`Bearer public`、UA。 |
-| `httpx/client.go` | `version.js` | `v2ClientVersion` → `V2_CLIENT_VERSION`（UA 与版本号唯一来源）。 |
-| `gateway/upstream.go`（端点） | `src/upstream.js` 的 `endpointFor` | `/inference/<family>/v1/…` 族路径；Anthropic 线加 `?beta=true`。 |
-| `gateway/upstream.go`（重试/轮换）、`warp/*`、`gateway/pool.go`、`gateway/rotation.go` 等 | **不移植** | 服务端运行时（进程池、WARP 出口、注册、轮换、冷却）是网关的职责；插件跑在用户本机，出口就是用户自己的 IP，这些层没有对应物。重试/失败分类沿用插件自己的 `failure.js` / `forward.js` 策略。 |
+| `identity/request.go` | `identity.js` | Session minting: `bootNonce` (process salt), `CanonicalSessionID` (slow-clock timestamp + descending encoding), `isOfficialSessionID`, `RandomProjectID`, base62. The JS side adds `sessionTimestampMs` (extracts the timestamp embedded in the session, so the persistence layer can do freshness-based re-minting). |
+| `protocol/tools.go` | `tool-renames.js` | `clint_<sha256[:12]>` opaque renaming, `ToolRenames` (forward/reverse mapping + case/separator-folding resolution in `Resolve`), conflict `_2` suffix. |
+| `gateway/toolshape.go` | `toolshape.js` | `renameAndCompleteTools` (rename all client tools + append the official 13-tool set), `rewriteToolReferences` (tool_choice / historical tool_calls / tool_use / input call lines / function_call / allowed_tools renamed in sync), legacy `functions` conversion. |
+| `gateway/toolshape.go` (assets) | `official-tools.js` + `assets/opencode_tools.json` | Official 2.x tool set (captured verbatim from the official CLI), `strict:false` (chat wire), Windows host shell description rewrite, `renamableToolName` (Responses/Messages built-in tools are skipped). |
+| `gateway/opencode_prompt.go` (assets) | `official-prompt.js` + `assets/opencode_prompt_v2.txt` | Official CLI system prompt (base + `<env>` + skills), marker deduplication, injection on the three wires. |
+| `gateway/upstream.go` (body part) | `gateway-body.js` | `ensureAnonymousChatUsage` (`stream_options.include_usage`), `ensureV2CompletionLimit` (`max_completion_tokens: 32000`). |
+| `gateway/upstream.go` (header part) | `headers.js` | `setV2Headers` four session headers + 40-hex `x-opencode-project` (`projectID`: `global`/git commit pass through directly, everything else is hashed to 40-hex), `anthropic-beta` header, `Bearer public`, UA. |
+| `httpx/client.go` | `version.js` | `v2ClientVersion` → `V2_CLIENT_VERSION` (the sole source for the UA and version number). |
+| `gateway/upstream.go` (endpoints) | `endpointFor` in `src/upstream.js` | `/inference/<family>/v1/…` family paths; the Anthropic wire adds `?beta=true`. |
+| `gateway/upstream.go` (retry/rotation), `warp/*`, `gateway/pool.go`, `gateway/rotation.go`, etc. | **Not ported** | The server runtime (process pool, WARP egress, registration, rotation, cooldown) is the gateway's responsibility; the plugin runs on the user's local machine and its egress is the user's own IP, so these layers have no counterpart. Retry/failure classification follows the plugin's own `failure.js` / `forward.js` policy. |
 
-`assets/` 下两个文件是上游 `//go:embed` 的原样拷贝 —— **永远不要手改**，同步时
-直接用新版本的同名文件覆盖。
+The two files under `assets/` are verbatim copies of the upstream
+`//go:embed` assets — **never edit them by hand**; when syncing, simply
+overwrite them with the same-named files from the new version.
 
-## 2. 适配层保留的偏差（upstream.js，均为有意为之）
+## 2. Deviations retained in the adapter layer (upstream.js, all intentional)
 
-移植不是逐字节照抄；以下偏差是插件形态决定的，同步上游时**保留**：
+Porting is not byte-for-byte copying; the following deviations are dictated
+by the plugin form, and should be **retained** when syncing upstream:
 
-1. **占位提示**：注入的官方工具集对本插件宿主是不可执行的占位工具，注入后追加
-   「placeholders in this session」提示词压住模型调用（参考实现的下游是真
-   CLI，会真的执行这些工具，所以不发这条）。
-2. **`tool_choice: 'none'` 删除**：v2 门禁见它即 403（2026-10-16 实测）。参考
-   实现从不主动下发，所以不需要删；插件的调用方（续写路径等）可能留下它，
-   适配层兜底清除。
-3. **幂等整形**：参考实现每个请求体只整形一次；插件可能对已整形请求体再次调
-   `applyFingerprint`（重试/恢复路径）。已带逐字官方定义的声明视为官方声明
-   （不再改名、不重复补），已带 `clint_` 前缀的名字是上一轮的线名（跳过）。
-4. **Chat 线提示注入保留块对象**：参考实现把所有 system 文本折叠进一条重建的
-   system 消息（丢失块对象与 `cache_control`）；本移植把官方提示**前插**进第一
-   条 system 消息（字符串拼接 / 块数组前插），其余 system 原样保留。
-5. **不强制 `stream: true`**：参考实现是流式代理所以强制；插件的探测等路径合
-   法地发非流式请求，只在 `stream === true` 时补 `stream_options`。
-6. **会话跨重启持久**：参考实现用 `bootNonce` 让每次重启重铸全部会话（守护进
-   程语义）；插件把 conversation → session 映射持久化到 `session-map.json`，
-   铸造时仍混入进程盐。持久层用 `sessionTimestampMs` 做时效检查：日期离开上游
-   接受窗口（±400 天）的旧 id 重铸，而不是永久重放。
-7. **响应端 copy-on-write**：参考实现原地改调用方对象；插件的工具对象/历史行
-   与宿主 harness 共享，改名一律换浅拷贝。
+1. **Placeholder prompt**: The injected official tool set consists of
+   placeholder tools that are not executable for this plugin's host; after
+   injection, a "placeholders in this session" prompt is appended to hold the
+   model down from calling them (the reference implementation's downstream is
+   a real CLI, which really does execute these tools, so it does not send
+   this note).
+2. **`tool_choice: 'none'` deletion**: The v2 gate answers 403 as soon as it
+   sees it (verified live on 2026-10-16). The reference implementation never
+   actively sends it, so it does not need to delete it; the plugin's callers
+   (such as continuation paths) may leave it behind, and the adapter layer
+   cleans it up as a fallback.
+3. **Idempotent shaping**: The reference implementation shapes each request
+   body only once; the plugin may call `applyFingerprint` again on an
+   already-shaped body (retry/recovery paths). A declaration that already
+   carries a verbatim official definition is treated as an official
+   declaration (not renamed, not completed again), and a name that already
+   has the `clint_` prefix is a wire name from the previous round (skipped).
+4. **Chat wire prompt injection retains block objects**: The reference
+   implementation folds all system text into a single rebuilt system message
+   (losing block objects and `cache_control`); this port **prepends** the
+   official prompt into the first system message (string concatenation /
+   prepending to a block array), and keeps the other system messages as-is.
+5. **Does not force `stream: true`**: The reference implementation is a
+   streaming proxy, so it forces it; paths such as the plugin's probes
+   legitimately send non-streaming requests, and `stream_options` is only
+   added when `stream === true`.
+6. **Sessions persist across restarts**: The reference implementation uses
+   `bootNonce` to re-mint all sessions on every restart (daemon semantics);
+   the plugin persists the conversation → session mapping to
+   `session-map.json`, while still mixing the process salt into minting. The
+   persistence layer uses `sessionTimestampMs` for a freshness check: an old
+   id whose date has left the window the upstream accepts (±400 days) is
+   re-minted, rather than replayed forever.
+7. **Copy-on-write on the response side**: The reference implementation
+   mutates the caller's objects in place; the plugin's tool objects/history
+   lines are shared with the host harness, so renaming always swaps in a
+   shallow copy.
 
-## 3. 升级流程（上游发新版时）
+## 3. Upgrade workflow (when upstream releases a new version)
 
-1. **取源码**：从 release 页下载 `Source code (tar.gz)`，解压到独立目录（例如
-   `/d/o2a-ref/opencode2api-<ver>/`），不要混进本仓库。
-2. **看 diff**：`git diff v<旧> v<新> -- internal/`，只关心
-   `identity/request.go`、`protocol/tools.go`、`gateway/toolshape.go`、
-   `gateway/opencode_prompt.go`、`gateway/upstream.go`（body/header/端点）、
-   `httpx/client.go`、以及 `internal/gateway/*.json|*.txt` 资产。
-3. **对表移植**：按第 1 节的对照表逐文件把 diff 语义搬进对应 JS 模块；资产
-   文件直接覆盖 `assets/`。更新 `version.js` 的三个常量。
-4. **跑守卫**：`node scripts/fingerprint-test.mjs && node scripts/free-lane-wire-test.mjs && node scripts/opencode-parity-test.mjs && node scripts/wire-tool-alias-test.mjs && node scripts/free-lane-compat-test.mjs`，再跑
-   `npm test`。
-5. **灰度验证**（有条件时）：对上游真发一条 `PONG` 探测（`scripts/oc-free-live-test.mjs`），
-   429/403 即回看 diff 是否漏搬了某个门禁事实。
+1. **Get the source**: Download `Source code (tar.gz)` from the releases
+   page and extract it to a separate directory (for example
+   `/d/o2a-ref/opencode2api-<ver>/`); do not mix it into this repository.
+2. **Look at the diff**: `git diff v<old> v<new> -- internal/`, caring only
+   about `identity/request.go`, `protocol/tools.go`, `gateway/toolshape.go`,
+   `gateway/opencode_prompt.go`, `gateway/upstream.go` (body/header/endpoints),
+   `httpx/client.go`, and the `internal/gateway/*.json|*.txt` assets.
+3. **Port according to the table**: Move the diff semantics, file by file
+   following the mapping table in section 1, into the corresponding JS
+   modules; overwrite the asset files in `assets/` directly. Update the three
+   constants in `version.js`.
+4. **Run the guards**: `node scripts/fingerprint-test.mjs && node scripts/free-lane-wire-test.mjs && node scripts/opencode-parity-test.mjs && node scripts/wire-tool-alias-test.mjs && node scripts/free-lane-compat-test.mjs`, then run
+   `npm test`.
+5. **Canary verification** (when conditions allow): Send a real `PONG` probe
+   to the upstream (`scripts/oc-free-live-test.mjs`); a 429/403 means looking
+   back at the diff to see whether some gate fact was missed in the port.
 
-## 4. 2026-10-31 线上对照的两条实测结论（写进守卫，防止回退）
+## 4. Two conclusions verified live on 2026-10-31 (written into the guards, to prevent regressions)
 
-用「让 v1.4.6 网关把整形后的请求发给本机明文 echo 服务器」的办法抓到了它的
-**最终线字节**，与本移植逐字段 diff 后得到：
+Using the method of "having the v1.4.6 gateway send its shaped request to a
+local plaintext echo server", we captured its **final wire bytes** and, after
+diffing them field by field against this port, obtained:
 
-1. **v2 道不发 `accept` 头**。参考实现的 `setV2Headers` 不含 Accept（Go 的
-   http client 不默认发）；本移植现同样默认不发，只有调用方显式给 `accept`
-   （如清单 GET）才发。`headers.js` 有对应注释，`free-lane-wire-test.mjs` 有守卫。
-2. **用 curl/python 重放本车道做 429/200 判定是无效的**。同一出口、同一时刻，
-   v1.4.6 自己的字节经 Go 客户端 200、经 curl/转发 429（误差信息同为
-   `FreeUsageLimitError`）——上游对 TLS/HTTP 客户端指纹敏感，429 的报文不区分
-   「IP 配额烧尽」与「非官方客户端」。判定只能用本车道自己的客户端
-   （插件 = Node/Bun）或参考网关本体做。
+1. **The v2 lane does not send an `accept` header**. The reference
+   implementation's `setV2Headers` does not include Accept (Go's http client
+   does not send it by default); this port now likewise does not send it by
+   default, and only sends it when the caller explicitly gives an `accept`
+   (such as a manifest GET). `headers.js` has a corresponding comment, and
+   `free-lane-wire-test.mjs` has a guard.
+2. **Replaying this lane with curl/python to judge 429/200 is invalid**. At
+   the same egress and the same moment, v1.4.6's own bytes get a 200 via the
+   Go client and a 429 via curl/forwarding (the error message is
+   `FreeUsageLimitError` in both cases) — the upstream is sensitive to the
+   TLS/HTTP client fingerprint, and a 429 message does not distinguish "IP
+   quota burned out" from "non-official client". Judgement can only be made
+   using this lane's own client (the plugin = Node/Bun) or the reference
+   gateway itself.
 
-## 5. 本目录的纪律
+## 5. Discipline for this directory
 
-- 纯函数、零插件依赖：本目录**不得** import `src/store.js`、`src/http.js` 等
-  插件模块，也不读插件配置；它只被 `src/upstream.js` 反向消费。这样对照上游
-  diff 时不存在隐藏耦合。
-- 上游事实（每条都对应一次 403/429 的实测）写在各文件的头注释里，与上游注释
-  对应；改行为前先读文件头。
-- 版本常量必须与资产文件同一次提交里一起更新——守卫测试会比对
-  `O2A_PORTED_VERSION` 与 UA 常量的一致性。
+- Pure functions, zero plugin dependencies: this directory **must not**
+  import plugin modules such as `src/store.js` or `src/http.js`, nor read
+  plugin configuration; it is only consumed in reverse by `src/upstream.js`.
+  That way, when comparing against an upstream diff, there is no hidden
+  coupling.
+- Upstream facts (each one corresponding to a live-verified 403/429) are
+  written in the header comments of each file, corresponding to the upstream
+  comments; read the file header before changing behavior.
+- The version constants must be updated together, in the same commit, as the
+  asset files — a guard test compares the consistency of
+  `O2A_PORTED_VERSION` with the UA constants.

@@ -72,7 +72,7 @@ try {
     assert.throws(() => prepareClientLaunch({ ...plan('codex'), baseUrl: 'https://example.com' }))
     const options = plan('codex')
     options.client.model = ''
-    assert.throws(() => prepareClientLaunch(options), /模型/)
+    assert.throws(() => prepareClientLaunch(options), /model/)
   })
   await check('a CLI executable on PATH is not reported as Codex Desktop', () => {
     const cliOnly = path.join(scratch, 'codex.exe')
@@ -98,7 +98,7 @@ try {
     assert.equal(resolved.executable, process.execPath)
     assert.deepEqual(resolved.args, [path.join(packageDir, 'bundle/gemini.js'), '--model', 'literal/%PATH%&model'])
     fs.writeFileSync(path.join(packageDir, 'package.json'), JSON.stringify({ bin: { gemini: '../../../../outside.js' } }))
-    assert.throws(() => resolveClientExecutable(source, 'gemini', { platform: 'win32' }), /无法解析/)
+    assert.throws(() => resolveClientExecutable(source, 'gemini', { platform: 'win32' }), /Cannot resolve/)
   })
   await check('private-write permission failures leave the old destination untouched', () => {
     const destination = path.join(scratch, 'atomic-private.json')
@@ -150,15 +150,15 @@ try {
     assert.equal(launches[0].options.env.CODEX_HOME, path.join(scratch, 'state/clients/codex-desktop'))
     assert.ok(launches[0].args[0].startsWith('--user-data-dir='))
     assert.equal(workbench.clients().find(row => row.id === 'codex-desktop').running, true)
-    await assert.rejects(() => workbench.launch({ id: 'codex-desktop' }), /已经启动/)
-    assert.throws(() => workbench.save({ id: 'codex-desktop', model: 'other' }), /先关闭/)
+    await assert.rejects(() => workbench.launch({ id: 'codex-desktop' }), /already running/)
+    assert.throws(() => workbench.save({ id: 'codex-desktop', model: 'other' }), /Close this client/)
     assert.equal((await workbench.stop({ id: 'codex-desktop' })).ok, true)
     assert.equal(workbench.clients().find(row => row.id === 'codex-desktop').running, false)
-    await assert.rejects(() => workbench.stop({ id: 'codex' }), /没有/)
+    await assert.rejects(() => workbench.stop({ id: 'codex' }), /no process/)
   })
   await check('unavailable model cannot start an installed client', async () => {
     workbench.save({ id: 'codex-desktop', model: 'gone' })
-    await assert.rejects(() => workbench.launch({ id: 'codex-desktop' }), /模型当前不可用/)
+    await assert.rejects(() => workbench.launch({ id: 'codex-desktop' }), /currently unavailable/)
     assert.equal(launches.length, 1)
   })
   await check('interactive ownership tracks the terminal handle and awaits Stop and disposal', async () => {
@@ -188,7 +188,7 @@ try {
     await clientManager.launch({ id: 'codex' })
     await clientManager.dispose()
     assert.equal(stops, 2)
-    await assert.rejects(() => clientManager.launch({ id: 'codex' }), /工作台正在停止/)
+    await assert.rejects(() => clientManager.launch({ id: 'codex' }), /workbench is stopping/)
   })
   stores = createRuntimeStores({ dataDir: path.join(scratch, 'providers') })
   let syncs = 0

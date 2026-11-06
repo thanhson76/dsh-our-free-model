@@ -1,4 +1,4 @@
-/** 渠道代理与真实 OAuth 生命周期回归；只使用隔离凭据、本机服务器和请求替身。 */
+/** Channel proxy and real OAuth lifecycle regression; uses only isolated credentials, local servers and request stubs. */
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import http from 'node:http'
@@ -22,7 +22,7 @@ async function check(name, run) { await run(); checks++; console.log(`ok  ${name
 try {
   if (!process.argv.includes('--oauth-only')) {
     const { createChannelFetch, parseWindowsProxy, channelProxyBypassed } = pack
-    await check('Windows 手动代理、按协议代理和例外规则', async () => {
+    await check('Windows manual proxy, per-protocol proxies and bypass rules', async () => {
       assert.equal(parseWindowsProxy('ProxyEnable REG_DWORD 0x0\nProxyServer REG_SZ proxy:80'), undefined)
       assert.equal(parseWindowsProxy('AutoConfigURL REG_SZ https://example.invalid/proxy.pac'), undefined)
       assert.equal(parseWindowsProxy(windows('127.0.0.1:7890')).server, '127.0.0.1:7890')
@@ -36,7 +36,7 @@ try {
         ['https://accounts.google.com', '<local>', true, false],
       ]) assert.equal(channelProxyBypassed(new URL(url), pattern, win), expected, `${url} / ${pattern}`)
     })
-    await check('代理优先级、系统配置缓存、本机旁路及逐请求参数保留', async () => {
+    await check('proxy priority, system-config caching, local bypass and per-request argument preservation', async () => {
       const seen = [], created = [], closed = []
       let outlet = true, reads = 0
       const env = { HTTPS_PROXY: 'http://environment.invalid:7890' }
@@ -64,7 +64,7 @@ try {
         env.NO_PROXY = '.googleapis.com'
         await network.fetch('https://oauth2.googleapis.com/token')
         assert.equal(seen.at(-1).init?.dispatcher, undefined)
-        assert.equal(reads, 0, '环境例外不应退回系统代理')
+        assert.equal(reads, 0, 'an environment bypass must not fall back to the system proxy')
         delete env.HTTPS_PROXY
         delete env.NO_PROXY
         await network.fetch('https://oauth2.googleapis.com/token')
@@ -83,7 +83,7 @@ try {
       assert.equal(closed.length, created.length)
       await assert.rejects(network.fetch('https://oauth2.googleapis.com/token'), /已停止/)
     })
-    await check('网络原因保留、凭据脱敏、失败不直连回退和取消', async () => {
+    await check('network-cause preservation, credential redaction, no direct fallback on failure, and cancellation', async () => {
       let calls = 0
       const network = createChannelFetch({
         environment: { HTTPS_PROXY: 'http://proxy-user:proxy-password@proxy.invalid:7890' },
@@ -103,7 +103,7 @@ try {
         assert.equal(calls, 1)
       } finally { await network.close() }
     })
-    await check('真实 HTTP 代理传递 POST、请求头和响应，不解析目标 DNS', async () => {
+    await check('a real HTTP proxy forwards POST, headers and the response without resolving the target DNS', async () => {
       const sockets = new Set(), forwarded = [], requests = []
       const target = http.createServer(async (req, res) => {
         const chunks = []
@@ -142,7 +142,7 @@ try {
 
   const products = [pack]
   if (packAt < 0) products.push(await import('../packages/standalone/channels/business.mjs'))
-  for (const [productIndex, product] of products.entries()) await check(`${productIndex === 0 ? '插件' : '独立端'}实际渠道包：OAuth 落定、续期、项目探测与推理共用代理`, async () => {
+  for (const [productIndex, product] of products.entries()) await check(`${productIndex === 0 ? 'plugin' : 'standalone'} actual channel pack: OAuth settlement, refresh, project probing and inference share the proxy`, async () => {
     const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'ofm-network-'))
     const keys = ['HTTPS_PROXY', 'https_proxy', 'HTTP_PROXY', 'http_proxy', 'NO_PROXY', 'no_proxy', 'ALL_PROXY', 'all_proxy', 'DSH_HOME', 'DSH_CHANNEL_PACK_STATE_DIR', 'DSH_OPENAI_GATEWAY_ENABLED', 'QODER_RUNTIME_INFO', 'QODER_MACHINE_TOKEN_PATH']
     const savedEnv = Object.fromEntries(keys.map(key => [key, process.env[key]]))
@@ -179,19 +179,19 @@ try {
         return Response.json(url.includes('/token') ? { access_token: 'fixture-access', refresh_token: 'fixture-refresh', expires_in: 3600, token_type: 'Bearer' } : { id: 'fixture-sub', email: 'fixture@example.invalid' })
       }
       if (url.includes(':loadCodeAssist') || url.includes(':streamGenerateContent')) {
-        assert.ok(init?.dispatcher, 'Gemini 项目探测与推理必须携带代理')
+        assert.ok(init?.dispatcher, 'Gemini project probing and inference must carry the proxy')
         seen.push({ url, body: init.body })
         if (url.includes(':loadCodeAssist')) return Response.json({ cloudaicompanionProject: 'fixture-project' })
         return new Response(`data: ${JSON.stringify({ response: { candidates: [{ content: { parts: [{ text: 'gemini-proxy-ok' }] }, finishReason: 'STOP' }], usageMetadata: { promptTokenCount: 3, candidatesTokenCount: 2 } } })}\n\n`, { headers: { 'content-type': 'text/event-stream' } })
       }
       if (url === 'https://api.cline.bot/api/v1/auth/refresh' || url === 'https://api.workos.com/user_management/authorize/device') {
-        assert.ok(init?.dispatcher, 'Cline 登录与续期必须携带代理')
+        assert.ok(init?.dispatcher, 'Cline login and refresh must carry the proxy')
         seen.push({ url, body: init.body })
         return Response.json(url.includes('/refresh')
           ? { success: true, data: { accessToken: 'workos:fixture-new', refreshToken: 'fixture-refresh', expiresAt: new Date(Date.now() + 3600000).toISOString() } }
           : { device_code: 'fixture-device', user_code: 'FIXTURE', verification_uri: 'https://example.invalid/login', expires_in: 300, interval: 5 })
       }
-      throw new Error('离线测试禁止外部请求')
+      throw new Error('external requests are forbidden in the offline test')
     }
     try {
       product.apply(ctx, { disableOpencode: true })
@@ -217,7 +217,7 @@ try {
         if (result.done) break
         await new Promise(resolve => setTimeout(resolve, 10))
       }
-      assert.equal(result.success, true, `授权未落定：${JSON.stringify(result)}`)
+      assert.equal(result.success, true, `authorization did not settle: ${JSON.stringify(result)}`)
       const account = ctx.accountPool.listAccountsByProvider('gemini').find(row => row.id === started.accountId)
       assert.ok(account)
       const credential = JSON.parse(creds.get(account.credentialRef))
@@ -244,7 +244,7 @@ try {
       transportCode = 'CERT_HAS_EXPIRED'
       const savedCredential = creds.get(account.credentialRef)
       await assert.rejects(ctx.geminiAuth.refreshAccountCredential(account.credentialRef), error => {
-        assert.equal(error.name, 'ChannelNetworkError', '网络证书问题不能废弃账号 refresh_token')
+        assert.equal(error.name, 'ChannelNetworkError', 'a network certificate problem must not discard the account refresh_token')
         assert.match(error.message, /CERT_HAS_EXPIRED/)
         return true
       })
@@ -259,7 +259,7 @@ try {
       fs.rmSync(scratch, { recursive: true, force: true })
     }
   })
-  console.log(`channel-network: ${checks}/${checks} 项通过`)
+  console.log(`channel-network: ${checks}/${checks} passed`)
 } finally {
   globalThis.fetch = savedFetch
   hooks.deregister()

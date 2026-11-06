@@ -1,25 +1,25 @@
-# 桌面端缺陷排查与修复计划
+# Desktop Defect Investigation and Fix Plan
 
-目标：修复用户报告的 GitHub 授权、Star 外链和布局问题，扫描独立端全部页面与本地接口，使用隔离数据验证，保留已有工作区修改与真实账号。
+Goal: Fix the GitHub authorization, Star external link, and layout issues reported by the user; scan all pages and local interfaces of the standalone app; verify using isolated data; and preserve existing workspace changes and real accounts.
 
-架构：保留 Tauri + 本机 Node 服务 + React 管理页。外部 HTTP(S) 链接由桌面原生层交给系统浏览器；管理页保持本机来源。EAC 使用现有授权与轮询协议。布局修复落实到源码并重建资源。
+Architecture: Retain Tauri + the local Node service + the React management page. External HTTP(S) links are handed by the desktop native layer to the system browser; the management page remains a local origin. EAC uses the existing authorization and polling protocol. Layout fixes are implemented in the source code and the resources are rebuilt.
 
-## 工作顺序
+## Work Sequence
 
-1. 运行 `node scripts/test-all.mjs --mode contributor` 建立基线；检查现有 UI、桌面和服务启动用例。
-2. 复现渠道详情自动滚动、内容宽度收缩和外链失效，记录原因。
-3. 为外链转交、授权发起/取消/失败、数据保存失败及页面加载错误补充针对性测试，先验证失败，再实施修复。
-4. 修复 `packages/desktop/src-tauri/src/lib.rs` 及必要的原生外链单元；修复 `packages/standalone/frontend/components/channel-browser.tsx`、`frontend/app.tsx`、`frontend/app.css`、`frontend/channels.mjs` 和直接相关服务端缺陷。
-5. 运行独立端类型检查、构建资源一致性、离线全部测试和 Rust 测试；真实启动构建后的桌面程序，检查标题栏、托盘与生命周期，使用同一构建资源逐页交互验收。
-6. 构建 Windows 安装包，产出验收记录、证据及未覆盖的第三方真实账号验证边界。
+1. Run `node scripts/test-all.mjs --mode contributor` to establish a baseline; check the existing UI, desktop, and service startup test cases.
+2. Reproduce the channel details auto-scrolling, content width shrinking, and external link failure, and record the causes.
+3. Add targeted tests for external link handover, authorization initiation/cancellation/failure, data save failure, and page loading errors; verify the failures first, then implement the fixes.
+4. Fix `packages/desktop/src-tauri/src/lib.rs` and the necessary native external-link units; fix `packages/standalone/frontend/components/channel-browser.tsx`, `frontend/app.tsx`, `frontend/app.css`, `frontend/channels.mjs`, and directly related server-side defects.
+5. Run the standalone type check, build resource consistency, all offline tests, and Rust tests; actually launch the built desktop program, check the title bar, tray, and lifecycle, and use the same build resources to verify interaction page by page.
+6. Build the Windows installer, and produce the verification record, evidence, and the boundaries for third-party real-account verification that is not covered.
 
-## 验收矩阵
+## Verification Matrix
 
-- 七个主页面及渠道四个子页；搜索/筛选/切换；13 个渠道详情。
-- 亮暗主题、960×600 最小窗口、1280×800 和 1600×1000；无水平溢出、标题被覆盖或异常自动滚动。
-- GitHub 授权链接与 Star 外链；授权等待、取消、错误和重新发起；账号凭据留在服务端。
-- 设置校验、保存/撤销/持久化、暂停/恢复；密钥显隐/复制/轮换、登录/退出边界。
-- OpenAI Chat/Responses、流式/非流式、模型测试/取消、使用量、渠道 RPC、备份接口与本机鉴权。
-- 桌面冷启动、重复实例、隐藏/恢复、窗口控制、退出清理和数据目录锁。
+- The seven main pages and the four channel subpages; search/filter/switching; 13 channel details.
+- Light and dark themes, 960×600 minimum window, 1280×800, and 1600×1000; no horizontal overflow, titles being covered, or abnormal auto-scrolling.
+- GitHub authorization link and Star external link; authorization waiting, cancellation, errors, and re-initiation; account credentials remain on the server side.
+- Settings validation, save/undo/persistence, pause/resume; secret show/hide/copy/rotation, login/exit boundaries.
+- OpenAI Chat/Responses, streaming/non-streaming, model testing/cancellation, usage, channel RPC, backup interfaces, and local authentication.
+- Desktop cold start, duplicate instances, hide/restore, window controls, exit cleanup, and the data directory lock.
 
-真实 GitHub 身份授权及各供应商的验证码/套餐/额度受外部环境与账号影响，未完成真实身份确认的步骤必须如实记录，不据本机替身测试宣称真实授权成功。
+Real GitHub identity authorization and each provider's verification codes/packages/quotas are affected by the external environment and accounts; steps for which real identity confirmation has not been completed must be recorded truthfully, and stub tests on this machine must not be used to claim that real authorization succeeded.

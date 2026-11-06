@@ -1,55 +1,55 @@
-# PR #97 审查修复决策
+# PR #97 Review Fix Decisions
 
-## 已确认范围
+## Confirmed Scope
 
-- 移除“白嫖模型接入”的 OpenCode 账号卡，避免调用不适用的浏览器账号创建 RPC。
-- OFM 挂载渠道包时关闭其 OpenCode provider、自动建槽和专用 RPC；保留已有账号及凭据。
-- OFM 原有匿名免费模型继续走 `src/adapter.js` 和 `src/upstream.js`。
-- 渠道网关中继与渠道包使用同一 home 解析顺序。
-- 升级备份、安装清扫及恢复包含发布的渠道包运行文件。
-- 成功刷新得到空 Kilo 免费池时清除目录和持久缓存；刷新失败时保留原缓存。
-- 修改保留在独立分支；经用户授权，将修复版安装到本机 Desktop 进行真实冒烟测试。
+- Remove the OpenCode account card from "Free channels", avoiding calls to an inapplicable browser account-creation RPC.
+- When OFM mounts the channel pack, disable its OpenCode provider, automatic slot creation and dedicated RPCs; existing accounts and credentials are retained.
+- OFM's original anonymous free models continue through `src/adapter.js` and `src/upstream.js`.
+- The channel gateway relay and the channel pack use the same home resolution order.
+- Upgrade backup, install clean-up and restore include the published channel-pack runtime files.
+- When a successful refresh returns an empty Kilo free pool, clear the catalogue and the persistent cache; when a refresh fails, keep the original cache.
+- The changes stay on a separate branch; with the user's authorization, install the fixed build on this machine's Desktop for a real smoke test.
 
-## 假设与维护边界
+## Assumptions and Maintenance Boundaries
 
-保持现有用户规模、请求并发及其他渠道行为。关闭 OpenCode 账号接入不增加网络请求，不迁移、删除或输出凭据。回滚必须恢复 pack 与 WASM 的原始字节。开发源码和仓库脚手架继续受保护。发布签名仍由维护者完成。
+The existing user scale, request concurrency and other channels' behaviour are unchanged. Disabling the OpenCode account integration adds no network requests and does not migrate, delete or output credentials. A rollback must restore the pack and WASM to their original bytes. The development source and repository scaffolding remain protected. Release signing is still done by the maintainer.
 
-## 决策
+## Decisions
 
-1. 采用追加的可选挂载配置关闭 OpenCode，省略配置时保留上游行为；只隐藏卡片不足以阻止自动建槽，删除已有数据不符合用户要求。
-2. 中继每次读取 `profileContext`，按 `DSH_CHANNEL_PACK_STATE_DIR`、`profileContext.home`、`DSH_HOME`、默认 home 的顺序解析；不改变 OFM 自身数据位置。
-3. 精确纳入当前发布的四个 vendor 文件，避免取消整棵 vendor 目录的脚手架保护。
-4. 直接从受版本管理的 TypeScript 源码打包，避免依赖未入库的旧 lib；记录本地适配差异并验证生成包。
-5. Kilo 合法清单是当前完整免费池的权威，包括 `data: []` 和全收费列表。网络、HTTP、JSON 或清单结构失败不代表空池，保留旧缓存；沿用现有持久化与目录刷新机制，不新增请求、账号或数据迁移。
+1. Disable OpenCode via an appended optional mount configuration; omitting the configuration preserves upstream behaviour. Merely hiding the card is not enough to stop automatic slot creation, and deleting existing data does not meet the user's requirements.
+2. The relay reads `profileContext` on every request and resolves in the order `DSH_CHANNEL_PACK_STATE_DIR`, `profileContext.home`, `DSH_HOME`, default home; OFM's own data locations are unchanged.
+3. Precisely include the four vendor files of the current release, avoiding removal of the scaffolding protection over the whole vendor tree.
+4. Package directly from the version-controlled TypeScript source, avoiding dependence on an old lib that is not checked in; record the local adaptation differences and verify the generated package.
+5. A valid Kilo listing is authoritative for the current complete free pool, including `data: []` and an all-paid listing. A network, HTTP, JSON or listing-structure failure does not mean an empty pool, so the old cache is kept; the existing persistence and catalogue refresh mechanisms are reused, with no new requests, accounts or data migrations.
 
-## 验证结果
+## Verification Results
 
-- 上一轮 `npm run test:contributor`：26/26 套件通过。
-- `node scripts/channel-pack-test.mjs`：实际生成包挂载 13 个账号 provider，OpenCode 未注册/预热，历史账号保留，创建 RPC 拒绝；实际接入页渲染 13 张卡；OFM 匿名模型能列出并从本地 HTTP 流式返回。
-- `node scripts/chan-relay-test.mjs`：25 项通过，包括不同 home 的密钥隔离、环境覆盖与鉴权围栏。
-- `node scripts/updater-test.mjs`：通过，包括 pack/WASM 原始字节恢复、1.x 升级失败清理新 vendor 文件及开发源码保留。
-- `tsc --noEmit -p tsconfig.json`：通过；仓库现有配置仅检查 adapter 接缝，不代表整个 vendored TypeScript 已完成类型检查。
-- `node --check index.js`、`node --check client.js`、`node --check vendor/channel-pack/pack.js` 和 `git diff --check`：通过。
-- 已从真实源码重新构建 pack，构建依赖位于隔离临时目录，仓库内的临时依赖已清理。
+- Previous round of `npm run test:contributor`: 26/26 suites passed.
+- `node scripts/channel-pack-test.mjs`: the actually generated package mounts 13 account providers, with OpenCode not registered/pre-warmed, historical accounts retained and the creation RPC rejected; the actual integration page renders 13 cards; OFM's anonymous models can be listed and stream back from local HTTP.
+- `node scripts/chan-relay-test.mjs`: 25 items passed, including key isolation across different homes, environment overrides and the authentication fence.
+- `node scripts/updater-test.mjs`: passed, including restoration of the pack/WASM original bytes, clean-up of new vendor files on a failed 1.x upgrade, and preservation of the development source.
+- `tsc --noEmit -p tsconfig.json`: passed; the repository's existing configuration only checks the adapter seams and does not mean the whole vendored TypeScript has been type-checked.
+- `node --check index.js`, `node --check client.js`, `node --check vendor/channel-pack/pack.js` and `git diff --check`: passed.
+- The pack has been rebuilt from the real source; the build dependencies live in an isolated temporary directory, and the temporary dependencies inside the repository have been cleaned up.
 
-### 本次 Kilo 空池修复
+### This Round's Kilo Empty-Pool Fix
 
-- 修改前，新回归实际失败：全收费清单刷新后，发现目录、设置目录、模型选择器都仍保留两个旧模型，磁盘缓存未清除。
-- 修改后 `node scripts/kilo-test.mjs`：57 项通过，覆盖全收费列表、显式空列表、缓存落盘、过期模型本地拒绝、免费池恢复、六类刷新失败及实际重新挂载后的空缓存。
-- `node scripts/picker-test.mjs`：通过，验证共享目录刷新下的原免费模型选择与鉴权行为。
-- `node scripts/channel-pack-test.mjs`：通过，确认 OpenCode 账号渠道停用、历史账号保留及原匿名模型流式回复。
-- `node --check index.js`、`node --check scripts/kilo-test.mjs`、`git diff --check`：通过。
-- 提交前再次执行 `npm run test:contributor`：26/26 套件通过；再次执行 adapter 范围 `tsc --noEmit -p tsconfig.json`、三个运行入口语法检查及 `git diff --check`，均通过。
+- Before the change, the new regression actually failed: after refreshing with an all-paid listing, the discovery catalogue, the settings catalogue and the model picker all still kept two old models, and the on-disk cache was not cleared.
+- After the change, `node scripts/kilo-test.mjs`: 57 items passed, covering an all-paid listing, an explicit empty listing, cache persistence to disk, local rejection of expired models, free-pool recovery, six kinds of refresh failure, and an empty cache after an actual re-mount.
+- `node scripts/picker-test.mjs`: passed, verifying the original free-model selection and authentication behaviour under a shared catalogue refresh.
+- `node scripts/channel-pack-test.mjs`: passed, confirming the OpenCode account channel is disabled, historical accounts are retained, and the original anonymous models reply by streaming.
+- `node --check index.js`, `node --check scripts/kilo-test.mjs`, `git diff --check`: passed.
+- Before committing, `npm run test:contributor` was run again: 26/26 suites passed; the adapter-scope `tsc --noEmit -p tsconfig.json`, the syntax checks of the three runtime entry points and `git diff --check` were run again and all passed.
 
-### Desktop 真实冒烟（2026-10-06）
+### Real Desktop Smoke Test (2026-10-06)
 
-- 安装来源为 `fix/pr97-reviewed-channels` 工作区的当前修改，基于 `699e5163683570f9c41077981d1ee17b1bfe038c`。先备份当前插件，再复制声明的运行文件；安装后及热重载后均核对 39 个文件 SHA-256，零差异。
-- 安装位置为 `~/.dsh/profiles/desktop/node_modules/dsh-our-free-model`，使用真实目录及既有注册；通过设置页热重载，不重启 Desktop。
-- 实际接入页显示 13 个账号渠道，未显示 OpenCode 卡片。原匿名免费模型和 Kilo 模型仍出现在设置页及对话模型选择器。
-- Desktop 设置页真实“测一次”：MiMo V2.6 Flash 成功，耗时 3342 ms；Kilo Ling 3.1 Flash 成功，耗时 2112 ms。两项均有本机统计中的成功终态。
-- Desktop 独立 MiMo V2.6 Flash 对话回复 `OK`，界面显示已完成，用时 30 秒。提示要求不调用工具、不读写文件。
-- Desktop 另一独立 Kilo Ling 3.1 Flash 对话（High）回复 `OK`，界面显示已完成，用时 30 秒；使用同一最小提示。
-- 已运行的渠道网关 `/v1/models` 返回 HTTP 200。用安装版中继代码及当前 home 的网关凭据，建立临时回环中继查询同一网关，返回 HTTP 200、39 个模型；测试后关闭临时中继，未开启持久 LAN 转发。
-- 本机备份、安装摘要及截图保存在 `~/.dsh/plugin-dev-artifacts/ofm-pr97-reviewed-20261006-203907/`，不提交这些本机资产。
+- The install source was the current changes in the `fix/pr97-reviewed-channels` workspace, based on `699e5163683570f9c41077981d1ee17b1bfe038c`. The current plugin was backed up first, then the declared runtime files were copied; the SHA-256 of 39 files was verified after installation and after hot reload, with zero differences.
+- The install location is `~/.dsh/profiles/desktop/node_modules/dsh-our-free-model`, using the real directory and the existing registration; hot reload was done through the settings page, without restarting Desktop.
+- The actual integration page shows 13 account channels and does not show an OpenCode card. The original anonymous free models and Kilo models still appear in the settings page and in the conversation model picker.
+- A real "test once" from the Desktop settings page: MiMo V2.6 Flash succeeded in 3342 ms; Kilo Ling 3.1 Flash succeeded in 2112 ms. Both have successful terminal states in the local statistics.
+- A separate Desktop MiMo V2.6 Flash conversation replied `OK`; the UI showed it complete, taking 30 seconds. The prompt required no tool calls and no file reads or writes.
+- Another separate Desktop Kilo Ling 3.1 Flash conversation (High) replied `OK`; the UI showed it complete, taking 30 seconds; the same minimal prompt was used.
+- The running channel gateway's `/v1/models` returned HTTP 200. Using the installed relay code and the current home's gateway credentials, a temporary loopback relay was set up to query the same gateway and returned HTTP 200 with 39 models; the temporary relay was closed after the test, and no persistent LAN forwarding was enabled.
+- The local backup, install summary and screenshots are stored in `~/.dsh/plugin-dev-artifacts/ofm-pr97-reviewed-20261006-203907/`; these local assets are not committed.
 
-未测试十三个渠道逐一登录、正式签名升级或真实上游空池。空池及刷新失败语义由上述本地回归覆盖。修复作为独立 PR 提交到 #97 的功能分支；修改后的发布文件需要维护者重新签署清单，再验证 #97 合入 main 的发布就绪状态。本分支没有 AOCI 资产，当前 MCP 绑定原 91db 工作区，不能据其状态声称本分支索引已对齐。
+Logging in to each of the thirteen channels one by one, a formally signed upgrade, and a real upstream empty pool were not tested. The empty-pool and refresh-failure semantics are covered by the local regressions above. The fix is submitted as a separate PR to #97's feature branch; the changed release files need the maintainer to re-sign the manifest before #97's readiness to merge into main can be verified. This branch has no AOCI assets, and the current MCP is bound to the original 91db workspace, so its state cannot be used to claim this branch's index is aligned.

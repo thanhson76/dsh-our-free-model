@@ -191,7 +191,7 @@ export const SETTINGS_INITIAL = {
   },
   /** Cap a turn's output so a slow lane cannot run away. */
   defaultMaxTokens: 32768,
-  /** 所有模型默认允许一次纯推理检查点续写，false 可关闭。 */
+  /** By default every model is allowed one reasoning-only checkpoint continuation; set false to disable it. */
   streamRecovery: true,
   /** Token savers. Tool-output compaction is on by default — it is invisible to
    *  the model's reasoning (the compacted text is what the model reads) and the
@@ -211,12 +211,12 @@ export const SETTINGS_INITIAL = {
   },
   /** Named fallback chains. A combo is a virtual model whose answer comes from
    *  the first link that produces output; see src/combos.js.
-   *  Ships one sensible default so a fresh install shows a single "推荐免费组"
+   *  Ships one sensible default so a fresh install shows a single "Recommended free group"
    *  entry instead of a dozen free models; users can edit/disable it in settings. */
   combos: [
     {
       id: 'combo:recommended-free',
-      name: '推荐免费组',
+      name: 'Recommended free group',
       models: ['deepseek-v4.1-flash-free', 'glm-5.3-flash-free', 'space-bunny-free'],
       strategy: 'fallback',
       stickyLimit: 1,

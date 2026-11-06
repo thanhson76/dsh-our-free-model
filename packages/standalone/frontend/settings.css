@@ -1,12 +1,12 @@
 /* ==========================================================================
-   配置与渠道页面样式 —— 服务设置 / API 接入 / 渠道管理
-   分层：1. 服务设置基础布局  2. 服务设置增强  3. API 接入（cx- 前缀）
-        4. 渠道管理外层（ch- 前缀）  5. 渠道内嵌组件（ofm_ 对齐，只加不删）
-        6. 响应式与降级  7. 深色主题
-   动效只动 transform / opacity / filter / clip-path，缓出 cubic-bezier(0.16, 1, 0.3, 1)。
+   Settings and channel page styles — Service settings / API access / Channel management
+   Layers: 1. Service settings base layout  2. Service settings enhancements  3. API access (cx- prefix)
+        4. Channel management outer layer (ch- prefix)  5. Embedded channel components (ofm_ aligned, only add, never remove)
+        6. Responsive and fallbacks  7. Dark theme
+   Animations only animate transform / opacity / filter / clip-path, easing out with cubic-bezier(0.16, 1, 0.3, 1).
    ========================================================================== */
 
-/* ---------- 1. 服务设置：基础布局 ---------- */
+/* ---------- 1. Service settings: base layout ---------- */
 .settings-fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .settings-card { margin-bottom: 20px; }
 .settings-card-heading { display: flex; align-items: center; gap: 11px; padding-bottom: 6px; }
@@ -40,23 +40,23 @@
 .settings-save-error { display: flex; gap: 8px; align-items: flex-start; color: var(--danger); background: var(--danger-soft); border: 1px solid var(--danger-line); padding: 12px; border-radius: 6px; font-size: 12px; margin-top: 14px; animation: feedbackIn 260ms cubic-bezier(0.16, 1, 0.3, 1); }
 .settings-save-error > svg { flex-shrink: 0; }
 
-/* ---------- 2. 服务设置：增强层 ---------- */
+/* ---------- 2. Service settings: enhancement layer ---------- */
 
-/* 页面入场 */
+/* Page entrance */
 @keyframes settingsIn { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
 .settings-browser { animation: settingsIn 300ms cubic-bezier(0.16, 1, 0.3, 1) }
 
-/* 分组卡片：标题区与字段区之间的呼吸感 */
+/* Grouped cards: breathing room between the heading area and the field area */
 .settings-card-heading { align-items: flex-start; padding-bottom: 14px; margin-bottom: 2px; border-bottom: 1px solid var(--line); }
 .settings-card-heading > svg { margin-top: 1px; padding: 7px; box-sizing: content-box; background: var(--amber-soft); color: var(--amber-ink); border-radius: 8px; }
 .settings-card-heading h2 { letter-spacing: -0.005em; }
 .settings-field:first-of-type, .settings-number-field:first-of-type { padding-top: 14px; }
 
-/* 数字输入：min/max 提示与 invalid 出现动画 */
+/* Number inputs: min/max hints and invalid appearance animation */
 .settings-number .settings-hint { display: block; font-size: 10px; color: var(--muted); margin-top: 6px; font-variant-numeric: tabular-nums; }
 @keyframes settingsErrorIn { from { opacity: 0; transform: translateY(-3px) } to { opacity: 1; transform: none } }
 
-/* 操作区状态点：dirty 琥珀 / 保存中蓝色脉冲 / 已保存绿 */
+/* Action-area status dot: dirty amber / saving blue pulse / saved green */
 .settings-status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: #c6bfb2; transition: background 250ms cubic-bezier(0.16, 1, 0.3, 1); }
 .settings-status-dirty { color: var(--warning); }
 .settings-status-dirty .settings-status-dot { background: var(--amber); box-shadow: 0 0 0 3px var(--amber-glow); }
@@ -67,14 +67,14 @@
 .spinning { animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg) } }
 
-/* 反馈出现动画 */
+/* Feedback appearance animation */
 @keyframes feedbackIn { from { opacity: 0; transform: translateY(5px) } to { opacity: 1; transform: none } }
 
-/* ---------- 3. API 接入（cx- 前缀） ---------- */
+/* ---------- 3. API access (cx- prefix) ---------- */
 
 .connection-browser { animation: settingsIn 300ms cubic-bezier(0.16, 1, 0.3, 1); }
 
-/* 反馈条：成功 / 错误 */
+/* Feedback bars: success / error */
 .connection-feedback, .connection-error {
   padding: 10px 13px; border-radius: 7px;
   animation: feedbackIn 260ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -83,11 +83,11 @@
 .connection-error { background: var(--danger-soft); border: 1px solid var(--danger-line); }
 .connection-error > svg { margin-top: 1px; }
 
-/* 卡片标题图标底块 */
+/* Card heading icon tile */
 .cx-icon { display: grid; place-items: center; width: 32px; height: 32px; flex-shrink: 0; background: var(--amber-soft); color: var(--amber-ink); border-radius: 8px; }
 .cx-icon-danger { background: var(--danger-soft); color: var(--danger); }
 
-/* 凭证字段：密码箱质感（等宽字体 + 内敛底槽） */
+/* Credential field: password-vault feel (monospace font + restrained inset slot) */
 .cx-field { flex: 1; min-width: 0; display: flex; align-items: center; gap: 9px; padding: 2px 4px 2px 12px; border: 1px solid var(--amber-line); border-radius: 7px; background: #fffdf8; transition: border-color 150ms cubic-bezier(0.16, 1, 0.3, 1), background 150ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 150ms cubic-bezier(0.16, 1, 0.3, 1); }
 .cx-field:focus-within { border-color: var(--amber); background: var(--surface); box-shadow: 0 0 0 3px var(--amber-glow); }
 .cx-field > svg { color: var(--dsw-alias-label-tertiary); }
@@ -98,11 +98,11 @@
 @keyframes cxReveal { from { opacity: 0.55 } to { opacity: 1 } }
 .copy-field .cx-field input[readonly] { cursor: default; }
 
-/* 复制成功反馈 */
+/* Copy-success feedback */
 .cx-copied { color: var(--success-ink) !important; border-color: #c9e2d3 !important; background: var(--success-soft) !important; }
 .cx-copied:hover:not(:disabled) { color: var(--success-ink) !important; border-color: #c9e2d3 !important; background: #e8f4ee !important; }
 
-/* 快速开始：迷你终端（昼主题也是深色代码块） */
+/* Quick start: mini terminal (the day theme also uses a dark code block) */
 .cx-code {
   position: relative; margin-top: 15px; padding: 15px 16px 15px 42px;
   background: #221f1a; color: #d9d2c5; border: 1px solid #3b352c; border-radius: 8px;
@@ -118,15 +118,15 @@
 .cx-code::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 4px; }
 .cx-code::-webkit-scrollbar-track { background: transparent; }
 
-/* 危险区：克制的红色警示 */
+/* Danger zone: a restrained red warning */
 .connection-danger { border-color: rgba(166, 58, 46, 0.34); }
 .connection-danger h2 { color: #9c3a34; }
 .cx-danger-btn { color: #a83a34 !important; border-color: #e3b3a8 !important; }
 .cx-danger-btn:hover:not(:disabled) { color: #8f2f2a !important; background: #fdf0e9 !important; border-color: #d99a8c !important; }
 
-/* ---------- 4. 渠道管理外层（ch- 前缀） ---------- */
+/* ---------- 4. Channel management outer layer (ch- prefix) ---------- */
 
-/* 汇总条：状态仪表感 */
+/* Summary bar: status-instrument feel */
 .ch-metric { display: flex; align-items: center; gap: 10px; }
 .ch-metric-icon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; background: var(--amber-soft); color: var(--amber-ink); flex-shrink: 0; }
 .ch-metric-body { display: flex; flex-direction: column; gap: 1px; }
@@ -139,11 +139,11 @@
 .channel-summary-strip { margin-bottom: 16px; }
 .channel-summary-strip .checkin-control .status-dot { animation: none; }
 
-/* 工具栏：筛选 chip 计数 */
+/* Toolbar: filter chip counts */
 .channel-filters button span { padding: 1px 6px; background: rgba(72, 58, 42, 0.08); border-radius: 8px; font-variant-numeric: tabular-nums; font-weight: 550; color: var(--ink-soft); }
 .channel-filters button[aria-pressed=true] span { background: var(--amber-soft); color: var(--amber-ink); }
 
-/* 供应商卡片：logo 质感 / 计数 tabular-nums / 悬停按钮显现 */
+/* Provider cards: logo texture / tabular-nums counts / button reveals on hover */
 .provider-grid { animation: settingsIn 320ms cubic-bezier(0.16, 1, 0.3, 1); }
 .provider-logo { border-radius: 9px; font-size: 12px; letter-spacing: 0.02em; box-shadow: inset 0 0 0 1px rgba(72, 58, 42, 0.06), 0 1px 2px rgba(72, 58, 42, 0.07); }
 .provider-card .status-dot { animation: none; }
@@ -152,19 +152,19 @@
 .provider-card:hover .provider-manage svg, .provider-manage:focus-visible svg { opacity: 1; transform: none; }
 .provider-card:focus-within { border-color: var(--amber-line); }
 
-/* 详情：侧边选中态左侧竖条 + 安全提示条 */
+/* Detail: left vertical bar for the selected sidebar item + security notice bar */
 .detail-provider-link { border-left: 2px solid transparent; border-radius: 0 6px 6px 0; padding-left: 10px; }
 .detail-provider-link.active { border-left-color: var(--amber); font-weight: 550; }
 .detail-security-note { padding: 11px 13px; background: var(--amber-soft); border: 1px solid var(--amber-line); border-radius: 7px; }
 .detail-security-note > svg { flex-shrink: 0; margin-top: 1px; color: var(--amber-ink); }
 
-/* 空态 */
+/* Empty state */
 .channel-empty { animation: settingsIn 300ms cubic-bezier(0.16, 1, 0.3, 1); }
 .channel-empty h2 { color: var(--ink-soft); }
 
-/* ---------- 5. 渠道内嵌组件：ofm_ 对齐主界面（只增不删） ---------- */
+/* ---------- 5. Embedded channel components: ofm_ aligned with the main UI (only add, never remove) ---------- */
 
-/* 按钮：对齐 ui-button-outline 的质感 */
+/* Buttons: aligned with the ui-button-outline feel */
 .ofm_root .ofm_btn {
   min-height: 30px; padding: 6px 12px; border-radius: 6px; border-color: var(--dsw-alias-border-l2);
   background: var(--surface); color: var(--ink-soft); font-size: 12px; font-weight: 500;
@@ -174,13 +174,13 @@
 .ofm_root .ofm_btn:active:not(:disabled) { transform: scale(0.97); }
 .ofm_root .ofm_btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
 
-/* 标签页切换：与主界面一致的字号层级 */
+/* Tab switching: type-size hierarchy consistent with the main UI */
 .ofm_root .ofm_seg { margin-top: 6px; }
 .ofm_root .ofm_seg button { font-size: 13px; font-weight: 500; padding: 11px 2px 13px; border-bottom: 2px solid transparent; transition: color 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms cubic-bezier(0.16, 1, 0.3, 1); }
 .ofm_root .ofm_seg button:hover { color: var(--ink); }
 .ofm_root .ofm_seg button[aria-selected=true] { font-weight: 600; }
 
-/* 供应商与数据管理面板 */
+/* Provider and data management panel */
 .ofm_root .ofm_hero { border: 1px solid var(--line); padding: 19px 21px; }
 .ofm_root .ofm_hero h3 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 0 0 4px; }
 .ofm_root .ofm_hero:hover { transform: none; box-shadow: var(--shadow-sm); }
@@ -192,16 +192,16 @@
 .ofm_root .ofm_row input[type=checkbox] { accent-color: var(--amber); width: 15px; height: 15px; }
 .ofm_root .ofm_note { color: var(--dsw-alias-label-tertiary); line-height: 1.7; }
 
-/* 弹窗 / 提示条 / 公告的圆角与阴影对齐 */
+/* Align radius and shadow for dialogs / notice bars / announcements */
 .ofm_root .ofm_modal { border-radius: 12px; box-shadow: 0 24px 64px -18px rgba(72, 58, 42, 0.30), 0 4px 16px rgba(72, 58, 42, 0.10); animation: settingsIn 260ms cubic-bezier(0.16, 1, 0.3, 1); }
 .ofm_root .ofm_toast { border-radius: 8px; box-shadow: var(--shadow-md); animation: feedbackIn 240ms cubic-bezier(0.16, 1, 0.3, 1); }
 .ofm_root .ofm_glass, .ofm_root .ofm_ann, .ofm_root .ofm_newsitem, .ofm_root .ofm_stat { border-radius: 8px; }
 
-/* 等宽与数字 */
+/* Monospace and numbers */
 .ofm_root .ofm_mono, .ofm_root .ofm_id { font-family: Consolas, "SFMono-Regular", monospace; }
 .ofm_root .ofm_num, .ofm_root .ofm_kpivalue, .ofm_root .ofm_credittotal { font-variant-numeric: tabular-nums; }
 
-/* ---------- 6. 响应式与降级 ---------- */
+/* ---------- 6. Responsive and fallbacks ---------- */
 @media (max-width: 700px) {
   .settings-field { gap: 16px; }
   .settings-number-field { align-items: stretch; flex-direction: column; gap: 10px; }
@@ -222,12 +222,12 @@
 }
 
 /* ==========================================================================
-   昼主题精修 · 纸面工作台（redesign-day / light-only）
-   范围：仅 :root:not([data-theme="dark"]) 限定的浅色规则；
-   [data-theme="dark"] 规则零改动；既有 @keyframes 全部保留。
+   Day theme refinement · paper workbench (redesign-day / light-only)
+   Scope: only light rules scoped to :root:not([data-theme="dark"]);
+   [data-theme="dark"] rules are untouched; all existing @keyframes are kept.
    ========================================================================== */
 
-/* ---------- 圆角统一：图标块 10 / 控件 9 / 卡面 12 / 弹窗 16 ---------- */
+/* ---------- Unified radii: icon tiles 10 / controls 9 / card surfaces 12 / dialogs 16 ---------- */
 :root:not([data-theme="dark"]) .settings-card-heading > svg { border-radius: 10px; }
 :root:not([data-theme="dark"]) .settings-note,
 :root:not([data-theme="dark"]) .settings-save-error { border-radius: 9px; }
@@ -254,7 +254,7 @@
 :root:not([data-theme="dark"]) .ofm_root .ofm_newsitem,
 :root:not([data-theme="dark"]) .ofm_root .ofm_stat { border-radius: 12px; }
 
-/* ---------- 溢出兜底：超长文本/ID 允许任意断行 ---------- */
+/* ---------- Overflow fallback: very long text/IDs may break anywhere ---------- */
 :root:not([data-theme="dark"]) .settings-field strong,
 :root:not([data-theme="dark"]) .settings-field small,
 :root:not([data-theme="dark"]) .settings-footer > span,
@@ -268,10 +268,10 @@
 :root:not([data-theme="dark"]) .detail-provider-link { min-width: 0; }
 
 /* ==========================================================================
-   7. 深色主题（夜）—— 深海仪器：设置页更像仪器控制面板
+   7. Dark theme (night) — deep-sea instrument: the settings page feels more like an instrument control panel
    ========================================================================== */
 
-/* ---------- 设置页深色 ---------- */
+/* ---------- Settings page dark ---------- */
 [data-theme="dark"] .settings-card-heading { border-bottom-color: rgba(0, 208, 192, 0.14); }
 [data-theme="dark"] .settings-card-heading > svg { background: var(--cp-cyan-soft); color: var(--cp-cyan); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05); }
 [data-theme="dark"] .settings-fieldset .settings-toggle { background: rgba(255, 255, 255, 0.04); border-color: var(--cp-cyan-line); box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45); }
@@ -292,7 +292,7 @@
 [data-theme="dark"] .settings-status-saved { color: var(--dsw-alias-state-success-primary); }
 [data-theme="dark"] .settings-status-saved .settings-status-dot { background: var(--dsw-alias-state-success-primary); box-shadow: 0 0 0 3px rgba(62, 207, 160, 0.12); border-radius: 1px; }
 
-/* ---------- API 接入深色 ---------- */
+/* ---------- API access dark ---------- */
 [data-theme="dark"] .connection-feedback { background: rgba(62, 207, 160, 0.07); border-color: rgba(62, 207, 160, 0.18); }
 [data-theme="dark"] .connection-error { background: rgba(233, 69, 66, 0.07); border-color: var(--cp-red-line); }
 [data-theme="dark"] .cx-icon { background: var(--cp-cyan-soft); color: var(--cp-cyan); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05); }
@@ -313,7 +313,7 @@
 [data-theme="dark"] .cx-danger-btn { color: #fff !important; border-color: #ff6b68 !important; background: var(--cp-red) !important; box-shadow: 0 0 14px -4px rgba(233, 69, 66, 0.5); }
 [data-theme="dark"] .cx-danger-btn:hover:not(:disabled) { color: #fff !important; background: #f25552 !important; border-color: #ff8a86 !important; box-shadow: 0 0 20px -4px rgba(233, 69, 66, 0.6); }
 
-/* ---------- 渠道管理深色 ---------- */
+/* ---------- Channel management dark ---------- */
 [data-theme="dark"] .ch-metric-icon { background: var(--cp-cyan-soft); color: var(--cp-cyan); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05); }
 [data-theme="dark"] .ch-metric-label { color: var(--dsw-alias-label-tertiary); }
 [data-theme="dark"] .ch-metric-value { color: var(--ink); text-shadow: 0 0 20px rgba(0, 208, 192, 0.08); }
@@ -331,7 +331,7 @@
 [data-theme="dark"] .detail-security-note > svg { color: var(--cp-cyan); }
 [data-theme="dark"] .channel-empty h2 { color: var(--dsw-alias-label-secondary); }
 
-/* ---------- 内嵌组件深色对齐 ---------- */
+/* ---------- Embedded components dark alignment ---------- */
 [data-theme="dark"] .ofm_root .ofm_btn {
   background: rgba(0, 208, 192, 0.03); border-color: var(--cp-cyan-line); color: var(--ink); border-radius: 2px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
@@ -348,25 +348,25 @@
 [data-theme="dark"] .ofm_root .ofm_toast { border-radius: 2px; box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.55); }
 
 /* ==========================================================================
-   逐元素精修层（precision pass）
-   覆盖：服务设置 settings-* / API 接入 connection-* · cx-* / 渠道管理 ch-*
-        provider-* · detail-* / EAC 内嵌 ofm_*
-   原则：只新增样式。class、DOM、aria 零改动；既有 6 个 @keyframes
-        （settingsIn / settingsErrorIn / settingsPulse / spin / feedbackIn /
-         cxReveal）全部保留，本层不新增、不改写任何关键帧。
-   动效：位移与形变只走 transform / opacity（≤180ms）；色彩与阴影过渡
-        ≤260ms 缓出，不触发几何重排。
+   Per-element refinement layer (precision pass)
+   Covers: service settings settings-* / API access connection-* · cx-* / channel management ch-*
+        provider-* · detail-* / EAC embedded ofm_*
+   Principle: only add styles. Zero changes to class, DOM, or aria; the 6 existing @keyframes
+        (settingsIn / settingsErrorIn / settingsPulse / spin / feedbackIn /
+         cxReveal) are all kept; this layer adds or rewrites no keyframes.
+   Motion: movement and deformation use only transform / opacity (≤180ms); color and shadow transitions
+        ease out over ≤260ms, without triggering geometry reflow.
    ========================================================================== */
 
-/* ---------- 0. 精修令牌：昼夜成对（本文件私有，不改写 app.css 令牌） ---------- */
+/* ---------- 0. Refinement tokens: day/night pairs (private to this file, does not rewrite app.css tokens) ---------- */
 :root:not([data-theme="dark"]) {
-  --ofm-hair: #eee9e0;            /* 卡片内发丝分隔线 */
+  --ofm-hair: #eee9e0;            /* Hairline divider inside cards */
   --ofm-sheen: rgba(255, 255, 255, 0.85);
   --ofm-hover-wash: rgba(72, 58, 42, 0.035);
-  --ofm-field-bg: #fffdf8;        /* 纸白输入底槽 */
+  --ofm-field-bg: #fffdf8;        /* Paper-white input slot */
   --ofm-field-line: var(--amber-line);
   --ofm-field-line-hover: #d9b98a;
-  --ofm-sunk: #f7f3ec;            /* 凹陷面：只读 / 禁用 */
+  --ofm-sunk: #f7f3ec;            /* Sunken surface: read-only / disabled */
   --ofm-track-ring: rgba(var(--warm-shadow), 0.12);
   --ofm-code-thumb: rgba(217, 119, 6, 0.35);
   --ofm-danger-card-top: rgba(166, 58, 46, 0.30);
@@ -385,20 +385,20 @@
 }
 
 /* ==========================================================================
-   1. 服务设置（settings-*）
+   1. Service settings (settings-*)
    ========================================================================== */
 
-/* 1.1 表单栏宽：与「API 接入」同栏宽，避免 1440px 下每行两端被拉开 */
+/* 1.1 Form column width: same column width as "API access", so rows are not stretched apart at 1440px */
 .settings-browser { max-width: 900px; }
 
-/* 1.2 分组卡片标题：图标块几何稳定 + 说明文案排版 */
+/* 1.2 Grouped card headings: stable icon-tile geometry + description typography */
 .settings-card { min-width: 0; }
 .settings-card-heading > svg { display: grid; place-items: center; width: 16px; height: 16px; box-sizing: content-box; box-shadow: inset 0 1px 0 var(--ofm-sheen); }
 .settings-card-heading > div { min-width: 0; }
 .settings-card-heading h2 { line-height: 1.35; text-wrap: balance; }
 .settings-card-heading p { line-height: 1.6; text-wrap: pretty; }
 
-/* 1.3 字段行：行高、断行与鼠标悬停热区（触屏不触发粘滞高亮） */
+/* 1.3 Field rows: line height, wrapping and mouse hover hot zone (touch does not trigger sticky highlight) */
 .settings-field strong { line-height: 1.45; }
 .settings-field small { text-wrap: pretty; }
 label.settings-field { cursor: pointer; }
@@ -407,26 +407,26 @@ label.settings-field { cursor: pointer; }
   label.settings-field:hover { background: var(--ofm-hover-wash); }
 }
 
-/* 1.4 开关：昼夜同一套几何；按压纵向挤压（transform），禁用降饱和 */
+/* 1.4 Switches: same geometry day and night; press squeezes vertically (transform), disabled desaturates */
 .settings-toggle { border-width: 1px; border-style: solid; transition: background 250ms cubic-bezier(0.16, 1, 0.3, 1), border-color 250ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 250ms cubic-bezier(0.16, 1, 0.3, 1), transform 180ms cubic-bezier(0.16, 1, 0.3, 1); }
-/* 通用 input 规则（app.css 的 9px 圆角）会盖掉开关的胶囊形，这里用更高权重还原；夜=方块触点。 */
+/* The generic input rule (app.css's 9px radius) would override the switch's capsule shape; restore it here with higher specificity; night = square contact. */
 .settings-fieldset .settings-field .settings-toggle { border-radius: 999px; }
 [data-theme="dark"] .settings-fieldset .settings-field .settings-toggle { border-radius: 2px; }
 .settings-toggle:active:not(:disabled) { transform: scaleY(0.94); }
 .settings-toggle:disabled, .settings-fieldset:disabled .settings-toggle { filter: saturate(0.55); }
 [data-theme="dark"] .settings-fieldset .settings-toggle:focus-visible { outline: 2px solid var(--cp-cyan); outline-offset: 3px; box-shadow: 0 0 0 5px var(--cp-glow); }
 
-/* 1.5 数字输入：读数质感 + 禁用态（保存中整表禁用） */
+/* 1.5 Number inputs: reading feel + disabled state (whole form disabled while saving) */
 .settings-number { min-width: 0; }
 .settings-number input { font-weight: 500; }
 .settings-number input:disabled { background: var(--ofm-sunk); border-color: var(--dsw-alias-border-l1); color: var(--dsw-alias-label-tertiary); cursor: not-allowed; }
 .settings-number .settings-hint { line-height: 1.5; }
 
-/* 1.6 行内错误：图标与首行对齐、任意断行 */
+/* 1.6 Inline errors: icon aligned with the first line, break anywhere */
 .settings-field-error { line-height: 1.5; text-wrap: pretty; overflow-wrap: anywhere; }
 .settings-field-error > svg { flex-shrink: 0; margin-top: 2px; }
 
-/* 1.7 底部状态区：dirty / saving / saved 连文字一起生效；状态点收边 */
+/* 1.7 Bottom status area: dirty / saving / saved apply to the text as well; status dot gets an inset edge */
 .settings-footer { padding: 15px 2px 8px; }
 .settings-footer > span { gap: 8px; min-height: 18px; line-height: 1.5; font-weight: 500; overflow-wrap: anywhere; }
 .settings-actions { align-items: center; }
@@ -438,24 +438,24 @@ label.settings-field { cursor: pointer; }
 [data-theme="dark"] .settings-footer > span.settings-status-saving { color: var(--cp-cyan); }
 [data-theme="dark"] .settings-footer > span.settings-status-saved { color: var(--dsw-alias-state-success-primary); }
 
-/* 1.8 提示条与保存失败：长文案兜底 */
+/* 1.8 Notice bars and save failures: fallback for long text */
 .settings-note { line-height: 1.65; overflow-wrap: anywhere; }
 .settings-save-error { line-height: 1.6; text-wrap: pretty; overflow-wrap: anywhere; }
 .settings-save-error > span { min-width: 0; }
 .settings-save-error > svg { margin-top: 1px; }
 
 /* ==========================================================================
-   2. API 接入（connection-* / cx-*）
+   2. API access (connection-* / cx-*)
    ========================================================================== */
 
-/* 2.1 卡片标题：窄屏换行与长文案兜底 */
+/* 2.1 Card headings: wrapping on narrow screens and fallback for long text */
 .connection-card { min-width: 0; }
 .connection-card-heading { flex-wrap: wrap; row-gap: 10px; }
 .connection-card-heading > div { min-width: 0; }
 .connection-card-heading h2 { line-height: 1.35; }
 .connection-card-heading p { line-height: 1.6; text-wrap: pretty; }
 
-/* 2.2 凭据字段：收敛到 38px 控件节奏（与按钮同高），悬停/聚焦联动 */
+/* 2.2 Credential fields: converged to a 38px control rhythm (same height as buttons), hover/focus linked */
 .cx-field { padding: 1px 4px 1px 12px; background: var(--ofm-field-bg); border-color: var(--ofm-field-line); }
 .cx-field:hover { border-color: var(--ofm-field-line-hover); }
 .cx-field > svg { transition: color 150ms cubic-bezier(0.16, 1, 0.3, 1); }
@@ -466,12 +466,12 @@ label.settings-field { cursor: pointer; }
 [data-theme="dark"] .cx-field:focus-within > svg { color: var(--cp-cyan); }
 [data-theme="dark"] .cx-revealed { box-shadow: inset 0 0 0 1px var(--cp-cyan-line); }
 
-/* 2.3 代码块：终端表面的浏览器细节（滚动条 / 选区 / 制表符 / 方向） */
+/* 2.3 Code blocks: browser details of the terminal surface (scrollbar / selection / tab size / direction) */
 .cx-code { tab-size: 2; -moz-tab-size: 2; direction: ltr; unicode-bidi: isolate; overscroll-behavior-x: contain; scrollbar-width: thin; scrollbar-color: var(--ofm-code-thumb) transparent; }
 :root:not([data-theme="dark"]) .cx-code::selection { background: rgba(217, 119, 6, 0.30); color: #fff8ea; }
 [data-theme="dark"] .cx-code::selection { background: rgba(0, 208, 192, 0.30); color: #eafffd; }
 
-/* 2.4 危险区：红色只做一层薄雾与 1px 顶光，不做整块红 */
+/* 2.4 Danger zone: red is only a thin haze and a 1px top light, not a full red block */
 .connection-danger { background: linear-gradient(180deg, #fffdfa, #fdf4f0); }
 .connection-danger::before { background: linear-gradient(90deg, transparent, var(--ofm-danger-card-top), transparent); }
 .connection-danger > .ui-button { flex-shrink: 0; }
@@ -479,11 +479,11 @@ label.settings-field { cursor: pointer; }
 [data-theme="dark"] .connection-danger { background: linear-gradient(180deg, #13161d, #17141a); }
 [data-theme="dark"] .connection-danger::before { background: linear-gradient(90deg, transparent, var(--ofm-danger-card-top), transparent); }
 
-/* 2.5 反馈条：图标对齐与长文案兜底 */
+/* 2.5 Feedback bars: icon alignment and fallback for long text */
 .connection-feedback, .connection-error { line-height: 1.6; overflow-wrap: anywhere; }
 .connection-feedback > svg { flex-shrink: 0; margin-top: 1px; }
 
-/* 2.6 字段标签与复制行：两组凭据之间的关系更清楚 */
+/* 2.6 Field labels and copy rows: the relationship between the two credential groups is clearer */
 .field-label { font-weight: 550; letter-spacing: 0.01em; margin: 20px 0 8px; overflow-wrap: anywhere; }
 .copy-field { align-items: stretch; }
 .copy-field > .ui-button { flex-shrink: 0; }
@@ -491,10 +491,10 @@ label.settings-field { cursor: pointer; }
 .footnote { line-height: 1.65; text-wrap: pretty; overflow-wrap: anywhere; }
 
 /* ==========================================================================
-   3. 渠道管理（ch-* / provider-* / detail-*）
+   3. Channel management (ch-* / provider-* / detail-*)
    ========================================================================== */
 
-/* 3.1 汇总指标：读数排版 + 图标块顶光 */
+/* 3.1 Summary metrics: reading typography + top light on icon tiles */
 .ch-metric { min-width: 0; }
 .ch-metric-body { min-width: 0; }
 .ch-metric-icon { box-shadow: inset 0 1px 0 var(--ofm-sheen); }
@@ -502,7 +502,7 @@ label.settings-field { cursor: pointer; }
 .ch-metric-value { letter-spacing: -0.01em; }
 .ch-skeleton { vertical-align: middle; }
 
-/* 3.2 供应商卡片：logo 浮雕 + 触屏设备也能看到「管理渠道」箭头 */
+/* 3.2 Provider cards: embossed logo + the "Manage channel" arrow is also visible on touch devices */
 .provider-logo { letter-spacing: 0.02em; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35); }
 .provider-manage { font-weight: 550; }
 @media (hover: none) {
@@ -510,14 +510,14 @@ label.settings-field { cursor: pointer; }
 }
 [data-theme="dark"] .provider-logo { text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35); }
 
-/* 3.3 详情侧栏：选中竖条收到 1px，配合已有底色与字重表达选中 */
+/* 3.3 Detail sidebar: the selected vertical bar is reduced to 1px, expressing selection together with the existing background and font weight */
 .detail-provider-link { border-left-width: 1px; border-radius: 0 8px 8px 0; min-width: 0; }
 
 /* ==========================================================================
-   4. EAC 内嵌（ofm_*）—— 与独立控制台同一控件刻度
+   4. EAC embedded (ofm_*) — same control scale as the standalone console
    ========================================================================== */
 
-/* 4.1 按钮与折叠开关：圆角/高度对齐，触摸目标 ≥24px */
+/* 4.1 Buttons and fold toggles: aligned radius/height, touch targets ≥24px */
 .ofm_root .ofm_btn { min-height: 32px; border-radius: 9px; }
 .ofm_root .ofm_btn:disabled { cursor: not-allowed; }
 .ofm_root .ofm_minibtn { display: inline-flex; align-items: center; justify-content: center; min-height: 24px; border-radius: 7px; }
@@ -525,26 +525,26 @@ label.settings-field { cursor: pointer; }
 .ofm_root .ofm_foldtoggle:hover { background: var(--dsw-alias-bg-layer-2); }
 [data-theme="dark"] .ofm_root .ofm_foldtoggle:hover { background: var(--cp-cyan-soft); color: var(--cp-cyan); }
 
-/* 4.2 行与分隔：上下对称的发丝线，控件圆角对齐 9px */
+/* 4.2 Rows and dividers: symmetric hairlines above and below, control radius aligned to 9px */
 .ofm_root .ofm_row { margin: 0; padding: 11px 0; border-top: 1px solid var(--ofm-hair); }
 .ofm_root .ofm_row.ofm_acts { padding-top: 13px; }
 .ofm_root .ofm_row select, .ofm_root .ofm_row input[type=text], .ofm_root .ofm_row input:not([type]) { border-radius: 9px; }
 .ofm_root .ofm_row input[type=checkbox] { margin: 0; cursor: pointer; }
 
-/* 4.3 卡片 / 弹窗 / 提示条圆角：夜主题与昼主题同刻度 */
+/* 4.3 Card / dialog / notice bar radii: night and day themes use the same scale */
 .ofm_root .ofm_card, .ofm_root .ofm_hero, .ofm_root .ofm_glass, .ofm_root .ofm_chan { border-radius: 12px; }
 .ofm_root .ofm_glass, .ofm_root .ofm_ann, .ofm_root .ofm_newsitem, .ofm_root .ofm_stat { border-radius: 12px; }
 .ofm_root .ofm_modal { border-radius: 16px; }
 .ofm_root .ofm_toast { border-radius: 11px; }
 [data-theme="dark"] .ofm_root .ofm_modal { border-radius: 16px; }
 
-/* 4.4 渠道折叠卡：logo 与状态标签跟主控制台同一语言（状态色交给内部圆点） */
+/* 4.4 Channel fold cards: logo and status label use the same language as the main console (status color is left to the inner dot) */
 .ofm_root .ofm_chanlogo { border-radius: 9px; }
 .ofm_root .ofm_chanstate { border-radius: 6px; background: var(--dsw-alias-bg-layer-2); box-shadow: inset 0 0 0 1px var(--dsw-alias-border-l1); }
 [data-theme="dark"] .ofm_root .ofm_chanstate { background: var(--cp-cyan-soft); color: var(--dsw-alias-label-secondary); box-shadow: inset 0 0 0 1px var(--cp-cyan-line); }
 
 /* ==========================================================================
-   5. 圆角刻度：夜主题与昼主题同刻度（把昼主题已定的值原样镜像，不加新数值）
+   5. Radius scale: night and day themes use the same scale (mirror the day theme's settled values as-is, no new values)
    ========================================================================== */
 .provider-logo { border-radius: 11px; }
 .settings-card-heading > svg, .cx-icon, .cx-icon-danger, .ch-metric-icon { border-radius: 10px; }
@@ -554,7 +554,7 @@ label.settings-field { cursor: pointer; }
 .detail-provider-link { border-radius: 0 8px 8px 0; }
 
 /* ==========================================================================
-   6. 对比度底线：昼主题实测低于 4.5:1 的次要文字（夜主题已有自己的规则）
+   6. Contrast floor: secondary text measured below 4.5:1 in the day theme (the night theme already has its own rules)
    ========================================================================== */
 :root:not([data-theme="dark"]) .settings-number .settings-hint { color: var(--muted); }
 :root:not([data-theme="dark"]) .ch-metric-label { color: var(--muted); }
@@ -563,7 +563,7 @@ label.settings-field { cursor: pointer; }
 :root:not([data-theme="dark"]) .detail-security-note { color: var(--dsw-alias-label-secondary); }
 
 /* ==========================================================================
-   7. 响应式补丁与动效降级
+   7. Responsive patches and motion fallbacks
    ========================================================================== */
 @media (max-width: 700px) {
   .connection-danger { flex-direction: column; align-items: stretch; }
@@ -575,15 +575,15 @@ label.settings-field { cursor: pointer; }
 }
 
 /* ==========================================================================
-   质感彩蛋层（egg pass / 昼 + 夜成对）
-   - 只新增样式：class / id / data-* / ARIA / JS 零改动。
-   - 既有 6 个 @keyframes（settingsIn / settingsErrorIn / settingsPulse /
-     spin / feedbackIn / cxReveal）原样保留；本层新增关键帧一律 set- 前缀，
-     且只使用 transform / opacity。
-   - 动效预算：微反馈 180–340ms，折叠 260ms；全部一次性，不做常驻装饰。
+   Texture easter-egg layer (egg pass / day + night pairs)
+   - Only add styles: zero changes to class / id / data-* / ARIA / JS.
+   - The 6 existing @keyframes (settingsIn / settingsErrorIn / settingsPulse /
+     spin / feedbackIn / cxReveal) are kept as-is; new keyframes in this layer all use the set- prefix,
+     and only use transform / opacity.
+   - Motion budget: micro-feedback 180–340ms, folding 260ms; all one-time, no permanent decoration.
    ========================================================================== */
 
-/* ---------- 0. 彩蛋令牌（本层私有，昼夜成对） ---------- */
+/* ---------- 0. Easter-egg tokens (private to this layer, day/night pairs) ---------- */
 :root:not([data-theme="dark"]) {
   --set-ring-blue: rgba(38, 86, 201, 0.14);
   --set-ring-green: rgba(30, 138, 99, 0.20);
@@ -600,7 +600,7 @@ label.settings-field { cursor: pointer; }
 }
 
 /* ==========================================================================
-   1. 设置开关：切换瞬间 Q 弹（旋钮滑动 + 微压缩回弹），hover 轨道微亮
+   1. Settings switch: a springy pop at the toggle moment (knob slides + slight compression rebound), hover track glows slightly
    ========================================================================== */
 @keyframes set-knob-pop {
   0% { transform: translateX(0) scaleX(1) scaleY(1); }
@@ -617,7 +617,7 @@ label.settings-field { cursor: pointer; }
 }
 
 /* ==========================================================================
-   2. 保存状态点：saved 时“点一下 + 一圈涟漪散开”，把“已保存”变成讨喜的落定感
+   2. Save status dot: when saved, "a tap + a ripple spreading out" turns "Saved" into a pleasing settled feeling
    ========================================================================== */
 .settings-footer > span { transition: color 220ms cubic-bezier(0.16, 1, 0.3, 1); }
 .settings-status-dot { position: relative; }
@@ -635,7 +635,7 @@ label.settings-field { cursor: pointer; }
 .settings-status-saved .settings-status-dot::after { animation: set-status-ring 620ms cubic-bezier(0.16, 1, 0.3, 1) 40ms; }
 
 /* ==========================================================================
-   3. 凭据框：聚焦时前导图标微放大并转为强调色；显隐切换有“揭开”感
+   3. Credential box: on focus the leading icon enlarges slightly and turns to the accent color; show/hide toggling feels like "unveiling"
    ========================================================================== */
 .cx-field > svg { transform-origin: 50% 50%; transition: color 150ms cubic-bezier(0.16, 1, 0.3, 1), transform 200ms cubic-bezier(0.22, 0.9, 0.3, 1); }
 .cx-field:focus-within > svg { transform: scale(1.18); }
@@ -650,7 +650,7 @@ label.settings-field { cursor: pointer; }
 }
 
 /* ==========================================================================
-   4. 复制成功：绿色“落章”弹跳 + 对勾轻轻弹入
+   4. Copy success: green "stamp" bounce + the checkmark pops in gently
    ========================================================================== */
 @keyframes set-copy-pop {
   0% { transform: scale(0.93); }
@@ -661,7 +661,7 @@ label.settings-field { cursor: pointer; }
 .cx-copied > svg, .copy-field .copied > svg { animation: set-copy-pop 340ms cubic-bezier(0.22, 0.9, 0.3, 1); }
 
 /* ==========================================================================
-   5. 渠道折叠：箭头带一点回弹地旋转，面板像抽屉一样落开
+   5. Channel folding: the arrow rotates with a little rebound, the panel drops open like a drawer
    ========================================================================== */
 .ofm_root .ofm_foldtoggle svg { transition: transform 300ms cubic-bezier(0.34, 1.5, 0.64, 1); }
 .ofm_root .ofm_foldtoggle[data-open="true"] svg { transform: rotate(90deg); }
@@ -676,7 +676,7 @@ label.settings-field { cursor: pointer; }
 }
 
 /* ==========================================================================
-   6. 危险按钮：hover 轻轻抬起 + 红色薄雾，回旋图标小幅摆动
+   6. Danger button: hover lifts slightly + red haze, the rotate icon swings a little
    ========================================================================== */
 .cx-danger-btn { transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), background-color 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms cubic-bezier(0.16, 1, 0.3, 1), color 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1); }
 .cx-danger-btn svg { transition: transform 220ms cubic-bezier(0.34, 1.5, 0.64, 1); }
@@ -688,7 +688,7 @@ label.settings-field { cursor: pointer; }
 }
 
 /* ==========================================================================
-   7. 命令框：hover 时边框亮起 + 一层很轻的终端呼吸光，暗示“可复制”
+   7. Command box: on hover the border lights up + a very light terminal breathing glow, hinting "copyable"
    ========================================================================== */
 .cx-code { transition: border-color 220ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1); }
 .cx-code::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: radial-gradient(120% 150% at 14% 0%, var(--set-code-glow), transparent 58%); opacity: 0; transition: opacity 220ms cubic-bezier(0.16, 1, 0.3, 1); }
@@ -698,7 +698,7 @@ label.settings-field { cursor: pointer; }
 }
 
 /* ==========================================================================
-   8. 动效降级：保留颜色与状态反馈，去掉位移 / 弹跳 / 涟漪
+   8. Motion fallback: keep color and state feedback, remove movement / bounce / ripples
    ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
   .settings-toggle:checked::after,
@@ -715,13 +715,13 @@ label.settings-field { cursor: pointer; }
   .ofm_root .ofm_foldtoggle:hover svg, .ofm_root .ofm_foldtoggle[data-open="true"]:hover svg { transform: none; }
 }
 
-/* ===== 世界观注入 · settings ===== */
-/* 物理身份：夜 = 终端（扫描青 / 方触点 / 解码）
-             昼 = 纸面（黄铜 / 暖光 / 墨水显影）
-   - 只新增规则：class / 测试钩子 / ARIA / 上方彩蛋层零改动。
-   - 新 keyframe 一律 set- 前缀，只动 opacity / filter / transform / clip-path。 */
+/* ===== Worldview injection · settings ===== */
+/* Physical identity: Night = terminal (scan cyan / square contacts / decoding)
+             Day = paper surface (brass / warm light / ink developing)
+   - Only add rules: zero changes to class / test hooks / ARIA / the easter-egg layer above.
+   - New keyframes all use the set- prefix, and only animate opacity / filter / transform / clip-path. */
 
-/* ---------- 0. 彩蛋层蓝色字面量的运行时覆盖（彩蛋层本体按约定原样保留） ---------- */
+/* ---------- 0. Runtime override of the easter-egg layer's blue literals (the easter-egg layer itself is kept as-is by convention) ---------- */
 :root:not([data-theme="dark"]) {
   --set-ring-blue: var(--amber-glow);
   --set-code-glow: rgba(217, 119, 6, 0.14);
@@ -733,7 +733,7 @@ label.settings-field { cursor: pointer; }
   --set-code-line: var(--cp-cyan-line);
 }
 
-/* ---------- 1. 输入框：夜=终端（等宽 + 青 caret + 四角刻度）；昼=纸白 + 琥珀柔光 ---------- */
+/* ---------- 1. Inputs: Night = terminal (monospace + cyan caret + corner ticks); Day = paper white + soft amber glow ---------- */
 [data-theme="dark"] .settings-browser .settings-number,
 [data-theme="dark"] .connection-browser .cx-field { position: relative; }
 [data-theme="dark"] .settings-browser .settings-number::before,
@@ -776,7 +776,7 @@ label.settings-field { cursor: pointer; }
   outline: none; border-color: var(--amber); background: #fffefb;
   box-shadow: 0 0 0 3px var(--amber-glow), 1px 2px 0 rgba(var(--warm-shadow), 0.05);
 }
-/* invalid 优先于普通聚焦：错误态保持红色语义 */
+/* invalid takes priority over normal focus: the error state keeps its red semantics */
 :root:not([data-theme="dark"]) .settings-browser .settings-number input[aria-invalid=true]:focus,
 :root:not([data-theme="dark"]) .settings-browser .settings-number input[aria-invalid=true]:focus-visible {
   border-color: var(--danger); box-shadow: 0 0 0 3px rgba(178, 59, 75, 0.13);
@@ -792,7 +792,7 @@ label.settings-field { cursor: pointer; }
 }
 :root:not([data-theme="dark"]) .connection-browser .cx-field input { caret-color: var(--amber); }
 
-/* ---------- 2. 折叠区：夜=抽屉滑出 / 昼=纸张翻开 ---------- */
+/* ---------- 2. Folding areas: Night = drawer slides out / Day = paper unfolds ---------- */
 @keyframes set-drawer {
   from { clip-path: inset(0 0 100% 0); }
   to { clip-path: inset(0 0 0 0); }
@@ -812,7 +812,7 @@ label.settings-field { cursor: pointer; }
   animation: set-fold-unfold 280ms cubic-bezier(0.16, 1, 0.3, 1), set-page-open 340ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ---------- 3. 凭据揭示：夜=解码 / 昼=墨水显影 ---------- */
+/* ---------- 3. Credential reveal: Night = decoding / Day = ink developing ---------- */
 @keyframes set-decode {
   0% { opacity: 0.15; filter: blur(6px) brightness(2.2); transform: translateX(-2px); }
   35% { opacity: 0.55; filter: blur(2.5px) brightness(1.6); transform: translateX(1.5px); }
@@ -828,7 +828,7 @@ label.settings-field { cursor: pointer; }
 :root:not([data-theme="dark"]) .connection-browser .cx-revealed { animation: set-reveal 480ms cubic-bezier(0.16, 1, 0.3, 1) both; }
 :root:not([data-theme="dark"]) .connection-browser .cx-revealed > svg { color: var(--amber); }
 
-/* ---------- 4. 保存成功：夜=涟漪+色差闪 / 昼=暖光晕开 ---------- */
+/* ---------- 4. Save success: Night = ripple + color-glitch flash / Day = warm glow spreading ---------- */
 @keyframes set-save-ripple {
   0% { opacity: 0.85; transform: scale(0.45); }
   70% { opacity: 0.18; transform: scale(1.35); }
@@ -878,7 +878,7 @@ label.settings-field { cursor: pointer; }
   animation: set-save-glow 520ms cubic-bezier(0.16, 1, 0.3, 1) 1;
 }
 
-/* ---------- 5. 危险区：夜=纯红终端键 / 昼=暖红+暖影 ---------- */
+/* ---------- 5. Danger zone: Night = pure-red terminal key / Day = warm red + warm shadow ---------- */
 [data-theme="dark"] .connection-browser .connection-danger {
   border-color: var(--cp-red);
   background: linear-gradient(180deg, #0e1116, #16100f);
@@ -902,7 +902,7 @@ label.settings-field { cursor: pointer; }
   box-shadow: 1px 3px 0 rgba(var(--warm-shadow), 0.10), 0 6px 14px -8px rgba(166, 58, 46, 0.4);
 }
 
-/* ---------- 6. 昼开关 hover：把彩蛋层的蓝环换成琥珀环（彩蛋层本体未动） ---------- */
+/* ---------- 6. Day switch hover: replace the easter-egg layer's blue ring with an amber ring (the easter-egg layer itself is untouched) ---------- */
 @media (hover: hover) {
   :root:not([data-theme="dark"]) .settings-browser .settings-fieldset .settings-toggle:hover:not(:disabled):not(:checked) {
     background: linear-gradient(180deg, #ece4d5, #e0d5c0);
@@ -919,7 +919,7 @@ label.settings-field { cursor: pointer; }
   }
 }
 
-/* ---------- 7. 夜=直角刻度（只收本文件负责的小控件；卡片切角由 app.css 负责） ---------- */
+/* ---------- 7. Night = right-angle ticks (only the small controls this file owns; card bevel cuts are handled by app.css) ---------- */
 [data-theme="dark"] .settings-card-heading > svg,
 [data-theme="dark"] .cx-icon,
 [data-theme="dark"] .ch-metric-icon,
@@ -933,7 +933,7 @@ label.settings-field { cursor: pointer; }
 [data-theme="dark"] .connection-error,
 [data-theme="dark"] .detail-security-note { border-radius: 1px; }
 
-/* ---------- 8. 动效降级 ---------- */
+/* ---------- 8. Motion fallback ---------- */
 @media (prefers-reduced-motion: reduce) {
   [data-theme="dark"] .ofm_root .ofm_chanfold,
   :root:not([data-theme="dark"]) .ofm_root .ofm_chanfold,

@@ -1,10 +1,10 @@
-# 网关工具消息的新旧内核兼容
+# Gateway Tool-Message Compatibility Between Old and New Kernels
 
-Chat 的 `role: tool` 和 Responses 的 `function_call_output` 都必须转成当前宿主的工具结果消息。DSH ≤0.1.6 使用 `user` 消息内的 `tool-result` 块，0.1.7+ 使用顶层带 `toolCallId` 的 `tool` 消息。外部 provider 不经过 channel-pack 的消息归一化层，固定输出任一格式都会破坏另一代内核的工具调用。
+Both Chat's `role: tool` and Responses' `function_call_output` must be converted into the current host's tool-result message. DSH ≤0.1.6 uses a `tool-result` block inside a `user` message, while 0.1.7+ uses a top-level `tool` message carrying a `toolCallId`. External providers do not pass through channel-pack's message normalisation layer, so always emitting either one format would break tool calls on the other kernel generation.
 
-网关的共享入口 `createGatewayToolMessage()` 委托宿主导出的 `createToolResultMessage()` 处理这些差异，内容块、调用 ID、消息 ID 和 source 都由既有宿主契约承载。Chat 与 Responses 继续共用图片入站逻辑。`isError` 的断言覆盖内部 helper；它不表示新增了 OpenAI 入站 `is_error` 扩展。
+The gateway's shared entry point `createGatewayToolMessage()` delegates these differences to the host-exported `createToolResultMessage()`; content blocks, call IDs, message IDs and source are all carried by the existing host contract. Chat and Responses continue to share the inbound image logic. The assertions on `isError` cover an internal helper; they do not mean a new OpenAI inbound `is_error` extension was added.
 
-## 回归检查
+## Regression checks
 
 ```powershell
 npm ci --ignore-scripts
@@ -13,16 +13,16 @@ npm run test:contributor
 npm run typecheck
 ```
 
-网关检查已纳入 `test:contributor`，不需要模型凭据或网络调用。测试分别加载固定的真实旧内核包 `dsh-llm-legacy`（`@deepseek-ai/dsh-llm@0.1.5-rc.2`）和项目安装的当前宿主；对 TypeScript 源码、已提交的 `pack.js` 分别执行两个端点的转换，检查：
+The gateway checks are included in `test:contributor` and need no model credentials or network calls. The tests separately load the pinned, real old-kernel package `dsh-llm-legacy` (`@deepseek-ai/dsh-llm@0.1.5-rc.2`) and the project's installed current host; they run the conversion for both endpoints against the TypeScript sources and the committed `pack.js` respectively, and check:
 
-- 宿主消息角色、工具调用 ID 与结果文本；
-- 并行工具调用和带图结果经现有序列化器后仍完整配对；
-- helper 的错误标记、系统消息来源、思考回传及普通历史保持正确。
+- the host message role, tool call ID and result text;
+- that parallel tool calls and results with images remain fully paired after the existing serialiser;
+- that the helper's error flag, system message source, thinking pass-back and ordinary history stay correct.
 
-旧宿主的开发依赖固定到同批次 `0.1.5-rc.2`，避免后续 `rc.3` 收紧 Cordis peer 范围导致两个测试内核冲突。该别名只用于测试，不会打包进运行时。
+The old host's development dependency is pinned to `0.1.5-rc.2` from the same batch, to avoid a later `rc.3` tightening the Cordis peer range and making the two test kernels conflict. That alias is for tests only and is not bundled into the runtime.
 
-修改 vendored 源码后需要运行 `node scripts/build-channel-pack.mjs` 同步生成包；网关回归也会捕获源码已修而生成包未更新的情况。
+After modifying the vendored sources, run `node scripts/build-channel-pack.mjs` to regenerate the package; the gateway regression also catches the case where the source is fixed but the generated package was not updated.
 
-独立端通过 `channels/contracts.mjs` 提供同名消息工厂，并用 `node scripts/build-standalone-channels.mjs` 同步业务产物。`node scripts/standalone-channels-test.mjs` 检查该产物的两个端点仍保留工具 ID 与结果；`node scripts/build-standalone-channels.mjs --check` 检查它与渠道包一致，避免重建后缺少工厂导出或继续运行旧转换代码。
+The standalone side provides a message factory of the same name through `channels/contracts.mjs`, and syncs the business artifact with `node scripts/build-standalone-channels.mjs`. `node scripts/standalone-channels-test.mjs` checks that the artifact's two endpoints still preserve tool IDs and results; `node scripts/build-standalone-channels.mjs --check` checks that it is consistent with the channel pack, avoiding a rebuild that loses the factory export or keeps running old conversion code.
 
-这些检查证明消息转换和本地序列化行为，不替代真实远端模型或完整桌面宿主验收。签名发布清单与 `release-readiness` 仍按 [贡献者和发布签名流程](contributor-ci-signing.md) 由持钥维护者准备。
+These checks prove the message-conversion and local serialisation behaviour; they are no substitute for acceptance against a real remote model or a full desktop host. The signed release manifest and `release-readiness` are still prepared by the key-holding maintainer following the [contributor and release signing process](contributor-ci-signing.md).

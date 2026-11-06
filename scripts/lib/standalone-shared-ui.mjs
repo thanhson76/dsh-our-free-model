@@ -1,19 +1,19 @@
-/** 仅转换独立端承载；渠道业务仍来自原插件页面。 */
+/** Converts only the standalone hosting; the channel business still comes from the original plugin pages. */
 import fs from 'node:fs'
 import vm from 'node:vm'
 let source = fs.readFileSync(new URL('../../client.js', import.meta.url), 'utf8')
 function replaceOnce(from, to) {
-  if (source.split(from).length !== 2) throw new Error(`共享页面替换位置改变：${from.slice(0, 90)}`)
+  if (source.split(from).length !== 2) throw new Error(`The shared page replacement point changed: ${from.slice(0, 90)}`)
   source = source.replace(from, to)
 }
 const anchor = '    exports.apply = apply'
-if (source.split(anchor).length !== 2) throw new Error('共享页面导出位置改变')
+if (source.split(anchor).length !== 2) throw new Error('The shared page export point changed')
 source = source.replace(anchor, "    exports.standalone = { ChannelsPage, ChannelCard, EacAuth, useEacLogin, DICT, CSS, Tank, usePool, poolReading, capacityText, CHANNEL_PROVIDERS, LedgerPage, LogsPage }\n" + anchor)
 const api = "try { return new URL('api/our-free-model', document.baseURI).pathname } catch { return '/api/our-free-model' }"
-if (source.split(api).length !== 2) throw new Error('共享页面 API 位置改变')
+if (source.split(api).length !== 2) throw new Error('The shared page API point changed')
 source = source.replace(api, "return '/api/management'")
 replaceOnce("api('/pool', { timeout: 25_000 })", "api('/eac/pool', { timeout: 25_000 })")
-// 原页面 POST 空 body；独立管理接口要求 JSON 对象。
+// The original page POSTs an empty body; the standalone management endpoints require a JSON object.
 replaceOnce("...body === undefined ? {} : { body: JSON.stringify(body) },", "body: JSON.stringify(body ?? {}),")
 replaceOnce("h(PageHero, { t, titleKey: 'dash.title', subKey: 'dash.sub' },",
   "h(PageHero, { title: t('dash.title'), sub: t('dash.sub') },")
@@ -31,7 +31,7 @@ const css = shared.CSS + `
 `
 
 export function standaloneSharedUi() {
-  return { name: '独立端共享渠道',
+  return { name: 'Standalone shared channels',
     resolveId(id) {
       if (id === 'ofm-shared-client' || id === 'ofm-provider-list') return '\0' + id
       if (id === 'ofm-shared-styles.css') return '\0' + id

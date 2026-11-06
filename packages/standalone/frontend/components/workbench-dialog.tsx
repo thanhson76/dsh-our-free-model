@@ -14,7 +14,7 @@ export function WorkbenchDialog({ title, onClose, busy, children }: {
   return <dialog ref={dialog} className="wb-dialog" aria-labelledby="wb-dialog-title"
     onCancel={event => { event.preventDefault(); if (!busy) onClose() }}
     onClick={event => { if (event.target === event.currentTarget && !busy) onClose() }}>
-    <header><h2 id="wb-dialog-title">{title}</h2><Button variant="ghost" size="icon" title="关闭" aria-label="关闭" disabled={busy} onClick={onClose}><X size={18} /></Button></header>
+    <header><h2 id="wb-dialog-title">{title}</h2><Button variant="ghost" size="icon" title="Close" aria-label="Close" disabled={busy} onClick={onClose}><X size={18} /></Button></header>
     {children}
   </dialog>
 }

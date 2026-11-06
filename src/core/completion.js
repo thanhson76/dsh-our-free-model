@@ -29,7 +29,7 @@ export function publicModelRows(snapshot) {
     })
 }
 
-/** 固定本次请求的模型和配置快照，两个入口使用同一条推理链路。 */
+/** Pins the model and configuration snapshot for this request, so both entry points use the same inference path. */
 export function createForwardCompletion({ adapter, state, signal }) {
   return async (request, onChunk) => {
     if (signal?.aborted) throw Object.assign(new Error('model runtime is stopped'), { statusCode: 503 })

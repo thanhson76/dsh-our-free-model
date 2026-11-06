@@ -1,4 +1,4 @@
-/** 使用未经修改的历史升级器，验证当前真实发布目录而非微型假包。 */
+/** Using the unmodified historical upgrader, verify the current real release directory rather than a tiny fake package. */
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import os from 'node:os'
@@ -21,22 +21,22 @@ function collect(rel) {
   if (fs.statSync(absolute).isDirectory()) {
     for (const name of fs.readdirSync(absolute)) if (!name.startsWith('.') && name !== 'node_modules') collect(`${rel}/${name}`)
   } else {
-    assert(!files.has(rel), `重复发布文件：${rel}`)
+    assert(!files.has(rel), `Duplicate published file: ${rel}`)
     files.set(rel, publishedBytes(fs.readFileSync(absolute)))
   }
 }
 for (const rel of ['package.json', ...pkg.files]) collect(rel)
 const rows = [...files].map(([path, body]) => ({ path, size: body.length, sha256: sha(body) })).sort((a, b) => a.path.localeCompare(b.path))
-assert(rows.length <= 80, `旧版最多 80 个文件，当前 ${rows.length}`)
-assert(rows.every(row => row.size > 0 && row.size <= 4 * 1024 * 1024), '有文件超过旧版 4 MiB 上限')
+assert(rows.length <= 80, `the legacy version allows at most 80 files; currently ${rows.length}`)
+assert(rows.every(row => row.size > 0 && row.size <= 4 * 1024 * 1024), 'a file exceeds the legacy 4 MiB limit')
 const keys = crypto.generateKeyPairSync('ed25519')
 const testKey = keys.publicKey.export({ format: 'der', type: 'spki' }).toString('base64')
-let manifest = { version: pkg.version, base: '../', publishedAt: new Date().toISOString(), notes: '旧版兼容回归', files: rows }
+let manifest = { version: pkg.version, base: '../', publishedAt: new Date().toISOString(), notes: 'Legacy compatibility regression', files: rows }
 if (production) {
   manifest = JSON.parse(fs.readFileSync(path.join(root, 'feed/manifest.json'), 'utf8'))
   assert.deepEqual(manifest.files, rows)
   assert.equal(manifest.version, pkg.version)
-  assert(verifyManifestSignature(parseManifest(manifest), PINNED_MANIFEST_PUBLIC_KEY), '生产清单签名无效')
+  assert(verifyManifestSignature(parseManifest(manifest), PINNED_MANIFEST_PUBLIC_KEY), 'the production manifest signature is invalid')
 } else manifest.signature = signManifest(parseManifest(manifest), keys.privateKey)
 const verifyKey = production ? PINNED_MANIFEST_PUBLIC_KEY : testKey
 const old = [
@@ -63,7 +63,7 @@ let installed
 try {
   for (const historical of old) {
     const fixture = fs.readFileSync(new URL(`./fixtures/updater-${historical.version}.mjs`, import.meta.url))
-    assert.deepEqual(fixture, git('show', `${historical.revision}:src/updater.js`), '历史升级器夹具已被修改')
+    assert.deepEqual(fixture, git('show', `${historical.revision}:src/updater.js`), 'the historical upgrader fixture has been modified')
     historical.module = await import(`./fixtures/updater-${historical.version}.mjs`)
     const oldManifest = JSON.parse(git('show', `${historical.revision}:feed/manifest.json`))
     const archive = path.join(scratch, `${historical.version}.tar`)
@@ -76,8 +76,8 @@ try {
     // would take "D:" for a remote host and refuse the file.
     const tar = process.env.SystemRoot ? path.join(process.env.SystemRoot, 'System32', 'tar.exe') : 'tar'
     execFileSync(tar, ['-xf', archive, '-C', historical.pkgDir], { windowsHide: true })
-    fs.writeFileSync(path.join(historical.dataDir, 'user-settings.json'), '保留用户数据\n')
-    await check(`${historical.version} 原版拒绝旧问题夹具，并接受当前 ${rows.length} 文件`, () => {
+    fs.writeFileSync(path.join(historical.dataDir, 'user-settings.json'), 'Preserved user data\n')
+    await check(`the original ${historical.version} rejects the old problem fixture and accepts the current ${rows.length} files`, () => {
       historical.module.parseManifest(manifest)
       const tooMany = Array.from({ length: 93 }, (_, i) => ({ path: i === 0 ? 'package.json' : `src/f-${i}.js`, size: 1, sha256: '0'.repeat(64) }))
       assert.throws(() => historical.module.parseManifest({ ...manifest, files: tooMany }), /above the 80 cap/)
@@ -85,38 +85,38 @@ try {
     })
     const updater = new historical.module.PluginUpdater({ pkgDir: historical.pkgDir, dataDir: historical.dataDir, settings: () => ({}), defaultSources: [url], manifestPublicKey: verifyKey })
     if (historical.version === '2.5.9') {
-      await check('2.5.9 激活失败恢复全部原版运行时文件', async () => {
+      await check('a 2.5.9 activation failure restores all original runtime files', async () => {
         const original = new Map(oldManifest.files.map(row => [row.path, fs.readFileSync(path.join(historical.pkgDir, row.path))]))
-        await assert.rejects(updater.apply({ activate: async () => ({ ok: false, error: '夹具拒绝激活', runtimeRestored: true }) }), /previous files restored/)
+        await assert.rejects(updater.apply({ activate: async () => ({ ok: false, error: 'Fixture refused activation', runtimeRestored: true }) }), /previous files restored/)
         for (const [rel, bytes] of original) assert.deepEqual(fs.readFileSync(path.join(historical.pkgDir, rel)), bytes, rel)
         assert.equal(fs.existsSync(path.join(historical.pkgDir, 'src/engine-parts')), true)
         assert.deepEqual(fs.readdirSync(path.join(historical.pkgDir, 'src/engine-parts')), [])
       })
-      await check('2.5.9 拒绝下载中被篡改的真实分片，已安装版本不变', async () => {
+      await check('2.5.9 rejects a real part tampered during download; the installed version is unchanged', async () => {
         tamperedPath = rows.find(row => row.path.endsWith('.part')).path
-        // 上一轮失败保留了已验证暂存；使用独立升级数据目录验证真实坏下载。
+        // The previous round's failure kept the verified staging; use an independent upgrade data directory to verify a real bad download.
         const fresh = new historical.module.PluginUpdater({ pkgDir: historical.pkgDir, dataDir: path.join(historical.dataDir, 'tampered'), settings: () => ({}), defaultSources: [url], manifestPublicKey: verifyKey })
         await assert.rejects(fresh.apply(), /staging failed|sha256|checksum/)
         assert.equal(JSON.parse(fs.readFileSync(path.join(historical.pkgDir, 'package.json'))).version, historical.version)
         tamperedPath = ''
       })
     }
-    await check(`${historical.version} 原版完成下载、安装和最新插件模块加载`, async () => {
+    await check(`the original ${historical.version} completes the download, install and loading of the latest plugin modules`, async () => {
       assert.equal((await updater.check()).available, true)
       await updater.apply({ activate: async () => {
         const module = await import(pathToFileURL(path.join(historical.pkgDir, 'index.js')).href)
         assert.equal(module.name, 'our-free-model')
         return { ok: true, version: JSON.parse(fs.readFileSync(path.join(historical.pkgDir, 'package.json'))).version }
       } })
-      // 1.3.1 尚不支持激活回调，另行验证升级后的真实模块。
+      // 1.3.1 does not support activation callbacks yet; verify the real modules after the upgrade separately.
       assert.equal((await import(pathToFileURL(path.join(historical.pkgDir, 'index.js')).href)).name, 'our-free-model')
       assert.equal(JSON.parse(fs.readFileSync(path.join(historical.pkgDir, 'package.json'))).version, pkg.version)
       for (const row of rows) assert.equal(sha(fs.readFileSync(path.join(historical.pkgDir, row.path))), row.sha256, row.path)
-      assert.equal(fs.readFileSync(path.join(historical.dataDir, 'user-settings.json'), 'utf8'), '保留用户数据\n')
+      assert.equal(fs.readFileSync(path.join(historical.dataDir, 'user-settings.json'), 'utf8'), 'Preserved user data\n')
       installed = historical
     })
   }
-  await check('升级后的新版升级器能重新检查同一签名发布且无需重复升级', async () => {
+  await check('the new upgrader after upgrading can re-check the same signed release without upgrading again', async () => {
     const { PluginUpdater } = await import(pathToFileURL(path.join(installed.pkgDir, 'src/updater.js')).href)
     const successor = new PluginUpdater({ pkgDir: installed.pkgDir, dataDir: installed.dataDir, settings: () => ({}), defaultSources: [url], manifestPublicKey: verifyKey })
     assert.equal((await successor.check()).available, false)
@@ -124,7 +124,7 @@ try {
   })
   const metadata = JSON.parse(fs.readFileSync(path.join(installed.pkgDir, 'vendor/magpie/engine.json')))
   if (metadata.binaries[`${process.platform}-${process.arch}`]) {
-    await check('真实升级产物仅凭分片还原引擎并启动认证管理接口', async () => {
+    await check('the real upgrade output restores the engine from parts alone and starts the authenticated management endpoints', async () => {
       assert.equal(fs.existsSync(path.join(installed.pkgDir, 'vendor/magpie/bin/magpie-win32-x64.exe')), false)
       const oldEnv = { ...process.env }
       let engine
@@ -146,11 +146,11 @@ try {
         Object.assign(process.env, oldEnv)
       }
     })
-  } else console.log(`ok 本机 ${process.platform}-${process.arch} 没有已发布原生引擎，跳过进程启动；旧版安装与模块加载已验证`)
-  console.log(`${checks}/${checks} 旧版升级检查通过；${rows.length} 个真实文件；${requestCount} 次本地文件请求；${production ? '生产签名' : '一次性测试签名'}；无上游调用`)
+  } else console.log(`ok this machine (${process.platform}-${process.arch}) has no published native engine; skipping process startup; legacy install and module loading were verified`)
+  console.log(`${checks}/${checks} legacy upgrade checks passed; ${rows.length} real files; ${requestCount} local file requests; ${production ? 'production signature' : 'one-off test signature'}; no upstream calls`)
 } finally {
   server.closeAllConnections()
   await new Promise(resolve => server.close(resolve))
-  if (!path.resolve(scratch).startsWith(path.resolve(os.tmpdir()) + path.sep)) throw new Error('清理路径越界')
+  if (!path.resolve(scratch).startsWith(path.resolve(os.tmpdir()) + path.sep)) throw new Error('Cleanup path out of bounds')
   fs.rmSync(scratch, { recursive: true, force: true })
 }

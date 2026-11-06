@@ -215,7 +215,7 @@ const pendingTree = EacAuth({ t, auth: { available: true }, eacLogin: { ...login
 const pendingLinks = []
 const collectLinks = node => { if (!node || typeof node !== 'object') return; if (node.type === 'a') pendingLinks.push(node); for (const child of node.children ?? []) { if (Array.isArray(child)) child.forEach(collectLinks); else collectLinks(child) } }
 collectLinks(pendingTree)
-assert.ok(pendingLinks.some(node => node.props.href === 'https://gateway.invalid/auth' && node.props.target === '_blank'), '等待授权面板必须提供可点击的授权链接')
+assert.ok(pendingLinks.some(node => node.props.href === 'https://gateway.invalid/auth' && node.props.target === '_blank'), 'the waiting-for-authorization panel must offer a clickable authorization link')
 const tree = EacAuth({ t, auth: { available: true, unverified: true }, eacLogin: { ...login, pending: null } })
 assert.ok(JSON.stringify(tree).includes('eac.pillUnknown'))
 assert.equal(JSON.stringify(tree).includes('eac.pillCompat'), false)

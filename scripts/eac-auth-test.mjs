@@ -196,25 +196,26 @@ try {
 
   const callbackPath = `/eac/auth/github/callback?code=code-test&state=${encodeURIComponent(authorize.searchParams.get('state'))}`
   const tampered = await get(`http://127.0.0.1:${new URL(primary.base).port}/eac/auth/github/callback?code=code-test&state=${encodeURIComponent('x' + authorize.searchParams.get('state'))}`)
-  check('a tampered state is refused', [tampered.status, (await tampered.text()).includes('授权已过期')], [400, true])
+  check('a tampered state is refused', [tampered.status, (await tampered.text()).includes('Authorization expired')], [400, true])
 
   // ── 2. the star verdict ────────────────────────────────────────────────────
   github.state.starred = false
   const unstarredPage = await get(`http://127.0.0.1:${new URL(primary.base).port}${callbackPath}`)
   const unstarredHtml = await unstarredPage.text()
-  check('not starred: the page asks for the star, not for a re-login', [unstarredPage.status, unstarredHtml.includes('还差一步'), unstarredHtml.includes('/eac/auth/github/recheck?t=')], [200, true, true])
+  check('not starred: the page asks for the star, not for a re-login', [unstarredPage.status, unstarredHtml.includes('One more step'), unstarredHtml.includes('/eac/auth/github/recheck?t=')], [200, true, true])
   const recheckUrl = new URL(/href="([^"]*recheck[^"]*)"/.exec(unstarredHtml)[1], 'https://gateway.example')
   const recheckPath = recheckUrl.pathname + recheckUrl.search
   check('poll reports the unstarred login', (await (await get(`${primary.base}/auth/poll?link=${'a'.repeat(32)}`)).json()).status, 'unstarred')
 
   github.state.starred = true
   const rechecked = await get(`http://127.0.0.1:${new URL(primary.base).port}${recheckPath}`)
-  check('recheck after starring grants without a new OAuth round', [rechecked.status, (await rechecked.text()).includes('已确认 Star')], [200, true])
+  check('recheck after starring grants without a new OAuth round', [rechecked.status, (await rechecked.text()).includes('Star confirmed')], [200, true])
 
   const collected = await (await get(`${primary.base}/auth/poll?link=${'a'.repeat(32)}`)).json()
   check('poll hands the token over', [collected.status, collected.login, typeof collected.token === 'string' && collected.token.length >= 32], ['ok', 'octocat', true])
-  // 收取是幂等的：一次领取的响应可能在半路死掉（源站重启/代理掐断都会变成
-  // 520），客户端只能靠再轮询一次自救——一次性领取把这种抖动变成永久卡死。
+  // Claiming is idempotent: a one-shot claim response can die halfway (an origin
+  // restart or a proxy cut both surface as 520), and the client can only rescue
+  // itself by polling once more — a single-use claim would turn that jitter into a permanent stall.
   const recollected = await (await get(`${primary.base}/auth/poll?link=${'a'.repeat(32)}`)).json()
   check('and again, until the window closes', [recollected.status, recollected.token === collected.token], ['ok', true])
 
@@ -541,7 +542,7 @@ try {
   const off = await startGateway(githubOff, { GITHUB_CLIENT_ID: '', GITHUB_CLIENT_SECRET: '' })
   try {
     const page = await get(`${off.base}/auth/github/start?link=${'d'.repeat(32)}`)
-    check('start without OAuth credentials answers 503 with a readable page', [page.status, (await page.text()).includes('未就绪')], [503, true])
+    check('start without OAuth credentials answers 503 with a readable page', [page.status, (await page.text()).includes('not ready')], [503, true])
   } finally {
     off.server.authGate.close()
     await new Promise(resolve => off.server.close(resolve))

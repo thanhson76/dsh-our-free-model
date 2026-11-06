@@ -1,4 +1,4 @@
-/** 出口变化只使旧测量失效，不能自动探测或恢复迟到的旧判定。 */
+/** An egress change only invalidates old measurements; it must not probe automatically or restore late old verdicts. */
 import assert from 'node:assert/strict'
 import { after, test } from 'node:test'
 import fs from 'node:fs'
@@ -32,7 +32,7 @@ function fixture() {
   stores.catalogStore.update({ entries: [id, other] })
   stores.availability.update({
     egress: { ip: '198.51.100.1' }, at: 1234,
-    results: { [id]: { state: 'region-blocked', detail: '旧出口受限', at: 1234 }, [other]: { state: 'available', at: 1234 } },
+    results: { [id]: { state: 'region-blocked', detail: 'Old egress restricted', at: 1234 }, [other]: { state: 'available', at: 1234 } },
     manualResults: { [other]: { state: 'available', source: 'manual', at: 2345 } },
   })
   let changes = 0
@@ -42,7 +42,7 @@ function fixture() {
     const address = String(url)
     requests.push(address)
     if (new URL(address).hostname === 'api.ipify.org') return Promise.resolve(Response.json({ ip }))
-    assert.ok(address.startsWith(upstream.base + '/'), `不得请求外部网络：${address}`)
+    assert.ok(address.startsWith(upstream.base + '/'), `must not request the external network: ${address}`)
     return originalFetch(url, init)
   }
   const runtime = createModelRuntime({ ...stores, logger: { info() {}, warn() {} }, onTopology: () => { changes++ } })
@@ -53,13 +53,13 @@ function fixture() {
   }
 }
 
-test('换出口恢复被旧地区判定隐藏的模型，历史测量保留且重启后仍失效，不发送探测', async () => {
+test('switching egress restores models hidden by an old region verdict; historical measurements are kept, still invalid after a restart, and no probe is sent', async () => {
   const f = fixture()
   try {
     assert.ok(!f.advertised().includes(id))
     await f.runtime.watchEgress()
     assert.ok(f.advertised().includes(id))
-    assert.equal(f.changes, 1, '应通知选择器重新计算模型分组')
+    assert.equal(f.changes, 1, 'the picker should be notified to recompute the model groups')
     assert.equal(f.requests.length, 1)
     assert.match(f.requests[0], /ipify/)
     const saved = JSON.parse(fs.readFileSync(path.join(f.dataDir, 'availability.json'), 'utf8'))
@@ -79,7 +79,7 @@ test('换出口恢复被旧地区判定隐藏的模型，历史测量保留且�
   } finally { f.close() }
 })
 
-test('相同出口保留有效测量且不发送探测，也不重复通知选择器', async () => {
+test('the same egress keeps valid measurements, sends no probe, and does not notify the picker again', async () => {
   const f = fixture()
   try {
     f.setIp('198.51.100.1')
@@ -91,7 +91,7 @@ test('相同出口保留有效测量且不发送探测，也不重复通知选�
   } finally { f.close() }
 })
 
-test('旧出口的在途手动测量不能覆盖新出口结果', async () => {
+test('an in-flight manual measurement from the old egress cannot overwrite the new egress result', async () => {
   const f = fixture()
   const started = gate(), release = gate()
   let running
@@ -110,14 +110,14 @@ test('旧出口的在途手动测量不能覆盖新出口结果', async () => {
   } finally { release.resolve(); await running?.catch(() => {}); f.close() }
 })
 
-test('旧出口的迟到失败不能写入新出口缓存', async () => {
+test('a late failure from the old egress cannot be written into the new egress cache', async () => {
   const f = fixture()
   const started = gate(), release = gate()
   let running
   try {
-    f.runtime.adapter.stream = async function* () { started.resolve(); await release.promise; throw new Error('旧出口失败') }
+    f.runtime.adapter.stream = async function* () { started.resolve(); await release.promise; throw new Error('Old egress failed') }
     running = f.runtime.testModel(id)
-    const rejected = assert.rejects(running, /旧出口失败/)
+    const rejected = assert.rejects(running, /Old egress failed/)
     await started.promise
     await f.runtime.watchEgress()
     const saved = structuredClone(f.stores.availability.get())
@@ -127,12 +127,12 @@ test('旧出口的迟到失败不能写入新出口缓存', async () => {
   } finally { release.resolve(); await running?.catch(() => {}); f.close() }
 })
 
-test('新出口的手动探测不合并到旧轮次，旧 HTTP 探测完成后不恢复过期判定', async () => {
+test('a manual probe on the new egress does not merge into the old round, and completing an old HTTP probe does not restore a stale verdict', async () => {
   const f = fixture()
   const started = gate(), release = gate()
   let running
   try {
-    // 两个旧 HTTP 请求都到达后再换出口，不依赖计时碰运气。
+    // Switch egress only after both old HTTP requests have arrived, instead of relying on timing luck.
     let oldRequests = 0
     probeAnswer = () => {
       oldRequests++
@@ -145,7 +145,7 @@ test('新出口的手动探测不合并到旧轮次，旧 HTTP 探测完成后�
     probeAnswer = () => ({ status: 400, body: JSON.stringify({ error: { message: 'Model is unavailable.' } }) })
     const newer = f.runtime.refreshAvailability(true)
     const deadline = new Promise((_, reject) => {
-      const timer = setTimeout(() => reject(new Error('新出口探测错误地等待旧轮次')), 3000)
+      const timer = setTimeout(() => reject(new Error('The new egress probe wrongly waited for the old round')), 3000)
       timer.unref()
       newer.finally(() => clearTimeout(timer)).catch(() => {})
     })

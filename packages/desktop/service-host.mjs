@@ -1,7 +1,7 @@
 import readline from 'node:readline'
 import { startStandalone } from '../standalone/service.mjs'
 
-// 桌面壳只控制自己启动的服务；stdin 关闭表示父进程已经离开。
+// The desktop shell only controls the service it started itself; stdin closing means the parent process has exited.
 let service
 let closing
 let parentGone = false
@@ -27,7 +27,7 @@ try {
     if (args[i] === '--no-refresh') options.refresh = false
     else if (args[i] === '--data-dir' && args[i + 1]) options.dataDir = args[++i]
     else if (args[i] === '--port' && /^\d+$/.test(args[i + 1] ?? '')) options.port = Number(args[++i])
-    else throw new Error('桌面服务启动参数无效')
+    else throw new Error('Invalid desktop service startup arguments')
   }
   service = await startStandalone(options)
   if (parentGone) await stop()
@@ -36,7 +36,7 @@ try {
     port: service.port, managementUrl: service.managementUrl,
   }) + '\n')
 } catch (error) {
-  // 仅传递错误码，启动信息不会泄漏账号、API Key 或登录令牌。
+  // Only the error code is passed on; startup information never leaks accounts, API keys or login tokens.
   process.stdout.write(JSON.stringify({ protocol: 'ofm-desktop-error/v1',
     code: error?.code === 'EEXIST' ? 'DATA_DIRECTORY_IN_USE' : 'START_FAILED' }) + '\n')
   process.exitCode = 1

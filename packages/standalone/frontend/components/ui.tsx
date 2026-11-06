@@ -3,7 +3,7 @@ import { Slot } from '@radix-ui/react-slot'
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
-// 按 shadcn 的源码维护方式组合基础组件，只引入本阶段需要的原语。
+// Compose the base components the way shadcn maintains its source, importing only the primitives needed at this stage.
 export const cn = (...values: ClassValue[]) => twMerge(clsx(values))
 
 type ButtonVariant = 'default' | 'outline' | 'ghost'
@@ -35,12 +35,12 @@ export function Input({ className, invalid = false, ...props }:
   return <input aria-invalid={invalid || undefined} className={cn('ui-input', invalid && 'is-invalid', className)} {...props} />
 }
 
-/** 16px 旋转指示器，配合按钮 busy 态或独立使用；只动 transform。 */
+/** 16px spinning indicator, used with a button’s busy state or on its own; only the transform animates. */
 export function Spinner({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
-  return <span className={cn('ui-spinner', className)} role="status" aria-label="加载中" {...props} />
+  return <span className={cn('ui-spinner', className)} role="status" aria-label="Loading" {...props} />
 }
 
-/** 纯 CSS 提示：把文字放到 tip，悬停/聚焦可见。不引入定位依赖。 */
+/** Pure-CSS tooltip: put the text in tip, visible on hover/focus. No positioning dependency is introduced. */
 export function Tooltip({ className, tip, children, ...props }:
   React.HTMLAttributes<HTMLSpanElement> & { tip: string }) {
   return <span className={cn('ui-tooltip', className)} data-tip={tip} {...props}>{children}</span>
@@ -50,7 +50,7 @@ export function Kbd({ className, ...props }: React.HTMLAttributes<HTMLElement>) 
   return <kbd className={cn('ui-kbd', className)} {...props} />
 }
 
-/** 受控小开关：class 契约与既有 .ui-switch 完全一致（on 表示开启）。 */
+/** Controlled small switch: the class contract matches the existing .ui-switch exactly (on means enabled). */
 export function Switch({ className, checked = false, onCheckedChange, disabled, ...props }:
   Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onChange'> & { checked?: boolean; onCheckedChange?: (next: boolean) => void }) {
   return <button type="button" role="switch" aria-checked={checked} disabled={disabled}

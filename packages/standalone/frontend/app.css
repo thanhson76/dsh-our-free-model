@@ -27,7 +27,7 @@
   --shadow-md: 0 2px 4px -1px rgba(72,58,42,0.05), 0 10px 28px -10px rgba(72,58,42,0.12), 0 0 1px rgba(72,58,42,0.05);
   --shadow-lg: 0 18px 48px -18px rgba(72,58,42,0.22), 0 4px 12px -4px rgba(72,58,42,0.08);
   --ease-out-expo: cubic-bezier(0.32, 0.72, 0, 1);
-  /* 昼主题新增令牌（纸面工作台） */
+  /* New tokens for the day theme (paper workbench) */
   --surface: #fffdfa;
   --surface-hover: #faf7f1;
   --hover: #f2ede3;
@@ -51,7 +51,7 @@
   --danger-line: #efd5d9;
 }
 
-/* ===== 昼 · 流光岁月：光束与纸面肌理 ===== */
+/* ===== Day · Flowing Light Years: light beams and paper texture ===== */
 :root {
   --beam1: radial-gradient(900px 480px at 14% -6%, rgba(255, 209, 140, 0.20), transparent 62%);
   --beam2: radial-gradient(820px 460px at 86% 0%, rgba(255, 177, 92, 0.13), transparent 66%);
@@ -415,8 +415,8 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 }
 
 
-/* ===== 夜 · 赛博终端：信号/扫描/故障 keyframe（全新名字，只动 transform/opacity） ===== */
-/* 主关键帧入口：页面进场时的一瞬"信号接入" */
+/* ===== Night · Cyber Terminal: signal/scan/glitch keyframes (brand-new names, only animate transform/opacity) ===== */
+/* Main keyframe entry: the moment of "signal connection" as the page enters */
 @keyframes cp-boot-in {
   0% { opacity: 0; transform: translate3d(0, 8px, 0) scaleY(0.98); clip-path: inset(0 0 100% 0); }
   35% { opacity: 1; clip-path: inset(0 0 0 0); }
@@ -424,13 +424,13 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
   62% { transform: translate3d(1.5px, 0, 0) scaleY(1); }
   100% { opacity: 1; transform: translate3d(0, 0, 0); clip-path: inset(0 0 0 0); }
 }
-/* 扫描线扫过 */
+/* Scanline sweeps across */
 @keyframes cp-scan-sweep {
   0% { transform: translate3d(-130%, 0, 0); opacity: 0; }
   12% { opacity: 1; }
   100% { transform: translate3d(230%, 0, 0); opacity: 0; }
 }
-/* 故障抖动（短促、单次、不循环） */
+/* Glitch jitter (brief, single, non-looping) */
 @keyframes cp-glitch-pop {
   0% { transform: translate3d(0,0,0); }
   18% { transform: translate3d(-2px, 1px, 0) skewX(-1deg); }
@@ -438,18 +438,18 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
   54% { transform: translate3d(-1px, 0, 0); }
   100% { transform: translate3d(0,0,0); }
 }
-/* 呼吸微光（极轻，用于状态点的"活着"感） */
+/* Breathing glow (very light, for the "alive" feel of status dots) */
 @keyframes cp-pulse-dot {
   0%, 100% { opacity: 1; box-shadow: 0 0 4px var(--cp-glow); }
   50% { opacity: 0.72; box-shadow: 0 0 9px var(--cp-glow); }
 }
-/* 数据微光沿边框流动 */
+/* Data shimmer flows along the border */
 @keyframes cp-edge-flow {
   0% { background-position: 0% 0; }
   100% { background-position: 200% 0; }
 }
 
-/* 昼 · 流光岁月专属：纸张浮起的暖光（不故障，和夜完全两套气质） */
+/* Day · Flowing Light Years only: warm light of paper lifting (no glitch — a completely different character from Night) */
 @keyframes light-surface-rise {
   0% { opacity: 0; transform: translate3d(0, 14px, 0); }
   100% { opacity: 1; transform: translate3d(0, 0, 0); }
@@ -458,11 +458,11 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 
 
 /* ==========================================================================
-   世界观注入 · 全局原子件（昼夜两套"物理身份"）
-   原则：同一个元素，夜=终端 / 昼=纸，不是换色是换身份。
+   Worldview injection · global atomic pieces (two "physical identities" for day and night)
+   Principle: the same element is Night = terminal / Day = paper — not a color change, an identity change.
    ========================================================================== */
 
-/* ---------- 1. 字体栈：数字与数据在夜走等宽终端字 ---------- */
+/* ---------- 1. Font stack: numbers and data use monospace terminal type at night ---------- */
 [data-theme="dark"] code, [data-theme="dark"] pre,
 [data-theme="dark"] .dashboard-metric strong, [data-theme="dark"] .usage-total,
 [data-theme="dark"] .provider-counts strong, [data-theme="dark"] .ch-metric-value,
@@ -472,7 +472,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
 }
-/* 昼：数字用表格数字，气质是"黄铜刻度"不是"终端读数" */
+/* Day: numbers use tabular figures; the character is "brass ticks", not "terminal readings" */
 :root:not([data-theme="dark"]) .dashboard-metric strong,
 :root:not([data-theme="dark"]) .usage-total,
 :root:not([data-theme="dark"]) .provider-counts strong,
@@ -481,14 +481,14 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
   letter-spacing: -0.01em;
 }
 
-/* ---------- 2. 浏览器原生件（AI 最常漏的三件） ---------- */
-/* 选区：夜=终端反白青 / 昼=荧光笔暖黄 */
+/* ---------- 2. Native browser pieces (the three AI most often misses) ---------- */
+/* Selection: Night = terminal inverted cyan / Day = highlighter warm yellow */
 [data-theme="dark"] ::selection { background: rgba(0, 208, 192, 0.22); color: #eafffd; }
 :root:not([data-theme="dark"]) ::selection { background: rgba(240, 180, 80, 0.32); color: #3a2a12; }
-/* 输入光标：夜=青 / 昼=暖墨 */
+/* Text caret: Night = cyan / Day = warm ink */
 [data-theme="dark"] input, [data-theme="dark"] textarea { caret-color: #00d0c0; }
 :root:not([data-theme="dark"]) input, :root:not([data-theme="dark"]) textarea { caret-color: #7a4a12; }
-/* 滚动条：夜=暗轨青灰拇指 / 昼=暖灰拇指 */
+/* Scrollbar: Night = dark track with cyan-gray thumb / Day = warm-gray thumb */
 * { scrollbar-width: thin; scrollbar-color: rgba(122,132,148,0.5) transparent; }
 [data-theme="dark"] * { scrollbar-color: rgba(0,208,192,0.28) transparent; }
 ::-webkit-scrollbar { width: 9px; height: 9px; }
@@ -498,7 +498,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] ::-webkit-scrollbar-thumb { background: rgba(0,208,192,0.22); border: 2px solid transparent; background-clip: content-box; border-radius: 0; }
 [data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: rgba(0,208,192,0.42); background-clip: content-box; }
 
-/* ---------- 3. focus 环：夜=青色刻度 / 昼=琥珀柔光 ---------- */
+/* ---------- 3. Focus ring: Night = cyan ticks / Day = soft amber glow ---------- */
 [data-theme="dark"] button:focus-visible, [data-theme="dark"] a:focus-visible,
 [data-theme="dark"] input:focus-visible, [data-theme="dark"] select:focus-visible,
 [data-theme="dark"] textarea:focus-visible, [data-theme="dark"] summary:focus-visible {
@@ -512,8 +512,8 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
   box-shadow: 0 0 0 3px var(--amber-glow);
 }
 
-/* ---------- 4. 按钮物理身份 ---------- */
-/* 夜 · 终端按键：斜切角 + 发丝描边 + 扫描光悬停 + 按下短促色差 */
+/* ---------- 4. The physical identity of buttons ---------- */
+/* Night · Terminal key: bevel-cut corners + hairline border + scan light on hover + brief color glitch on press */
 [data-theme="dark"] .ui-button, [data-theme="dark"] .primary, [data-theme="dark"] .secondary, [data-theme="dark"] .danger-button {
   border-radius: 2px;
   clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
@@ -544,14 +544,14 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 }
 [data-theme="dark"] .ui-button-ghost { color: var(--muted); clip-path: none; }
 [data-theme="dark"] .ui-button-ghost:hover { background: rgba(0,208,192,0.08); color: #eafffd; border-radius: 3px; }
-/* 夜 · 危险键：全界面唯一允许纯红大色块的地方 */
+/* Night · Danger key: the only place in the whole UI allowed a large block of pure red */
 [data-theme="dark"] .danger-button {
   background: var(--cp-red); color: #fff; border: 1px solid #ff6b68;
   box-shadow: 0 0 16px -4px rgba(233,69,66,0.5);
 }
 [data-theme="dark"] .danger-button:hover { background: #f25552; box-shadow: 0 0 22px -4px rgba(233,69,66,0.65); }
 
-/* 昼 · 纸上凸起：柔和圆角 + 暖棕定向影（投向右下，像被左上的太阳照着） */
+/* Day · Raised on paper: soft rounded corners + warm-brown directional shadow (cast to the lower right, as if lit by a sun at the upper left) */
 :root:not([data-theme="dark"]) .ui-button, :root:not([data-theme="dark"]) .primary,
 :root:not([data-theme="dark"]) .secondary, :root:not([data-theme="dark"]) .danger-button {
   transition: transform 160ms var(--ease-out-expo), box-shadow 220ms var(--ease-out-expo), background-color 160ms var(--ease-out-expo), border-color 160ms var(--ease-out-expo), color 160ms var(--ease-out-expo);
@@ -570,7 +570,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
   box-shadow: 0 1px 2px rgba(var(--warm-shadow), 0.16);
 }
 
-/* ---------- 5. 徽章：夜=方括号终端标签 / 昼=纸标签琥珀油墨 ---------- */
+/* ---------- 5. Badges: Night = bracketed terminal labels / Day = paper labels in amber ink ---------- */
 [data-theme="dark"] .ui-badge {
   font-family: Consolas, monospace; font-size: 10px; letter-spacing: 0.08em;
   border-radius: 1px; clip-path: none; padding: 2px 8px;
@@ -583,7 +583,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 :root:not([data-theme="dark"]) .ui-badge { letter-spacing: 0.01em; }
 :root:not([data-theme="dark"]) .ui-badge-warning { background: var(--amber-soft); color: var(--amber-ink); border-color: var(--amber-line); }
 
-/* ---------- 6. 状态点：夜=小方块待机灯 / 昼=温润实心圆 ---------- */
+/* ---------- 6. Status dots: Night = small square standby light / Day = warm solid circle ---------- */
 [data-theme="dark"] .status-dot {
   width: 7px; height: 7px; border-radius: 1px;
   background: var(--cp-cyan); box-shadow: 0 0 6px var(--cp-glow);
@@ -591,7 +591,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 }
 [data-theme="dark"] .status-dot.paused { background: var(--cp-amber); box-shadow: 0 0 6px rgba(232,163,61,0.5); animation: none; }
 
-/* ---------- 7. 开关：夜=滑动触点带光 / 昼=纸面黄铜拨杆 ---------- */
+/* ---------- 7. Switches: Night = sliding contact with light / Day = brass toggle lever on paper ---------- */
 [data-theme="dark"] .ui-switch {
   background: rgba(255,255,255,0.05); border: 1px solid var(--cp-cyan-line); border-radius: 2px;
 }
@@ -605,10 +605,10 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 
 
 /* ==========================================================================
-   世界观注入 · 骨架 / 卡片 / 登录页 / 遥测文本
+   Worldview injection · skeleton / cards / login page / telemetry text
    ========================================================================== */
 
-/* ---------- 8. 侧边栏：夜=终端控制台面板 / 昼=纸面书脊 ---------- */
+/* ---------- 8. Sidebar: Night = terminal console panel / Day = paper book spine ---------- */
 [data-theme="dark"] .sidebar {
   background: linear-gradient(180deg, rgba(16,17,25,0.85), rgba(11,12,18,0.92));
   border-right: 1px solid var(--cp-red-line);
@@ -647,7 +647,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] .sidebar-support button { color: var(--cp-cyan); }
 [data-theme="dark"] .sidebar-support button:hover { color: #63e8da; }
 
-/* 昼 · 侧边栏纸面书脊 */
+/* Day · sidebar paper book spine */
 :root:not([data-theme="dark"]) .sidebar { background: linear-gradient(180deg, #fffdfa, #fbf7f0); }
 :root:not([data-theme="dark"]) .nav-group-label { letter-spacing: 0.10em; }
 :root:not([data-theme="dark"]) .console-nav-item.selected {
@@ -655,7 +655,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
   box-shadow: inset 2px 0 0 var(--green);
 }
 
-/* ---------- 9. 顶栏：夜=状态栏带遥测 / 昼=纸面抬头 ---------- */
+/* ---------- 9. Top bar: Night = status bar with telemetry / Day = paper letterhead ---------- */
 [data-theme="dark"] .topbar {
   background: rgba(11,12,18,0.75); backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--cp-red-line);
@@ -667,7 +667,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] .console-topbar-status > span:last-child::before { content: "● "; font-size: 8px; }
 [data-theme="dark"] .console-breadcrumb strong { color: #eafffd; }
 
-/* ---------- 10. 卡片：夜=切角芯片板 / 昼=纸上浮起 ---------- */
+/* ---------- 10. Cards: Night = bevel-cut chip board / Day = floating on paper ---------- */
 [data-theme="dark"] .ui-card {
   border-radius: 0;
   clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
@@ -676,7 +676,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
   box-shadow: var(--shadow-md);
   position: relative;
 }
-/* 四角 L 型瞄准刻度 */
+/* L-shaped aiming ticks at the four corners */
 [data-theme="dark"] .ui-card::after {
   content: ""; position: absolute; inset: 0; pointer-events: none;
   background:
@@ -699,7 +699,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] .card-heading h2 { letter-spacing: 0.02em; }
 [data-theme="dark"] .card-heading p { color: var(--muted); }
 
-/* 昼 · 纸上浮起 */
+/* Day · floating on paper */
 :root:not([data-theme="dark"]) .ui-card {
   border: 1px solid var(--line);
   box-shadow: 1px 2px 0 rgba(var(--warm-shadow), 0.05), 0 10px 26px -14px rgba(var(--warm-shadow), 0.20);
@@ -710,7 +710,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
   box-shadow: 1px 4px 0 rgba(var(--warm-shadow), 0.07), 0 16px 34px -14px rgba(var(--warm-shadow), 0.28);
 }
 
-/* ---------- 11. 世界观遥测文本：夜主题角落的"系统串号"（低对比、有但不吵） ---------- */
+/* ---------- 11. Worldview telemetry text: the night theme corner's "system serial string" (low contrast — present but not noisy) ---------- */
 [data-theme="dark"] .dashboard-heading, [data-theme="dark"] .page-heading { position: relative; }
 [data-theme="dark"] .heading-eyebrow, [data-theme="dark"] .eyebrow {
   font-family: Consolas, monospace; letter-spacing: 0.18em; text-transform: uppercase;
@@ -721,7 +721,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] .console-sidebar-footer > div { font-family: Consolas, monospace; font-size: 11px; letter-spacing: 0.04em; }
 [data-theme="dark"] .console-sidebar-footer small { font-family: Consolas, monospace; }
 
-/* ---------- 12. 登录页：夜=信号接入 / 昼=纸上落款 ---------- */
+/* ---------- 12. Login page: Night = signal connection / Day = signature on paper ---------- */
 [data-theme="dark"] .login-card {
   clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
   border: 1px solid var(--cp-cyan-line); border-radius: 0;
@@ -737,10 +737,10 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 
 
 /* ==========================================================================
-   世界观注入 · 概览页（图表 / 快速连接 / 来源行 / 指标卡）
+   Worldview injection · Overview page (charts / quick connect / source rows / metric cards)
    ========================================================================== */
 
-/* ---------- 13. 概览指标卡 ---------- */
+/* ---------- 13. Overview metric cards ---------- */
 [data-theme="dark"] .dashboard-metric strong {
   font-size: 30px; color: #eafffd; letter-spacing: 0.01em;
   text-shadow: 0 0 18px rgba(0,208,192,0.28);
@@ -749,7 +749,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 :root:not([data-theme="dark"]) .dashboard-metric strong { color: #2a2018; letter-spacing: -0.02em; }
 :root:not([data-theme="dark"]) .ov-metric-icon { color: var(--amber); }
 
-/* ---------- 14. 概览图表（柱状） ---------- */
+/* ---------- 14. Overview chart (bars) ---------- */
 [data-theme="dark"] .dashboard-chart-bar {
   background: linear-gradient(180deg, rgba(0,208,192,0.85), rgba(0,208,192,0.35)),
     repeating-linear-gradient(0deg, transparent 0 2px, rgba(0,0,0,0.18) 2px 3px);
@@ -773,7 +773,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
   box-shadow: 1px 3px 0 rgba(var(--warm-shadow), 0.12), 0 0 14px -2px var(--amber-glow), inset 0 1px 0 rgba(255,255,255,0.6);
 }
 
-/* ---------- 15. 快速连接（API 接入卡） ---------- */
+/* ---------- 15. Quick connect (API access card) ---------- */
 [data-theme="dark"] .quick-icon { color: var(--cp-cyan); }
 [data-theme="dark"] .quick-endpoint {
   background: rgba(0,0,0,0.35); border: 1px solid var(--cp-cyan-line); border-radius: 2px;
@@ -791,7 +791,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 :root:not([data-theme="dark"]) .quick-endpoint code { color: var(--amber-ink); }
 :root:not([data-theme="dark"]) .copy-feedback { color: var(--amber-ink); }
 
-/* ---------- 16. 来源行（source-row） ---------- */
+/* ---------- 16. Source rows (source-row) ---------- */
 [data-theme="dark"] .source-row {
   border-radius: 2px; border-left: 2px solid transparent;
   transition: border-color 180ms var(--ease-out-expo), background-color 180ms var(--ease-out-expo), transform 180ms var(--ease-out-expo);
@@ -803,7 +803,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 :root:not([data-theme="dark"]) .source-row:hover { background: var(--surface-hover); transform: translateX(2px); }
 :root:not([data-theme="dark"]) .source-icon { color: var(--amber); }
 
-/* ---------- 17. 运行检查 / 失败列表（红色只在真错误时） ---------- */
+/* ---------- 17. Runtime checks / failure list (red only for real errors) ---------- */
 [data-theme="dark"] .ov-failure-row { border-left: 2px solid var(--cp-red); font-family: Consolas, monospace; }
 [data-theme="dark"] .ov-failure-row span { color: #ff8a87; }
 [data-theme="dark"] .runtime-check svg { color: var(--cp-cyan); }
@@ -815,18 +815,18 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 }
 
 /* ==========================================================================
-   深色主题（夜）—— 深海仪器
-   设计基调：深空蓝灰分层 + 月白文字 + 微青品牌蓝 + 克制微光
-   层次：L0 页面 #08090d < L1 侧边栏/顶栏 #0d0f14 < L2 卡片 #101119
+   Dark theme (Night) — deep-sea instrument
+   Design tone: layered deep-space blue-gray + moon-white text + faint cyan brand blue + restrained glow
+   Layers: L0 page #08090d < L1 sidebar/top bar #0d0f14 < L2 cards #101119
    ========================================================================== */
 [data-theme="dark"] {
   color-scheme: dark;
-  /* 底色：夜之城的近黑炭蓝，暗得足够，光才有重量 */
+  /* Base color: the near-black charcoal blue of a night city — dark enough that light has weight */
   --ink: #dfe6e9;
   --muted: #8d99a5;
   --line: rgba(233, 69, 66, 0.16);
   --paper: #0a0b10;
-  /* --green 为主强调槽位，夜主题切换为扫描青 */
+  /* --green is the main accent slot; the night theme switches it to scan cyan */
   --green: #00d0c0;
   --dsw-alias-label-primary: #dfe6e9;
   --dsw-alias-label-secondary: #8d99a5;
@@ -841,7 +841,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
   --dsw-alias-state-business-primary: #e94542;
   --dsw-alias-accent-primary: #e94542;
   --dsw-alias-accent-secondary: rgba(233, 69, 66, 0.14);
-  /* 夜主题专属世界令牌 */
+  /* Night-theme-only world tokens */
   --cp-red: #e94542;
   --cp-red-soft: rgba(233, 69, 66, 0.13);
   --cp-red-line: rgba(233, 69, 66, 0.34);
@@ -857,7 +857,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
   --shadow-lg: 0 20px 50px -18px rgba(0,0,0,0.65), 0 0 24px -6px rgba(0,208,192,0.10);
 }
 
-/* ---------- 全局深色基底 ---------- */
+/* ---------- Global dark base ---------- */
 [data-theme="dark"] body { background: var(--paper); color: var(--ink); }
 [data-theme="dark"] body { background: var(--paper); color: var(--ink); }
 [data-theme="dark"] body::before {
@@ -874,12 +874,12 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
   content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background: radial-gradient(120% 90% at 50% 40%, transparent 58%, rgba(4, 5, 8, 0.42) 100%);
 }
-/* 侧边栏吸附靠基础层的 position: sticky（z-index 也已由基础层给到 1）。
-   这里绝不能给侧边栏补 position，否则它会退回 relative，跟着主界面一起滚走。 */
+/* The sidebar's sticking relies on the base layer's position: sticky (the base layer also already gives it z-index 1).
+   Never add a position to the sidebar here, or it will fall back to relative and scroll away with the main UI. */
 [data-theme="dark"] .topbar, [data-theme="dark"] main, [data-theme="dark"] .app-shell > *:not(.sidebar) { position: relative; z-index: 1; }
 [data-theme="dark"] ::selection { background: rgba(0, 208, 192, 0.24); color: #eafffd; }
 
-/* ---------- 侧边栏深色 ---------- */
+/* ---------- Sidebar dark ---------- */
 [data-theme="dark"] .sidebar {
   background: #0d0f14;
   border-right-color: rgba(255, 255, 255, 0.05);
@@ -909,7 +909,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] .status-dot { background: var(--dsw-alias-state-success-primary); box-shadow: 0 0 6px rgba(62, 207, 160, 0.4); }
 [data-theme="dark"] .status-dot.paused { background: #d39319; box-shadow: 0 0 6px rgba(211, 147, 25, 0.35); }
 
-/* ---------- 顶栏深色 ---------- */
+/* ---------- Top bar dark ---------- */
 [data-theme="dark"] .topbar {
   background: rgba(13, 15, 20, 0.85);
   border-bottom-color: rgba(255, 255, 255, 0.05);
@@ -921,7 +921,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] .console-topbar-status { color: var(--dsw-alias-label-tertiary); }
 [data-theme="dark"] .topbar-divider { background: rgba(255, 255, 255, 0.08); }
 
-/* ---------- 卡片深色 ---------- */
+/* ---------- Cards dark ---------- */
 [data-theme="dark"] .ui-card {
   background: #101119;
   border-color: rgba(255, 255, 255, 0.05);
@@ -933,18 +933,18 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045), 0 8px 28px -10px rgba(0, 0, 0, 0.5);
 }
 
-/* ---------- 标题深色 ---------- */
+/* ---------- Headings dark ---------- */
 [data-theme="dark"] h1, [data-theme="dark"] h2 { color: var(--ink); }
 [data-theme="dark"] .heading-eyebrow, [data-theme="dark"] .eyebrow { color: var(--dsw-alias-label-tertiary); letter-spacing: 0.06em; }
 [data-theme="dark"] .dashboard-heading p, [data-theme="dark"] .page-heading p { color: var(--dsw-alias-label-secondary); }
 
-/* ---------- 指标卡深色 ---------- */
+/* ---------- Metric cards dark ---------- */
 [data-theme="dark"] .dashboard-metric > div > span { color: var(--dsw-alias-label-tertiary); }
 [data-theme="dark"] .dashboard-metric strong { color: var(--ink); text-shadow: 0 0 20px rgba(232, 236, 241, 0.06); }
 [data-theme="dark"] .dashboard-metric p { color: var(--dsw-alias-label-tertiary); }
 [data-theme="dark"] .dashboard-metric svg { color: var(--dsw-alias-label-tertiary); }
 
-/* ---------- 按钮深色 ---------- */
+/* ---------- Buttons dark ---------- */
 [data-theme="dark"] .ui-button-default, [data-theme="dark"] .primary {
   background: var(--green); color: #0a0f1e;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 1px 3px rgba(0, 0, 0, 0.35);
@@ -977,7 +977,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] .ui-button-ghost:hover { background: rgba(255, 255, 255, 0.05); color: var(--ink); }
 [data-theme="dark"] .ui-button-ghost:active { transform: scale(0.97); }
 
-/* ---------- Badge 深色 ---------- */
+/* ---------- Badge dark ---------- */
 [data-theme="dark"] .ui-badge {
   background: rgba(255, 255, 255, 0.045);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -996,7 +996,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
   color: var(--green);
 }
 
-/* ---------- 输入框深色 ---------- */
+/* ---------- Inputs dark ---------- */
 [data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea, [data-theme="dark"] .ui-input {
   background: #10131a;
   border-color: rgba(255, 255, 255, 0.065);
@@ -1018,7 +1018,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
   appearance: none; -webkit-appearance: none;
 }
 
-/* ---------- 开关深色（settings-toggle） ---------- */
+/* ---------- Switch dark (settings-toggle) ---------- */
 [data-theme="dark"] .settings-toggle {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.07);
@@ -1048,7 +1048,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
   box-shadow: 0 0 0 3px rgba(0, 208, 192, 0.18), 0 0 14px rgba(0, 208, 192, 0.15);
 }
 
-/* ---------- 小开关深色（ui-switch） ---------- */
+/* ---------- Small switch dark (ui-switch) ---------- */
 [data-theme="dark"] .ui-switch { background: rgba(255, 255, 255, 0.09); transition: background 250ms cubic-bezier(.32,.72,0,1); }
 [data-theme="dark"] .ui-switch span {
   background: var(--dsw-alias-label-secondary);
@@ -1058,7 +1058,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] .ui-switch.on { background: var(--green); box-shadow: 0 0 10px rgba(0, 208, 192, 0.18); }
 [data-theme="dark"] .ui-switch.on span { background: #fff; }
 
-/* ---------- 通知条深色 ---------- */
+/* ---------- Notice bars dark ---------- */
 [data-theme="dark"] .notice {
   background: rgba(62, 207, 160, 0.06);
   border: 1px solid rgba(62, 207, 160, 0.15);
@@ -1075,7 +1075,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
   color: var(--dsw-alias-state-error-primary);
 }
 
-/* ---------- 图表深色 ---------- */
+/* ---------- Charts dark ---------- */
 [data-theme="dark"] .dashboard-chart-bar { background: var(--green); box-shadow: 0 0 8px rgba(0, 208, 192, 0.1); }
 [data-theme="dark"] .dashboard-chart-bar.zero { background: rgba(255, 255, 255, 0.07); box-shadow: none; }
 [data-theme="dark"] .dashboard-chart-bar:hover { filter: brightness(1.15); }
@@ -1086,7 +1086,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] .chart-empty small { color: var(--dsw-alias-label-tertiary); opacity: 0.7; }
 [data-theme="dark"] .chart-empty svg { color: var(--dsw-alias-label-tertiary); }
 
-/* ---------- 用量页深色 ---------- */
+/* ---------- Usage page dark ---------- */
 [data-theme="dark"] .usage-day-bar { background: var(--green); box-shadow: 0 0 8px rgba(0, 208, 192, 0.1); }
 [data-theme="dark"] .usage-day-bar.zero { background: rgba(255, 255, 255, 0.07); box-shadow: none; }
 [data-theme="dark"] .usage-day-bar:hover { filter: brightness(1.15); }
@@ -1109,7 +1109,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] .usage-empty svg { color: var(--dsw-alias-label-tertiary); opacity: 0.6; }
 [data-theme="dark"] .usage-window-empty { color: var(--dsw-alias-label-tertiary); }
 
-/* ---------- 模型页深色 ---------- */
+/* ---------- Models page dark ---------- */
 [data-theme="dark"] .model-summary { border-bottom-color: rgba(255, 255, 255, 0.05); color: var(--dsw-alias-label-secondary); }
 [data-theme="dark"] .model-summary > span:last-child { color: var(--dsw-alias-label-tertiary); }
 [data-theme="dark"] .model-search > svg { color: var(--dsw-alias-label-tertiary); }
@@ -1137,7 +1137,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] .model-empty { color: var(--dsw-alias-label-tertiary); }
 [data-theme="dark"] .model-empty svg { color: var(--dsw-alias-label-tertiary); opacity: 0.5; }
 
-/* ---------- 设置页深色 ---------- */
+/* ---------- Settings page dark ---------- */
 [data-theme="dark"] .settings-card-heading > svg { color: var(--green); }
 [data-theme="dark"] .settings-note { background: rgba(0, 208, 192, 0.06); color: var(--dsw-alias-label-secondary); border: 1px solid rgba(0, 208, 192, 0.1); }
 [data-theme="dark"] .settings-footer > span { color: var(--dsw-alias-label-tertiary); }
@@ -1145,7 +1145,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] .settings-number input[aria-invalid=true] { border-color: var(--dsw-alias-state-error-primary); }
 [data-theme="dark"] .settings-field-error { color: var(--dsw-alias-state-error-primary); }
 
-/* ---------- API 接入页深色 ---------- */
+/* ---------- API access page dark ---------- */
 [data-theme="dark"] .quick-connect {
   background: #101119; border-top-color: var(--green);
   border-color: rgba(0, 208, 192, 0.12);
@@ -1176,7 +1176,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] .text-button { color: var(--green); }
 [data-theme="dark"] .text-button:hover { color: #63e8da; }
 
-/* ---------- 来源列表深色 ---------- */
+/* ---------- Source list dark ---------- */
 [data-theme="dark"] .source-row { border-bottom-color: rgba(255, 255, 255, 0.03); }
 [data-theme="dark"] .source-row:hover { background: rgba(255, 255, 255, 0.02); }
 [data-theme="dark"] .source-icon { background: rgba(255, 255, 255, 0.04); color: var(--dsw-alias-label-secondary); }
@@ -1187,7 +1187,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] .source-row:nth-child(2) .source-icon { background: rgba(62, 207, 160, 0.08); color: var(--dsw-alias-state-success-primary); }
 [data-theme="dark"] .source-row:nth-child(3) .source-icon { background: rgba(155, 91, 137, 0.1); color: #c88bbd; }
 
-/* ---------- 运行检查深色 ---------- */
+/* ---------- Runtime checks dark ---------- */
 [data-theme="dark"] .runtime-check { color: var(--dsw-alias-label-secondary); border-bottom-color: rgba(255, 255, 255, 0.03); }
 [data-theme="dark"] .runtime-check svg { color: var(--dsw-alias-state-success-primary); }
 [data-theme="dark"] .runtime-check strong { color: var(--ink); }
@@ -1197,7 +1197,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] .failure-list span { color: var(--ink); }
 [data-theme="dark"] .failure-list small { color: var(--dsw-alias-label-tertiary); }
 
-/* ---------- 渠道页深色 ---------- */
+/* ---------- Channels page dark ---------- */
 [data-theme="dark"] .channel-summary-strip { color: var(--dsw-alias-label-secondary); border-bottom-color: rgba(255, 255, 255, 0.05); }
 [data-theme="dark"] .channel-summary-strip strong { color: var(--ink); }
 [data-theme="dark"] .channel-search > svg { color: var(--dsw-alias-label-tertiary); }
@@ -1241,7 +1241,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] .checkin-control { color: var(--dsw-alias-label-secondary); }
 [data-theme="dark"] .detail-security-note { color: var(--dsw-alias-label-tertiary); }
 
-/* ---------- 渠道页内嵌组件深色（ofm_root） ---------- */
+/* ---------- Channel page embedded components dark (ofm_root) ---------- */
 [data-theme="dark"] .ofm_root { color: var(--ink); }
 [data-theme="dark"] .ofm_hero { background: #0d0f14; border-color: rgba(255, 255, 255, 0.06); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 1px 3px rgba(0, 0, 0, 0.3); }
 [data-theme="dark"] .ofm_pill { background: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.05); color: var(--dsw-alias-label-secondary); }
@@ -1339,7 +1339,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] .ofm_root .ofm_chanstate { background: rgba(62, 207, 160, 0.07); color: var(--dsw-alias-state-success-primary); }
 [data-theme="dark"] .ofm_root .ofm_chanlogo { background: rgba(0, 208, 192, 0.09); }
 
-/* ---------- 登录页深色 ---------- */
+/* ---------- Login page dark ---------- */
 [data-theme="dark"] .login-shell, [data-theme="dark"] .loading-screen { background: var(--paper); }
 [data-theme="dark"] .login-shell::before {
   content: ""; position: fixed; inset: 0; pointer-events: none;
@@ -1370,7 +1370,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] .loading-screen .brand-mark { color: var(--ink); }
 [data-theme="dark"] .loading-screen p { color: var(--dsw-alias-label-tertiary); }
 
-/* ---------- 焦点环深色 ---------- */
+/* ---------- Focus ring dark ---------- */
 [data-theme="dark"] button:focus-visible, [data-theme="dark"] a:focus-visible, [data-theme="dark"] input:focus-visible,
 [data-theme="dark"] select:focus-visible, [data-theme="dark"] textarea:focus-visible, [data-theme="dark"] summary:focus-visible {
   outline: 2px solid var(--green);
@@ -1378,23 +1378,23 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
   box-shadow: 0 0 0 4px rgba(0, 208, 192, 0.1), 0 0 12px rgba(0, 208, 192, 0.08);
 }
 
-/* ---------- 滚动条深色 ---------- */
+/* ---------- Scrollbar dark ---------- */
 [data-theme="dark"] * { scrollbar-color: rgba(255, 255, 255, 0.14) transparent; }
 [data-theme="dark"] *::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.07); border-radius: 4px; }
 [data-theme="dark"] *::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.13); box-shadow: 0 0 6px rgba(255, 255, 255, 0.04); }
 [data-theme="dark"] *::-webkit-scrollbar-track { background: transparent; }
 
-/* ---------- footer 深色 ---------- */
+/* ---------- footer dark ---------- */
 [data-theme="dark"] footer { color: var(--dsw-alias-label-tertiary); }
 [data-theme="dark"] footer span { color: var(--green); }
 
-/* ---------- 图表容器背景透明化 ---------- */
+/* ---------- Chart container background made transparent ---------- */
 [data-theme="dark"] .dashboard-chart { background: transparent; }
 [data-theme="dark"] .usage-panel .dashboard-chart { background: transparent; }
 [data-theme="dark"] .usage-total { color: var(--ink); }
 [data-theme="dark"] .usage-total span { color: var(--dsw-alias-label-tertiary); }
 
-/* ---------- 卡片底部 / 卡片标题深色 ---------- */
+/* ---------- Card footer / card heading dark ---------- */
 [data-theme="dark"] .card-foot { color: var(--dsw-alias-label-tertiary); border-top-color: rgba(255, 255, 255, 0.04); }
 [data-theme="dark"] .card-foot button { color: var(--green); }
 [data-theme="dark"] .card-foot button:hover { color: #63e8da; }
@@ -1402,12 +1402,12 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] .card-heading p { color: var(--dsw-alias-label-tertiary); }
 [data-theme="dark"] .card-heading svg { color: var(--dsw-alias-label-tertiary); }
 
-/* ---------- 表格通用深色 ---------- */
+/* ---------- Table general dark ---------- */
 [data-theme="dark"] th { color: var(--dsw-alias-label-tertiary); border-bottom-color: rgba(255, 255, 255, 0.05); }
 [data-theme="dark"] td { border-bottom-color: rgba(255, 255, 255, 0.035); }
 [data-theme="dark"] tbody tr:hover td { background: rgba(255, 255, 255, 0.02); }
 
-/* ---------- 动效：深色专属节奏 ---------- */
+/* ---------- Motion: dark-only rhythm ---------- */
 [data-theme="dark"] .console-nav-item,
 [data-theme="dark"] .ui-button,
 [data-theme="dark"] .primary,
@@ -1431,7 +1431,7 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
   transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-/* ---------- 状态点呼吸微光 ---------- */
+/* ---------- Status dot breathing glow ---------- */
 @keyframes darkPulse {
   0%, 100% { box-shadow: 0 0 4px rgba(62, 207, 160, 0.3); }
   50% { box-shadow: 0 0 8px rgba(62, 207, 160, 0.5); }
@@ -1443,16 +1443,16 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 }
 [data-theme="dark"] .status-dot.paused { animation: darkPulsePaused 3s ease-in-out infinite; }
 
-/* ---------- 旋转加载 ---------- */
+/* ---------- Spinning loader ---------- */
 [data-theme="dark"] .spinning { animation: spin 1s linear infinite !important; }
 
-/* ---------- 深色减弱动效 ---------- */
+/* ---------- Dark reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   [data-theme="dark"] .status-dot,
   [data-theme="dark"] .status-dot.paused { animation: none !important; }
 }
 
-/* ---------- 补充遗漏选择器（兼容旧版） ---------- */
+/* ---------- Supplementary missed selectors (legacy compatibility) ---------- */
 [data-theme="dark"] .connect-button { width: 100%; }
 [data-theme="dark"] .dashboard-chart-column span { color: var(--dsw-alias-label-tertiary); }
 [data-theme="dark"] .model-empty h2 { color: var(--dsw-alias-label-secondary); }
@@ -1462,37 +1462,37 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f2ede4; borde
 [data-theme="dark"] .ui-switch:checked span { background: #fff; }
 
 /* ==========================================================================
-   组件系统与骨架层精修（redesign-a）
-   范围：ui.tsx / shell.tsx / app.tsx 对应的样式
-   原则：只新增 class 与增强，不删除任何既有 class；昼夜双主题都覆盖
-   动画：只动 transform / opacity；分级 100-150ms / 150-300ms / 300-500ms
+   Component system and skeleton layer refinement (redesign-a)
+   Scope: styles corresponding to ui.tsx / shell.tsx / app.tsx
+   Principle: only add classes and enhancements, delete no existing class; both day and night themes are covered
+   Motion: only transform / opacity; tiers 100-150ms / 150-300ms / 300-500ms
    ========================================================================== */
 
-/* ---------- 主题切换过渡（避免生硬闪变） ---------- */
+/* ---------- Theme-switch transition (avoids a harsh flash) ---------- */
 body, .app-shell, .sidebar, .topbar, .ui-card, .login-card, .login-shell, .loading-screen {
   transition: background-color 300ms var(--ease-out-expo), color 300ms var(--ease-out-expo), border-color 300ms var(--ease-out-expo);
 }
 
-/* ---------- 主题切换：从按钮位置向四周扩散 ----------
-   由 shell.tsx 的 toggle 调 startViewTransition 驱动；这里只描述"新主题"如何盖住旧主题。
-   扩散圆心取 --theme-reveal-x/y（按钮中心，视口坐标），半径取到视口最远角。
-   不支持 View Transition 的宿主（或 prefers-reduced-motion）由 JS 直接切换，看不到这一段。 */
+/* ---------- Theme switch: spreads outward from the button position ----------
+   Driven by shell.tsx's toggle calling startViewTransition; this only describes how the "new theme" covers the old theme.
+   The spread's center is --theme-reveal-x/y (button center, viewport coordinates), and the radius reaches the farthest viewport corner.
+   Hosts without View Transition support (or prefers-reduced-motion) are switched directly by JS and never see this. */
 ::view-transition-old(root) {
   animation: none;
-  /* 旧主题保持不动，等新主题的圆盘扫过来 */
+  /* The old theme stays still, waiting for the new theme's disc to sweep over */
   z-index: 1;
 }
 ::view-transition-new(root) {
   z-index: 2;
   animation: theme-reveal-in 560ms var(--ease-out-expo) both;
 }
-/* 关掉 root 分组自带的缩放/淡入，只留上面这一条扩散 */
+/* Turn off the root group's built-in scale/fade-in, keeping only the spread above */
 ::view-transition-group(root) { animation: none; }
 @keyframes theme-reveal-in {
   from { clip-path: circle(0 at var(--theme-reveal-x, 50%) var(--theme-reveal-y, 50%)); }
   to { clip-path: circle(var(--theme-reveal-r, 150vmax) at var(--theme-reveal-x, 50%) var(--theme-reveal-y, 50%)); }
 }
-/* 扩散进行中：暂停 300ms 的底色过渡，避免新主题快照抓到"过渡中间色" */
+/* While spreading: pause the 300ms base-color transition so the new-theme snapshot does not capture a "mid-transition color" */
 .theme-transitioning, .theme-transitioning * {
   transition: none !important;
 }
@@ -1500,7 +1500,7 @@ body, .app-shell, .sidebar, .topbar, .ui-card, .login-card, .login-shell, .loadi
   ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; }
 }
 
-/* ---------- Spinner（旋转指示器，只动 transform） ---------- */
+/* ---------- Spinner (rotating indicator, only animates transform) ---------- */
 .ui-spinner {
   display: inline-block; flex-shrink: 0; width: 14px; height: 14px;
   border: 2px solid rgba(38, 86, 201, 0.2); border-top-color: currentColor;
@@ -1510,7 +1510,7 @@ body, .app-shell, .sidebar, .topbar, .ui-card, .login-card, .login-shell, .loadi
 .ui-button-spinner { width: 13px; height: 13px; border-width: 2px; }
 .primary .ui-spinner, .ui-button-default .ui-spinner { border-color: rgba(255, 255, 255, 0.28); border-top-color: #fff; }
 
-/* ---------- Button 精修：状态分层 + 按压感 ---------- */
+/* ---------- Button refinement: state layering + press feel ---------- */
 .ui-button, .primary, .secondary {
   position: relative;
   transition: background 150ms var(--ease-out-expo), color 150ms var(--ease-out-expo),
@@ -1526,11 +1526,11 @@ body, .app-shell, .sidebar, .topbar, .ui-card, .login-card, .login-shell, .loadi
   opacity: 0.5; transform: none; box-shadow: none;
 }
 .ui-button.is-busy { pointer-events: none; }
-/* 尺寸变体（默认 md 保持原样） */
+/* Size variants (the default md stays as-is) */
 .ui-button-sm { min-height: 28px; padding: 4px 10px; font-size: 11px; gap: 6px; }
 .ui-button-lg { min-height: 42px; padding: 11px 18px; font-size: 13px; }
 .ui-button-icon { min-height: 32px; min-width: 32px; padding: 7px; justify-content: center; }
-/* 昼主题 hover 微浮雕 */
+/* Day theme hover slight emboss */
 .ui-button-default:hover:not(:disabled), .primary:hover:not(:disabled) {
   box-shadow: 0 1px 3px rgba(72, 58, 42, 0.14), 0 6px 16px -6px rgba(38, 86, 201, 0.38);
 }
@@ -1538,7 +1538,7 @@ body, .app-shell, .sidebar, .topbar, .ui-card, .login-card, .login-shell, .loadi
   box-shadow: 0 1px 2px rgba(72, 58, 42, 0.06);
 }
 
-/* ---------- Card 精修：双层 bezel（外壳 hairline + 内芯高光） ---------- */
+/* ---------- Card refinement: double bezel (outer shell hairline + inner core highlight) ---------- */
 .ui-card {
   box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   transition: transform 200ms var(--ease-out-expo), box-shadow 200ms var(--ease-out-expo), border-color 200ms var(--ease-out-expo);
@@ -1548,7 +1548,7 @@ body, .app-shell, .sidebar, .topbar, .ui-card, .login-card, .login-shell, .loadi
 .ui-card-interactive { cursor: pointer; }
 .ui-card-interactive:active { transform: translateY(0) scale(0.995); transition-duration: 100ms; }
 
-/* ---------- Badge 精修：字重/状态点 ---------- */
+/* ---------- Badge refinement: font weight / status dot ---------- */
 .ui-badge { font-weight: 500; letter-spacing: 0.01em; }
 .ui-badge-dot {
   display: inline-block; width: 5px; height: 5px; border-radius: 50%;
@@ -1557,7 +1557,7 @@ body, .app-shell, .sidebar, .topbar, .ui-card, .login-card, .login-shell, .loadi
 .ui-badge-success .ui-badge-dot { box-shadow: 0 0 0 2px rgba(30, 138, 99, 0.16); }
 .ui-badge-blue .ui-badge-dot { box-shadow: 0 0 0 2px rgba(38, 86, 201, 0.16); }
 
-/* ---------- Input 精修：聚焦光晕 / invalid / placeholder ---------- */
+/* ---------- Input refinement: focus halo / invalid / placeholder ---------- */
 .ui-input:focus-visible {
   border-color: var(--green);
   box-shadow: 0 0 0 3px var(--accent-glow), 0 0 16px -4px rgba(38, 86, 201, 0.18);
@@ -1579,7 +1579,7 @@ input, textarea { caret-color: var(--green); }
   color: var(--muted);
 }
 
-/* ---------- Tooltip（纯 CSS，无需定位依赖） ---------- */
+/* ---------- Tooltip (pure CSS, no positioning dependency) ---------- */
 .ui-tooltip { position: relative; display: inline-flex; }
 .ui-tooltip::after {
   content: attr(data-tip); position: absolute; left: 50%; bottom: calc(100% + 7px);
@@ -1591,7 +1591,7 @@ input, textarea { caret-color: var(--green); }
 }
 .ui-tooltip:hover::after, .ui-tooltip:focus-within::after { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* ---------- 侧边栏：导航选中指示器（左侧小竖条） ---------- */
+/* ---------- Sidebar: navigation selected indicator (small vertical bar on the left) ---------- */
 .console-nav-item { position: relative; }
 .console-nav-indicator {
   position: absolute; left: 0; top: 50%; width: 3px; height: 20px; border-radius: 0 2px 2px 0;
@@ -1606,20 +1606,20 @@ input, textarea { caret-color: var(--green); }
   .console-nav-indicator { display: none; }
 }
 
-/* ---------- 侧边栏：导航分组标签质感 ---------- */
+/* ---------- Sidebar: navigation group label texture ---------- */
 .nav-group-label {
   font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
   font-size: 10px; color: var(--dsw-alias-label-tertiary);
 }
 
-/* ---------- 侧边栏底部状态区：呼吸效果 ---------- */
+/* ---------- Sidebar bottom status area: breathing effect ---------- */
 .console-sidebar-footer .status-dot { animation: status-breathe 2.6s ease-in-out infinite; }
 @keyframes status-breathe {
   0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(29, 154, 107, 0.25); }
   50% { opacity: 0.65; box-shadow: 0 0 0 3px rgba(29, 154, 107, 0); }
 }
 
-/* ---------- ThemeToggle：Sun/Moon 旋转缩放过渡 ---------- */
+/* ---------- ThemeToggle: Sun/Moon rotate-scale transition ---------- */
 .theme-toggle { overflow: hidden; }
 .theme-toggle-track { position: relative; display: grid; width: 16px; height: 16px; }
 .theme-toggle-icon {
@@ -1631,25 +1631,25 @@ input, textarea { caret-color: var(--green); }
 .theme-toggle-track[data-theme="dark"] .theme-toggle-moon { transform: rotate(-90deg) scale(0.4); opacity: 0; }
 .theme-toggle-track[data-theme="dark"] .theme-toggle-sun { transform: rotate(0deg) scale(1); opacity: 1; }
 
-/* ---------- 顶栏：面包屑当前页入场 ---------- */
+/* ---------- Top bar: breadcrumb current-page entrance ---------- */
 .console-breadcrumb-current { display: inline-block; animation: crumb-in 220ms var(--ease-out-expo); }
 @keyframes crumb-in { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ---------- 页面切换入场（key=page 触发） ---------- */
+/* ---------- Page-switch entrance (triggered by key=page) ---------- */
 section.page { animation: page-enter 260ms var(--ease-out-expo); }
 @keyframes page-enter {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ---------- 通知条进入动画（slide + fade，只动 transform/opacity） ---------- */
+/* ---------- Notice bar entrance animation (slide + fade, only transform/opacity) ---------- */
 .notice-enter { animation: notice-in 280ms var(--ease-out-expo); }
 @keyframes notice-in {
   from { opacity: 0; transform: translateY(-8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ---------- 登录页：昼主题呼吸纸面 ---------- */
+/* ---------- Login page: day theme breathing paper surface ---------- */
 .login-shell {
   background:
     radial-gradient(880px 420px at 50% 28%, rgba(38, 86, 201, 0.05), transparent 64%),
@@ -1680,7 +1680,7 @@ section.page { animation: page-enter 260ms var(--ease-out-expo); }
   from { opacity: 0; transform: translateY(10px) scale(0.985); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
-/* 品牌字标精修 */
+/* Brand wordmark refinement */
 .brand-mark { letter-spacing: -0.035em; }
 .login-card .brand-mark {
   font-size: 34px; letter-spacing: -0.04em;
@@ -1690,21 +1690,21 @@ section.page { animation: page-enter 260ms var(--ease-out-expo); }
   0%, 100% { opacity: 1; }
   50% { opacity: 0.88; }
 }
-/* 登录提交按钮 busy 态：隐藏文字留 spinner（结构不变） */
+/* Login submit button busy state: hide the text, keep the spinner (structure unchanged) */
 .primary.is-busy .login-submit-label { opacity: 0.75; }
 .primary.is-busy > span[aria-hidden="true"]:last-child { display: none; }
-/* 错误提示出现动画 */
+/* Error message appearance animation */
 .login-error-enter { animation: error-in 240ms var(--ease-out-expo); }
 @keyframes error-in {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
 }
-/* 登录输入框聚焦光晕 */
+/* Login input focus halo */
 .login-card input:focus-visible {
   box-shadow: 0 0 0 3px var(--accent-glow), 0 0 20px -4px rgba(38, 86, 201, 0.2);
 }
 
-/* ---------- LoadingScreen 设计感 ---------- */
+/* ---------- LoadingScreen design feel ---------- */
 .loading-inner { display: grid; place-items: center; gap: 14px; animation: login-in 320ms var(--ease-out-expo); }
 .loading-brand { animation: brand-breathe 2.6s ease-in-out infinite; margin-bottom: 0; }
 .loading-bar {
@@ -1721,24 +1721,24 @@ section.page { animation: page-enter 260ms var(--ease-out-expo); }
   100% { transform: translateX(380%); }
 }
 
-/* ---------- footer 排版细节 ---------- */
+/* ---------- footer typography details ---------- */
 footer { letter-spacing: 0.04em; }
 
 /* ==========================================================================
-   组件系统与骨架层精修 —— 夜主题（深海仪器）覆盖
+   Component system and skeleton layer refinement — night theme (deep-sea instrument) overrides
    ========================================================================== */
 
-/* ---------- Spinner 夜主题 ---------- */
+/* ---------- Spinner night theme ---------- */
 [data-theme="dark"] .ui-spinner { border-color: rgba(0, 208, 192, 0.18); border-top-color: var(--green); }
 [data-theme="dark"] .primary .ui-spinner, [data-theme="dark"] .ui-button-default .ui-spinner { border-color: rgba(10, 15, 30, 0.25); border-top-color: #0a0f1e; }
 
-/* ---------- Button 夜主题 focus 光晕 ---------- */
+/* ---------- Button night theme focus halo ---------- */
 [data-theme="dark"] .ui-button:focus-visible, [data-theme="dark"] .primary:focus-visible, [data-theme="dark"] .secondary:focus-visible {
   outline-color: var(--green);
   box-shadow: 0 0 0 4px rgba(0, 208, 192, 0.14), 0 0 16px rgba(0, 208, 192, 0.12);
 }
 
-/* ---------- Card 夜主题：仪器面板嵌入面板槽 ---------- */
+/* ---------- Card night theme: instrument panel set into a panel slot ---------- */
 [data-theme="dark"] .ui-card {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 1px 3px rgba(0, 0, 0, 0.4);
 }
@@ -1748,12 +1748,12 @@ footer { letter-spacing: 0.04em; }
 }
 [data-theme="dark"] .ui-card-interactive:active { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 2px 8px rgba(0, 0, 0, 0.4); }
 
-/* ---------- Badge 夜主题状态点 ---------- */
+/* ---------- Badge night theme status dot ---------- */
 [data-theme="dark"] .ui-badge-success .ui-badge-dot { box-shadow: 0 0 0 2px rgba(62, 207, 160, 0.18), 0 0 5px rgba(62, 207, 160, 0.35); }
 [data-theme="dark"] .ui-badge-blue .ui-badge-dot { box-shadow: 0 0 0 2px rgba(0, 208, 192, 0.18), 0 0 5px rgba(0, 208, 192, 0.35); }
 [data-theme="dark"] .ui-badge-warning .ui-badge-dot { box-shadow: 0 0 0 2px rgba(242, 166, 90, 0.18), 0 0 5px rgba(242, 166, 90, 0.3); }
 
-/* ---------- Input 夜主题聚焦光晕 ---------- */
+/* ---------- Input night theme focus halo ---------- */
 [data-theme="dark"] .ui-input:focus-visible {
   box-shadow: 0 0 0 3px rgba(0, 208, 192, 0.14), 0 0 18px -2px rgba(0, 208, 192, 0.1), inset 0 1px 2px rgba(0, 0, 0, 0.15);
 }
@@ -1762,29 +1762,29 @@ footer { letter-spacing: 0.04em; }
   box-shadow: 0 0 0 3px rgba(227, 106, 106, 0.14);
 }
 
-/* ---------- Kbd 夜主题 ---------- */
+/* ---------- Kbd night theme ---------- */
 [data-theme="dark"] .ui-kbd {
   background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.08);
   border-bottom-color: rgba(255, 255, 255, 0.12); color: var(--dsw-alias-label-secondary);
 }
 
-/* ---------- Tooltip 夜主题 ---------- */
+/* ---------- Tooltip night theme ---------- */
 [data-theme="dark"] .ui-tooltip::after { background: #1a1f2a; color: #dfe6f2; box-shadow: 0 3px 12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05); }
 
-/* ---------- 侧边栏选中指示器夜主题（带微光） ---------- */
+/* ---------- Sidebar selected indicator night theme (with a faint glow) ---------- */
 [data-theme="dark"] .console-nav-item.selected .console-nav-indicator {
   box-shadow: 0 0 6px rgba(0, 208, 192, 0.5);
 }
 [data-theme="dark"] .nav-group-label { color: var(--dsw-alias-label-tertiary); letter-spacing: 0.06em; }
 
-/* ---------- 侧边栏底部状态呼吸夜主题 ---------- */
+/* ---------- Sidebar bottom status breathing night theme ---------- */
 [data-theme="dark"] .console-sidebar-footer .status-dot { animation: status-breathe-dark 2.8s ease-in-out infinite; }
 @keyframes status-breathe-dark {
   0%, 100% { opacity: 1; box-shadow: 0 0 4px rgba(62, 207, 160, 0.35), 0 0 0 0 rgba(62, 207, 160, 0.2); }
   50% { opacity: 0.7; box-shadow: 0 0 8px rgba(62, 207, 160, 0.5), 0 0 0 3px rgba(62, 207, 160, 0); }
 }
 
-/* ---------- 登录页夜主题：仪器开机画面 ---------- */
+/* ---------- Login page night theme: instrument power-on screen ---------- */
 [data-theme="dark"] .login-shell {
   background:
     radial-gradient(900px 460px at 50% 34%, rgba(0, 208, 192, 0.05), transparent 62%),
@@ -1815,14 +1815,14 @@ footer { letter-spacing: 0.04em; }
   box-shadow: 0 0 0 3px rgba(0, 208, 192, 0.14), 0 0 22px -2px rgba(0, 208, 192, 0.14), inset 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
-/* ---------- LoadingScreen 夜主题 ---------- */
+/* ---------- LoadingScreen night theme ---------- */
 [data-theme="dark"] .loading-bar { background: rgba(0, 208, 192, 0.12); }
 [data-theme="dark"] .loading-bar-fill { background: var(--green); box-shadow: 0 0 8px rgba(0, 208, 192, 0.4); }
 [data-theme="dark"] .loading-brand { animation: brand-breathe-dark 2.6s ease-in-out infinite; }
 
-/* ---------- 页面切换/通知 夜主题保持同动画（无需覆盖） ---------- */
+/* ---------- Page switch / notices night theme keep the same animation (no override needed) ---------- */
 
-/* ---------- 减弱动效降级（两主题通用，放最后确保生效） ---------- */
+/* ---------- Reduced-motion fallback (shared by both themes, placed last to ensure it takes effect) ---------- */
 @media (prefers-reduced-motion: reduce) {
   .login-card-enter, .notice-enter, .login-error-enter,
   section.page, .console-breadcrumb-current, .loading-inner {
@@ -1838,8 +1838,8 @@ footer { letter-spacing: 0.04em; }
   body, .app-shell, .sidebar, .topbar, .ui-card, .login-card { transition: none !important; }
 }
 
-/* ---------- 对比度红线修正（redesign-a 复审） ---------- */
-/* 占位文字 ≥ 4.5:1；小字标签按正文标准处理 */
+/* ---------- Contrast red-line fix (redesign-a re-review) ---------- */
+/* Placeholder text ≥ 4.5:1; small labels are treated to body-text standards */
 .ui-input::placeholder { color: #757064; }
 input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
 .nav-group-label { color: var(--dsw-alias-label-tertiary); }
@@ -1848,12 +1848,12 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
 [data-theme="dark"] .nav-group-label { color: #7d8aa2; }
 
 /* ==========================================================================
-   昼主题精修 · 呼吸感纸面 / 精致工作台（redesign-day / light-only）
-   范围：仅 :root:not([data-theme="dark"]) 限定的浅色规则；
-   [data-theme="dark"] 规则零改动；既有 @keyframes 全部保留；动画只用 transform / opacity。
+   Day theme refinement · breathing paper surface / refined workbench (redesign-day / light-only)
+   Scope: only light rules scoped to :root:not([data-theme="dark"]);
+   [data-theme="dark"] rules are untouched; all existing @keyframes are kept; animations use only transform / opacity.
    ========================================================================== */
 
-/* ---------- 1. 纸面肌理：固定噪声层（不滚动、不拦截点击） ---------- */
+/* ---------- 1. Paper texture: fixed noise layer (does not scroll, does not intercept clicks) ---------- */
 :root:not([data-theme="dark"]) body::before {
   content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
   opacity: 0.5; mix-blend-mode: multiply;
@@ -1861,7 +1861,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
   background-size: 180px 180px;
 }
 
-/* ---------- 2. 排版：标题节奏与换行 ---------- */
+/* ---------- 2. Typography: heading rhythm and wrapping ---------- */
 :root:not([data-theme="dark"]) h1 { font-size: 33px; font-weight: 600; line-height: 1.2; letter-spacing: -0.022em; text-wrap: balance; }
 :root:not([data-theme="dark"]) h2 { letter-spacing: -0.006em; text-wrap: balance; }
 :root:not([data-theme="dark"]) h3 { letter-spacing: -0.004em; }
@@ -1875,7 +1875,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
   :root:not([data-theme="dark"]) .page { padding: 24px 18px; }
 }
 
-/* ---------- 3. 微观 eyebrow 标签（药丸小徽标） ---------- */
+/* ---------- 3. Micro eyebrow labels (small pill badges) ---------- */
 :root:not([data-theme="dark"]) .heading-eyebrow,
 :root:not([data-theme="dark"]) .eyebrow {
   display: inline-flex; align-items: center; gap: 6px; max-width: 100%;
@@ -1893,7 +1893,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
   :root:not([data-theme="dark"]) .eyebrow { padding: 3px 8px; letter-spacing: 0.09em; }
 }
 
-/* ---------- 4. 控件尺寸与圆角统一 ---------- */
+/* ---------- 4. Unified control sizes and radii ---------- */
 :root:not([data-theme="dark"]) .ui-button,
 :root:not([data-theme="dark"]) .primary,
 :root:not([data-theme="dark"]) .secondary,
@@ -1923,7 +1923,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
 :root:not([data-theme="dark"]) .ofm_root .ofm_glass,
 :root:not([data-theme="dark"]) .ofm_root .ofm_chan { border-radius: 12px; }
 
-/* ---------- 5. 悬浮微起伏（只用 transform） ---------- */
+/* ---------- 5. Hover micro rise/fall (transform only) ---------- */
 :root:not([data-theme="dark"]) .ui-button:hover:not(:disabled),
 :root:not([data-theme="dark"]) .primary:hover:not(:disabled),
 :root:not([data-theme="dark"]) .secondary:hover:not(:disabled),
@@ -1933,7 +1933,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
 :root:not([data-theme="dark"]) .secondary:active:not(:disabled),
 :root:not([data-theme="dark"]) .danger-button:active:not(:disabled) { transform: translateY(0) scale(0.97); }
 
-/* ---------- 6. 溢出兜底：超长文本/数字/英文 ---------- */
+/* ---------- 6. Overflow fallback: very long text/numbers/English ---------- */
 :root:not([data-theme="dark"]) .notice > span,
 :root:not([data-theme="dark"]) .source-row strong,
 :root:not([data-theme="dark"]) .source-row small,
@@ -1946,12 +1946,12 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
 :root:not([data-theme="dark"]) .login-help code { background: #f4efe6; padding: 1px 6px; border-radius: 6px; color: var(--ink); }
 
 /* ==========================================================================
-   夜主题精修 · 深海仪器 / OLED Ethereal Glass（redesign-night）
-   范围：仅新增 [data-theme="dark"] 覆盖；不改动浅色 :root 与无主题规则。
-   既有动画关键帧全部保留；本层不新增或改写任何关键帧。
+   Night theme refinement · deep-sea instrument / OLED Ethereal Glass (redesign-night)
+   Scope: only adds [data-theme="dark"] overrides; does not change the light :root or unthemed rules.
+   All existing animation keyframes are kept; this layer adds or rewrites no keyframes.
    ========================================================================== */
 
-/* ---------- 1. 夜色调色板：蓝紫深底 + 清晰四级文字 ---------- */
+/* ---------- 1. Night palette: blue-violet deep base + clear four-level text ---------- */
 [data-theme="dark"] {
   --ink: #edf2f8;
   --muted: #9aa6b8;
@@ -1970,7 +1970,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
   --shadow-md: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 18px 46px -30px rgba(0, 0, 0, 0.92), 0 2px 8px rgba(0, 0, 0, 0.34);
 }
 
-/* ---------- 2. 基底：去纯黑、环境渐变、极轻噪点 ---------- */
+/* ---------- 2. Base: no pure black, ambient gradient, very light noise ---------- */
 [data-theme="dark"] body {
   background:
     radial-gradient(1120px 620px at 82% -12%, rgba(0, 208, 192, 0.075), transparent 58%),
@@ -2001,7 +2001,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
   background-size: 160px 160px;
 }
 
-/* ---------- 3. 外壳：侧边栏与顶栏的玻璃仪器感 ---------- */
+/* ---------- 3. Shell: glass-instrument feel for the sidebar and top bar ---------- */
 [data-theme="dark"] .sidebar {
   background: linear-gradient(180deg, rgba(13, 17, 23, 0.98) 0%, rgba(10, 14, 20, 0.98) 100%);
   border-right-color: rgba(255, 255, 255, 0.065);
@@ -2026,7 +2026,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
   box-shadow: inset 0 0 0 1px rgba(0, 208, 192, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-/* ---------- 4. 卡片与浮层：内发光边框 + 边缘折射 ---------- */
+/* ---------- 4. Cards and overlays: inner-glow border + edge refraction ---------- */
 [data-theme="dark"] .ui-card {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.022), transparent 30%),
@@ -2100,8 +2100,8 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 18px 48px -28px rgba(0, 0, 0, 0.9);
 }
 
-/* ---------- 5. 控件：按钮、输入、开关、徽章（世界观：夜=终端键 / 昼=纸上凸起） ---------- */
-/* 夜 · 终端按键：斜切角 + 发丝描边 + 悬停扫描光 + 按下短促色差 */
+/* ---------- 5. Controls: buttons, inputs, switches, badges (worldview: Night = terminal keys / Day = raised on paper) ---------- */
+/* Night · Terminal keys: bevel-cut corners + hairline border + scan light on hover + brief color glitch on press */
 [data-theme="dark"] .ui-button {
   border-radius: 2px;
   clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
@@ -2146,14 +2146,14 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
 [data-theme="dark"] .secondary:active { background: rgba(0,208,192,0.14); }
 [data-theme="dark"] .ui-button-ghost { color: var(--muted); clip-path: none; }
 [data-theme="dark"] .ui-button-ghost:hover { background: rgba(0,208,192,0.08); color: #eafffd; border-radius: 3px; }
-/* 夜 · 危险键：全界面唯一允许纯红大色块的地方 */
+/* Night · Danger key: the only place in the whole UI allowed a large block of pure red */
 [data-theme="dark"] .danger-button {
   background: var(--cp-red); color: #fff; border: 1px solid #ff6b68;
   box-shadow: 0 0 16px -4px rgba(233,69,66,0.5);
 }
 [data-theme="dark"] .danger-button:hover { background: #f25552; box-shadow: 0 0 22px -4px rgba(233,69,66,0.68); }
 [data-theme="dark"] .danger-button:active { background: #d93e3b; }
-/* ---------- 6. 数据仪表：图表、表格与来源列表 ---------- */
+/* ---------- 6. Data instruments: charts, tables and source lists ---------- */
 [data-theme="dark"] .dashboard-chart-bar,
 [data-theme="dark"] .usage-day-bar {
   background: linear-gradient(180deg, #74a4ff 0%, #00d0c0 56%, #4478dd 100%);
@@ -2201,7 +2201,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
   color: var(--dsw-alias-label-tertiary);
 }
 
-/* ---------- 7. 登录与加载：仪器开机画面 ---------- */
+/* ---------- 7. Login and loading: instrument power-on screen ---------- */
 [data-theme="dark"] .login-shell,
 [data-theme="dark"] .loading-screen {
   background:
@@ -2226,7 +2226,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
   box-shadow: 0 0 12px rgba(0, 208, 192, 0.45);
 }
 
-/* ---------- 8. 滚动条、工具提示与焦点环 ---------- */
+/* ---------- 8. Scrollbar, tooltips and focus ring ---------- */
 [data-theme="dark"] * {
   scrollbar-color: rgba(140, 153, 172, 0.28) transparent;
 }
@@ -2253,27 +2253,27 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
   box-shadow: 0 0 0 4px rgba(0, 208, 192, 0.14), 0 0 18px -8px rgba(0, 208, 192, 0.45);
 }
 /* ==========================================================================
-   逐元素精修层（final pass）· 骨架 / 顶栏 / 概览 / 登录 / 浏览器表面
-   浅色 = 呼吸感纸面工作台 · 深色 = 深海仪器舱
+   Per-element refinement layer (final pass) · skeleton / top bar / overview / login / browser surface
+   Light = breathing paper workbench · Dark = deep-sea instrument cabin
    --------------------------------------------------------------------------
-   本层硬性自检：
-   1) 只新增规则：不改写、不删除任何既有规则、class 名、DOM 契约；既有 15 个
-      @keyframes（status-pulse / spin / darkPulse / darkPulsePaused / ui-spin /
+   This layer's hard self-check:
+   1) Only add rules: rewrite or delete no existing rules, class names, or DOM contracts; the 15 existing
+      @keyframes(status-pulse / spin / darkPulse / darkPulsePaused / ui-spin /
       status-breathe / crumb-in / page-enter / notice-in / login-in /
       brand-breathe / error-in / loading-slide / status-breathe-dark /
-      brand-breathe-dark）全部原样保留，本层不新增也不改写关键帧。
-   2) 动效只用 transform / opacity，阴影与颜色只做平滑过渡；
-      不动 width / height / top / left（避免触发布局）。
-   3) 浅色统一加 :root:not([data-theme="dark"]) 前缀（与既有浅色层同权重、靠后胜出）；
-      深色统一加 [data-theme="dark"] 前缀；不带前缀的规则只做两主题通用的结构性增强。
+      brand-breathe-dark)are all kept as-is; this layer adds or rewrites no keyframes.
+   2) Motion uses only transform / opacity; shadows and colors only transition smoothly;
+      never touch width / height / top / left (to avoid triggering layout).
+   3) Light rules uniformly get the :root:not([data-theme="dark"]) prefix (same specificity as the existing light layer, winning by coming later);
+      Dark rules uniformly get the [data-theme="dark"] prefix; unprefixed rules only make structural enhancements shared by both themes.
    ========================================================================== */
 
-/* ---------- 0. 新增令牌（不改任何旧令牌的值） ---------- */
+/* ---------- 0. New tokens (no old token values changed) ---------- */
 :root {
   --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-glide: cubic-bezier(0.22, 0.61, 0.36, 1);
   --focus-halo: rgba(38, 86, 201, 0.16);
-  --ink-quiet: #6a6459;              /* 极小号标签专用，对纸面 5.78:1 */
+  --ink-quiet: #6a6459;              /* For tiny labels only, 5.78:1 against the paper surface */
   --thumb: rgba(80, 66, 48, 0.24);
   --thumb-strong: rgba(80, 66, 48, 0.4);
   --mono-font: ui-monospace, "Cascadia Mono", "Cascadia Code", Consolas, "SFMono-Regular", "DejaVu Sans Mono", monospace;
@@ -2282,16 +2282,16 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-glide: cubic-bezier(0.22, 0.61, 0.36, 1);
   --focus-halo: rgba(0, 208, 192, 0.18);
-  --ink-quiet: #8d9ab0;              /* 对仪器面板 6.26:1 */
+  --ink-quiet: #8d9ab0;              /* 6.26:1 against the instrument panel */
   --thumb: rgba(150, 163, 182, 0.26);
   --thumb-strong: rgba(172, 184, 202, 0.44);
 }
 
 /* ==========================================================================
-   A. 骨架与导航
+   A. Skeleton and navigation
    ========================================================================== */
 
-/* A1 侧边栏：纸面分层 + 滚动稳定（宽度与内边距沿用既有断点，不动） ---------- */
+/* A1 Sidebar: paper layering + stable scrolling (width and padding keep the existing breakpoints, untouched) ---------- */
 .sidebar { scrollbar-gutter: stable; overscroll-behavior: contain; }
 :root:not([data-theme="dark"]) .sidebar {
   background: linear-gradient(180deg, #fffefb 0%, #fffdfa 46%, #fbf8f3 100%);
@@ -2300,7 +2300,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
     16px 0 44px -40px rgba(72, 58, 42, 0.55);
 }
 
-/* A2 品牌区：字标节奏 + 图标（图片）圆角与带底色相的阴影 ---------- */
+/* A2 Brand area: wordmark rhythm + icon (image) radius and shadow tinted with the base hue ---------- */
 .console-brand { letter-spacing: -0.004em; }
 .console-brand > span { line-height: 1.18; min-width: 0; }
 .console-brand small { margin-top: 2px; letter-spacing: 0.02em; }
@@ -2328,7 +2328,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.55), 0 16px 30px -16px rgba(0, 208, 192, 1);
 }
 
-/* A3 工作空间切换条：从“上下两条分割线”改为一块内嵌小卡 ---------- */
+/* A3 Workspace switch bar: changed from "two divider lines above and below" to one inset small card ---------- */
 .workspace-switch {
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -2358,7 +2358,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
     0 6px 16px -12px rgba(0, 208, 192, 0.9);
 }
 
-/* A4 导航条目：默认 / hover / 按下 / 选中 四态 + 春感指示条 ---------- */
+/* A4 Navigation items: the four states default / hover / pressed / selected + a springy indicator bar ---------- */
 .console-nav-item {
   transition:
     background-color 160ms var(--ease-glide),
@@ -2403,12 +2403,12 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
   box-shadow: inset 0 0 0 1px rgba(0, 208, 192, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-/* A5 分组小标签：更细的视觉重量 + 统一追踪 ---------- */
+/* A5 Group small labels: finer visual weight + unified tracking ---------- */
 .nav-group-label { letter-spacing: 0.09em; line-height: 1.4; }
 :root:not([data-theme="dark"]) .nav-group-label { color: var(--ink-quiet); }
 [data-theme="dark"] .nav-group-label { color: #7d8aa2; letter-spacing: 0.09em; }
 
-/* A6 侧边栏说明块：内嵌小卡（保留 margin-top:auto 的贴底行为） ---------- */
+/* A6 Sidebar note block: inset small card (keeps margin-top:auto's stick-to-bottom behavior) ---------- */
 .sidebar-support {
   margin: auto 0 12px;
   padding: 12px 12px 13px;
@@ -2431,7 +2431,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
-/* A7 底部状态区 + 状态点：在线呼吸 / 暂停静止（语义化的“静止=暂停”） ---------- */
+/* A7 Bottom status area + status dot: online breathes / paused is still (the semantic "still = paused") ---------- */
 .console-sidebar-footer { padding: 14px 4px 0; gap: 8px; }
 .console-sidebar-footer > div { gap: 7px; line-height: 1.4; }
 .status-dot { position: relative; }
@@ -2444,8 +2444,8 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
 [data-theme="dark"] .status-dot::after { background: rgba(62, 207, 160, 0.22); }
 [data-theme="dark"] .status-dot.paused::after { background: rgba(211, 147, 25, 0.24); }
 
-/* A8 顶栏：纸面工具条（不吸顶——渠道页自带 .ofm_nav 也是 sticky top:0，
-      两者共存会互相压盖，因此这里只做材质与层次，不动定位） ---------- */
+/* A8 Top bar: paper toolbar (not sticky — the channels page's own .ofm_nav is also sticky top:0,
+      and the two coexisting would overlap each other, so this only does material and layering, not positioning) ---------- */
 :root:not([data-theme="dark"]) .topbar {
   background: linear-gradient(180deg, #fffefc 0%, #fffdfa 100%);
   box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.7), 0 10px 24px -22px rgba(72, 58, 42, 0.9);
@@ -2464,7 +2464,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
 .console-topbar-status > span:last-child { font-size: 10px; letter-spacing: 0.14em; opacity: 0.85; }
 .topbar-divider { margin: 0 3px; opacity: 0.9; }
 
-/* A9 主题切换键：一块会随主题变化的“小开关面板”，图标用春感曲线换位 ---------- */
+/* A9 Theme toggle key: a "small switch panel" that changes with the theme; the icon swaps position with a springy curve ---------- */
 .theme-toggle {
   width: 34px; height: 34px; min-width: 34px; min-height: 34px;
   padding: 0;
@@ -2510,16 +2510,16 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
 }
 [data-theme="dark"] .theme-toggle-sun { color: #f0c674; filter: drop-shadow(0 0 5px rgba(240, 198, 116, 0.28)); }
 
-/* A10 窄屏补偿：桌面改动不泄漏到手机（移动端骨架保持既有断点） ---------- */
+/* A10 Narrow-screen compensation: desktop changes do not leak to phones (the mobile skeleton keeps its existing breakpoints) ---------- */
 @media (max-width: 700px) {
   .console-sidebar-footer { padding: 0; gap: 6px; }
 }
 
 /* ==========================================================================
-   B. 登录页（第一印象）
+   B. Login page (first impression)
    ========================================================================== */
 
-/* B0 eyebrow 裁决：退回“纯文字 + 极简短线”的极致排版，昼夜一致 ---------- */
+/* B0 eyebrow decision: revert to the ultimate typography of "plain text + a minimal short line", consistent day and night ---------- */
 .heading-eyebrow, .eyebrow {
   display: flex; align-items: center; gap: 8px;
   max-width: 100%;
@@ -2553,7 +2553,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
 }
 [data-theme="dark"] .heading-eyebrow::before,
 [data-theme="dark"] .eyebrow::before { background: #74a4ff; opacity: 0.55; }
-/* 登录卡内是居中叙事，不需要区域标记线：纯文字 */
+/* Inside the login card is a centered narrative; no section marker line is needed: plain text */
 .login-card .eyebrow::before { display: none; }
 @media (max-width: 430px) {
   :root:not([data-theme="dark"]) .heading-eyebrow,
@@ -2562,7 +2562,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
   [data-theme="dark"] .eyebrow { letter-spacing: 0.11em; }
 }
 
-/* B1 登录外壳：三段式纸面/仪器底（避免“一个均匀渐变”） ---------- */
+/* B1 Login shell: a three-part paper/instrument base (avoiding "one uniform gradient") ---------- */
 .login-shell, .loading-screen { min-height: 100dvh; }
 :root:not([data-theme="dark"]) .login-shell,
 :root:not([data-theme="dark"]) .loading-screen {
@@ -2572,7 +2572,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
     linear-gradient(180deg, #fdfbf7 0%, var(--paper) 46%, #f7f4ee 100%);
 }
 
-/* B2 登录卡：外层 hairline + 内层高光 + 带蓝底色相的投影 ---------- */
+/* B2 Login card: outer hairline + inner highlight + shadow tinted with a blue base hue ---------- */
 :root:not([data-theme="dark"]) .login-card {
   border-radius: 16px;
   border-color: var(--line);
@@ -2605,7 +2605,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
 }
 [data-theme="dark"] .login-card:focus-within .login-card-glow { opacity: 1; transform: scaleX(1); }
 
-/* B3 品牌字标与标题层级 ---------- */
+/* B3 Brand wordmark and heading hierarchy ---------- */
 .brand-mark { letter-spacing: -0.032em; }
 .login-card .brand-mark { font-size: 34px; line-height: 1.1; margin-bottom: 18px; }
 :root:not([data-theme="dark"]) .login-card h1 {
@@ -2615,7 +2615,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
 .login-card p { max-width: 48ch; line-height: 1.68; }
 .login-card h2, .login-help h2 { letter-spacing: -0.005em; }
 
-/* B4 表单：标签 / 输入框（默认-hover-focus-invalid-disabled）/ 提交按钮 ---------- */
+/* B4 Form: labels / inputs (default-hover-focus-invalid-disabled) / submit button ---------- */
 .login-card form { gap: 12px; margin: 22px 0 12px; }
 .login-card label { font-size: 11.5px; font-weight: 550; letter-spacing: 0.01em; }
 .login-card input {
@@ -2660,7 +2660,7 @@ input::placeholder, textarea::placeholder { color: #757064; opacity: 1; }
 .primary.is-busy .ui-spinner { opacity: 0.95; }
 .login-card .login-submit-label { letter-spacing: 0.01em; }
 
-/* B5 帮助区：命令框 / 代码 / 次级按钮 / 状态行 / 错误 ---------- */
+/* B5 Help area: command box / code / secondary buttons / status line / errors ---------- */
 .login-help { margin: 20px 0 16px; padding-top: 20px; }
 .login-help h2 { font-size: 14px; margin-bottom: 10px; }
 .login-help p { font-size: 12px; line-height: 1.7; max-width: 52ch; }
@@ -2708,10 +2708,10 @@ code, pre, kbd { font-family: var(--mono-font); }
 }
 
 /* ==========================================================================
-   C. 概览页（dashboard-* / connect-* / quick-* / source-* / runtime-*）
+   C. Overview page (dashboard-* / connect-* / quick-* / source-* / runtime-*)
    ========================================================================== */
 
-/* C1 页面标题区：留白节奏 + 标题不被挤断 ---------- */
+/* C1 Page heading area: whitespace rhythm + headings are not squeezed or broken ---------- */
 .dashboard-heading, .page-heading { gap: 18px; }
 .dashboard-heading > div, .page-heading > div { min-width: 0; }
 .dashboard-heading h1, .page-heading h1 { text-wrap: balance; }
@@ -2719,7 +2719,7 @@ code, pre, kbd { font-family: var(--mono-font); }
 :root:not([data-theme="dark"]) .dashboard-heading p,
 :root:not([data-theme="dark"]) .page-heading p { color: var(--muted); }
 
-/* C2 指标卡：数字与标签的排版秩序（hover 由 ov- 家族色接管） ---------- */
+/* C2 Metric cards: typographic order of numbers and labels (hover is taken over by the ov- family colors) ---------- */
 .dashboard-metric > div { align-items: center; gap: 10px; }
 .dashboard-metric > div > span { min-width: 0; overflow-wrap: anywhere; }
 .dashboard-metric strong { line-height: 1.15; }
@@ -2728,7 +2728,7 @@ code, pre, kbd { font-family: var(--mono-font); }
 [data-theme="dark"] .dashboard-metric > div > span { color: var(--ink-quiet); }
 :root:not([data-theme="dark"]) .dashboard-metric p { color: var(--ink-quiet); }
 
-/* C3 图表：实线网格 + 仪器柱（顶部内高光），hover 与空态都照顾 ---------- */
+/* C3 Chart: solid grid + instrument bars (inner highlight at the top), caring for both hover and empty states ---------- */
 .chart-grid-lines span { border-top-style: solid; border-top-color: rgba(72, 58, 42, 0.085); }
 [data-theme="dark"] .chart-grid-lines span {
   border-top-style: solid; border-top-color: rgba(255, 255, 255, 0.055);
@@ -2754,7 +2754,7 @@ code, pre, kbd { font-family: var(--mono-font); }
 .chart-empty small { max-width: 42ch; text-align: center; line-height: 1.6; }
 :root:not([data-theme="dark"]) .chart-empty { box-shadow: inset 0 0 0 1px rgba(72, 58, 42, 0.04); }
 
-/* C4 API 接入卡：3px 蓝条 -> 1px 发丝线 + 顶部品牌微光 ---------- */
+/* C4 API access card: 3px blue bar -> 1px hairline + brand glow at the top ---------- */
 .quick-connect { border-top-width: 1px; border-top-color: var(--accent-line); }
 .quick-connect::before {
   background: linear-gradient(90deg, transparent, var(--green) 16%, var(--accent-line) 84%, transparent);
@@ -2798,14 +2798,14 @@ code, pre, kbd { font-family: var(--mono-font); }
 .quick-endpoint code { letter-spacing: 0.01em; }
 :root:not([data-theme="dark"]) .quick-endpoint code { color: #2a4fae; }
 
-/* C5 接入步骤清单：紧一分组、松一分离 ---------- */
+/* C5 Access steps list: tight within a group, loose between groups ---------- */
 .connect-steps { gap: 7px; margin: 16px 0; line-height: 1.55; }
 .connect-steps span { display: flex; align-items: flex-start; gap: 8px; overflow-wrap: anywhere; }
 .connect-steps b { flex: 0 0 auto; margin-right: 0; font-variant-numeric: tabular-nums; }
 :root:not([data-theme="dark"]) .connect-steps { color: var(--ink-quiet); }
 [data-theme="dark"] .connect-steps span { color: var(--dsw-alias-label-secondary); }
 
-/* C6 来源列表：图标章 / 行 hover / 箭头跟随 ---------- */
+/* C6 Source list: icon stamps / row hover / arrow follows ---------- */
 .source-list { margin-top: 14px; }
 .source-row { padding: 14px 0; gap: 12px; }
 :root:not([data-theme="dark"]) .source-row:hover {
@@ -2822,7 +2822,7 @@ code, pre, kbd { font-family: var(--mono-font); }
 :root:not([data-theme="dark"]) .source-row strong { letter-spacing: -0.005em; }
 :root:not([data-theme="dark"]) .source-row small { color: var(--ink-quiet); }
 
-/* C7 运行检查 / 失败样本 / 卡片脚注 ---------- */
+/* C7 Runtime checks / failure samples / card footnotes ---------- */
 .runtime-check { padding: 15px 0; gap: 9px; }
 .runtime-check span, .runtime-check strong { min-width: 0; }
 .runtime-check span { overflow-wrap: anywhere; }
@@ -2843,16 +2843,16 @@ code, pre, kbd { font-family: var(--mono-font); }
 [data-theme="dark"] .connection-footnote { color: var(--dsw-alias-label-tertiary); }
 
 /* ==========================================================================
-   D. 全局浏览器表面（craft floor：选中 / 滚动条 / 焦点 / 光标 / 占位符 / 等宽）
+   D. Global browser surface (craft floor: selection / scrollbar / focus / caret / placeholder / monospace)
    ========================================================================== */
 
-/* D1 文字选中：由调色板染色，昼夜都可辨认 ---------- */
+/* D1 Text selection: tinted by the palette, recognizable day and night ---------- */
 ::selection { background: rgba(38, 86, 201, 0.22); color: var(--ink); }
 [data-theme="dark"] ::selection { background: rgba(0, 208, 192, 0.34); color: #f2f6ff; }
 [data-theme="dark"] .ofm_root ::selection { background: rgba(0, 208, 192, 0.28); color: #f2f6ff; }
 
-/* D2 滚动条：细药丸 + 悬停加深（已被 models/usage/settings 单独定制过的滚动区
-      优先级更高，不受本层影响） ---------- */
+/* D2 Scrollbar: thin pill + darkens on hover (scroll areas already customized separately by models/usage/settings
+      have higher priority and are not affected by this layer) ---------- */
 * { scrollbar-width: thin; scrollbar-color: var(--thumb) transparent; }
 [data-theme="dark"] * { scrollbar-color: var(--thumb) transparent; }
 *::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -2876,7 +2876,7 @@ code, pre, kbd { font-family: var(--mono-font); }
   background-clip: content-box;
 }
 
-/* D3 焦点环：全站统一的 2px 环 + 紧跟元素自身圆角（不再被压成 4px 方角） ---------- */
+/* D3 Focus ring: a site-wide unified 2px ring + closely follows the element's own radius (no longer flattened into a 4px square corner) ---------- */
 :root {
   --focus-ring: #2656c9;
 }
@@ -2903,14 +2903,14 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, .ui-input:foc
   box-shadow: 0 0 0 4px var(--focus-halo), 0 0 18px -8px rgba(0, 208, 192, 0.45);
 }
 
-/* D4 光标与占位符：颜色来自品牌蓝，且都在 4.5:1 之上 ---------- */
+/* D4 Caret and placeholder: colors come from the brand blue, and both are above 4.5:1 ---------- */
 input, textarea, select, .ui-input, [contenteditable="true"] { caret-color: var(--green); }
 input:disabled, textarea:disabled, select:disabled { caret-color: transparent; }
 input::placeholder, textarea::placeholder, .ui-input::placeholder { color: #6d675c; opacity: 1; }
 [data-theme="dark"] input::placeholder, [data-theme="dark"] textarea::placeholder,
 [data-theme="dark"] .ui-input::placeholder { color: #7d8aa0; opacity: 1; }
 
-/* D5 等宽元素：只用于代码、数据与测量（UI 文案不动用等宽做装饰） ---------- */
+/* D5 Monospace elements: only for code, data and measurements (UI copy does not use monospace as decoration) ---------- */
 code, pre, kbd { font-family: var(--mono-font); }
 code, pre { font-variant-ligatures: none; }
 .ui-kbd {
@@ -2932,10 +2932,10 @@ code, pre { font-variant-ligatures: none; }
 }
 
 /* ==========================================================================
-   E. 全局组件（ui-*）与通知条
+   E. Global components (ui-*) and notice bars
    ========================================================================== */
 
-/* E1 圆角体系统一：深色对齐浅色（卡片 12 / 控件 9 / 小徽章 7 / 浮层 10） ---------- */
+/* E1 Unified radius system: dark aligns with light (cards 12 / controls 9 / small badges 7 / overlays 10) ---------- */
 [data-theme="dark"] .ui-button, [data-theme="dark"] .ui-button-default, [data-theme="dark"] .ui-button-outline,
 [data-theme="dark"] .ui-button-ghost, [data-theme="dark"] .primary, [data-theme="dark"] .secondary,
 [data-theme=dark] .danger-button { border-radius: 0; }
@@ -2948,7 +2948,7 @@ code, pre { font-variant-ligatures: none; }
 [data-theme=dark] .ui-input { border-radius: 0; }
 [data-theme=dark] .notice, [data-theme=dark] pre, [data-theme=dark] .confirm-panel { border-radius: 0; }
 
-/* E2 按钮：三变体 × 默认 / hover / 按下 / 聚焦 / 禁用 / 加载 ---------- */
+/* E2 Buttons: three variants × default / hover / pressed / focused / disabled / loading ---------- */
 :root:not([data-theme="dark"]) .ui-button-default,
 :root:not([data-theme="dark"]) .primary {
   background: linear-gradient(180deg, #3163d6 0%, #2656c9 56%, #204ec0 100%);
@@ -2991,23 +2991,23 @@ code, pre { font-variant-ligatures: none; }
 }
 .ui-button[data-busy] { pointer-events: none; }
 
-/* E3 按钮内 spinner：不撑高、不抖动 ---------- */
+/* E3 Spinner inside buttons: does not stretch height, does not jitter ---------- */
 .ui-button .ui-spinner, .primary .ui-spinner { align-self: center; }
 .ui-spinner { border-width: 1.5px; }
 .ui-button-spinner { width: 13px; height: 13px; border-width: 1.5px; }
 
-/* E4 卡片：交互卡片的按压回弹 ---------- */
+/* E4 Cards: press rebound of interactive cards ---------- */
 .ui-card-interactive {
   transition: transform 180ms var(--ease-glide), box-shadow 220ms var(--ease-out-expo),
     border-color 220ms var(--ease-out-expo);
 }
 
-/* E5 徽章：计数用等宽数字，标签行高稳定 ---------- */
+/* E5 Badges: counts use tabular figures, label line-height is stable ---------- */
 .ui-badge { padding: 3px 8px; line-height: 1.35; font-variant-numeric: tabular-nums; }
 .ui-badge-neutral .ui-badge-dot { box-shadow: 0 0 0 2px rgba(72, 58, 42, 0.12); }
 [data-theme="dark"] .ui-badge-neutral .ui-badge-dot { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1); }
 
-/* E6 输入 / 开关：边界可辨认（控件边界 ≥3:1）与禁用态 ---------- */
+/* E6 Inputs / switches: recognizable boundaries (control boundaries ≥3:1) and disabled state ---------- */
 .ui-input { min-height: 38px; }
 :root:not([data-theme="dark"]) .ui-input:hover:not(:disabled) { border-color: var(--accent-line); }
 input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
@@ -3039,7 +3039,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18), 0 0 18px -6px rgba(0, 208, 192, 1);
 }
 
-/* E7 提示气泡：长文案换行，不再一条长条溢出 ---------- */
+/* E7 Tooltip bubbles: long text wraps, no longer overflowing as one long strip ---------- */
 .ui-tooltip::after {
   max-width: min(260px, 70vw);
   white-space: normal;
@@ -3048,7 +3048,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   letter-spacing: 0.005em;
 }
 
-/* E8 通知条：对齐页面内容列（1440 容器 - 36px 内边距 = 1368），三类共用基线 ---------- */
+/* E8 Notice bars: aligned with the page content column (1440 container - 36px padding = 1368), three types share a baseline ---------- */
 .notice {
   display: flex; align-items: center; justify-content: space-between;
   gap: 12px; flex-wrap: wrap;
@@ -3068,7 +3068,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 [data-theme="dark"] .text-button:hover { color: #63e8da; text-decoration: underline; text-underline-offset: 3px; }
 :root:not([data-theme="dark"]) .text-button:hover { text-decoration: underline; text-underline-offset: 3px; }
 
-/* ---------- 窄屏补偿：桌面改动不泄漏到既有移动端断点 ---------- */
+/* ---------- Narrow-screen compensation: desktop changes do not leak into the existing mobile breakpoints ---------- */
 @media (max-width: 700px) {
   .notice { width: calc(100% - 36px); margin-left: auto; margin-right: auto; }
   .dashboard-heading, .page-heading { gap: 10px; }
@@ -3076,21 +3076,21 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 }
 
 /* ==========================================================================
-   质感彩蛋层（sk- micro-delights）· 骨架 / 导航 / 登录 / 概览微反馈
+   Texture easter-egg layer (sk- micro-delights) · skeleton / navigation / login / overview micro-feedback
    --------------------------------------------------------------------------
-   本层只新增规则：不改写、不删除任何既有规则、class 名、DOM 契约。
-   既有 15 个 @keyframes 原样保留；新增关键帧全部启用 sk- 新名字：
-   sk-logo-nod / sk-brand-dot-pop / sk-copied-in / sk-check-pop。
-   动效只使用 transform / opacity（颜色与阴影只做平滑过渡），不动宽高与定位。
-   浅色统一加 :root:not([data-theme="dark"]) 前缀，深色统一加 [data-theme="dark"]；
-   不带主题前缀的规则在两主题下都成立。
+   This layer only adds rules: it rewrites or deletes no existing rules, class names, or DOM contracts.
+   The 15 existing @keyframes are kept as-is; new keyframes all use new sk- names:
+   sk-logo-nod / sk-brand-dot-pop / sk-copied-in / sk-check-pop.
+   Motion uses only transform / opacity (colors and shadows only transition smoothly), never touching width, height, or positioning.
+   Light rules uniformly get the :root:not([data-theme="dark"]) prefix, dark rules uniformly get [data-theme="dark"];
+   Rules without a theme prefix hold in both themes.
    ========================================================================== */
 
 /* ==========================================================================
-   A. 骨架与导航
+   A. Skeleton and navigation
    ========================================================================== */
 
-/* A1 品牌 logo：扫过时轻轻“点一次头”，动画收尾与悬停位无缝衔接（560ms 春感） */
+/* A1 Brand logo: "nods once" lightly when swept over; the animation's end connects seamlessly with the hover position (560ms springy) */
 @keyframes sk-logo-nod {
   0%   { transform: translateY(0)    rotate(0deg)    scale(1); }
   38%  { transform: translateY(-1px) rotate(-4.5deg) scale(1.02); }
@@ -3100,21 +3100,21 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 .console-brand:hover .console-mark { animation: sk-logo-nod 560ms var(--ease-spring); }
 .console-brand:active .console-mark { animation: none; }
 
-/* A2 主题开关：日升月沉的垂直交替（在既有旋转缩放之上叠加方向感） */
+/* A2 Theme switch: the sun rises and the moon sets in vertical alternation (adding direction on top of the existing rotate-scale) */
 .theme-toggle-track[data-theme="light"] .theme-toggle-sun { transform: translateY(5px) rotate(90deg) scale(0.35); opacity: 0; }
 .theme-toggle-track[data-theme="light"] .theme-toggle-moon { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
 .theme-toggle-track[data-theme="dark"] .theme-toggle-moon { transform: translateY(-5px) rotate(-90deg) scale(0.35); opacity: 0; }
 .theme-toggle-track[data-theme="dark"] .theme-toggle-sun { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
 
-/* A3 导航指示条：选中切换 300ms 春感更从容；hover 预览更醒目 */
+/* A3 Navigation indicator bar: selected switching is calmer with a 300ms spring; hover preview is more prominent */
 .console-nav-indicator { transition: transform 300ms var(--ease-spring), opacity 200ms var(--ease-glide); }
 .console-nav-item:hover .console-nav-indicator { transform: translateY(-50%) scaleY(0.65); }
 
-/* A4 导航图标：hover 位移更“跟手”（1px -> 2px，同一条春感曲线） */
+/* A4 Navigation icons: hover displacement follows the hand more (1px -> 2px, the same springy curve) */
 .console-nav-item svg { transition: transform 240ms var(--ease-spring), opacity 180ms var(--ease-glide); }
 .console-nav-item:hover svg { transform: translateX(2px); }
 
-/* A5 工作空间头像：hover 轻轻歪头（外层 -5°，盾牌 +3° 作惯性反作用） */
+/* A5 Workspace avatar: hover tilts its head lightly (outer layer -5°, shield +3° as an inertial counter-reaction) */
 .workspace-avatar { transition: transform 260ms var(--ease-spring), box-shadow 280ms var(--ease-out-expo); }
 .workspace-avatar svg { transition: transform 300ms var(--ease-spring); }
 .workspace-switch:hover .workspace-avatar { transform: rotate(-5deg) scale(1.07); }
@@ -3129,17 +3129,17 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
     0 8px 18px -12px rgba(0, 208, 192, 1);
 }
 
-/* A6 状态点：扫到状态行时“啵”一下（点体 1.18 / 光环 1.6），不打断既有呼吸 */
+/* A6 Status dot: "pops" when swept to the status row (dot body 1.18 / halo 1.6), without interrupting the existing breathing */
 .status-dot { transition: transform 260ms var(--ease-spring); }
 .status-dot::after { transition: transform 260ms var(--ease-spring); }
 .console-sidebar-footer > div:hover .status-dot { transform: scale(1.18); }
 .console-sidebar-footer > div:hover .status-dot::after { transform: scale(1.6); }
 
 /* ==========================================================================
-   B. 登录页：品牌字标的“一个有设计的瞬间”
+   B. Login page: the brand wordmark's "one designed moment"
    ========================================================================== */
 
-/* B1 开始输入（focus-within）那一刻，句点蹦一下并亮起；只播一次，不循环 */
+/* B1 At the moment typing starts (focus-within), the period hops once and lights up; plays once only, no loop */
 @keyframes sk-brand-dot-pop {
   0%   { transform: translateY(0) scale(1); }
   42%  { transform: translateY(-3px) scale(1.42); }
@@ -3161,10 +3161,10 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 }
 
 /* ==========================================================================
-   C. 概览：图表 / 来源 / 复制反馈
+   C. Overview: charts / sources / copy feedback
    ========================================================================== */
 
-/* C1 图表柱：hover 时从底部轻轻“长”一点；zero 柱不参与，保持数据诚实 */
+/* C1 Chart bars: on hover they "grow" slightly from the bottom; zero bars do not participate, keeping the data honest */
 .dashboard-chart-column:hover .dashboard-chart-bar:not(.zero) { transform: scale(1.06, 1.08); }
 :root:not([data-theme="dark"]) .dashboard-chart-column:hover .dashboard-chart-bar:not(.zero) {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 6px 14px -8px rgba(38, 86, 201, 0.6);
@@ -3173,15 +3173,15 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   box-shadow: 0 0 14px -2px rgba(0, 208, 192, 0.5);
 }
 
-/* C2 图表日期标签：hover 跟随主题变量变得更清晰（浅更深 / 深更亮） */
+/* C2 Chart date labels: on hover they follow the theme variables and become clearer (darker in light / brighter in dark) */
 .dashboard-chart-column > span { transition: color 180ms var(--ease-glide); }
 .dashboard-chart-column:hover > span { color: var(--dsw-alias-label-secondary); }
 
-/* C3 来源图标：hover 时图标轻轻“歪一下”，像被拿起来看了一眼 */
+/* C3 Source icons: on hover the icon "tilts" lightly, as if picked up for a look */
 .source-icon svg { transition: transform 280ms var(--ease-spring); }
 .source-row:hover .source-icon svg { transform: rotate(-6deg) scale(1.05); }
 
-/* C4 复制反馈：文字上浮落定 + 一枚纯 CSS 小对勾延迟弹出（零新增 DOM） */
+/* C4 Copy feedback: the text floats up and settles + a pure-CSS small checkmark pops out with a delay (zero new DOM) */
 @keyframes sk-copied-in {
   0%   { opacity: 0; transform: translateY(4px) scale(0.97); }
   62%  { opacity: 1; transform: translateY(0) scale(1.012); }
@@ -3209,14 +3209,14 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 }
 
 /* ==========================================================================
-   D. 减弱动效：只关掉本层新增的动作，保留颜色 / 阴影等状态反馈
+   D. Reduced motion: only turns off this layer's new motions, keeping state feedback such as color / shadow
    ========================================================================== */
 
 
 /* ==========================================================================
-   世界观收口 · 压住共享包/编译产物里残留的旧蓝主按钮（最高优先级）
-   共享包 ChannelCard 等组件的 .ui-button-default 自带 linear-gradient(#6a9bf5..)，
-   且加载在主题层之后。此处用 [data-theme="dark"] body 提升特异性统一归位。
+   Worldview wrap-up · suppressing the old blue primary buttons left in the shared package / build output (highest priority)
+   The shared package's ChannelCard and other components' .ui-button-default carries its own linear-gradient(#6a9bf5..),
+   and loads after the theme layer. This uses [data-theme="dark"] body to raise specificity and unify them back into place.
    ========================================================================== */
 [data-theme="dark"] body .ui-button-default,
 [data-theme="dark"] body .primary,
@@ -3235,7 +3235,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 
 
 
-/* ---------- 昼 · 主按钮：黄铜主键（世界观：昼=纸+黄铜，不是品牌蓝） ---------- */
+/* ---------- Day · Primary button: brass primary key (worldview: Day = paper + brass, not brand blue) ---------- */
 :root:not([data-theme="dark"]) body .ui-button-default,
 :root:not([data-theme="dark"]) body .primary {
   background: linear-gradient(180deg, #d18a2e, #b5761f);
@@ -3281,15 +3281,15 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   .console-nav-item:hover .console-nav-indicator { transform: translateY(-50%) scaleY(0.5); }
 }
 /* ==== V5 LIGHT START ==== */
-/* 拾光者样板间 · 三原子件：卡片 / 黄铜按钮 / 开关
-   世界观：纸 + 黄铜 + 左上光源暖影
-   读书笔记映射：
-   - 卡片 → 双嵌套（外纸壳 + 内亮纸面）+ 可见纸纹 + 方向影
-   - 按钮 → 黄铜镜面高光条 + 拉丝 + 暗倒角 + hover 高光移动 + active 下沉
-   - 开关 → 黄铜胶囊框 + 墨水洇开反馈
+/* Light Keeper showroom · three atomic pieces: cards / brass buttons / switches
+   Worldview: paper + brass + warm shadow from an upper-left light source
+   Reading-notes mapping:
+   - Cards → double nesting (outer paper shell + inner bright paper surface) + visible paper grain + directional shadow
+   - Buttons → brass mirror highlight strip + brushed texture + dark chamfer + highlight moves on hover + sinks on active
+   - Switches → brass capsule frame + ink-spread feedback
 */
 
-/* ---- 1. 卡片：纸上浮起 ---- */
+/* ---- 1. Cards: floating on paper ---- */
 :root:not([data-theme="dark"]) .ui-card,
 :root:not([data-theme="dark"]) .login-card {
   background: #fdfcf9 !important;
@@ -3300,7 +3300,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   position: relative !important;
   overflow: hidden !important;
 }
-/* 纸纹：fixed 定位伪元素叠加极细噪点 */
+/* Paper grain: a fixed-positioned pseudo-element overlays very fine noise */
 :root:not([data-theme="dark"]) .ui-card::before {
   content: "" !important;
   position: absolute !important;
@@ -3312,7 +3312,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   pointer-events: none !important;
   z-index: 0 !important;
 }
-/* 顶部薄光边：模拟纸被左上阳光照亮的边缘 */
+/* Thin light edge at the top: simulating the edge of paper lit by sunlight from the upper left */
 :root:not([data-theme="dark"]) .ui-card::after {
   content: "" !important;
   position: absolute !important;
@@ -3324,19 +3324,19 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   pointer-events: none !important;
   z-index: 1 !important;
 }
-/* 卡片内容不被纹理遮住 */
+/* Card content is not covered by the texture */
 :root:not([data-theme="dark"]) .ui-card > * {
   position: relative !important;
   z-index: 2 !important;
 }
-/* hover：迎光上浮 2px，影子拉开（纸被拿起透光） */
+/* hover: lifts 2px toward the light, shadow stretches out (paper picked up, light passing through) */
 :root:not([data-theme="dark"]) .ui-card:hover,
 :root:not([data-theme="dark"]) .login-card:hover {
   transform: translateY(-2px) !important;
   box-shadow: 4px 6px 0 rgba(86,52,10,0.03), 10px 14px 32px -6px rgba(86,52,10,0.17), 0 2px 5px rgba(86,52,10,0.06) !important;
 }
 
-/* ---- 2. 黄铜按钮：不是橙色渐变，是"真黄铜" ---- */
+/* ---- 2. Brass buttons: not an orange gradient, but "real brass" ---- */
 :root:not([data-theme="dark"]) body .ui-button-default,
 :root:not([data-theme="dark"]) body .primary {
   background: linear-gradient(180deg, #c8842a 0%, #b45309 50%, #9a4708 100%) !important;
@@ -3352,7 +3352,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   position: relative !important;
   overflow: hidden !important;
 }
-/* 镜面高光条：顶部一条白色反光，不是整体渐变 */
+/* Mirror highlight strip: one white reflection at the top, not an overall gradient */
 :root:not([data-theme="dark"]) body .ui-button-default::before,
 :root:not([data-theme="dark"]) body .primary::before {
   content: "" !important;
@@ -3366,7 +3366,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   pointer-events: none !important;
   transition: left 350ms cubic-bezier(0.32,0.72,0,1), right 350ms cubic-bezier(0.32,0.72,0,1) !important;
 }
-/* 拉丝纹理：极细水平噪点 */
+/* Brushed texture: very fine horizontal noise */
 :root:not([data-theme="dark"]) body .ui-button-default::after,
 :root:not([data-theme="dark"]) body .primary::after {
   content: "" !important;
@@ -3379,7 +3379,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   pointer-events: none !important;
   opacity: 0.6 !important;
 }
-/* hover：高光位置移动（模拟黄铜微转反光面变） */
+/* hover: the highlight position moves (simulating brass turning slightly and its reflective face changing) */
 :root:not([data-theme="dark"]) body .ui-button-default:hover::before,
 :root:not([data-theme="dark"]) body .primary:hover::before {
   left: 3% !important;
@@ -3397,7 +3397,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
     4px 8px 18px -4px rgba(86,52,10,0.35) !important;
   transform: translateY(-1px) !important;
 }
-/* active：按进纸里，下沉 1px，高光收缩 */
+/* active: pressed into the paper, sinks 1px, highlight contracts */
 :root:not([data-theme="dark"]) body .ui-button-default:active,
 :root:not([data-theme="dark"]) body .primary:active {
   background: linear-gradient(180deg, #a86407 0%, #9a4708 50%, #8a3e06 100%) !important;
@@ -3417,7 +3417,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   opacity: 0.6 !important;
 }
 
-/* ---- 3. 开关：黄铜胶囊 + 墨水洇开 ---- */
+/* ---- 3. Switches: brass capsule + ink spread ---- */
 :root:not([data-theme="dark"]) .ui-switch {
   width: 33px !important;
   height: 20px !important;
@@ -3430,13 +3430,13 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   position: relative !important;
   overflow: visible !important;
 }
-/* 墨水洇开：on 时 track 底色从中心慢慢扩散成暖棕墨 */
+/* Ink spread: when on, the track's base color slowly spreads from the center into warm-brown ink */
 :root:not([data-theme="dark"]) .ui-switch.on {
   background: radial-gradient(circle at 50% 50%, #c8842a 0%, #b45309 55%, #a04a08 100%) !important;
   border-color: #8a4a06 !important;
   box-shadow: 0 1px 2px rgba(86,52,10,0.18) inset, 0 -1px 1px rgba(255,240,200,0.25) inset !important;
 }
-/* 滑块：黄铜圆片带镜面高光点 */
+/* Thumb: a brass disc with a mirror highlight dot */
 :root:not([data-theme="dark"]) .ui-switch span {
   display: block !important;
   width: 14px !important;
@@ -3447,7 +3447,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   transition: transform 450ms cubic-bezier(0.16,1,0.3,1) !important;
   position: relative !important;
 }
-/* 滑块高光点：左上小亮点 */
+/* Thumb highlight dot: a small bright dot at the upper left */
 :root:not([data-theme="dark"]) .ui-switch span::after {
   content: "" !important;
   position: absolute !important;
@@ -3458,7 +3458,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   background: rgba(255,255,255,0.7) !important;
   border-radius: 50% !important;
 }
-/* on 状态滑块：变成黄铜色（仪器拨杆被推到黄铜端） */
+/* On-state thumb: turns brass-colored (the instrument lever pushed to the brass end) */
 :root:not([data-theme="dark"]) .ui-switch.on span {
   background: linear-gradient(180deg, #e8c47a 0%, #c8842a 100%) !important;
   box-shadow: 0 1px 2px rgba(86,52,10,0.20), 0 0 0 0.5px rgba(140,75,6,0.18) !important;
@@ -3469,11 +3469,11 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 }
 
 /* ============================================================
-   V5 LIGHT 铺开 · 全套（徽章/分割线/状态点 → 输入与聚焦 →
-   原生件 → 纸纹与光束 → 颜色纪律 → 图表与空态）
+   V5 LIGHT rollout · the full set (badges/dividers/status dots → inputs and focus →
+   native pieces → paper grain and light beams → color discipline → charts and empty states)
    ============================================================ */
 
-/* ---- 0. 令牌重声明：蓝色泄漏清零（昼内不引蓝） ---- */
+/* ---- 0. Token re-declaration: blue leakage zeroed (no blue introduced within Day) ---- */
 :root:not([data-theme="dark"]) {
   --green: #b45309 !important;
   --accent-soft: #f5ede0 !important;
@@ -3530,7 +3530,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 :root:not([data-theme="dark"]) .channel-empty svg { color: #b45309 !important; opacity: 0.30 !important; }
 :root:not([data-theme="dark"]) .channel-empty p { color: #6b655c !important; }
 
-/* ---- 1. 徽章 · 分割线 · 状态点（黄铜胶囊 + 虚线分隔） ---- */
+/* ---- 1. Badges · dividers · status dots (brass capsules + dashed dividers) ---- */
 :root:not([data-theme="dark"]) .ui-badge { border-radius: 999px !important; padding: 3px 9px !important; font-size: 10px !important; letter-spacing: 0.04em !important; background: #f5ede0 !important; color: #9a4708 !important; border: 1px solid #e3d5bd !important; }
 :root:not([data-theme="dark"]) .ui-badge-success { background: #eff5f0 !important; color: #177552 !important; border-color: #d5e2d9 !important; }
 :root:not([data-theme="dark"]) .ui-badge-warning { background: #fbf6ea !important; color: #8a6215 !important; border-color: #eadfc6 !important; }
@@ -3538,17 +3538,17 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 :root:not([data-theme="dark"]) .card-foot { border-top: 1px dashed #d8cdb9 !important; }
 :root:not([data-theme="dark"]) .dashboard-heading, :root:not([data-theme="dark"]) .page-heading { border-bottom: 1px dashed #d8cdb9 !important; padding-bottom: 10px !important; }
 
-/* ---- 2. 输入框与聚焦（墨环） ---- */
+/* ---- 2. Inputs and focus (ink ring) ---- */
 :root:not([data-theme="dark"]) input, :root:not([data-theme="dark"]) textarea, :root:not([data-theme="dark"]) select, :root:not([data-theme="dark"]) .ui-input { background: #fdfcf9 !important; border: 1px solid #ddd3c2 !important; border-radius: 6px !important; box-shadow: inset 0 1px 2px rgba(86,52,10,0.04) !important; transition: border-color 280ms cubic-bezier(0.32,0.72,0,1), box-shadow 280ms cubic-bezier(0.32,0.72,0,1) !important; }
 :root:not([data-theme="dark"]) .channel-search input:focus { border-color: #b45309 !important; box-shadow: 0 0 0 3px rgba(180,83,9,0.14), 0 0 14px -6px rgba(180,83,9,0.35) !important; }
 :root:not([data-theme="dark"]) .channel-search input:hover:not(:focus) { border-color: #cbbba0 !important; }
 
-/* ---- 3. 原生件（滚动条 / selection / caret / focus ring） ---- */
+/* ---- 3. Native pieces (scrollbar / selection / caret / focus ring) ---- */
 :root:not([data-theme="dark"]) * { scrollbar-color: rgba(140,110,70,0.28) transparent !important; }
 :root:not([data-theme="dark"]) *:hover { scrollbar-color: rgba(140,110,70,0.42) transparent !important; }
 :root:not([data-theme="dark"]) button:focus-visible, :root:not([data-theme="dark"]) a:focus-visible, :root:not([data-theme="dark"]) input:focus-visible, :root:not([data-theme="dark"]) select:focus-visible, :root:not([data-theme="dark"]) textarea:focus-visible, :root:not([data-theme="dark"]) [tabindex]:focus-visible { outline: 2px solid #b45309 !important; outline-offset: 2px !important; }
 
-/* ---- 4. 纸纹与光束 ---- */
+/* ---- 4. Paper grain and light beams ---- */
 :root:not([data-theme="dark"]) .ui-card::before {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='p2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23p2)' opacity='0.07'/%3E%3C/svg%3E") !important;
 }
@@ -3566,7 +3566,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   100% { transform: translate3d(2.5%, 0.5%, 0) scale(1.02); }
 }
 
-/* ---- 5. 按钮高光移动：left/right → transform 位移（性能修正） ---- */
+/* ---- 5. Button highlight movement: left/right → transform displacement (performance fix) ---- */
 :root:not([data-theme="dark"]) body .ui-button-default::before,
 :root:not([data-theme="dark"]) body .primary::before {
   left: 10% !important;
@@ -3584,26 +3584,26 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   transform: translateX(0) !important;
 }
 /* ============================================================
-   V5 LIGHT 返工补丁 · R1（验收批评家 P0×3 + P1×3）
-   P0-1 蓝清残余：hover 蓝辉光 → 暖棕（开关 on / quick-endpoint / source-row / quick-icon）
-   P0-2 形状统一：按钮全变体 6px / .login-card 8px / 徽章 999px 复申
-   P0-3 黄铜按钮：active 全变体 translateY(1px)，拍死 scale(0.97)
-   P1-4 纸纹卡片级：复申 0.07 纸纹（构建后可见）
-   P1-5 开关墨水洇开：lt5-ink-spread 挂到 .ui-switch.on span
-   P1-6 selection 兜底：黄铜 20%（拍 2810 行蓝）
+   V5 LIGHT rework patch · R1 (acceptance critic P0×3 + P1×3)
+   P0-1 Blue-clearing leftovers: hover blue glow → warm brown (switch on / quick-endpoint / source-row / quick-icon)
+   P0-2 Shape unification: all button variants 6px / .login-card 8px / badges 999px re-declared
+   P0-3 Brass buttons: active on all variants translateY(1px), firmly overriding scale(0.97)
+   P1-4 Paper grain at card level: re-declare the 0.07 paper grain (visible after build)
+   P1-5 Switch ink spread: attach lt5-ink-spread to .ui-switch.on span
+   P1-6 selection fallback: brass 20% (overrides the blue at line 2810)
    ============================================================ */
 
-/* P1-6 ::selection 兜底（黄铜，拍基础层 2810 蓝） */
+/* P1-6 ::selection fallback (brass, overrides the base layer's blue at line 2810) */
 :root:not([data-theme="dark"]) ::selection { background: rgba(180,83,9,0.20) !important; color: #1c1917 !important; }
 
-/* P0-1 hover 蓝辉光清零 */
+/* P0-1 hover blue glow zeroed */
 :root:not([data-theme="dark"]) .ui-switch.on:hover:not(:disabled) { box-shadow: inset 0 1px 0 rgba(255,255,255,0.30), inset 0 0 0 1px rgba(140,75,6,0.55), 0 4px 12px -6px rgba(180,83,9,0.50) !important; }
 :root:not([data-theme="dark"]) .ui-switch.on { box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), inset 0 0 0 1px rgba(140,75,6,0.50) !important; }
 :root:not([data-theme="dark"]) .quick-endpoint:hover { border-color: var(--accent-line) !important; box-shadow: inset 0 1px 2px rgba(86,52,10,0.05), 0 0 0 3px rgba(180,83,9,0.06) !important; }
 :root:not([data-theme="dark"]) .source-row:hover { background: linear-gradient(90deg, rgba(180,83,9,0.055), rgba(180,83,9,0)) !important; }
 :root:not([data-theme="dark"]) .quick-icon { box-shadow: inset 0 0 0 1px rgba(180,83,9,0.12), 0 1px 2px rgba(86,52,10,0.06) !important; }
 
-/* P0-2 形状统一 */
+/* P0-2 Shape unification */
 :root:not([data-theme="dark"]) .ui-button,
 :root:not([data-theme="dark"]) .ui-button-sm,
 :root:not([data-theme="dark"]) .ui-button-lg,
@@ -3617,7 +3617,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 :root:not([data-theme="dark"]) .count-badge { border-radius: 999px !important; }
 :root:not([data-theme="dark"]) .ui-badge-blue .ui-badge-dot { background: #b45309 !important; box-shadow: 0 0 0 2px rgba(180,83,9,0.16) !important; }
 
-/* P0-3 active 全变体：按进纸里 */
+/* P0-3 active on all variants: pressed into the paper */
 :root:not([data-theme="dark"]) .ui-button:active,
 :root:not([data-theme="dark"]) .ui-button-sm:active,
 :root:not([data-theme="dark"]) .ui-button-lg:active,
@@ -3628,13 +3628,13 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 :root:not([data-theme="dark"]) body .ui-button-default:active,
 :root:not([data-theme="dark"]) body .primary:active { transform: translateY(1px) !important; scale: 1 !important; }
 
-/* P1-4 卡片纸纹复申（构建产物验证点） */
+/* P1-4 Card paper grain re-declared (build-output verification point) */
 :root:not([data-theme="dark"]) .ui-card::before {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='p2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23p2)' opacity='0.07'/%3E%3C/svg%3E") !important;
   background-size: 120px 120px !important;
 }
 
-/* P1-5 开关墨水洇开：黄铜墨从滑块中心洇开 */
+/* P1-5 Switch ink spread: brass ink spreads from the center of the thumb */
 @keyframes lt5-ink-spread {
   0%   { opacity: 0.45; transform: scale(0.30); }
   68%  { opacity: 0.28; }
@@ -3656,40 +3656,40 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   pointer-events: none !important;
 }
 /* ============================================================
-   V5 LIGHT 返工补丁 · R2（批评家重测范围补漏：模型清单页）
+   V5 LIGHT rework patch · R2 (covering gaps in the critic's retest scope: model list page)
    ============================================================ */
 :root:not([data-theme="dark"]) .model-table { border-radius: 8px !important; }
 /* ==== V5 LIGHT END ==== */
 
 /* ==== V5 NIGHT START ==== */
 /* ==========================================================================
-   夜 · 赛博终端 · V5 全套铺开（样板间 0-4 已过审，本轮铺开 5-14）
-   本块为 app.css 末尾追加，绝不修改任何已有行。
-   0-4：卡片（切角 18px + 四角刻度） + 按钮（斜切 + 100ms 色差）
-   5-14：令牌清扫 / 标题方块光标 / 徽章分割线状态点 / 输入框聚焦刻度 /
-         原生件 / 全屏基底 / 图表空态 / 蓝偏色逐条清扫
-   纪律：选择器一律带引号 [data-theme="dark"] 且声明全部 !important；
-   动效只碰 transform / opacity / clip-path / filter；新关键帧 cp5- 前缀。
-   层叠要点：!important 声明在 CSS 层叠里高于 @keyframes 动画，所以"被动画
-   驱动的属性"（::after 的 opacity / clip-path / filter、按钮 :active 的
-   transform / filter）在本块里刻意不写静态 !important 值，改由 visibility
-   与状态选择器控制开关，否则动画会被静默压掉。
-   提权要点：文件里已有一组 [data-theme="dark"] body .ui-button-default /
-   .primary 的 !important 规则（压共享包旧蓝按钮用），特异性 (0,2,1)/(0,2,2)
-   高于普通的 [data-theme="dark"] .ui-button。所以按钮底色 / 文字 / 边框 /
-   阴影这几条必须同样带 body 前缀，并用 :not() 链把特异性提到 (0,4,1)。
+   Night · Cyber Terminal · V5 full rollout (showroom 0-4 already approved, this round rolls out 5-14)
+   This block is appended at the end of app.css and never modifies any existing line.
+   0-4: Cards (18px bevel cuts + corner ticks) + buttons (bevel cut + 100ms color glitch)
+   5-14: token sweep / heading block cursor / badges, dividers and status dots / input focus ticks /
+         native pieces / fullscreen base / chart empty states / blue-biased colors swept one by one
+   Discipline: selectors always use quoted [data-theme="dark"] and all declarations are !important;
+   Motion only touches transform / opacity / clip-path / filter; new keyframes use the cp5- prefix.
+   Cascade note: !important declarations rank above @keyframes animations in the CSS cascade, so "properties driven by animations"
+   (::after's opacity / clip-path / filter, buttons' :active
+   transform / filter) deliberately get no static !important values in this block; instead visibility
+   and state selectors control them, otherwise the animations would be silently suppressed.
+   Specificity note: the file already has a set of [data-theme="dark"] body .ui-button-default /
+   .primary !important rules (for suppressing the shared package's old blue buttons), with specificity (0,2,1)/(0,2,2),
+   higher than a plain [data-theme="dark"] .ui-button. So the button background / text / border /
+   shadow rules must likewise carry the body prefix, and use a :not() chain to raise specificity to (0,4,1).
    ========================================================================== */
 
-/* ---------- 0. 令牌重声明：蓝色泄漏清零 + 无障碍硬线 ---------- */
+/* ---------- 0. Token re-declaration: blue leakage zeroed + accessibility hard line ---------- */
 [data-theme="dark"] {
-  /* 原值 #6f9df3 属旧品牌蓝家族（浅蓝），暗色聚焦环换成扫描青 */
+  /* The original value #6f9df3 belongs to the old brand-blue family (light blue); the dark focus ring is changed to scan cyan */
   --focus-ring: #00d0c0 !important;
-  /* 三级文字：原 #55606e 在 #0a0b10 上约 3.1:1，提到约 5.4:1 */
+  /* Tertiary text: the original #55606e on #0a0b10 was about 3.1:1, raised to about 5.4:1 */
   --dsw-alias-label-tertiary: #7c8794 !important;
 }
 
-/* ---------- 1. 新关键帧（cp5- 前缀） ---------- */
-/* 边框被青光从左边起笔重新描一遍，走满一圈后余辉收掉 */
+/* ---------- 1. New keyframes (cp5- prefix) ---------- */
+/* The border is redrawn by cyan light starting from the left; after a full circuit the afterglow fades */
 @keyframes cp5-edge-sweep {
   0%   { clip-path: inset(0 100% 0 0); opacity: 0; filter: drop-shadow(0 0 0 rgba(0, 208, 192, 0)); }
   12%  { opacity: 1; }
@@ -3697,7 +3697,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   100% { clip-path: inset(0 0 0 0); opacity: 0.45; filter: drop-shadow(0 0 5px rgba(0, 208, 192, 0.35)); }
 }
 
-/* 按下瞬间的 100ms 色差故障：红青错位一闪，是信号抖动，不是按钮弹跳 */
+/* The 100ms color glitch at the press moment: a flash of red/cyan misalignment — signal jitter, not a button bounce */
 @keyframes cp5-glitch-hit {
   0%   { transform: translate3d(0, 0, 0); filter: none; }
   25%  { transform: translate3d(-1px, 0, 0); filter: drop-shadow(2px 0 0 rgba(233, 69, 66, 0.55)) drop-shadow(-2px 0 0 rgba(0, 208, 192, 0.55)); }
@@ -3705,17 +3705,17 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   100% { transform: translate3d(0, 0, 0); filter: none; }
 }
 
-/* ---------- 2. 卡片：切角芯片板 ---------- */
+/* ---------- 2. Cards: bevel-cut chip boards ---------- */
 [data-theme="dark"] .ui-card {
   border-radius: 0 !important;
-  /* 只切两个对角：左上 + 右下（斜切替代圆角，其余角保持 90 度） */
+  /* Only two diagonal corners are cut: top-left + bottom-right (bevel cuts replace rounding; the other corners stay at 90 degrees) */
   clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 14px) 100%, 0 100%, 0 14px) !important;
   background:
     linear-gradient(180deg, rgba(0, 208, 192, 0.06) 0%, rgba(0, 208, 192, 0.015) 40%, rgba(0, 208, 192, 0.03) 100%),
     #0b0f15 !important;
   border: 1px solid rgba(0, 208, 192, 0.18) !important;
   border-top-color: rgba(0, 208, 192, 0.34) !important;
-  /* 夜的世界不起浮：层级靠亮度，不靠投影，只留一道内侧顶光 */
+  /* The night world does not float: hierarchy comes from brightness, not shadows; only one inner top light remains */
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045) !important;
   overflow: hidden !important;
   position: relative !important;
@@ -3732,7 +3732,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
     #0d131a !important;
 }
 
-/* 四角刻度：右上 / 左下 = L 型刻度；左上 / 右下 = 与斜切边平行的斜刻度 */
+/* Corner ticks: top-right / bottom-left = L-shaped ticks; top-left / bottom-right = diagonal ticks parallel to the bevel-cut edge */
 [data-theme="dark"] .ui-card::before {
   content: "" !important;
   position: absolute !important;
@@ -3763,7 +3763,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 [data-theme="dark"] .ui-card:hover::before,
 [data-theme="dark"] .ui-card:focus-within::before { opacity: 0.95 !important; }
 
-/* 悬停：边框被青光从左边起笔描一遍；静止态完全不可见 */
+/* Hover: the border is traced once by cyan light starting from the left; completely invisible at rest */
 [data-theme="dark"] .ui-card::after {
   content: "" !important;
   position: absolute !important;
@@ -3771,7 +3771,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   pointer-events: none !important;
   border: 1px solid rgba(0, 208, 192, 0.75) !important;
   background: transparent !important;
-  /* 静止态用 visibility 收起来：opacity / clip-path 留给关键帧，不能被 !important 压住 */
+  /* At rest it is hidden with visibility: opacity / clip-path are left to the keyframes and must not be suppressed by !important */
   visibility: hidden !important;
   transition: none !important;
 }
@@ -3781,7 +3781,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   animation: cp5-edge-sweep 680ms var(--ease-out-expo) 1 forwards !important;
 }
 
-/* 卡内排版：数据 / 正文等宽 + 表格数字；元数据全大写宽字距 */
+/* In-card typography: data / body in monospace + tabular figures; metadata in all-caps with wide letter-spacing */
 [data-theme="dark"] .ui-card .card-heading h2,
 [data-theme="dark"] .ui-card .card-heading h3 {
   font-family: var(--mono-font) !important;
@@ -3801,7 +3801,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   letter-spacing: 0.1em !important;
   font-variant-numeric: tabular-nums !important;
   color: var(--dsw-alias-label-secondary) !important;
-  /* 原分隔线取 --line-soft（#f1ece3，浅色纸白），夜主题下是一条暖白亮线，这里归位 */
+  /* The original divider used --line-soft (#f1ece3, light paper white), which is a warm-white bright line in the night theme; restored here */
   border-top-color: rgba(0, 208, 192, 0.16) !important;
 }
 [data-theme="dark"] .ui-card .card-foot button {
@@ -3813,7 +3813,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 }
 [data-theme="dark"] .ui-card .card-foot button:hover { color: #7ff5ea !important; }
 
-/* ---------- 3. 按钮：斜切终端键（只做默认变体 + .primary） ---------- */
+/* ---------- 3. Buttons: bevel-cut terminal keys (default variant + .primary only) ---------- */
 [data-theme="dark"] body .ui-button-default,
 [data-theme="dark"] body button.ui-button-default,
 [data-theme="dark"] body .ui-button:not(.ui-button-outline):not(.ui-button-ghost),
@@ -3830,12 +3830,12 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   background: rgba(0, 208, 192, 0.18) !important;
   color: #7ff5ea !important;
   border: 1px solid #00d0c0 !important;
-  /* 静止态不留零偏移彩色光晕，只留一道内侧顶光；亮是稀缺信号 */
+  /* At rest no zero-offset colored halo is left, only one inner top light; brightness is a scarce signal */
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), inset 0 0 14px -6px rgba(0, 208, 192, 0.85) !important;
   transition: opacity 160ms var(--ease-out-expo) !important;
 }
 
-/* 方括号替代：左右各一条 1px 竖刻度，不改文案也不加字符 */
+/* Bracket substitute: one 1px vertical tick on each side; no copy changed and no characters added */
 [data-theme="dark"] .ui-button-default::before,
 [data-theme="dark"] .ui-button:not(.ui-button-outline):not(.ui-button-ghost):not(.ui-button-icon)::before,
 [data-theme="dark"] .primary::before {
@@ -3850,7 +3850,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 [data-theme="dark"] .ui-button-default:disabled::before,
 [data-theme="dark"] .primary:disabled::before { opacity: 0.25 !important; }
 
-/* 悬停：底色升一档 + 轮廓余辉（:not(:active) 给按下故障让路，避免压掉关键帧） */
+/* Hover: background rises one level + outline afterglow (:not(:active) yields to the press glitch, avoiding suppressing the keyframes) */
 [data-theme="dark"] body .ui-button-default:hover:not(:active):not(:disabled),
 [data-theme="dark"] body .primary:hover:not(:active):not(:disabled) {
   background: rgba(0, 208, 192, 0.30) !important;
@@ -3858,13 +3858,13 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
   filter: drop-shadow(0 0 9px rgba(0, 208, 192, 0.55)) !important;
 }
-/* 悬停：沿用既有扫描光带，只把光束加亮（不碰 transform / opacity，避免压掉动画） */
+/* Hover: reuses the existing scan light band, only brightening the beam (does not touch transform / opacity, avoiding suppressing the animation) */
 [data-theme="dark"] .ui-button:hover::after,
 [data-theme="dark"] .primary:hover::after {
   background: linear-gradient(105deg, transparent, rgba(0, 208, 192, 0.5), transparent) !important;
 }
 
-/* 按下：100ms 短促色差故障（此处刻意不写 transform / filter 的静态 !important） */
+/* Press: a 100ms brief color glitch (deliberately no static !important for transform / filter here) */
 [data-theme="dark"] .ui-button-default:active,
 [data-theme="dark"] .primary:active,
 [data-theme="dark"] .ui-button:not(.ui-button-outline):not(.ui-button-ghost):active {
@@ -3872,7 +3872,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   background: rgba(0, 208, 192, 0.28) !important;
 }
 
-/* 聚焦：方角 2px 青环（原生件接管；暗色聚焦环令牌已在上方转青） */
+/* Focus: a square-cornered 2px cyan ring (handled by the native pieces; the dark focus-ring token was already turned cyan above) */
 [data-theme="dark"] .ui-button:focus-visible,
 [data-theme="dark"] .ui-button-default:focus-visible,
 [data-theme="dark"] .primary:focus-visible {
@@ -3881,7 +3881,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   outline-offset: 2px !important;
 }
 
-/* 禁用：断电态（不靠整体降透明度表达，改由配色断电） */
+/* Disabled: powered-off state (not expressed by lowering overall opacity, but by powering off the colors) */
 [data-theme="dark"] .ui-button-default:disabled:not(.is-busy),
 [data-theme="dark"] .primary:disabled:not(.is-busy) {
   background: rgba(255, 255, 255, 0.03) !important;
@@ -3891,13 +3891,13 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   opacity: 1 !important;
 }
 
-/* 加载中：既有扫描光带持续走格（走格 = 传输中，和断电态区分开） */
+/* Loading: the existing scan light band keeps stepping (stepping = transmitting, distinct from the powered-off state) */
 [data-theme="dark"] .ui-button-default.is-busy::after,
 [data-theme="dark"] .ui-button-default[data-busy]::after {
   animation: cp-scan-sweep 1100ms linear infinite !important;
 }
 
-/* ---------- 4. 降级：prefers-reduced-motion ---------- */
+/* ---------- 4. Fallback: prefers-reduced-motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   [data-theme="dark"] .ui-card::after,
   [data-theme="dark"] .ui-button::after,
@@ -3905,37 +3905,37 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   [data-theme="dark"] .primary::after { animation: none !important; }
 }
 
-/* ---------- 5. 令牌清扫：红归位 + 蓝清零 + 基底去紫 ---------- */
+/* ---------- 5. Token sweep: red restored + blue zeroed + purple removed from the base ---------- */
 [data-theme="dark"] {
-  /* 业务/强调槽位在暗色下原本落在纯红 #e94542；红只该属于真错误 */
+  /* The business/accent slot originally landed on pure red #e94542 in dark; red should belong only to real errors */
   --dsw-alias-state-business-primary: #00d0c0 !important;
   --dsw-alias-accent-primary: #00d0c0 !important;
   --dsw-alias-accent-secondary: rgba(0, 208, 192, 0.14) !important;
-  /* 通用描边：由中性白改成扫描青发丝线，全站分割线一起归位 */
+  /* General border: changed from neutral white to a scan-cyan hairline; all site dividers are restored together */
   --line: rgba(0, 208, 192, 0.14) !important;
   --dsw-alias-border-l1: rgba(0, 208, 192, 0.16) !important;
   --dsw-alias-border-l2: rgba(0, 208, 192, 0.26) !important;
-  /* 暖棕残留：浅色 --ink-faint(#8b8377) 在夜里是暖灰，换冷灰（约 5.7:1） */
+  /* Warm-brown leftover: the light --ink-faint (#8b8377) is a warm gray at night; changed to a cool gray (about 5.7:1) */
   --ink-faint: #7f8b99 !important;
-  /* 基底纹理：从"看不见"提到"看得见" */
+  /* Base texture: raised from "invisible" to "visible" */
   --cp-grid: rgba(0, 208, 192, 0.055) !important;
   --cp-scan: rgba(0, 0, 0, 0.15) !important;
   --cp-cyan-line: rgba(0, 208, 192, 0.42) !important;
   --cp-glow: rgba(0, 208, 192, 0.22) !important;
 }
 
-/* ---------- 6. 新增关键帧（cp5- 前缀） ---------- */
-/* 方块光标闪烁：不是渐隐，是二值跳变（终端没有中间态） */
+/* ---------- 6. New keyframes (cp5- prefix) ---------- */
+/* Block cursor blinking: not a fade, but a binary jump (a terminal has no intermediate state) */
 @keyframes cp5-blink {
   0%, 69%   { opacity: 1; }
   70%, 100% { opacity: 0; }
 }
-/* 状态点方块呼吸：step 式，两态跳变，不做平滑呼吸 */
+/* Status-dot block breathing: stepped, jumping between two states, no smooth breathing */
 @keyframes cp5-pulse-square {
   0%, 49%   { opacity: 1; }
   50%, 100% { opacity: 0.4; }
 }
-/* 页面进场：信号接入（一次，不循环） */
+/* Page entrance: signal connection (once, no loop) */
 @keyframes cp5-boot-in {
   0%   { opacity: 0; transform: translate3d(0, 6px, 0); clip-path: inset(0 0 100% 0); }
   38%  { opacity: 1; clip-path: inset(0 0 0 0); }
@@ -3944,7 +3944,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   100% { opacity: 1; transform: translate3d(0, 0, 0); clip-path: inset(0 0 0 0); }
 }
 
-/* ---------- 7. 页面标题：方块光标 + 信号接入 + 蓝标记线归位 ---------- */
+/* ---------- 7. Page headings: block cursor + signal connection + blue marker line restored ---------- */
 [data-theme="dark"] h1,
 [data-theme="dark"] .page-heading h1 {
   text-transform: uppercase !important;
@@ -3965,7 +3965,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   box-shadow: 0 0 10px rgba(0, 208, 192, 0.55) !important;
   animation: cp5-blink 1.1s step-end infinite !important;
 }
-/* 区域标记线原为蓝色 #74a4ff，归位成扫描青 */
+/* The section marker line was originally blue #74a4ff; restored to scan cyan */
 [data-theme="dark"] .heading-eyebrow::before,
 [data-theme="dark"] .eyebrow::before {
   background: #00d0c0 !important;
@@ -3978,7 +3978,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   letter-spacing: 0.14em !important;
   color: #7f8b99 !important;
 }
-/* ---------- 8. 徽章 / 分割线 / 状态点方块 ---------- */
+/* ---------- 8. Badges / dividers / status-dot blocks ---------- */
 [data-theme="dark"] .ui-badge {
   border-radius: 0 !important;
   clip-path: none !important;
@@ -4005,7 +4005,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 }
 [data-theme="dark"] hr { border: 0 !important; border-top: 1px solid rgba(0, 208, 192, 0.16) !important; }
 [data-theme="dark"] .topbar-divider { background: rgba(0, 208, 192, 0.22) !important; }
-/* 状态点：圆点 -> 5px 小方块，step 式呼吸（两态跳变） */
+/* Status dot: circle -> 5px small square, stepped breathing (two-state jump) */
 [data-theme="dark"] .status-dot,
 [data-theme="dark"] .console-sidebar-footer .status-dot {
   border-radius: 0 !important;
@@ -4015,7 +4015,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 }
 [data-theme="dark"] .status-dot:not(.paused) { box-shadow: 0 0 6px rgba(0, 208, 192, 0.5) !important; }
 
-/* ---------- 9. 输入框：等宽 + 聚焦四角 L 刻度 ---------- */
+/* ---------- 9. Inputs: monospace + focus L-shaped corner ticks ---------- */
 [data-theme="dark"] input:not(.settings-toggle):not([type="checkbox"]):not([type="radio"]),
 [data-theme="dark"] select,
 [data-theme="dark"] textarea,
@@ -4033,7 +4033,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 [data-theme="dark"] select:hover,
 [data-theme="dark"] textarea:hover,
 [data-theme="dark"] .ui-input:hover { border-color: rgba(0, 208, 192, 0.36) !important; }
-/* input 是替换元素，放不了伪元素：四角 L 刻度用背景层画（2px 内缩，7px 臂长） */
+/* input is a replaced element and cannot hold pseudo-elements: the L-shaped corner ticks are drawn with a background layer (2px inset, 7px arm length) */
 [data-theme="dark"] input:not(.settings-toggle):not([type="checkbox"]):not([type="radio"]):focus,
 [data-theme="dark"] textarea:focus,
 [data-theme="dark"] .ui-input:focus,
@@ -4059,12 +4059,12 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   background-repeat: no-repeat !important;
   outline: none !important;
 }
-/* select 自带背景箭头图，不能换背景层：只给边框与内环 */
+/* select has its own background arrow image and cannot swap the background layer: only border and inner ring are given */
 [data-theme="dark"] select:focus {
   border-color: #00d0c0 !important;
   box-shadow: inset 0 0 0 1px rgba(0, 208, 192, 0.40), 0 0 0 3px rgba(0, 208, 192, 0.10) !important;
 }
-/* 真错误保留纯红：invalid 必须盖过我上面的青描边 */
+/* Real errors keep pure red: invalid must override my cyan border above */
 [data-theme="dark"] .ui-input.is-invalid,
 [data-theme="dark"] .ui-input[aria-invalid="true"],
 [data-theme="dark"] input[aria-invalid="true"],
@@ -4074,7 +4074,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   box-shadow: inset 0 0 0 1px rgba(233, 69, 66, 0.38) !important;
 }
 
-/* ---------- 10. 原生件接管：滚动条 / selection / caret / 聚焦环 ---------- */
+/* ---------- 10. Native pieces take over: scrollbar / selection / caret / focus ring ---------- */
 [data-theme="dark"] * { scrollbar-color: rgba(0, 208, 192, 0.34) #070a0e !important; }
 [data-theme="dark"] *::-webkit-scrollbar { width: 10px !important; height: 10px !important; }
 [data-theme="dark"] *::-webkit-scrollbar-track { background: #070a0e !important; }
@@ -4089,17 +4089,17 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 [data-theme="dark"] ::selection { background: rgba(0, 208, 192, 0.32) !important; color: #eafffd !important; }
 [data-theme="dark"] textarea,
 [data-theme="dark"] [contenteditable="true"] { caret-color: #00d0c0 !important; }
-/* summary 的聚焦环原本直接写死蓝色 #6f9df3，这里归位 */
+/* summary's focus ring originally hard-coded blue #6f9df3; restored here */
 [data-theme="dark"] summary:focus-visible { outline-color: #00d0c0 !important; }
-/* ---------- 11. 全屏基底：扫描线 / 40px 网格 / 噪点 / 去紫去红 ---------- */
-/* 页面底色：删掉紫蓝径向光（原 rgba(112,88,210)），只留冷青环境光 */
+/* ---------- 11. Fullscreen base: scanlines / 40px grid / noise / purple and red removed ---------- */
+/* Page base color: the purple-blue radial light (originally rgba(112,88,210)) is removed, leaving only cool-cyan ambient light */
 [data-theme="dark"] body {
   background:
     radial-gradient(1120px 620px at 82% -12%, rgba(0, 208, 192, 0.075), transparent 58%),
     radial-gradient(900px 560px at -10% 8%, rgba(0, 208, 192, 0.035), transparent 60%),
     linear-gradient(180deg, #0a0e14 0%, #0a0b10 38%, #080a0e 100%) !important;
 }
-/* 扫描线 + 网格：从"垫在内容底下、几乎看不见"改成"盖在整屏之上、看得见" */
+/* Scanlines + grid: changed from "under the content, almost invisible" to "over the whole screen, visible" */
 [data-theme="dark"] body::before {
   content: "" !important;
   position: fixed !important;
@@ -4114,7 +4114,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   background-size: auto, 40px 40px, 40px 40px !important;
   background-repeat: repeat, repeat, repeat !important;
 }
-/* 噪点：0.04 -> 0.12（soft-light），提到肉眼可见的胶片颗粒 */
+/* Noise: 0.04 -> 0.12 (soft-light), raised to film grain visible to the naked eye */
 [data-theme="dark"] body::after {
   z-index: 30 !important;
   pointer-events: none !important;
@@ -4122,7 +4122,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   mix-blend-mode: soft-light !important;
 }
 
-/* ---------- 12. 图表与空态 ---------- */
+/* ---------- 12. Charts and empty states ---------- */
 [data-theme="dark"] .dashboard-chart-bar:not(.zero),
 [data-theme="dark"] .usage-day-bar:not(.zero) {
   border-radius: 0 !important;
@@ -4160,7 +4160,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   letter-spacing: 0.1em !important;
 }
 [data-theme="dark"] .empty-state svg { color: rgba(0, 208, 192, 0.55) !important; }
-/* 空态尾部一枚等待光标（不加文案、不注入英文） */
+/* A waiting cursor at the end of the empty state (no copy added, no English injected) */
 [data-theme="dark"] .empty-state p::after {
   content: "" !important;
   display: inline-block !important;
@@ -4173,7 +4173,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 }
 [data-theme="dark"] .chart-empty { border: 1px solid rgba(0, 208, 192, 0.18) !important; border-radius: 0 !important; }
 
-/* ---------- 13. 蓝偏色清扫：逐条点名剩下的蓝 ---------- */
+/* ---------- 13. Blue-bias sweep: naming the remaining blues one by one ---------- */
 [data-theme="dark"] .brand-mark span { color: #7ff5ea !important; text-shadow: 0 0 18px rgba(0, 208, 192, 0.42) !important; }
 [data-theme="dark"] .loading-bar-fill { background: linear-gradient(90deg, #00d0c0 0%, #7ff5ea 100%) !important; }
 [data-theme="dark"] .theme-toggle:hover { color: #7ff5ea !important; }
@@ -4181,10 +4181,10 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 [data-theme="dark"] .ui-switch.on { background: rgba(0, 208, 192, 0.55) !important; border-color: rgba(0, 208, 192, 0.75) !important; }
 [data-theme="dark"] .settings-toggle:checked { background: rgba(0, 208, 192, 0.55) !important; border-color: rgba(0, 208, 192, 0.75) !important; }
 [data-theme="dark"] .settings-toggle:checked:hover { background: rgba(0, 208, 192, 0.72) !important; }
-/* 插件面板里唯一一处硬编码蓝（.ofm_starbtn）顺手归位；若归铸器师管，我一行撤回 */
+/* The only hard-coded blue in the plugin panel (.ofm_starbtn) is restored along the way; if it belongs to the foundry master, I will revert this one line */
 [data-theme="dark"] .ofm_starbtn { color: #7ff5ea !important; }
 
-/* ---------- 14. 降级：prefers-reduced-motion（新增选择器） ---------- */
+/* ---------- 14. Fallback: prefers-reduced-motion (new selectors) ---------- */
 @media (prefers-reduced-motion: reduce) {
   [data-theme="dark"] h1,
   [data-theme="dark"] .page-heading h1 { animation: none !important; }
@@ -4194,16 +4194,16 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   [data-theme="dark"] .status-dot,
   [data-theme="dark"] .console-sidebar-footer .status-dot { animation: none !important; }
 }
-/* ---------- 15. 返工加固：徽章 0 圆角 / 标题光标 / 状态点 steps / 卡片扫光余辉 ---------- */
-/* 15.1 徽章：浅色侧有两条 0 圆角竞争者：:root:not([data-theme="dark"]) .ui-badge 的 7px
-   （app.css L1872，无 !important）与浅色块 L3494 的 999px !important，两者特异性都是 (0,3,0)。
-   主题属性挂在 html 上（shell.tsx 用 dataset.theme），所以它们本来就不该匹配；但为彻底保险，
-   这里把特异性提到 (0,3,1)：重复类名是刻意为之，只服务于"运行时恒为 0 圆角"。 */
+/* ---------- 15. Rework reinforcement: badge 0 radius / heading cursor / status-dot steps / card scan-light afterglow ---------- */
+/* 15.1 Badges: on the light side there are two 0-radius competitors: the 7px of :root:not([data-theme="dark"]) .ui-badge
+   (app.css L1872, no !important) and the 999px !important of the light block at L3494; both have specificity (0,3,0).
+   The theme attribute sits on html (shell.tsx uses dataset.theme), so they should not match anyway; but to be completely safe,
+   specificity is raised here to (0,3,1): the repeated class name is deliberate, serving only "always 0 radius at runtime". */
 [data-theme="dark"] body .ui-badge.ui-badge {
   border-radius: 0 !important;
 }
 
-/* 15.2 标题方块光标：特异性由 (0,1,2) 提到 (0,2,2)，方块加大到 0.5em，截图更容易读到 */
+/* 15.2 Heading block cursor: specificity raised from (0,1,2) to (0,2,2), the block enlarged to 0.5em so screenshots read it more easily */
 [data-theme="dark"] body h1::before {
   content: "" !important;
   display: inline-block !important;
@@ -4218,7 +4218,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   animation: cp5-blink 1.1s steps(1, end) infinite !important;
 }
 
-/* 15.3 状态点：侧栏变体的竞争规则特异性是 (0,3,0)，这里提到 (0,3,1)，保持 steps 硬切 */
+/* 15.3 Status dots: the sidebar variant's competing rule has specificity (0,3,0); raised here to (0,3,1), keeping the hard stepped cuts */
 [data-theme="dark"] body .console-sidebar-footer .status-dot,
 [data-theme="dark"] body .status-dot.status-dot {
   border-radius: 0 !important;
@@ -4227,8 +4227,8 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   animation: cp5-pulse-square 1.6s steps(1, end) infinite !important;
 }
 
-/* ---------- 16. 全局滚动条：补一条直接命中根节点的规则 ---------- */
-/* 根元素 html 不匹配 [data-theme="dark"] *（后代选择器），所以根滚动条一直是 --thumb 灰蓝 */
+/* ---------- 16. Global scrollbar: add a rule that hits the root node directly ---------- */
+/* The root element html does not match [data-theme="dark"] * (a descendant selector), so the root scrollbar was always the --thumb gray-blue */
 [data-theme="dark"],
 [data-theme="dark"] * { scrollbar-color: rgba(0, 208, 192, 0.34) #070a0e !important; }
 [data-theme="dark"]::-webkit-scrollbar,
@@ -4247,7 +4247,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 [data-theme="dark"]::-webkit-scrollbar-corner,
 [data-theme="dark"] *::-webkit-scrollbar-corner { background: #070a0e !important; }
 
-/* ---------- 17. Skeleton 与禁用态 ---------- */
+/* ---------- 17. Skeleton and disabled state ---------- */
 [data-theme="dark"] .ofm_skel,
 [data-theme="dark"] .ofm_root .ofm_skel {
   border-radius: 0 !important;
@@ -4261,7 +4261,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 [data-theme="dark"] .ofm_root .ofm_skel::after {
   background: linear-gradient(100deg, transparent 20%, rgba(0, 208, 192, 0.16) 48%, transparent 76%) !important;
 }
-/* 禁用态：条纹叠加表达"断电后仍在通电的骨架"，不用文字标记，避免与方括号刻度伪元素打架 */
+/* Disabled state: a stripe overlay expresses "a skeleton still powered after power-off"; no text markers, to avoid clashing with the bracket-tick pseudo-elements */
 [data-theme="dark"] body button:disabled:not(.is-busy):not([data-busy]):not(.danger-button),
 [data-theme="dark"] body [aria-disabled="true"]:not(.is-busy) {
   opacity: 1 !important;
@@ -4272,7 +4272,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   filter: none !important;
 }
 
-/* ---------- 18. 空态统一：把模型页 [ NO SIGNAL ] 模板搬到首页图表空态与通用空态 ---------- */
+/* ---------- 18. Empty-state unification: move the models page's [ NO SIGNAL ] template to the home chart empty state and the general empty state ---------- */
 [data-theme="dark"] .chart-empty,
 [data-theme="dark"] .empty-state {
   position: relative !important;
@@ -4307,15 +4307,15 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   box-shadow: 0 0 10px -1px rgba(0, 208, 192, 0.55) !important;
   animation: cp5-blink 1.05s steps(1, end) infinite !important;
 }
-/* 降级补充：首页空态新加的等待光标也要在 reduced-motion 下停 */
+/* Fallback supplement: the home empty state's new waiting cursor must also stop under reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   [data-theme="dark"] .chart-empty::after { animation: none !important; }
 }
 
-/* ==== V5 NIGHT · 圆角清零 + 切角多样化 ==== */
-/* 用户要求：赛博终端不该有钝圆边框，全部清零。但不是千篇一律的直角，而是不同角度的斜切，独具一格。 */
+/* ==== V5 NIGHT · radius zeroing + varied bevel cuts ==== */
+/* User requirement: a cyber terminal should not have dull rounded borders — zero them all. But not uniform right angles; bevel cuts at different angles, each with its own character. */
 
-/* 一级：大容器（卡片/面板/表格/登录卡）—— 18px 对角切 */
+/* Level 1: large containers (cards/panels/tables/login card) — 18px diagonal cut */
 [data-theme="dark"] .ui-card,
 [data-theme="dark"] .login-card,
 [data-theme="dark"] .model-table,
@@ -4327,7 +4327,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px) !important;
 }
 
-/* 二级：按钮/输入框/下拉 —— 8px 单侧切（左上或右上，不对称才像切割） */
+/* Level 2: buttons/inputs/selects — 8px single-side cut (top-left or top-right; asymmetry looks like cutting) */
 [data-theme="dark"] .ui-button,
 [data-theme="dark"] .ui-button-default,
 [data-theme="dark"] .ui-button-outline,
@@ -4346,7 +4346,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   clip-path: polygon(8px 0, 100% 0, 100% 100%, 0 100%, 0 8px) !important;
 }
 
-/* 三级：徽章/标签/状态点 —— 4px 微切（小到几乎看不见，但凑近能发现是切角不是圆角） */
+/* Level 3: badges/tags/status dots — 4px micro cut (so small it is almost invisible, but up close you can tell it is a bevel cut, not a rounded corner) */
 [data-theme="dark"] .ui-badge,
 [data-theme="dark"] .count-badge,
 [data-theme="dark"] .status-dot,
@@ -4356,7 +4356,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   clip-path: polygon(4px 0, 100% 0, 100% 100%, 0 100%, 0 4px) !important;
 }
 
-/* 四级：滚动条/开关/进度条 —— 纯直角（机械件的零修饰） */
+/* Level 4: scrollbars/switches/progress bars — pure right angles (zero ornamentation for mechanical parts) */
 [data-theme="dark"] ::-webkit-scrollbar-thumb,
 [data-theme="dark"] .ui-switch,
 [data-theme="dark"] .ui-switch span,
@@ -4368,7 +4368,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   clip-path: none !important;
 }
 
-/* 五级：骨架屏/空状态/图表柱 —— 12px 对角切（比卡片小一号，区分层级） */
+/* Level 5: skeleton screens/empty states/chart bars — 12px diagonal cut (one size smaller than cards, to distinguish levels) */
 [data-theme="dark"] .ofm_skel,
 [data-theme="dark"] .empty-state,
 [data-theme="dark"] .chart-empty,
@@ -4379,7 +4379,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px) !important;
 }
 
-/* 六级：头像/图标容器 —— 允许保留极小圆角（2px），因为完全直角会割手 */
+/* Level 6: avatars/icon containers — a tiny radius (2px) may be kept, because a fully square corner would cut the hand */
 [data-theme="dark"] .workspace-avatar,
 [data-theme="dark"] .source-icon,
 [data-theme="dark"] .quick-icon,
@@ -4387,45 +4387,45 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   border-radius: 2px !important;
   clip-path: none !important;
 }
-/* ==== V5 NIGHT · 圆角清零 END ==== */
-/* ==== V5 NIGHT · 深度打磨（14 项修复） ==== */
+/* ==== V5 NIGHT · radius zeroing END ==== */
+/* ==== V5 NIGHT · deep polish (14 fixes) ==== */
 
-/* --- 1. KPI 图标容器：圆角清零 + 切角 --- */
+/* --- 1. KPI icon container: radius zeroed + bevel cut --- */
 [data-theme="dark"] .ov-metric-icon {
   border-radius: 0 !important;
   clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px) !important;
 }
 
-/* --- 2. 侧边栏导航按钮：2px 圆角清零 --- */
+/* --- 2. Sidebar navigation buttons: 2px radius zeroed --- */
 [data-theme="dark"] .console-nav-item {
   border-radius: 0 !important;
 }
 
-/* --- 3. 模型来源 source-row：圆角清零 + 切角 --- */
+/* --- 3. Model source source-row: radius zeroed + bevel cut --- */
 [data-theme="dark"] .source-row,
 [data-theme="dark"] .ov-source-row {
   border-radius: 0 !important;
   clip-path: polygon(8px 0, 100% 0, 100% 100%, 0 100%, 0 8px) !important;
 }
 
-/* --- 4. workspace-switch：12px 圆角清零 + 切角 --- */
+/* --- 4. workspace-switch: 12px radius zeroed + bevel cut --- */
 [data-theme="dark"] .workspace-switch {
   border-radius: 0 !important;
   clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px) !important;
 }
 
-/* --- 5. 全局 ::selection：蓝色泄漏 → 青色 --- */
+/* --- 5. Global ::selection: blue leakage → cyan --- */
 [data-theme="dark"] ::selection {
   background: rgba(0, 208, 192, 0.32) !important;
   color: #eaf6ff !important;
 }
 
-/* --- 6. 设置页开关：加切角 --- */
+/* --- 6. Settings page switch: add a bevel cut --- */
 [data-theme="dark"] .settings-toggle {
   clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px) !important;
 }
 
-/* --- 7. hover 卡片：青色微光从左扫到右 --- */
+/* --- 7. hover cards: a cyan shimmer sweeps from left to right --- */
 @keyframes cp5-sweep-glow {
   0% { background-position: -200% 0; opacity: 0; }
   15% { opacity: 1; }
@@ -4449,7 +4449,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   clip-path: inherit;
 }
 
-/* --- 8. 标题前闪烁方块光标 --- */
+/* --- 8. Blinking block cursor before headings --- */
 @keyframes cp5-blink-cursor {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
@@ -4462,7 +4462,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   font-size: 0.85em;
 }
 
-/* --- 9. 保存/测试成功 glitch 故障动效（更广泛应用） --- */
+/* --- 9. Save/test success glitch effect (applied more widely) --- */
 [data-theme="dark"] .settings-status-saved,
 [data-theme="dark"] .ui-button.is-success,
 [data-theme="dark"] .badge-success {
@@ -4470,7 +4470,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   box-shadow: 0 0 16px -5px var(--cp-glow, rgba(0,208,192,0.16)) !important;
 }
 
-/* --- 10. 状态灯呼吸加强 --- */
+/* --- 10. Status light breathing strengthened --- */
 @keyframes cp5-pulse-strong {
   0%, 100% { opacity: 1; box-shadow: 0 0 6px 1px var(--cp-cyan, #00d0c0), 0 0 14px 2px rgba(0,208,192,0.3); }
   50% { opacity: 0.4; box-shadow: 0 0 2px 0px var(--cp-cyan, #00d0c0), 0 0 4px 0px rgba(0,208,192,0.1); }
@@ -4479,14 +4479,14 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   animation: 1.6s steps(1) infinite cp5-pulse-square, 2.4s ease-in-out infinite cp5-pulse-strong !important;
 }
 
-/* --- 11. 侧边栏选中项：改切角形状 --- */
+/* --- 11. Sidebar selected item: changed to a bevel-cut shape --- */
 [data-theme="dark"] .console-nav-item.selected,
 [data-theme="dark"] .console-nav-item[aria-current] {
   border-radius: 0 !important;
   clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%) !important;
 }
 
-/* --- 12. 全局滚动条：统一暗底青边 --- */
+/* --- 12. Global scrollbar: unified dark base with cyan edge --- */
 [data-theme="dark"] *::-webkit-scrollbar-track {
   background: #070a0e !important;
 }
@@ -4503,53 +4503,53 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   scrollbar-color: rgba(0, 208, 192, 0.28) #070a0e !important;
 }
 
-/* --- 13. 空状态柱条：暗青色扫描线纹理 --- */
+/* --- 13. Empty-state bars: dark-cyan scanline texture --- */
 [data-theme="dark"] .dashboard-chart-bar.zero,
 [data-theme="dark"] .usage-day-bar.zero {
   background: repeating-linear-gradient(0deg, rgba(0,208,192,0.06) 0px, rgba(0,208,192,0.06) 1px, transparent 1px, transparent 4px) !important;
   border: 1px solid rgba(0, 208, 192, 0.08) !important;
 }
 
-/* --- 14. 失败/警报指标红色补强 --- */
+/* --- 14. Failure/alert metrics: red reinforced --- */
 [data-theme="dark"] .ov-metric[data-accent="danger"] .ov-metric-icon {
   background: var(--cp-red-soft, rgba(233,69,66,0.15)) !important;
   color: var(--cp-red, #e94542) !important;
   box-shadow: rgba(233,69,66,0.25) 0 0 10px -3px !important;
 }
 
-/* ==== V5 NIGHT · 深度打磨 END ==== */
+/* ==== V5 NIGHT · deep polish END ==== */
 
-/* ==== V5 NIGHT · 第二轮深度打磨（26 处圆角清零 + 七级差异化签名） ==== */
+/* ==== V5 NIGHT · second-round deep polish (26 radius zeroings + seven-level differentiated signatures) ==== */
 
-/* ---- P0 · 全页面通用元素 ---- */
+/* ---- P0 · elements common to all pages ---- */
 
-/* 1. logo 图片：10px 圆角 → 对角切 6px（Ⅵ 图标座级） */
+/* 1. Logo image: 10px radius → 6px diagonal cut (Level VI icon-base grade) */
 [data-theme="dark"] .console-mark {
   border-radius: 0 !important;
   clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px) !important;
 }
 
-/* 2. 工作空间头像：2px 圆角 → 对角切 4px（Ⅳ 徽章级） */
+/* 2. Workspace avatar: 2px radius → 4px diagonal cut (Level IV badge grade) */
 [data-theme="dark"] .workspace-avatar {
   border-radius: 0 !important;
   clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px) !important;
 }
 
-/* 3. 导航指示器：999px 药丸 → 方形刻度线（2px 宽 × 100% 高） */
+/* 3. Navigation indicator: 999px pill → square tick line (2px wide × 100% high) */
 [data-theme="dark"] .console-nav-indicator {
   border-radius: 0 !important;
   width: 2px !important;
 }
 
-/* 4. 侧边栏底部信息卡：12px 圆角 → 对角切 12px（Ⅶ 骨架级） */
+/* 4. Sidebar bottom info card: 12px radius → 12px diagonal cut (Level VII skeleton grade) */
 [data-theme="dark"] .sidebar-support {
   border-radius: 0 !important;
   clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px) !important;
 }
 
-/* ---- P1 · 差异化签名（不再千篇一律） ---- */
+/* ---- P1 · Differentiated signatures (no longer all the same) ---- */
 
-/* 5. 按钮 hover：填充反色（透明底青框 → 青底黑字）+ 辉光 + 微浮起 */
+/* 5. Button hover: fill inversion (transparent base with cyan frame → cyan base with black text) + glow + slight lift */
 [data-theme="dark"] .ui-button:hover:not(:disabled) {
   background: var(--cp-cyan, #00d0c0) !important;
   color: #0a0f14 !important;
@@ -4560,7 +4560,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   transform: translateY(0) scale(0.98) !important;
 }
 
-/* 6. 危险按钮 hover：红底白字 + 红色辉光 */
+/* 6. Danger button hover: red base with white text + red glow */
 [data-theme="dark"] .danger-button:hover:not(:disabled),
 [data-theme="dark"] .ui-button.danger:hover:not(:disabled) {
   background: var(--cp-red, #e94542) !important;
@@ -4568,7 +4568,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   box-shadow: 0 0 14px var(--cp-red, #e94542), 0 0 30px rgba(233, 69, 66, 0.3) !important;
 }
 
-/* 7. 输入框 focus：边框实色 + 辉光 */
+/* 7. Input focus: solid border color + glow */
 [data-theme="dark"] .ui-input:focus,
 [data-theme="dark"] .ui-input:focus-visible {
   border-color: var(--cp-cyan, #00d0c0) !important;
@@ -4576,7 +4576,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   outline: none !important;
 }
 
-/* 8. 徽章：等宽大写 + 宽字距 + 霓虹发光 */
+/* 8. Badges: monospace uppercase + wide letter-spacing + neon glow */
 [data-theme="dark"] .ui-badge,
 [data-theme="dark"] .count-badge {
   font-family: Consolas, "Cascadia Mono", "SF Mono", "JetBrains Mono", monospace !important;
@@ -4586,180 +4586,180 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   text-shadow: 0 0 6px rgba(0, 208, 192, 0.4) !important;
 }
 
-/* 9. 导航选中项：左侧 2px 青色竖线 + 10% 青色底（差异化于按钮/输入框） */
+/* 9. Navigation selected item: a 2px cyan vertical line on the left + 10% cyan base (differentiated from buttons/inputs) */
 [data-theme="dark"] .console-nav-item.selected,
 [data-theme="dark"] .console-nav-item[aria-current] {
   border-left: 2px solid var(--cp-cyan, #00d0c0) !important;
   background: linear-gradient(90deg, rgba(0, 208, 192, 0.15), rgba(0, 208, 192, 0.05)) !important;
 }
 
-/* ---- P2 · 各页面残留圆角清零 ---- */
+/* ---- P2 · zeroing leftover radii on each page ---- */
 
-/* 10. 概览页 quick-icon：2px → 对角切 4px */
+/* 10. Overview page quick-icon: 2px → 4px diagonal cut */
 [data-theme="dark"] .quick-icon,
 [data-theme="dark"] .ov-quick-icon {
   border-radius: 0 !important;
   clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px) !important;
 }
 
-/* 11. 概览页 quick-endpoint：10px → 单侧切 8px（Ⅱ 按钮级，右下切） */
+/* 11. Overview page quick-endpoint: 10px → 8px single-side cut (Level II button grade, bottom-right cut) */
 [data-theme="dark"] .quick-endpoint,
 [data-theme="dark"] .ov-endpoint {
   border-radius: 0 !important;
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%) !important;
 }
 
-/* 12. 概览页 source-icon：2px → 对角切 4px */
+/* 12. Overview page source-icon: 2px → 4px diagonal cut */
 [data-theme="dark"] .source-icon {
   border-radius: 0 !important;
   clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px) !important;
 }
 
-/* 13. 用量页 channel-filters：6px → 清零 */
+/* 13. Usage page channel-filters: 6px → zeroed */
 [data-theme="dark"] .channel-filters {
   border-radius: 0 !important;
 }
 
-/* 14. 用量页筛选按钮：2px → 清零 */
+/* 14. Usage page filter buttons: 2px → zeroed */
 [data-theme="dark"] .channel-filters button {
   border-radius: 0 !important;
 }
 
-/* 15. 用量页 usage-window-empty：1px → 对角切 8px */
+/* 15. Usage page usage-window-empty: 1px → 8px diagonal cut */
 [data-theme="dark"] .usage-window-empty {
   border-radius: 0 !important;
   clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px) !important;
 }
 
-/* 16. 设置页 settings-field：9px → 对角切 12px（Ⅰ 面板级） */
+/* 16. Settings page settings-field: 9px → 12px diagonal cut (Level I panel grade) */
 [data-theme="dark"] .settings-field {
   border-radius: 0 !important;
   clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px) !important;
 }
 
-/* 17. 设置页 settings-note：1px → 清零 */
+/* 17. Settings page settings-note: 1px → zeroed */
 [data-theme="dark"] .settings-note {
   border-radius: 0 !important;
 }
 
-/* 18. 设置页 settings-status-dot：1px → 清零 */
+/* 18. Settings page settings-status-dot: 1px → zeroed */
 [data-theme="dark"] .settings-status-dot {
   border-radius: 0 !important;
 }
 
-/* 19. 设置页 settings-toggle 滑块：1px/2px → 清零 */
+/* 19. Settings page settings-toggle thumb: 1px/2px → zeroed */
 [data-theme="dark"] .settings-fieldset .settings-toggle:after,
 [data-theme="dark"] .settings-fieldset .settings-toggle:checked:after,
 [data-theme="dark"] .settings-fieldset .settings-field .settings-toggle {
   border-radius: 0 !important;
 }
 
-/* 20. API 接入页 cx-icon：1px → 对角切 4px */
+/* 20. API access page cx-icon: 1px → 4px diagonal cut */
 [data-theme="dark"] .cx-icon {
   border-radius: 0 !important;
   clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px) !important;
 }
 
-/* 21. API 接入页 cx-field：1px → 对角切 8px */
+/* 21. API access page cx-field: 1px → 8px diagonal cut */
 [data-theme="dark"] .cx-field {
   border-radius: 0 !important;
   clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px) !important;
 }
 
-/* 22. API 接入页 cx-code：1px → 对角切 8px */
+/* 22. API access page cx-code: 1px → 8px diagonal cut */
 [data-theme="dark"] .cx-code {
   border-radius: 0 !important;
   clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px) !important;
 }
 
-/* 23. 渠道页 ch-metric-icon：1px → 对角切 4px */
+/* 23. Channels page ch-metric-icon: 1px → 4px diagonal cut */
 [data-theme="dark"] .ch-metric-icon {
   border-radius: 0 !important;
   clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px) !important;
 }
 
-/* 24. 渠道页 checkin-control：999px 药丸 → 对角切 8px */
+/* 24. Channels page checkin-control: 999px pill → 8px diagonal cut */
 [data-theme="dark"] .checkin-control {
   border-radius: 0 !important;
   clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px) !important;
 }
 
-/* 25. 渠道页筛选按钮组：4px/6px/8px → 清零 */
+/* 25. Channels page filter button group: 4px/6px/8px → zeroed */
 [data-theme="dark"] .channel-filters,
 [data-theme="dark"] .channel-filters button,
 [data-theme="dark"] .channel-filters span {
   border-radius: 0 !important;
 }
 
-/* 26. 渠道页 provider-logo：2px → 对角切 4px */
+/* 26. Channels page provider-logo: 2px → 4px diagonal cut */
 [data-theme="dark"] .provider-logo {
   border-radius: 0 !important;
   clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px) !important;
 }
 
-/* 27. 模型清单页 model-row-actions 按钮：2px → 清零 */
+/* 27. Model list page model-row-actions buttons: 2px → zeroed */
 [data-theme="dark"] .model-browser .model-row-actions .ui-button-outline,
 [data-theme="dark"] .model-browser .model-row-actions .ui-button {
   border-radius: 0 !important;
 }
 
-/* 28. 模型清单页 md-copy-done：2px → 清零 */
+/* 28. Model list page md-copy-done: 2px → zeroed */
 [data-theme="dark"] .model-browser .model-row-actions .md-copy-done {
   border-radius: 0 !important;
 }
 
-/* 29. 登录页 login-card：16px → 对角切 18px（Ⅰ 面板级） */
+/* 29. Login page login-card: 16px → 18px diagonal cut (Level I panel grade) */
 [data-theme="dark"] .login-card {
   border-radius: 0 !important;
   clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px) !important;
 }
 
-/* 30. 登录页 login-card form .primary：11px → 清零（已由按钮级覆盖） */
+/* 30. Login page login-card form .primary: 11px → zeroed (already covered by the button level) */
 [data-theme="dark"] .login-card form .primary {
   border-radius: 0 !important;
 }
 
-/* 31. 杂项：ui-button-ghost hover 3px → 清零 */
+/* 31. Misc: ui-button-ghost hover 3px → zeroed */
 [data-theme="dark"] .ui-button-ghost:hover {
   border-radius: 0 !important;
 }
 
-/* 32. 杂项：滚动条 4px → 清零 */
+/* 32. Misc: scrollbar 4px → zeroed */
 [data-theme="dark"] *::-webkit-scrollbar-thumb {
   border-radius: 0 !important;
 }
 
-/* 33. 杂项：detail-security-note 1px → 清零 */
+/* 33. Misc: detail-security-note 1px → zeroed */
 [data-theme="dark"] .detail-security-note {
   border-radius: 0 !important;
 }
 
-/* 34. 杂项：usage-feedback 1px → 清零 */
+/* 34. Misc: usage-feedback 1px → zeroed */
 [data-theme="dark"] .usage-browser .usage-feedback {
   border-radius: 0 !important;
 }
 
-/* 35. 杂项：copy-feedback 1px → 清零 */
+/* 35. Misc: copy-feedback 1px → zeroed */
 [data-theme="dark"] .copy-feedback::after {
   border-radius: 0 !important;
 }
 
-/* 36. 杂项：usage-model-filters 2px → 清零 */
+/* 36. Misc: usage-model-filters 2px → zeroed */
 [data-theme="dark"] .usage-browser .usage-model-filters select:focus-visible {
   border-radius: 0 !important;
 }
 
-/* 37. 杂项：usage-pagination 2px → 清零 */
+/* 37. Misc: usage-pagination 2px → zeroed */
 [data-theme="dark"] .usage-browser .usage-pagination .ui-button {
   border-radius: 0 !important;
 }
 
-/* ==== V5 NIGHT · 第二轮深度打磨 END ==== */
-/* ==== V5 NIGHT · 第三轮深度打磨（颜色丰富/差异化/棱角分明） ==== */
+/* ==== V5 NIGHT · second-round deep polish END ==== */
+/* ==== V5 NIGHT · third-round deep polish (richer colors / differentiation / sharp edges) ==== */
 
-/* ---- 问题一：颜色太单一 ---- */
+/* ---- Problem 1: colors too monotonous ---- */
 
-/* 1. 红色注入：失败/警报元素必须有红色存在感 */
+/* 1. Red injection: failure/alert elements must have a red presence */
 [data-theme="dark"] .ov-metric[data-accent="danger"] .ov-metric-icon,
 [data-theme="dark"] .ov-failures .ov-failure-row,
 [data-theme="dark"] .model-browser .channel-error,
@@ -4767,7 +4767,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   color: var(--cp-red, #e94542) !important;
 }
 
-/* 失败回合 KPI 图标用红色 */
+/* Failed-round KPI icons use red */
 [data-theme="dark"] .usage-metrics .ov-metric:nth-child(5) .ov-metric-icon {
   background: rgba(233, 69, 66, 0.12) !important;
   color: var(--cp-red, #e94542) !important;
@@ -4777,7 +4777,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   color: var(--cp-red, #e94542) !important;
 }
 
-/* 已恢复回合 KPI 图标用琥珀色 */
+/* Recovered-round KPI icons use amber */
 [data-theme="dark"] .usage-metrics .ov-metric:nth-child(6) .ov-metric-icon {
   background: rgba(232, 163, 61, 0.12) !important;
   color: var(--cp-amber, #e8a33d) !important;
@@ -4787,7 +4787,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   color: var(--cp-amber, #e8a33d) !important;
 }
 
-/* 输入/输出 Token 用不同颜色区分 */
+/* Input/output Tokens are distinguished by different colors */
 [data-theme="dark"] .usage-metrics .ov-metric:nth-child(3) .ov-metric-icon {
   background: rgba(0, 208, 192, 0.12) !important;
   color: var(--cp-cyan, #00d0c0) !important;
@@ -4797,7 +4797,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   color: var(--cp-amber, #e8a33d) !important;
 }
 
-/* 2. 琥珀色注入：警告/注意类元素 */
+/* 2. Amber injection: warning/attention elements */
 [data-theme="dark"] .ui-badge-warning,
 [data-theme="dark"] .badge-warn {
   background: rgba(232, 163, 61, 0.12) !important;
@@ -4805,7 +4805,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   border-color: rgba(232, 163, 61, 0.35) !important;
 }
 
-/* 3. 状态徽章按语义着色：成功=青、警告=琥珀、错误=红、信息=灰 */
+/* 3. Status badges colored by semantics: success = cyan, warning = amber, error = red, info = gray */
 [data-theme="dark"] .ui-badge-success,
 [data-theme="dark"] .badge-success {
   background: rgba(0, 208, 192, 0.12) !important;
@@ -4819,15 +4819,15 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   border-color: rgba(233, 69, 66, 0.35) !important;
 }
 
-/* 4. KPI 数字按语义着色：正常=白、异常=红、注意=琥珀 */
+/* 4. KPI numbers colored by semantics: normal = white, abnormal = red, attention = amber */
 [data-theme="dark"] .ov-metric strong {
   color: var(--cp-cyan, #00d0c0) !important;
   text-shadow: 0 0 12px rgba(0, 208, 192, 0.15) !important;
 }
 
-/* ---- 问题二：设计同质化 ---- */
+/* ---- Problem 2: design homogenization ---- */
 
-/* 5. 按钮差异化：主按钮=实心青底黑字（扳机），幽灵按钮=透明底青框（瞄具） */
+/* 5. Button differentiation: primary button = solid cyan base with black text (trigger), ghost button = transparent base with cyan frame (sight) */
 [data-theme="dark"] .ui-button-default,
 [data-theme="dark"] .primary {
   background: var(--cp-cyan, #00d0c0) !important;
@@ -4847,7 +4847,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   background: #0bc4b4 !important;
 }
 
-/* 幽灵按钮：透明底 + 青框（和主按钮完全不同的视觉语言） */
+/* Ghost button: transparent base + cyan frame (a completely different visual language from the primary button) */
 [data-theme="dark"] .ui-button-ghost {
   background: transparent !important;
   color: var(--cp-cyan, #00d0c0) !important;
@@ -4859,7 +4859,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   box-shadow: 0 0 10px rgba(0, 208, 192, 0.15) !important;
 }
 
-/* 6. 输入框差异化：深色内嵌底 + 右下单侧切（和按钮的左上切方向不同） */
+/* 6. Input differentiation: dark inset base + single-side cut at the bottom right (a different cut direction from buttons' top-left) */
 [data-theme="dark"] .ui-input,
 [data-theme="dark"] input[type="text"],
 [data-theme="dark"] input[type="number"],
@@ -4880,14 +4880,14 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   outline: none !important;
 }
 
-/* 7. 徽章差异化：更小的切角（4px）+ 更强的发光（和按钮/输入框区分） */
+/* 7. Badge differentiation: smaller bevel cuts (4px) + stronger glow (distinguishing them from buttons/inputs) */
 [data-theme="dark"] .ui-badge,
 [data-theme="dark"] .count-badge {
   text-shadow: 0 0 8px currentColor !important;
   font-weight: 600 !important;
 }
 
-/* 8. 导航选中项差异化：左侧 2px 青色竖线 + 背景渐变 + 文字发光 */
+/* 8. Navigation selected-item differentiation: a 2px cyan vertical line on the left + background gradient + glowing text */
 [data-theme="dark"] .console-nav-item.selected,
 [data-theme="dark"] .console-nav-item[aria-current] {
   border-left: 2px solid var(--cp-cyan, #00d0c0) !important;
@@ -4896,9 +4896,9 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   text-shadow: 0 0 8px rgba(0, 208, 192, 0.3) !important;
 }
 
-/* ---- 问题三：棱角不分明 ---- */
+/* ---- Problem 3: edges not distinct ---- */
 
-/* 9. 卡片边框加强：0.666px → 1px + 不透明度提升 */
+/* 9. Card border strengthened: 0.666px → 1px + opacity raised */
 [data-theme="dark"] .ui-card,
 [data-theme="dark"] .ov-metric,
 [data-theme="dark"] .usage-panel {
@@ -4906,7 +4906,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 20px -8px rgba(0, 208, 192, 0.1) !important;
 }
 
-/* 10. 四角 L 型刻度线：用伪元素画真正的四角刻度 */
+/* 10. L-shaped tick lines at the four corners: draw real four-corner ticks with pseudo-elements */
 [data-theme="dark"] .ui-card::after,
 [data-theme="dark"] .ov-metric::after {
   content: "" !important;
@@ -4914,16 +4914,16 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   inset: 0 !important;
   pointer-events: none !important;
   background:
-    /* 左上角 L */
+    /* Top-left L */
     linear-gradient(to right, var(--cp-cyan, #00d0c0) 12px, transparent 12px) top left / 12px 1px,
     linear-gradient(to bottom, var(--cp-cyan, #00d0c0) 12px, transparent 12px) top left / 1px 12px,
-    /* 右上角 L */
+    /* Top-right L */
     linear-gradient(to left, var(--cp-cyan, #00d0c0) 12px, transparent 12px) top right / 12px 1px,
     linear-gradient(to bottom, var(--cp-cyan, #00d0c0) 12px, transparent 12px) top right / 1px 12px,
-    /* 右下角 L */
+    /* Bottom-right L */
     linear-gradient(to left, var(--cp-cyan, #00d0c0) 12px, transparent 12px) bottom right / 12px 1px,
     linear-gradient(to top, var(--cp-cyan, #00d0c0) 12px, transparent 12px) bottom right / 1px 12px,
-    /* 左下角 L */
+    /* Bottom-left L */
     linear-gradient(to right, var(--cp-cyan, #00d0c0) 12px, transparent 12px) bottom left / 12px 1px,
     linear-gradient(to top, var(--cp-cyan, #00d0c0) 12px, transparent 12px) bottom left / 1px 12px !important;
   background-repeat: no-repeat !important;
@@ -4932,18 +4932,18 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   clip-path: inherit !important;
 }
 
-/* 11. 按钮边框加强：0.666px → 1px */
+/* 11. Button border strengthened: 0.666px → 1px */
 [data-theme="dark"] .ui-button {
   border-width: 1px !important;
 }
 
-/* 12. 设置页开关加强：更明显的视觉边界 */
+/* 12. Settings page switch strengthened: a more obvious visual boundary */
 [data-theme="dark"] .settings-toggle {
   border: 1px solid rgba(0, 208, 192, 0.4) !important;
   box-shadow: 0 0 8px rgba(0, 208, 192, 0.15), inset 0 0 4px rgba(0, 208, 192, 0.1) !important;
 }
 
-/* 13. 输入框边框加强：0.666px → 1px + 不透明度提升 */
+/* 13. Input border strengthened: 0.666px → 1px + opacity raised */
 [data-theme="dark"] .ui-input,
 [data-theme="dark"] input[type="text"],
 [data-theme="dark"] input[type="number"],
@@ -4954,110 +4954,110 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   border-color: rgba(0, 208, 192, 0.25) !important;
 }
 
-/* 14. 徽章边框加强：不透明度提升 */
+/* 14. Badge border strengthened: opacity raised */
 [data-theme="dark"] .ui-badge,
 [data-theme="dark"] .count-badge {
   border-width: 1px !important;
   border-color: rgba(0, 208, 192, 0.45) !important;
 }
 
-/* 15. 空状态图表面板加强：边框更明显 */
+/* 15. Empty-state chart panel strengthened: border more obvious */
 [data-theme="dark"] .chart-empty,
 [data-theme="dark"] .ov-chart-empty {
   border: 1px solid rgba(0, 208, 192, 0.3) !important;
   box-shadow: inset 0 0 30px -10px rgba(0, 208, 192, 0.15) !important;
 }
 
-/* 16. 侧边栏底部信息卡边框加强 */
+/* 16. Sidebar bottom info card border strengthened */
 [data-theme="dark"] .sidebar-support {
   border: 1px solid rgba(0, 208, 192, 0.15) !important;
 }
 
-/* 17. workspace-switch 边框加强 */
+/* 17. workspace-switch border strengthened */
 [data-theme="dark"] .workspace-switch {
   border: 1px solid rgba(0, 208, 192, 0.2) !important;
 }
 
-/* ==== V5 NIGHT · 第三轮深度打磨 END ==== */
-/* ==== V5 NIGHT · 第四轮深度打磨（EAC 协付渠道 + 登录页残留） ==== */
+/* ==== V5 NIGHT · third-round deep polish END ==== */
+/* ==== V5 NIGHT · fourth-round deep polish (EAC co-pay channels + login page leftovers) ==== */
 
-/* 1. EAC 状态徽章（ofm_pill）：999px 药丸 → 切角 4px */
+/* 1. EAC status badge (ofm_pill): 999px pill → 4px bevel cut */
 [data-theme="dark"] .ofm_pill {
   border-radius: 0 !important;
   clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px) !important;
 }
 
-/* 2. EAC 状态点（ofm_dot）：50% 圆形 → 方形 */
+/* 2. EAC status dot (ofm_dot): 50% circle → square */
 [data-theme="dark"] .ofm_dot {
   border-radius: 0 !important;
   width: 5px !important;
   height: 5px !important;
 }
 
-/* 3. EAC "点个 Star" 按钮（ofm_starbtn）：7px 圆角 → 切角 8px */
+/* 3. EAC "Star" button (ofm_starbtn): 7px radius → 8px bevel cut */
 [data-theme="dark"] .ofm_starbtn {
   border-radius: 0 !important;
   clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px) !important;
 }
 
-/* 4. EAC 信息卡（ofm_hero）：12px/20px 圆角 → 对角切 18px */
+/* 4. EAC info card (ofm_hero): 12px/20px radius → 18px diagonal cut */
 [data-theme="dark"] .ofm_hero {
   border-radius: 0 !important;
   clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px) !important;
 }
 
-/* 5. 登录页代码块（code）：6px 圆角 → 切角 4px */
+/* 5. Login page code block (code): 6px radius → 4px bevel cut */
 [data-theme="dark"] code {
   border-radius: 0 !important;
   clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px) !important;
 }
 
-/* ==== V5 NIGHT · 第四轮深度打磨 END ==== *//* ==== V5 NIGHT END ==== */
+/* ==== V5 NIGHT · fourth-round deep polish END ==== *//* ==== V5 NIGHT END ==== */
 
 /* ==========================================================================
-   ==== V5 DAY · 流光岁月打磨（只动白昼，黑夜一律不碰） =====================
-   依据 impeccable craft-floor：
-   ① kicker 去"装扮感"——缩短字距、弱化前置短线（保留标签本身做导航）；
-   ② 彩色表面次级字改暖调，不再用中性灰（对标 Claude #6c6a64）；
-   ③ 状态徽章分色——成功/警告/危险/信息分色相，别全一个橙；
-   ④ 缓动已在上方 :root 换成指数 ease-out（回弹过时）。
+   ==== V5 DAY · Flowing Light Years polish (daylight only, night is never touched) =====================
+   Based on the impeccable craft-floor:
+   ① Remove the kicker's "dressed-up" feel — shorten letter-spacing, weaken the leading short line (keep the label itself for navigation);
+   ② Secondary text on colored surfaces turns warm, no longer neutral gray (benchmarked against Claude #6c6a64);
+   ③ Status badges get separate colors — success/warning/danger/info get separate hues, not all one orange;
+   ④ Easing was already changed in :root above to an exponential ease-out (bounce is dated).
    ========================================================================== */
 
-/* ① kicker：缩短字距、弱化前置短线，去"等宽仪表盘"味 */
+/* ① kicker: shorten letter-spacing, weaken the leading short line, remove the "monospace dashboard" feel */
 :root:not([data-theme="dark"]) .heading-eyebrow,
 :root:not([data-theme="dark"]) .eyebrow {
   letter-spacing: 0.07em !important;
-  color: #8a8175 !important;            /* 暖调 tertiary，不再偏灰 */
+  color: #8a8175 !important;            /* Warm tertiary, no longer grayish */
 }
 :root:not([data-theme="dark"]) .heading-eyebrow::before,
 :root:not([data-theme="dark"]) .eyebrow::before {
   width: 10px !important;
-  background: #b49a6a !important;       /* 黄铜短线，贴纸张语言 */
+  background: #b49a6a !important;       /* Brass short line, fitting the paper language */
   opacity: 0.6 !important;
 }
 
-/* ② 彩色表面次级字暖调：徽章、计数、表格次级信息不再用中性灰 */
+/* ② Secondary text on colored surfaces turns warm: badges, counts, and secondary table info no longer use neutral gray */
 :root:not([data-theme="dark"]) .ui-badge {
-  color: #6c6a64 !important;            /* 暖灰，贴奶白画布 */
+  color: #6c6a64 !important;            /* Warm gray, fitting the creamy-white canvas */
   background: #f3efe7 !important;
 }
 :root:not([data-theme="dark"]) .dashboard-metric > div,
 :root:not([data-theme="dark"]) .console-breadcrumb,
 :root:not([data-theme="dark"]) .console-topbar-status,
 :root:not([data-theme="dark"]) .workspace-switch small {
-  color: #7d7668 !important;            /* 次级信息统一暖调 */
+  color: #7d7668 !important;            /* Secondary info uniformly warm */
 }
 
-/* ③ 状态徽章分色：成功=绿 / 警告=琥珀 / 危险=红 / 信息=黄铜，别全一个橙 */
+/* ③ Status badges get separate colors: success = green / warning = amber / danger = red / info = brass — not all one orange */
 :root:not([data-theme="dark"]) .ui-badge-success { background: #eff7f2 !important; color: #177552 !important; border-color: #cfe6da !important; }
 :root:not([data-theme="dark"]) .ui-badge-warning { background: #fbf6ea !important; color: #8a6215 !important; border-color: #e9ddc0 !important; }
 :root:not([data-theme="dark"]) .ui-badge-danger,
 :root:not([data-theme="dark"]) .ui-badge-error   { background: #fdf5f5 !important; color: #9c3343 !important; border-color: #f0d5d5 !important; }
 :root:not([data-theme="dark"]) .ui-badge-blue,
 :root:not([data-theme="dark"]) .ui-badge-info    { background: #f3efe7 !important; color: #8a4b06 !important; border-color: #eedfc6 !important; }
-/* ==== V5 DAY · 流光岁月打磨 END ==== */
-/* ---- V5 DAY 补：侧边栏选中态 & 黄铜按钮（收现代 SaaS 味，贴纸张/黄铜） ---- */
-/* ⑥ 侧边栏选中：圆角收敛 + 左侧一道黄铜细线（页签折角感），不再是大圆角块 */
+/* ==== V5 DAY · Flowing Light Years polish END ==== */
+/* ---- V5 DAY supplement: sidebar selected state & brass buttons (pull back the modern SaaS feel, fitting paper/brass) ---- */
+/* ⑥ Sidebar selected: radius reined in + a thin brass line on the left (a tab folded-corner feel), no longer a big rounded block */
 :root:not([data-theme="dark"]) .console-nav-item { border-radius: 5px !important; }
 :root:not([data-theme="dark"]) .console-nav-item.selected {
   border-radius: 5px !important;
@@ -5066,7 +5066,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   color: #8a4b06 !important;
 }
 
-/* ⑦ 黄铜主键：压哑光、减甜度——细刻边 + 几乎无大软阴影，像黄铜铭牌 */
+/* ⑦ Brass primary key: matte, less sweetness — a finely etched edge + almost no large soft shadow, like a brass nameplate */
 :root:not([data-theme="dark"]) .ui-button-default,
 :root:not([data-theme="dark"]) .primary {
   background: linear-gradient(180deg, #b57309, #9a5c06) !important;
@@ -5083,12 +5083,12 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
 :root:not([data-theme="dark"]) .primary:active {
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.18) !important;
 }
-/* ==== V5 DAY 补 END ==== */
+/* ==== V5 DAY supplement END ==== */
 /* ==========================================================================
-   ==== V5 DAY · 错位与不合理修复（只动白昼） =============================
+   ==== V5 DAY · misalignment and irrationality fixes (daylight only) =============================
    ========================================================================== */
 
-/* ① 个人工作空间卡片：文字容器允许收缩换行，别被徽章挤成竖排 */
+/* ① Personal workspace card: the text container may shrink and wrap; do not let the badge squeeze it into a vertical column */
 :root:not([data-theme="dark"]) .workspace-switch > span:not(.workspace-avatar) {
   flex: 1 1 auto !important;
   min-width: 0 !important;
@@ -5100,33 +5100,33 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   text-overflow: ellipsis !important;
 }
 :root:not([data-theme="dark"]) .workspace-switch > .ui-badge {
-  flex-shrink: 0 !important;   /* 徽章不挤压文字 */
+  flex-shrink: 0 !important;   /* The badge does not squeeze the text */
   margin-left: 0 !important;
 }
 :root:not([data-theme="dark"]) .workspace-switch { flex-wrap: nowrap !important; }
-/* ==== 修复① END ==== */
-/* ③ 能力标签与状态标签语义分层：能力=黄铜描边中性 / 状态=按语义分色 */
-/* 能力标签（纯文本/思考/视觉 = ui-badge-neutral）：黄铜描边，贴"仪器铭牌" */
+/* ==== Fix ① END ==== */
+/* ③ Capability labels and status labels in semantic layers: capability = neutral with a brass outline / status = colored by semantics */
+/* Capability labels (text-only/thinking/vision = ui-badge-neutral): brass outline, fitting an "instrument nameplate" */
 :root:not([data-theme="dark"]) .ui-badge-neutral {
   background: #f6f2ea !important;
   color: #6b6157 !important;
   border: 1px solid #e2d9c8 !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.5) !important;
 }
-/* 状态-警告（不可用/地区受限 = ui-badge-warning）：琥珀 */
+/* Status-warning (unavailable/region-restricted = ui-badge-warning): amber */
 :root:not([data-theme="dark"]) .ui-badge-warning {
   background: #fbf3e4 !important;
   color: #9a5c06 !important;
   border: 1px solid #ecd9b8 !important;
 }
-/* 状态-成功（已探测可用/可用）：绿 */
+/* Status-success (probed available/available): green */
 :root:not([data-theme="dark"]) .ui-badge-success {
   background: #edf6f0 !important;
   color: #1a7a52 !important;
   border: 1px solid #cfe5d8 !important;
 }
-/* ==== 修复③ END ==== */
-/* ② 测试按钮可点/不可点状态分层：禁用的明显"灰掉+去掉黄铜" */
+/* ==== Fix ③ END ==== */
+/* ② Test button clickable/unclickable state layering: disabled is obviously "grayed out + brass removed" */
 :root:not([data-theme="dark"]) .model-browser button:disabled,
 :root:not([data-theme="dark"]) .models-browser button:disabled,
 :root:not([data-theme="dark"]) .ui-button:disabled,
@@ -5138,7 +5138,7 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   box-shadow: none !important;
   cursor: not-allowed !important;
 }
-/* ④ 图表区空态：加极淡的黄铜坐标网格，让"没数据"也有仪器感，不再一片死白 */
+/* ④ Chart area empty state: add a very faint brass coordinate grid, so "no data" also has an instrument feel, no longer a dead white expanse */
 :root:not([data-theme="dark"]) .usage-chart-area,
 :root:not([data-theme="dark"]) .chart-area,
 :root:not([data-theme="dark"]) .dashboard-chart {
@@ -5147,55 +5147,55 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
     linear-gradient(to top, rgba(138,75,6,0.06) 1px, transparent 1px) !important;
   background-size: 48px 32px, 100% 32px !important;
 }
-/* ⑤ "0 Token"下那条断掉的虚线：藏掉意图不明的装饰 */
+/* ⑤ The broken dashed line under "0 Token": hide the decoration of unclear intent */
 :root:not([data-theme="dark"]) .usage-total-line,
 :root:not([data-theme="dark"]) .chart-total-line { display: none !important; }
-/* ==== 修复②④⑤ END ==== */
-/* ⑥ 渠道页搜索框：给图标让位，不再压字 */
+/* ==== Fixes ②④⑤ END ==== */
+/* ⑥ Channels page search box: make room for the icon, no longer pressing on the text */
 :root:not([data-theme="dark"]) .channel-search input,
-:root:not([data-theme="dark"]) input[placeholder*="搜索渠道"],
-:root:not([data-theme="dark"]) input[placeholder*="搜索模型"] {
+:root:not([data-theme="dark"]) input[placeholder*="Search channel"],
+:root:not([data-theme="dark"]) input[placeholder*="Search model"] {
   padding-left: 34px !important;
 }
 
-/* ⑧ API 接入页代码块：纯黑 → 深棕墨，贴合暖纸基调 */
+/* ⑧ API access page code block: pure black → deep-brown ink, fitting the warm-paper tone */
 :root:not([data-theme="dark"]) .quick-start pre,
 :root:not([data-theme="dark"]) .code-block,
 :root:not([data-theme="dark"]) pre,
 :root:not([data-theme="dark"]) .connection-code,
 :root:not([data-theme="dark"]) .quick-start-code {
-  background: #2b2118 !important;          /* 深棕墨，不是纯黑 */
+  background: #2b2118 !important;          /* Deep-brown ink, not pure black */
   color: #f2e9da !important;
   border: 1px solid #4a3a2a !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.04) !important;
 }
 :root:not([data-theme="dark"]) pre code,
 :root:not([data-theme="dark"]) .quick-start code { color: #f2e9da !important; background: transparent !important; }
-/* ==== 修复⑥⑧ END ==== */
-/* ④⑤ 用量图表区精修（真实类名）：0 数据也有仪器刻度感，虚线改实线 */
-/* "0 Token"下那条点状虚线：去掉，改成干净排版 */
+/* ==== Fixes ⑥⑧ END ==== */
+/* ④⑤ Usage chart area refinement (real class names): zero data also has an instrument tick feel; dashed lines become solid */
+/* The dotted dashed line under "0 Token": remove it, use clean typography instead */
 :root:not([data-theme="dark"]) .usage-window-total {
   border-bottom: none !important;
   text-decoration: none !important;
 }
 :root:not([data-theme="dark"]) .usage-window-total strong,
 :root:not([data-theme="dark"]) .usage-window-total b { text-decoration: none !important; border: 0 !important; }
-/* 图表区：加淡黄铜坐标网格，0 柱子轨道做出"刻度槽"感 */
+/* Chart area: add a faint brass coordinate grid; zero-bar tracks get a "tick slot" feel */
 :root:not([data-theme="dark"]) .usage-trend-chart {
   background-image:
     linear-gradient(to top, rgba(138,75,6,0.07) 1px, transparent 1px) !important;
   background-size: 100% 25% !important;
   border-bottom: 1px solid #e6ddcc !important;
 }
-/* 0 数据柱子的轨道：淡黄铜刻度槽，看得见但克制 */
+/* Zero-data bar tracks: faint brass tick slots — visible but restrained */
 :root:not([data-theme="dark"]) .usage-day-track {
   background: linear-gradient(180deg, rgba(138,75,6,0.045), rgba(138,75,6,0.02)) !important;
   border: 1px solid rgba(138,75,6,0.08) !important;
   border-radius: 3px !important;
 }
 :root:not([data-theme="dark"]) .usage-day-bar.zero { background: rgba(138,75,6,0.10) !important; min-height: 3px !important; border-radius: 2px !important; }
-/* ==== 修复④⑤ END ==== */
-/* ⑦ 页面内容少时撑满视口：页脚自然落底，不再浮在中间 */
+/* ==== Fixes ④⑤ END ==== */
+/* ⑦ When page content is sparse, fill the viewport: the footer falls naturally to the bottom instead of floating in the middle */
 :root:not([data-theme="dark"]) .app-shell main {
   display: flex !important;
   flex-direction: column !important;
@@ -5208,8 +5208,8 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   flex-shrink: 0 !important;
   margin-top: auto !important;
 }
-/* ==== 修复⑦ END ==== */
-/* ① 修正：徽章固定不伸展，文字容器独占剩余空间并允许省略 */
+/* ==== Fix ⑦ END ==== */
+/* ① Correction: the badge is fixed and does not stretch; the text container takes the remaining space and may be truncated */
 :root:not([data-theme="dark"]) .workspace-switch { display: flex !important; align-items: center !important; }
 :root:not([data-theme="dark"]) .workspace-switch > .workspace-avatar { flex: 0 0 auto !important; }
 :root:not([data-theme="dark"]) .workspace-switch > span:not(.workspace-avatar):not(.ui-badge) {
@@ -5226,24 +5226,24 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   flex: 0 0 auto !important;
   margin-left: auto !important;
 }
-/* ==== 修复① 修正 END ==== */
-/* ① 补强：标题"个人工作空间"不竖排断行（核心），整体省略 */
+/* ==== Fix ① correction END ==== */
+/* ① Reinforcement: the "Personal Workspace" title must not break into a vertical column (core), truncated as a whole */
 :root:not([data-theme="dark"]) .workspace-switch > span:not(.workspace-avatar):not(.ui-badge) {
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
 }
-/* ==== 修复① 补强 END ==== */
-/* ⑤ 修正：去掉大 0 下面那条琥珀点状虚线（::after 伪元素画的） */
+/* ==== Fix ① reinforcement END ==== */
+/* ⑤ Correction: remove the amber dotted dashed line under the big 0 (drawn by the ::after pseudo-element) */
 :root:not([data-theme="dark"]) [data-testid="usage-window-total"]::after,
 :root:not([data-theme="dark"]) .usage-window-total strong::after {
   display: none !important;
   content: none !important;
   background: none !important;
 }
-/* ==== 修复⑤ 修正 END ==== */
-/* ==== 夜主题·工作空间卡片修复 ==== */
-/* 赛博终端：文字不竖排，徽章不挤压，省略号截断 */
+/* ==== Fix ⑤ correction END ==== */
+/* ==== Night theme · workspace card fix ==== */
+/* Cyber terminal: text does not stack vertically, the badge does not squeeze, truncation with an ellipsis */
 [data-theme="dark"] .workspace-switch { display: flex !important; align-items: center !important; }
 [data-theme="dark"] .workspace-switch > .workspace-avatar { flex: 0 0 auto !important; }
 [data-theme="dark"] .workspace-switch > span:not(.workspace-avatar):not(.ui-badge) {
@@ -5263,4 +5263,4 @@ input:disabled, select:disabled, textarea:disabled, .ui-input:disabled {
   flex: 0 0 auto !important;
   margin-left: auto !important;
 }
-/* ==== 夜主题·工作空间卡片修复 END ==== */
+/* ==== Night theme · workspace card fix END ==== */

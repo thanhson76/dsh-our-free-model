@@ -1,4 +1,4 @@
-/** 从当前 TSX 源码在内存构建，使用真实 React、虚拟表格和本机管理摘要；无需生成 web 资源。 */
+/** Built in memory from the current TSX sources, using real React, the virtual table and the local management summary; no generated web assets needed. */
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import http from 'node:http'
@@ -19,17 +19,17 @@ const { chromium } = require(process.env.OFM_PLAYWRIGHT_MODULE ?? 'playwright')
 const frontend = fileURLToPath(new URL('../packages/standalone/frontend/', import.meta.url))
 const key = 'isolated-model-row-fixture'
 const logger = { warn() {} }
-const failure = '上游连接中断：' + 'ConnectionReset'.repeat(20)
+const failure = 'Upstream connection dropped: ' + 'ConnectionReset'.repeat(20)
 const stop = { type: 'finish', reason: { kind: 'stop' } }
 const answer = async function* () { yield { type: 'text-delta', text: 'OK' }; yield stop }
 
-test('standalone 真实模型行保留持久化实测结果、原因和原有筛选/路由', async t => {
+test('standalone real model rows preserve persisted measured results, reasons and the existing filtering/routing', async t => {
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ofm-model-row-'))
   let stores, runtime, management, server, browser
   try {
     stores = createRuntimeStores({ dataDir, logger })
     stores.settings.update({ enabled: true, exposeRegionModels: true, combos: [], forwardKey: key })
-    // 额外清单使窗口确实发生虚拟化；所有上游推理都由本机异步生成器提供。
+    // The extra catalog rows make the window actually virtualize; all upstream inference is provided by a local async generator.
     stores.catalogStore.update({ sealIds: Array.from({ length: 140 }, (_, i) => 'fixture/listed-' + i) })
     runtime = createModelRuntime({ ...stores, logger, sealedCredential: () => ({}) })
     const [failedId, successId, untouchedId, probedId] = runtime.catalog.map(row => row.id)
@@ -48,14 +48,14 @@ test('standalone 真实模型行保留持久化实测结果、原因和原有筛
     const detail = saved.manualResults[failedId].detail
     assert.equal(saved.manualResults[failedId].state, 'unknown')
     assert.equal(saved.manualResults[failedId].source, 'manual')
-    assert.equal(saved.manualResults[failedId].ttftMs, undefined, '失败覆盖成功后不保留旧速度')
+    assert.equal(saved.manualResults[failedId].ttftMs, undefined, 'a failure overwriting a success does not keep the old speed')
     assert.equal(detail, failure.slice(0, 200))
     runtime.dispose(); stores.dispose()
     stores = createRuntimeStores({ dataDir, logger })
     runtime = createModelRuntime({ ...stores, logger, sealedCredential: () => ({}) })
     runtime.adapter.stream = async function* () { throw new Error(failure) }
-    assert.deepEqual(stores.availability.get(), saved, '必须从磁盘重新读取真实失败记录')
-    assert.deepEqual(runtime.publicModelRows().map(row => row.id), routesBefore, '失败模型保留原有路由')
+    assert.deepEqual(stores.availability.get(), saved, 'the real failure record must be re-read from disk')
+    assert.deepEqual(runtime.publicModelRows().map(row => row.id), routesBefore, 'a failed model keeps its original routing')
     const settingsBefore = structuredClone(stores.settings.get())
 
     const shared = standaloneSharedUi()
@@ -99,7 +99,7 @@ test('standalone 真实模型行保留持久化实测结果、原因和原有筛
     const errors = [], externalRequests = []
     const rowFor = (page, id) => page.locator('[data-model-id=' + JSON.stringify(id) + ']')
     const findRow = async (page, id) => {
-      await page.getByRole('searchbox', { name: '搜索模型' }).fill(id)
+      await page.getByRole('searchbox', { name: 'Search models' }).fill(id)
       const row = rowFor(page, id)
       await row.waitFor()
       return row
@@ -108,18 +108,18 @@ test('standalone 真实模型行保留持久化实测结果、原因和原有筛
       const row = rowFor(page, failedId)
       await row.waitFor()
       const state = row.locator('.model-state')
-      assert.equal(await state.locator('.ui-badge').textContent(), '实测失败')
-      assert.equal(await state.locator('.ui-badge-warning').count(), 1, '失败必须使用警示色')
-      assert.equal(await state.locator('.ui-badge-success').count(), 0, '失败不得误标绿色可用')
+      assert.equal(await state.locator('.ui-badge').textContent(), 'Measured: failed')
+      assert.equal(await state.locator('.ui-badge-warning').count(), 1, 'a failure must use the warning colour')
+      assert.equal(await state.locator('.ui-badge-success').count(), 0, 'a failure must not be mislabelled green/available')
       assert.equal(await state.locator('small[title]').textContent(), detail)
       assert.equal(await state.locator('small[title]').getAttribute('title'), detail)
-      assert.ok((await row.ariaSnapshot()).includes(detail), '读屏树必须保留完整失败原因')
-      assert.equal(await row.getByRole('button', { name: '测试模型：' + failedId, exact: true }).isEnabled(), true, '失败模型仍可发起测试')
+      assert.ok((await row.ariaSnapshot()).includes(detail), 'the accessibility tree must keep the full failure reason')
+      assert.equal(await row.getByRole('button', { name: 'Test model: ' + failedId, exact: true }).isEnabled(), true, 'a failed model can still be tested')
       return row
     }
 
-    for (const [name, width] of [['桌面', 1280], ['窄屏', 390]]) {
-      await t.test(name + '：磁盘重载、真实摘要、可访问原因、筛选和虚拟化', async () => {
+    for (const [name, width] of [['Desktop', 1280], ['Narrow screen', 390]]) {
+      await t.test(name + ': disk reload, real summary, accessible reasons, filtering and virtualization', async () => {
         const context = await browser.newContext({ viewport: { width, height: 900 } })
         await context.route('**/*', route => {
           if (new URL(route.request().url()).origin !== origin) { externalRequests.push(route.request().url()); return route.abort() }
@@ -138,56 +138,56 @@ test('standalone 真实模型行保留持久化实测结果、原因和原有筛
           assert.equal(measured.detail, detail)
           assert.equal(measured.routable, true)
 
-          for (const [id, label, tone] of [[successId, '实测可用', 'success'], [untouchedId, '未探测', 'neutral'], [probedId, '已探测可用', 'success'], [listedId, '清单已收录', 'neutral']]) {
+          for (const [id, label, tone] of [[successId, 'Measured: available', 'success'], [untouchedId, 'Not probed', 'neutral'], [probedId, 'Available (probed)', 'success'], [listedId, 'Listed in catalog', 'neutral']]) {
             const row = await findRow(page, id)
             assert.equal(await row.locator('.model-state .ui-badge').textContent(), label)
             assert.equal(await row.locator('.model-state .ui-badge-' + tone).count(), 1)
           }
-          await page.getByRole('searchbox', { name: '搜索模型' }).fill('')
-          await page.getByRole('combobox', { name: '筛选可用状态' }).selectOption('unknown')
+          await page.getByRole('searchbox', { name: 'Search models' }).fill('')
+          await page.getByRole('combobox', { name: 'Filter by availability' }).selectOption('unknown')
           await failedRow(page)
           const unknown = summary.catalog.filter(row => (row.availability ?? 'unknown') === 'unknown')
           await page.waitForFunction(count => document.querySelector('[role=table]').getAttribute('aria-rowcount') === String(count + 1), unknown.length)
-          await page.getByRole('combobox', { name: '筛选可用状态' }).selectOption('available')
+          await page.getByRole('combobox', { name: 'Filter by availability' }).selectOption('available')
           await page.waitForFunction(id => !document.querySelector('[data-model-id=' + JSON.stringify(id) + ']'), failedId)
           assert.equal(await rowFor(page, successId).count(), 1)
-          await page.getByRole('combobox', { name: '筛选可用状态' }).selectOption('all')
-          await page.getByRole('button', { name: '可接入', exact: true }).click()
+          await page.getByRole('combobox', { name: 'Filter by availability' }).selectOption('all')
+          await page.getByRole('button', { name: 'Connectable', exact: true }).click()
           await failedRow(page)
-          await page.getByRole('button', { name: '未公开', exact: true }).click()
+          await page.getByRole('button', { name: 'Not public', exact: true }).click()
           assert.equal(await rowFor(page, failedId).count(), 0)
-          await page.getByRole('button', { name: '全部模型', exact: true }).click()
+          await page.getByRole('button', { name: 'All models', exact: true }).click()
           await failedRow(page)
-          await page.getByRole('combobox', { name: '筛选渠道' }).selectOption('eac')
+          await page.getByRole('combobox', { name: 'Filter by channel' }).selectOption('eac')
           const listed = await findRow(page, listedId)
-          assert.equal(await listed.locator('.model-state .ui-badge').textContent(), '清单已收录')
-          await page.getByRole('combobox', { name: '筛选渠道' }).selectOption('all')
-          await page.getByRole('searchbox', { name: '搜索模型' }).fill('')
+          assert.equal(await listed.locator('.model-state .ui-badge').textContent(), 'Listed in catalog')
+          await page.getByRole('combobox', { name: 'Filter by channel' }).selectOption('all')
+          await page.getByRole('searchbox', { name: 'Search models' }).fill('')
 
           const readsBefore = summaryReads
           await page.reload()
           const row = await failedRow(page)
-          assert.ok(summaryReads > readsBefore, '刷新必须重新读取真实管理摘要')
-          await row.getByRole('button', { name: '测试模型：' + failedId, exact: true }).click()
-          const result = page.getByRole('region', { name: '模型测试结果' })
+          assert.ok(summaryReads > readsBefore, 'a refresh must re-read the real management summary')
+          await row.getByRole('button', { name: 'Test model: ' + failedId, exact: true }).click()
+          const result = page.getByRole('region', { name: 'Model test result' })
           await result.locator('p').waitFor()
           assert.ok((await result.textContent()).includes(detail))
-          assert.equal(await result.locator('pre').count(), 0, '失败测试不能渲染成功回答')
+          assert.equal(await result.locator('pre').count(), 0, 'a failed test must not render a successful answer')
           await page.reload()
           await failedRow(page)
-          assert.ok(await page.locator('[data-model-id]').count() < summary.catalog.length, '必须使用真实虚拟化，不能挂载全部模型')
-          assert.equal(await row.evaluate(element => element.scrollWidth <= element.clientWidth), true, '长错误不能撑宽模型行')
-          assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, '页面不能产生横向溢出')
-          const scroll = page.getByRole('rowgroup', { name: '滚动模型列表' })
+          assert.ok(await page.locator('[data-model-id]').count() < summary.catalog.length, 'real virtualization must be used; not all models may be mounted')
+          assert.equal(await row.evaluate(element => element.scrollWidth <= element.clientWidth), true, 'a long error must not widen the model row')
+          assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'the page must not overflow horizontally')
+          const scroll = page.getByRole('rowgroup', { name: 'Scrollable model list' })
           await scroll.press('End')
           await rowFor(page, lastId).waitFor()
-          assert.equal(await rowFor(page, lastId).locator('.model-state .ui-badge').textContent(), '清单已收录')
+          assert.equal(await rowFor(page, lastId).locator('.model-state .ui-badge').textContent(), 'Listed in catalog')
           const bounds = await page.locator('[data-model-id]').evaluateAll(rows => rows.map(row => ({ top: row.getBoundingClientRect().top, bottom: row.getBoundingClientRect().bottom })))
-          for (let i = 1; i < bounds.length; i++) assert.ok(bounds[i].top >= bounds[i - 1].bottom - 1, '虚拟行测量后不得互相重叠')
+          for (let i = 1; i < bounds.length; i++) assert.ok(bounds[i].top >= bounds[i - 1].bottom - 1, 'virtual rows must not overlap after measurement')
         } finally { await context.close() }
       })
     }
-    await t.test('旧摘要把 listing 写成 available 时仍不冒充实测成功', async () => {
+    await t.test('an old summary that writes listing as available still does not pass it off as a measured success', async () => {
       const context = await browser.newContext()
       try {
         const page = await context.newPage()
@@ -200,19 +200,19 @@ test('standalone 真实模型行保留持久化实测结果、原因和原有筛
         await page.goto(origin)
         await page.getByTestId('models-ready').waitFor()
         const row = await findRow(page, listedId)
-        assert.equal(await row.locator('.model-state .ui-badge').textContent(), '清单已收录')
+        assert.equal(await row.locator('.model-state .ui-badge').textContent(), 'Listed in catalog')
         assert.equal(await row.locator('.model-state .ui-badge-success').count(), 0)
       } finally { await context.close() }
     })
-    assert.deepEqual(errors, [], '真实 React 不得出现运行错误')
-    assert.deepEqual(externalRequests, [], '测试仅访问本机')
-    assert.deepEqual(stores.settings.get(), settingsBefore, '筛选和渲染不得改写设置')
-    assert.deepEqual(runtime.publicModelRows().map(row => row.id), routesBefore, '测试和筛选后失败模型仍保留在原路由')
+    assert.deepEqual(errors, [], 'real React must not produce runtime errors')
+    assert.deepEqual(externalRequests, [], 'the test only accesses the local machine')
+    assert.deepEqual(stores.settings.get(), settingsBefore, 'filtering and rendering must not rewrite settings')
+    assert.deepEqual(runtime.publicModelRows().map(row => row.id), routesBefore, 'after testing and filtering, a failed model stays on its original route')
   } finally {
     await browser?.close()
     if (server?.listening) { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)) }
     management?.dispose(); runtime?.dispose(); stores?.dispose()
-    // 递归清理仅限本测试刚创建的临时目录。
+    // Recursive cleanup is limited to the temp directory this test just created.
     assert.equal(path.dirname(dataDir), path.resolve(os.tmpdir()))
     assert.ok(path.basename(dataDir).startsWith('ofm-model-row-'))
     fs.rmSync(dataDir, { recursive: true, force: true })

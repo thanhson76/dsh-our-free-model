@@ -163,7 +163,7 @@ const DISPLAY_NAMES = {
 const REGION_SENSITIVE = [/^muse.?spark/]
 
 /**
- * Is this id on the免密 lane? The gateway's listing mixes paid and free ids;
+ * Is this id on the no-key lane? The gateway's listing mixes paid and free ids;
  * only these answer without a per-user key.
  */
 export function isFreeLane(modelId) {
@@ -397,7 +397,7 @@ const EAC_CAPABILITIES = [
 
 /**
  * Ids the EAC page leads with. The two OpenCode free models are pinned to the
- * top of their group and carry the NEW / 爆 badges and the 高速 tag.
+ * top of their group and carry the NEW / hot badges and the fast tag.
  */
 const EAC_FEATURED = new Set([
   'opencode/deepseek-v4.1-flash-free',
@@ -506,7 +506,7 @@ export function isEacEntry(entry) {
 // in the roster is the verdict — the listing named them this round), and the
 // pages show the channel tag. No credential exists on this lane, so there is
 // nothing to seal, gate, or leak; the cost is stated upstream instead —
-// free-pool prompts may be logged by the provider (README, 免责声明).
+// free-pool prompts may be logged by the provider (README, Disclaimer).
 
 export const KILO_CHANNEL = 'kilo'
 export const KILO_TAG = 'Kilo'

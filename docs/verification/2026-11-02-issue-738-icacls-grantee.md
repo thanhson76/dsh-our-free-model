@@ -1,71 +1,43 @@
-# #738 修复验证：icacls 授权对象改用当前用户 SID
+# #738 Fix Verification: Change the icacls Grantee to the Current User's SID
 
-## 缺陷
+## The defect
 
-`restrictPermissions()` 在 Windows 上执行
+On Windows, `restrictPermissions()` executes
 
 ```
 icacls <file> /inheritance:r /grant:r "<USERNAME>:F"
 ```
 
-`<USERNAME>` 是裸账户名。当计算机名与登录账户名只差大小写时（Windows 允许、
-个人机常见），`icacls` 在账户数据库与计算机账户之间解析这个名字，**计算机账户
-胜出**。写入的 ACE 因此指向 `S-1-5-21-<machine>`——一个没有任何用户令牌携带的
-SID；而同一次调用里的 `/inheritance:r` 已经先删掉了继承 ACE。文件于是只剩一条
-谁都匹配不上的 ACE：随后的 `fs.renameSync` 必然 `EPERM`，文件连同已写入的内容
-一起变成不可读、不可写、不可删。
+`<USERNAME>` is a bare account name. When the computer name and the login account name differ only by case (allowed by Windows and common on personal machines), `icacls` resolves that name between the account database and the computer account, and **the computer account wins**. The ACE written therefore points to `S-1-5-21-<machine>` — a SID that no user token carries; and the `/inheritance:r` in the same call has already removed the inherited ACEs first. The file is thus left with a single ACE that matches nobody: the subsequent `fs.renameSync` inevitably fails with `EPERM`, and the file, together with the content already written to it, becomes unreadable, unwritable, and undeletable.
 
-`restrictPermissions()` 服务于全部「临时文件 + rename」的私有落盘路径
-（`eac-user.js`、`store.js` 两处、`updater.js`、`picks.js`、`egress.js`、
-`magpie-engine.js` 两处、`subscriptions.js` 三处、`packages/standalone` 三处），
-所以这台机器上登录令牌、`settings.json`、`catalog.json`、`upgrade-state.json`
-全部只在内存里，升级流程也卡在状态落盘。
+`restrictPermissions()` serves all of the private on-disk paths that use "temporary file + rename" (`eac-user.js`, two places in `store.js`, `updater.js`, `picks.js`, `egress.js`, two places in `magpie-engine.js`, three places in `subscriptions.js`, and three places in `packages/standalone`), so on this machine login tokens, `settings.json`, `catalog.json`, and `upgrade-state.json` all existed only in memory, and the upgrade flow was also stuck at persisting its state to disk.
 
-## 方案
+## The solution
 
-`src/open-external.js` 新增 `currentUserGrantee()`：
+`src/open-external.js` adds `currentUserGrantee()`:
 
-1. `whoami /user /fo csv /nh` 取当前令牌的 SID，加 `*` 前缀交给 `icacls`
-   （`*` 明确告诉 icacls 这是 SID，不要做名字解析）。
-2. `whoami` 缺失或失败时回退到 `USERDOMAIN\USERNAME` 全限定名；仍比裸名严格，
-   因为它点名了账户域，不再把二选一留给 icacls。
-3. 结果按进程记忆化：令牌的 SID 在进程生命周期内不变，而这些存储定时 flush。
+1. `whoami /user /fo csv /nh` obtains the current token's SID, and prefixes it with `*` before handing it to `icacls` (the `*` explicitly tells icacls this is a SID, so it should not do name resolution).
+2. When `whoami` is missing or fails, fall back to the fully qualified name `USERDOMAIN\USERNAME`; this is still stricter than a bare name, because it names the account domain and no longer leaves the either/or choice to icacls.
+3. The result is memoized per process: a token's SID does not change during the process lifetime, while these stores flush on a timer.
 
-保留 PR #637 的原始动机：`whoami` 的**账户名**输出走 OEM 代码页，非 ASCII 机器名
-会被 UTF-8 解码毁掉。SID 是纯 ASCII、不含可本地化文本，这条顾虑对 SID 不适用。
-`restrictPermissions()` 的语义、抛错/放弃写入的行为、POSIX 分支与全部调用点均未改动。
+The original motivation for PR #637 is preserved: the **account name** output of `whoami` goes through the OEM code page, and a non-ASCII machine name would be destroyed by UTF-8 decoding. A SID is pure ASCII and contains no localizable text, so that concern does not apply to a SID.
+The semantics of `restrictPermissions()`, its behaviour of throwing / abandoning the write, the POSIX branch, and all call sites are unchanged.
 
-## 已执行
+## What was run
 
-本机环境：Windows 10.0.26300.9818 / Node v24.15.0，`COMPUTERNAME=COLOR`、
-`USERNAME=color`、`USERDOMAIN=COLOR`（即触发条件成立）。
+Local environment: Windows 10.0.26300.9818 / Node v24.15.0, `COMPUTERNAME=COLOR`, `USERNAME=color`, `USERDOMAIN=COLOR` (i.e. the triggering condition holds).
 
-- **修复前**：`node scripts/private-file-permissions-test.mjs` → `5 private-file
-  check(s) failed`，首个失败为
-  `the DACL does not name S-1-5-21-...-1001: <file> COLOR\:(F)`，`renameSync` 复现
-  `EPERM`。同一份代码模拟 `USERNAME=COMPUTERNAME` 独立复现 `RESULT: REPRODUCED — EPERM`。
-- **修复后**：`5/5 private-file checks passed`；同一复现脚本输出
-  `RESULT: still accessible`。
-- 断言口径从「acl 文本含 `(F)` 且不含 `(I)`」加强为「DACL 的 SDDL 里必须出现**当前
-  令牌的 SID**」（`icacls /save` 产物恒以 SID 形式记录），这才约束住本缺陷；旧的
-  `(F)` 断言在坏 ACE 上同样成立，捕不到它。
-- 新增端到端用例：在 `USERNAME`/`USERDOMAIN` 与 `COMPUTERNAME` 相同的前提下，走完
-  「写 tmp → restrictPermissions → rename 覆盖正式文件 → 回读」整条私有落盘路径。
-- `node scripts/test-all.mjs --mode contributor`：**103/108**。失败 5 项经 `git stash`
-  对标为既有失败，与本改动无关：`legacy-upgrade`（浅克隆缺 `f14d261` 对象，
-  CI `fetch-depth: 0` 不触发）、`magpie-engine`（4 项 reviewer 回归，基线同样失败）、
-  `magpie-policy`、`standalone-management`（`registry.npmjs.org` 不可达 + 残留
-  `EPERM` 临时目录，基线同样失败）、`forward`（并发抖动，单跑 2/2 通过）。
-- 直接受影响的套件全部通过：`private-file` 5/5、`open-external`、`updater`、
-  `subscriptions` 38/38。
-- `node --check`、`git diff --check`：通过。
+- **Before the fix**: `node scripts/private-file-permissions-test.mjs` → `5 private-file check(s) failed`, with the first failure being `the DACL does not name S-1-5-21-...-1001: <file> COLOR\:(F)`, and `renameSync` reproducing `EPERM`. Simulating `USERNAME=COMPUTERNAME` with the same code independently reproduced `RESULT: REPRODUCED — EPERM`.
+- **After the fix**: `5/5 private-file checks passed`; the same reproduction script output `RESULT: still accessible`.
+- The assertion criterion was strengthened from "the ACL text contains `(F)` and does not contain `(I)`" to "the DACL's SDDL must contain **the current token's SID**" (the output of `icacls /save` is always recorded in SID form), which is what actually constrains this defect; the old `(F)` assertion also held on the bad ACE and could not catch it.
+- Added an end-to-end case: under the premise that `USERNAME`/`USERDOMAIN` are the same as `COMPUTERNAME`, run through the entire private on-disk path of "write tmp → restrictPermissions → rename over the official file → read back".
+- `node scripts/test-all.mjs --mode contributor`: **103/108**. The 5 failures were benchmarked with `git stash` as pre-existing failures unrelated to this change: `legacy-upgrade` (the shallow clone lacks the `f14d261` object; CI with `fetch-depth: 0` does not trigger it), `magpie-engine` (4 reviewer regressions, also failing on the baseline), `magpie-policy`, `standalone-management` (`registry.npmjs.org` unreachable + leftover `EPERM` temporary directory, also failing on the baseline), and `forward` (concurrency flakiness, passed 2/2 when run alone).
+- All directly affected suites passed: `private-file` 5/5, `open-external`, `updater`, and `subscriptions` 38/38.
+- `node --check` and `git diff --check`: passed.
 
-## 边界
+## Boundaries
 
-- 未覆盖域账户与 Microsoft 账户实机（本机为本地账户）；回退分支只保证不比原实现弱，
-  未在无 `whoami` 的环境实测。
-- 未在 POSIX 实机运行；该分支代码未改动，CI Linux 覆盖。
-- 已存在但**未被本改动修复**的坏 ACE 文件不会自愈：`restrictPermissions()` 只处理
-  新写入的临时文件。历史残留仍需 `icacls <path> /reset` 手工恢复（已验证可恢复且
-  内容不丢）。
-- 未跑 `test:release`（签名清单对齐属正式发布流程，本分支不触碰）。
+- Domain accounts and Microsoft accounts were not covered on real hardware (this machine uses a local account); the fallback branch only guarantees it is no weaker than the original implementation, and was not tested in an environment without `whoami`.
+- Not run on real POSIX hardware; that branch's code is unchanged and is covered by CI on Linux.
+- Files with a bad ACE that already exist but were **not fixed by this change** will not heal themselves: `restrictPermissions()` only handles newly written temporary files. Historical leftovers still need to be recovered manually with `icacls <path> /reset` (verified to be recoverable without losing content).
+- `test:release` was not run (aligning the signed manifest belongs to the formal release process, which this branch does not touch).

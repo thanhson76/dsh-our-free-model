@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>EAC 网关 · IP 看板</title>
+<title>EAC Gateway · IP Dashboard</title>
 <style>
   :root { color-scheme: light dark; }
   * { box-sizing: border-box; }
@@ -37,34 +37,34 @@
 </style>
 </head>
 <body>
-<h1>EAC 网关 · IP 看板</h1>
-<div class="sub">数据由网关进程实时统计并每 30 秒落盘 · <span id="gen"></span> · <button onclick="load()">刷新</button> <span id="err" class="err"></span></div>
+<h1>EAC Gateway · IP Dashboard</h1>
+<div class="sub">Data is tallied in real time by the gateway process and flushed to disk every 30 seconds · <span id="gen"></span> · <button onclick="load()">Refresh</button> <span id="err" class="err"></span></div>
 
 <div class="cards" id="cards"></div>
 
-<div class="panel"><h2>请求热力图 · 星期 × 小时（近 7 天，颜色越亮请求越多）</h2><div id="heat"></div></div>
-<div class="panel"><h2>请求曲线 · 近 72 小时（每小时请求数）</h2><div id="curve"></div></div>
+<div class="panel"><h2>Request heatmap · Weekday × hour (last 7 days, brighter = more requests)</h2><div id="heat"></div></div>
+<div class="panel"><h2>Request curve · Last 72 hours (requests per hour)</h2><div id="curve"></div></div>
 <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px;">
   <div id="gate" style="display:none">
   <div class="box">
-    <h2>EAC 网关管理令牌</h2>
-    <p>输入 .env 里的 ADMIN_TOKEN，本浏览器会记住（存于 localStorage，不动服务器）。</p>
+    <h2>EAC Gateway admin token</h2>
+    <p>Enter the ADMIN_TOKEN from .env; this browser will remember it (stored in localStorage, the server is untouched).</p>
     <input id="gateToken" type="password" placeholder="ADMIN_TOKEN" autocomplete="off">
     <div class="gerr" id="gateErr"></div>
-    <button onclick="useGateToken()">进入看板</button>
+    <button onclick="useGateToken()">Open dashboard</button>
   </div>
 </div>
 
 <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-  <div class="panel"><h2>Token 消耗占比 · 按 IP</h2><div id="pieIp"></div><div class="legend" id="pieIpL"></div></div>
-  <div class="panel"><h2>Token 消耗占比 · 按模型</h2><div id="pieModel"></div><div class="legend" id="pieModelL"></div></div>
+  <div class="panel"><h2>Token consumption share · By IP</h2><div id="pieIp"></div><div class="legend" id="pieIpL"></div></div>
+  <div class="panel"><h2>Token consumption share · By model</h2><div id="pieModel"></div><div class="legend" id="pieModelL"></div></div>
 </div>
-<div class="panel"><h2>IP 明细（按总请求排序 · IP 以盐值哈希存储，仅本面板可关联）</h2>
+<div class="panel"><h2>IP details (sorted by total requests · IPs stored as salted hashes, linkable only in this panel)</h2>
   <div style="overflow-x:auto"><table id="tbl">
     <thead><tr>
-      <th>IP 哈希</th><th class="num">总请求</th><th class="num">今日</th><th class="num">近 1 小时</th>
-      <th class="num">Token 入</th><th class="num">Token 出</th><th class="num">拒绝</th>
-      <th class="num">当前并发</th><th class="num">并发峰值</th><th>模型数</th><th>最后活跃</th>
+      <th>IP hash</th><th class="num">Total requests</th><th class="num">Today</th><th class="num">Last 1 hour</th>
+      <th class="num">Tokens in</th><th class="num">Tokens out</th><th class="num">Refusals</th>
+      <th class="num">Current concurrency</th><th class="num">Peak concurrency</th><th>Models</th><th>Last active</th>
     </tr></thead><tbody></tbody>
   </table></div>
 </div>
@@ -74,7 +74,7 @@ const QS = new URLSearchParams(location.search)
 let T = QS.get('t') ?? localStorage.getItem('eacStatsToken') ?? ''
 const PALETTE = ['#4f8cff','#38d1b2','#ffb648','#ff6f91','#a78bfa','#7ee081','#ff9f6e','#5ad0f0','#f072ae','#c2d94c']
 const esc = s => String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]))
-const ago = ts => { const s = Math.max(0, (Date.now() - ts) / 1000); if (s < 60) return Math.floor(s) + ' 秒前'; if (s < 3600) return Math.floor(s/60) + ' 分钟前'; if (s < 86400) return Math.floor(s/3600) + ' 小时前'; return Math.floor(s/86400) + ' 天前' }
+const ago = ts => { const s = Math.max(0, (Date.now() - ts) / 1000); if (s < 60) return Math.floor(s) + 's ago'; if (s < 3600) return Math.floor(s/60) + 'm ago'; if (s < 86400) return Math.floor(s/3600) + 'h ago'; return Math.floor(s/86400) + 'd ago' }
 const fmt = n => Number(n ?? 0).toLocaleString('en-US')
 
 function showGate(message) {
@@ -83,7 +83,7 @@ function showGate(message) {
 }
 function useGateToken() {
   T = document.getElementById('gateToken').value.trim()
-  if (T === '') { document.getElementById('gateErr').textContent = '请输入令牌'; return }
+  if (T === '') { document.getElementById('gateErr').textContent = 'Please enter a token'; return }
   load()
 }
 
@@ -92,20 +92,20 @@ async function load() {
     const res = await fetch('stats-data?t=' + encodeURIComponent(T), { cache: 'no-store' })
     if (res.status === 401 || res.status === 403) {
       document.getElementById('gen').textContent = ''
-      showGate(res.status === 403 ? '看板未启用：服务器 .env 需要配置 ADMIN_TOKEN' : '')
-      if (res.status === 401) document.getElementById('gateErr').textContent = '令牌无效，请重新输入'
+      showGate(res.status === 403 ? 'Dashboard not enabled: the server .env needs ADMIN_TOKEN configured' : '')
+      if (res.status === 401) document.getElementById('gateErr').textContent = 'Invalid token, please re-enter'
       return
     }
     document.getElementById('gate').style.display = 'none'
-    if (T !== '') { try { localStorage.setItem('eacStatsToken', T) } catch { /* 隐私模式忽略 */ } }
+    if (T !== '') { try { localStorage.setItem('eacStatsToken', T) } catch { /* ignore in private mode */ } }
     const d = await res.json()
     document.getElementById('err').textContent = ''
-    document.getElementById('gen').textContent = '生成于 ' + new Date(d.generatedAt).toLocaleTimeString('zh-CN')
+    document.getElementById('gen').textContent = 'Generated at ' + new Date(d.generatedAt).toLocaleTimeString('en-US')
     renderCards(d); renderHeat(d.hourly); renderCurve(d.hourly)
     renderPie('pieIp', 'pieIpL', d.ips.slice(0, 10).map(r => ({ label: r.hash.slice(0, 8), value: r.in + r.out })))
     renderPie('pieModel', 'pieModelL', Object.entries(d.models ?? {}).map(([label, value]) => ({ label, value })).sort((a,b) => b.value - a.value))
     renderTable(d)
-  } catch (e) { document.getElementById('err').textContent = '加载失败：' + e.message }
+  } catch (e) { document.getElementById('err').textContent = 'Load failed: ' + e.message }
 }
 
 function renderCards(d) {
@@ -113,11 +113,11 @@ function renderCards(d) {
   const today = (d.days ?? []).find(([day]) => day === d.day)
   const auth = d.auth ?? {}
   document.getElementById('cards').innerHTML = [
-    ['活跃 IP 数', t.ips], ['累计请求', fmt(t.req)], ['今日请求', fmt(today?.[1]?.req ?? 0)],
-    ['Token 入', fmt(t.in)], ['Token 出', fmt(t.out)],
-    // GitHub 授权闸门（自建形态）：已 star 的账号数 / 已知账号数，以及开关状态。
-    ['已授权账号', fmt(auth.authorized ?? 0)], ['已知账号', fmt(auth.known ?? 0)],
-    ['授权闸门', auth.required === true ? '强制' : auth.configured === true ? '兼容期' : '未配置'],
+    ['Active IPs', t.ips], ['Total requests', fmt(t.req)], ['Requests today', fmt(today?.[1]?.req ?? 0)],
+    ['Tokens in', fmt(t.in)], ['Tokens out', fmt(t.out)],
+    // GitHub authorization gate (self-hosted form): number of starred accounts / known accounts, and the enforcement status.
+    ['Authorized accounts', fmt(auth.authorized ?? 0)], ['Known accounts', fmt(auth.known ?? 0)],
+    ['Authorization gate', auth.required === true ? 'Enforced' : auth.configured === true ? 'Compatibility window' : 'Not configured'],
   ].map(([k, v]) => '<div class="card"><span>' + k + '</span><b>' + fmt(v) + '</b></div>').join('')
 }
 
@@ -135,18 +135,18 @@ function renderHeat(hourly) {
   const cw = 22, ch = 15, left = 34, top = 14
   let svg = '<svg width="' + (left + 24 * cw + 10) + '" height="' + (top + 7 * ch + 18) + '">'
   for (let h = 0; h < 24; h += 3) svg += '<text x="' + (left + h * cw + 8) + '" y="' + 10 + '">' + String(h).padStart(2, '0') + '</text>'
-  const wd = ['一','二','三','四','五','六','日']
+  const wd = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
   for (const c of cells) {
     const a = c.n === 0 ? 0.05 : 0.12 + 0.88 * Math.sqrt(c.n / max)
-    svg += '<rect x="' + (left + c.hour * cw) + '" y="' + (top + c.dow * ch) + '" width="' + (cw - 3) + '" height="' + (ch - 3) + '" rx="3" fill="#4f8cff" fill-opacity="' + a.toFixed(2) + '"><title>周' + wd[c.dow] + ' ' + String(c.hour).padStart(2,'0') + ':00 — ' + c.n + ' 请求</title></rect>'
+    svg += '<rect x="' + (left + c.hour * cw) + '" y="' + (top + c.dow * ch) + '" width="' + (cw - 3) + '" height="' + (ch - 3) + '" rx="3" fill="#4f8cff" fill-opacity="' + a.toFixed(2) + '"><title>' + wd[c.dow] + ' ' + String(c.hour).padStart(2,'0') + ':00 — ' + c.n + ' requests</title></rect>'
   }
-  for (let d = 0; d < 7; d++) svg += '<text x="6" y="' + (top + d * ch + 11) + '">周' + wd[d] + '</text>'
+  for (let d = 0; d < 7; d++) svg += '<text x="6" y="' + (top + d * ch + 11) + '">' + wd[d] + '</text>'
   document.getElementById('heat').innerHTML = svg + '</svg>'
 }
 
 function renderCurve(hourly) {
   const rows = hourly.slice(-72)
-  if (rows.length < 2) { document.getElementById('curve').innerHTML = '<span class="muted">数据不足（需要至少两个小时的请求）。</span>'; return }
+  if (rows.length < 2) { document.getElementById('curve').innerHTML = '<span class="muted">Insufficient data (needs at least two hours of requests).</span>'; return }
   const W = 900, H = 200, padL = 46, padB = 30, padT = 12
   const max = Math.max(1, ...rows.map(([, n]) => n))
   const px = i => padL + i / (rows.length - 1) * (W - padL - 20)
@@ -159,13 +159,13 @@ function renderCurve(hourly) {
   rows.forEach(([h], i) => { if (i % 12 === 0) labels += '<text x="' + (px(i) - 14) + '" y="' + (H - 10) + '">' + h.slice(5, 13).replace('T', ' ') + '</text>' })
   document.getElementById('curve').innerHTML = '<svg width="' + W + '" height="' + H + '">' + grid +
     '<path d="' + area + '" fill="#4f8cff" fill-opacity="0.12"/><path d="' + path + '" fill="none" stroke="#4f8cff" stroke-width="1.8"/>' +
-    rows.map(([h, n], i) => '<circle cx="' + px(i) + '" cy="' + py(n) + '" r="2.4" fill="#4f8cff"><title>' + h + ' — ' + n + ' 请求</title></circle>').join('') + labels + '</svg>'
+    rows.map(([h, n], i) => '<circle cx="' + px(i) + '" cy="' + py(n) + '" r="2.4" fill="#4f8cff"><title>' + h + ' — ' + n + ' requests</title></circle>').join('') + labels + '</svg>'
 }
 
 function renderPie(divId, legendId, rows) {
   rows = rows.filter(r => r.value > 0)
   const el = document.getElementById(divId)
-  if (rows.length === 0) { el.innerHTML = '<span class="muted">暂无数据。</span>'; document.getElementById(legendId).innerHTML = ''; return }
+  if (rows.length === 0) { el.innerHTML = '<span class="muted">No data yet.</span>'; document.getElementById(legendId).innerHTML = ''; return }
   const total = rows.reduce((s, r) => s + r.value, 0)
   const W = 220, R = 85, cx = W / 2, cy = 100
   let a0 = -Math.PI / 2, svg = ''
@@ -188,7 +188,7 @@ function renderTable(d) {
     '<code>' + esc(r.hash) + '</code>', fmt(r.req), fmt(r.today), fmt(r.freq1h), fmt(r.in), fmt(r.out), fmt(r.rej),
     fmt(r.conc), fmt(r.concMax), Object.keys(r.models ?? {}).length, esc(ago(r.last)),
   ].map((cell, i) => '<td' + (i >= 1 && i <= 8 ? ' class="num"' : '') + '>' + cell + '</td>').join('') + '</tr>').join('')
-  document.querySelector('#tbl tbody').innerHTML = body || '<tr><td colspan="11" class="muted">暂无请求。</td></tr>'
+  document.querySelector('#tbl tbody').innerHTML = body || '<tr><td colspan="11" class="muted">No requests yet.</td></tr>'
 }
 
 load()

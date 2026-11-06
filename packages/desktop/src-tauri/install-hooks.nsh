@@ -1,5 +1,5 @@
-; Node 及完整许可证随安装包分发；进程检查交给 Tauri 的标准安装器。
-; 不按名称强杀进程、不删除其它服务的锁、不覆盖已有配置。
+; Node and the full license are distributed with the installer; process checks are left to the standard Tauri installer.
+; Never force-kills processes by name, never deletes other services' locks, and never overwrites existing configuration.
 !macro NSIS_HOOK_POSTINSTALL
   CreateDirectory "$PROFILE\.our-free-model"
 !macroend

@@ -3,7 +3,7 @@
 
 # dsh-our-free-model
 
-[简体中文](README.md) | **English**
+[简体中文](README_ZH.md) | **English**
 
   <img alt="license" src="https://img.shields.io/badge/license-MIT-263146?style=flat-square">
   <img alt="zero dependencies" src="https://img.shields.io/badge/dependencies-zero-4b6fff?style=flat-square">
@@ -24,8 +24,6 @@
 > step of any kind. The frontier models are simply there, DeepSeek V4.1 Flash and
 > Kimi K3 among them. Completely free, with no usage cap.
 >
-> 你只需在 dsh 里装上这个插件，无需登录、注册、填 API Key 或任何其它操作，就能用上包括
-> DeepSeek V4.1 Flash、Kimi K3 在内的前沿模型——完全免费，不限量。
 >
 > The roster follows upstream, availability is measured from **your own** network
 > egress, the thinking-effort control sends a real budget instead of a prompt hint, and
@@ -348,7 +346,7 @@ needs a few seconds before it carries traffic, and the plugin waits for the new
 exit to answer before regrouping, so region-gated models follow the new exit.
 Reprobe (below) does the same on demand.
 
-**Re-check geography.** `重新探测可用性` (Reprobe) re-runs availability against
+**Re-check geography.** `Re-probe availability` re-runs availability against
 your current exit. Toggling a VPN and re-probing moves region-gated models
 between the two groups on its own.
 
@@ -658,10 +656,10 @@ row.
 | Probe verdicts → what the picker advertises | live upstream, `host-selftest.mjs` | 10 listed models → 7 on the main route plus 2 under `region-limited`, and the forward port's `/v1/models` follows at 9; `deepseek-v4-flash-free` (`Model is unavailable`) left the dropdown with its refusal recorded in the settings page. 5xx / 429 / dropped connections all keep their model |
 | A model with no verdict is survivable | offline fake kernel, `picker-test.mjs` | With a newly listed model whose probe the test holds open, `listModels` and `/summary` both answer, the model is advertised and reads `availability=unknown` |
 | Rungs still enforced | live upstream, MiMo V2.6 Flash | `light` now sends 4096 and the same prompt finished `stop` at 2 980 tokens; before the change `light` (2048) ended that same prompt with `length` |
-| Long answers stop being cut | live upstream, `probes/long-answer.mjs` | `balanced` sent `max_tokens=16384`; the request produced **10 164** output tokens (19 914 characters, 194 s) and finished `stop`. The old 8192 ceiling cut the same turn with `length` — the symptom in issue #2. The model cards print each rung's real number (`默认档上限 16K`), read in the browser |
+| Long answers stop being cut | live upstream, `probes/long-answer.mjs` | `balanced` sent `max_tokens=16384`; the request produced **10 164** output tokens (19 914 characters, 194 s) and finished `stop`. The old 8192 ceiling cut the same turn with `length` — the symptom in issue #2. The model cards print each rung's real number (`Default ceiling 16K`), read in the browser |
 | The body decides, not the header (issue #6) | offline fake gateway, `sniff-test.mjs` | A 200 with `application/json` over SSE frames streams normally with no error; a Chinese character split across chunks, a 400-frame stream past the 4 K sniff window, a single JSON body, an empty body and an HTML junk body all route by shape. On the old code that same response also made the probe report a working model as `unavailable` |
 | Composition with no web server | offline fake kernel, `scripts/tui-test.mjs` | With only `llm` mounted, `apply()` does not throw, both routes register, a full streamed turn completes, the forward port comes up and rejects keyless requests, and the background loops run on plain unref'd timers. The dashboard half waits, and mounts both routes the moment `webServer` appears. **Not yet verified on a real dsh-tui**: neither kernel on this machine (source build 0.1.7-rc.1, AIO 6.9.3) ships a tui profile |
-| The plugin really installs and runs | **real kernel**, dsh 0.1.7-rc.1 web on port 3099 | No `did not activate` in the startup log; `/api/our-free-model/summary` 200 (10 models: 6 available, 2 region-blocked, 1 unknown, 1 unavailable), `/events` streams its hello; in the browser `Settings → Our Free Model` renders the 10 cards, the *Not in the picker* group, the `思考不可关` and `默认档上限 16K` tags, with an empty console. The first cut of this round **failed here**: with `inject` reduced to `['llm']`, reading `ctx.interval` threw `cannot get property "timer" without inject` and the plugin stopped activating on every composition |
+| The plugin really installs and runs | **real kernel**, dsh 0.1.7-rc.1 web on port 3099 | No `did not activate` in the startup log; `/api/our-free-model/summary` 200 (10 models: 6 available, 2 region-blocked, 1 unknown, 1 unavailable), `/events` streams its hello; in the browser `Settings → Our Free Model` renders the 10 cards, the *Not in the picker* group, the `Thinking always on` and `Default ceiling 16K` tags, with an empty console. The first cut of this round **failed here**: with `inject` reduced to `['llm']`, reading `ctx.interval` threw `cannot get property "timer" without inject` and the plugin stopped activating on every composition |
 | Two new problems the review itself caught | targeted repro + standing assertions | (1) Aborting during the head sniff threw the raw `AbortError` (numeric `code` 20), which `toFailure` cannot recognise and downgrades to `TRANSPORT` — a retryable code, i.e. a hole where a turn the user cancelled could be retried. All three read paths now share `classifyStreamFailure`, and sniff carries two abort assertions. (2) After committing, another `src/http.js` edit drifted the manifest, and `--check` plus the new `release-e2e.mjs` failed it on the spot - the gate works, and it is also the reminder that any edit means re-running it |
 | This round, on the request path: two ways to lose or double-pay a turn | local fake gateway, targeted repro + standing assertions | (1) `readHead` filled its whole 4 KB window before deciding what the body was, so a **short answer the gateway had already finished typing** sat in the sniff until the deadline and was then discarded with the cancel — a completed turn reported as a retryable `TIMEOUT`, which the harness sends again and the lane pays for twice (the repro prints `frames delivered: 0`). The body is now allowed to declare itself a stream on the first frame, which also stops withholding the first 4 KB of every answer. (2) In-stream errors were classified into `llmCode`, and `toFailure` reads `code` — so every refusal inside a stream arrived as retryable `TRANSPORT` (re-sending a turn whose partial answer had already been forwarded), and a mid-turn `RegionError` could never reach the egress re-probe. In-stream errors now go through the same `classifyFailure` as an error envelope |
 | This round, at the settings boundary | offline, `picker-test.mjs` + `effort-test.mjs` | `probeIntervalMinutes:'abc'` made `Math.max(1,'abc')` = NaN, and Node treats `setTimeout(fn, NaN)` as 1 ms — a full catalog probe every second. `defaultMaxTokens:0` (which is what clearing the settings-page field posts) became `min(capacity, 0)`, cutting every turn to the 512-token floor while the picker went on printing its 4 K/16 K/32 K ladder. Numbers are now coerced both where they are written and where they are read, and a non-positive value means "unset". The same assertions pin the forward listener to a loopback bind (`0.0.0.0` is refused with a 400 that says why) and pin that `connection` admission is read **per request**: patch the snapshot back in and the late-mount 401 check goes red on the spot |

@@ -1,144 +1,135 @@
-# 独立端界面第一阶段验收
+# Standalone UI Phase 1 Acceptance
 
-## 交付范围
+## Scope Delivered
 
-完成概览、渠道管理、公共导航及窄屏布局。前端采用 React、TypeScript、
-Vite、Tailwind 和项目内维护的基础组件；不是直接安装整套 shadcn 业务页面。
-模型清单、用量、设置、API 接入及登录继续使用已有控制逻辑。
-第一阶段到此停在可评审状态，不自动进入第二阶段。
+Completed Overview, Channel Management, shared navigation, and narrow-screen layout. The frontend uses React, TypeScript, Vite, Tailwind, and base components maintained within the project; it does not directly install a full set of shadcn business pages.
+The model list, usage, settings, API access, and login continue to use the existing control logic.
+Phase 1 stops here in a reviewable state and does not automatically proceed to Phase 2.
 
-- 概览展示实际模型数量、用户回合、Token、恢复回合、七天用量和运行状态。
-- 十三个账号渠道支持搜索、已接入/待接入筛选、详情和渠道切换。
-- 详情复用原渠道登录、账号池、续期、签到、模型开关和积分业务。
-- 渠道用量、请求日志、供应商启停、昵称、账号优先级、积分锁定及备份入口保留。
-- EAC 继续复用原授权和资源池逻辑；匿名与 Kilo 可从模型来源入口进入清单。
-- React 共用一份，渠道 JS 按需导入；删除旧的独立渠道包和重复源码入口。
-- 服务只公开构建清单登记的 JS/CSS，不按请求路径读取文件。
-- 退出管理清空 React 页面并中断渠道 RPC；迟到的导入不挂载过期页面。
-- 模型卡片和用量表只在对应页面渲染，不在概览后台生成千条隐藏卡片。
+- Overview shows the actual model count, user turns, Tokens, resumed turns, seven-day usage, and running status.
+- The thirteen account channels support search, Connected / Not connected filtering, details, and channel switching.
+- Details reuse the original channel login, account pool, renewal, check-in, model toggles, and credits business logic.
+- Channel usage, request log, provider enable/disable, nickname, account priority, credits lock, and backup entry are retained.
+- EAC continues to reuse the original authorization and resource pool logic; Anonymous and Kilo can be reached from the model source entry into the list.
+- React is shared as a single copy, and channel JS is imported on demand; the old standalone channel bundles and duplicate source entries were removed.
+- The service only exposes JS/CSS registered in the build manifest and does not read files by request path.
+- Exiting management clears the React page and interrupts channel RPC; late imports do not mount stale pages.
+- Model cards and usage tables are rendered only on their corresponding pages and do not generate thousands of hidden cards in the background on Overview.
 
-未修改插件 `client.js`、渠道协议、推理核心或真实用户数据。未提升版本、
-创建 tag 或发布 Release。第一轮验收结束时尚未推送；后续按用户要求提交 PR。
+The plugin `client.js`, channel protocols, inference core, and real user data were not modified. The version was not bumped, no tag was created, and no Release was published. At the end of the first round of acceptance it had not yet been pushed; a PR was later submitted as requested by the user.
 
-## 实际验证
+## Actual Verification
 
-| 命令 | 结果 |
+| Command | Result |
 | --- | --- |
-| `npm run build:standalone-ui` | 通过，生成 HTML、资源清单及三个静态资源 |
-| `npm run typecheck:standalone` | 通过，检查新 TypeScript 组件与承载接口 |
-| `node scripts/build-standalone-ui.mjs --check` | 通过，源码和提交资源一致 |
-| `node scripts/standalone-frontend-test.mjs` | 通过，资源登记、动态依赖、按需分包及空统计 |
-| `node scripts/standalone-management-test.mjs` | 同步最新主线后 15/15 通过，含跨平台启动器及全部分包的 GET/HEAD、方法限制和非公开路径 |
-| `node scripts/standalone-channels-test.mjs` | 11/11 通过，使用真实适配器与本机替身上游 |
-| `node scripts/test-all.mjs --mode contributor` | 同步主线后 33/33 个套件通过，日志位于 `.verify/ui-phase1-pr-contributor.log` |
-| `node scripts/test-all.mjs --mode release` | 0/3 通过：签名清单和目录记录尚未随源码变更重新生成；日志位于 `.verify/ui-phase1-pr-release.log` |
-| `node scripts/measure-standalone-ui.mjs --record` | 通过，记录原始及理论 gzip 体积 |
-| `git diff --check` | 通过 |
+| `npm run build:standalone-ui` | Passed, generated HTML, an asset manifest, and three static assets |
+| `npm run typecheck:standalone` | Passed, checked the new TypeScript components and hosting interface |
+| `node scripts/build-standalone-ui.mjs --check` | Passed, source and committed assets are consistent |
+| `node scripts/standalone-frontend-test.mjs` | Passed, asset registration, dynamic dependencies, on-demand chunking, and empty statistics |
+| `node scripts/standalone-management-test.mjs` | 15/15 passed after syncing the latest mainline, including the cross-platform launcher and GET/HEAD, method restrictions, and non-public paths for all chunks |
+| `node scripts/standalone-channels-test.mjs` | 11/11 passed, using real adapters and a local stub upstream |
+| `node scripts/test-all.mjs --mode contributor` | 33/33 suites passed after syncing mainline, log located at `.verify/ui-phase1-pr-contributor.log` |
+| `node scripts/test-all.mjs --mode release` | 0/3 passed: the signed manifest and directory records have not yet been regenerated with the source changes; log located at `.verify/ui-phase1-pr-release.log` |
+| `node scripts/measure-standalone-ui.mjs --record` | Passed, recorded raw and theoretical gzip sizes |
+| `git diff --check` | Passed |
 
-构建产生两条来自 lucide 的 `use client` 指令被忽略警告。此处是普通浏览器
-应用而非 React Server Components；构建成功，浏览器验收未出现运行错误。
-原插件共享 JavaScript 与保留的控制器未开启 `checkJs`，不能把新组件的
-类型检查当作这些旧代码也已严格类型化。
+The build produces two warnings that the `use client` directive from lucide is ignored. This is an ordinary browser application rather than React Server Components; the build succeeded, and browser acceptance showed no runtime errors.
+The original plugin's shared JavaScript and the retained controllers do not have `checkJs` enabled, so the type checking of the new components should not be taken to mean that this old code is also strictly typed.
 
-## 浏览器验收
+## Browser Acceptance
 
-使用 Codex 内置浏览器实际点击并截图，数据目录为隔离的
-`.verify/ui-phase1-data`，页面始终显示替身提示。
+The Codex built-in browser was used to actually click through and take screenshots, with the data directory isolated at `.verify/ui-phase1-data`, and the page always showing the stub notice.
 
-| 场景 | 结果 |
+| Scenario | Result |
 | --- | --- |
-| 概览真实零值及空用量 | 通过，没有虚构增长率或调用记录 |
-| 十三个渠道全部展示 | 通过 |
-| 搜索 `qoder` | 显示两个对应渠道 |
-| 不存在的名称 | 显示空状态，重置后恢复全部渠道 |
-| 账号详情与列表 | 通过，原账号操作和模型入口可达 |
-| 供应商与备份 | 启停、积分锁定、账号选择及导入导出入口可达 |
-| 渠道用量与日志 | 通过，空账本和请求记录正常显示 |
-| EAC | 未授权状态、GitHub 登录入口和替身资源池正常显示 |
-| 退出及重新登录 | 退出后渠道与侧栏文本清空，重新登录恢复管理 |
-| 桌面 | 默认约 1123 CSS px 宽，图标及图片加载成功，未发现文字溢出 |
-| 窄屏 | 实际 389 × 844 CSS px，按钮和标题无文字溢出；测量有 1px 亚像素取整差异 |
-| 浏览器错误日志 | 本次检查没有 error 记录 |
+| Overview with real zero values and empty usage | Passed, no fabricated growth rates or call records |
+| All thirteen channels displayed | Passed |
+| Search `qoder` | Shows the two corresponding channels |
+| Non-existent name | Shows the empty state, and resetting restores all channels |
+| Account details and list | Passed, original account operations and model entry are reachable |
+| Provider and backup | Enable/disable, credits lock, account selection, and import/export entries are reachable |
+| Channel usage and log | Passed, empty ledger and request records display normally |
+| EAC | Unauthorized state, GitHub login entry, and stub resource pool display normally |
+| Exit and re-login | After exit, channel and sidebar text are cleared, and re-login restores management |
+| Desktop | Approximately 1123 CSS px wide by default, icons and images loaded successfully, no text overflow found |
+| Narrow screen | Actually 389 × 844 CSS px, buttons and headings have no text overflow; measurement has a 1px subpixel rounding difference |
+| Browser error log | No error records in this check |
 
-浏览器继承了宿主缩放，视口工具的输入值不等于 CSS 像素。
-窄屏依据 DOM 实测宽度记录，不能把第一次设置的 390 工具像素误报为
-390 CSS px；实际布局测量保存在 `standalone-ui-phase1/layout.json`。
+The browser inherited the host scaling, so the viewport tool's input value is not equal to CSS pixels.
+The narrow screen is recorded based on the DOM-measured width; the 390 tool pixels set the first time must not be misreported as 390 CSS px; the actual layout measurements are saved in `standalone-ui-phase1/layout.json`.
 
-截图：
+Screenshots:
 
-- [旧概览](standalone-ui-phase1/overview-before.png)
-- [新概览](standalone-ui-phase1/overview-desktop.png)
-- [渠道列表](standalone-ui-phase1/channels-desktop.png)
-- [账号详情](standalone-ui-phase1/detail-desktop.png)
-- [窄屏概览](standalone-ui-phase1/overview-mobile.png)
-- [窄屏渠道](standalone-ui-phase1/channels-mobile.png)
-- [窄屏详情](standalone-ui-phase1/detail-mobile.png)
-- [同步主线后的 Windows 登录页](standalone-ui-phase1/login-windows.png)
+- [Old overview](standalone-ui-phase1/overview-before.png)
+- [New overview](standalone-ui-phase1/overview-desktop.png)
+- [Channel list](standalone-ui-phase1/channels-desktop.png)
+- [Account details](standalone-ui-phase1/detail-desktop.png)
+- [Narrow-screen overview](standalone-ui-phase1/overview-mobile.png)
+- [Narrow-screen channels](standalone-ui-phase1/channels-mobile.png)
+- [Narrow-screen details](standalone-ui-phase1/detail-mobile.png)
+- [Windows login page after syncing mainline](standalone-ui-phase1/login-windows.png)
 
-提交 PR 前已同步主线 `befe365`，将新增的 macOS/Windows 系统判断、终端按钮
-与手动命令迁入 `frontend/legacy.js` 和 `frontend/index.html`，重新生成资源。
-本轮在 Windows 浏览器重新检查登录页、概览与十三个渠道，浏览器错误日志为空。
-macOS 原生窗口的实机结果沿用主线记录，本轮未在 macOS 重新执行。
+Before submitting the PR, mainline `befe365` was synced, and the newly added macOS/Windows system detection, terminal button, and manual command were migrated into `frontend/legacy.js` and `frontend/index.html`, and the assets were regenerated.
+In this round, the login page, overview, and thirteen channels were re-checked in the Windows browser, and the browser error log was empty.
+The real-machine results for the macOS native window follow the mainline record; they were not re-run on macOS in this round.
 
-## 体积与速度
+## Size and Speed
 
-比较范围是页面静态 HTML/JS/CSS，不含管理 API 的 JSON 响应、
-开发依赖、后端文件或安装包。旧版五个资源全部在首屏加载；
-新版首屏只引用 HTML、入口 JS 和 CSS，渠道 JS 首次进入该页面时导入。
+The comparison scope is the pages' static HTML/JS/CSS, not including management API JSON responses, development dependencies, backend files, or install packages. The old version loaded all five assets on the first screen;
+the new version's first screen only references HTML, entry JS, and CSS, and channel JS is imported when that page is first entered.
 
-| 指标 | 改版前 | 改版后 |
+| Metric | Before | After |
 | --- | ---: | ---: |
-| 全部静态资源原始体积 | 507.8 KiB | 558.1 KiB |
-| 全部静态资源理论 gzip | 168.2 KiB | 194.2 KiB |
-| 首屏静态资源原始体积 | 507.8 KiB | 326.8 KiB |
-| 首屏静态资源理论 gzip | 168.2 KiB | 103.6 KiB |
+| Total static assets, raw size | 507.8 KiB | 558.1 KiB |
+| Total static assets, theoretical gzip | 168.2 KiB | 194.2 KiB |
+| First-screen static assets, raw size | 507.8 KiB | 326.8 KiB |
+| First-screen static assets, theoretical gzip | 168.2 KiB | 103.6 KiB |
 
-以上改版后体积包含同步主线的跨平台登录逻辑。
-首屏原始体积减少 **35.6%**，但总体原始体积增加 **9.9%**，
-理论 gzip 总体增加约 **15.5%**。不能宣称整个包变小了。
-总量增长主要来自新概览、导航、筛选详情、图标及基础组件依赖，
-以及统一样式；旧共享渠道组件为保持业务兼容仍保留。
-当前 HTTP 资源没有开启 gzip，这里只是同一压缩方法的理论对比。
-独立安装包尚未构建，因此没有 ZIP 大小结论。
+The after sizes above include the cross-platform login logic synced from mainline.
+The first-screen raw size decreased by **35.6%**, but the overall raw size increased by **9.9%**,
+and the theoretical gzip overall increased by about **15.5%**. It cannot be claimed that the whole package became smaller.
+The total growth mainly comes from the new overview, navigation, filtering details, icons and base component dependencies,
+and unified styles; the old shared channel components are still retained to maintain business compatibility.
+The current HTTP assets do not have gzip enabled; this is only a theoretical comparison using the same compression method.
+The standalone install package has not yet been built, so there is no ZIP size conclusion.
 
-第一轮验收在同步 macOS 登录改动之前，采用同一浏览器
-“刷新/点击至目标可见”的自动化方法：
+The first round of acceptance, before syncing the macOS login changes, used the same browser "refresh/click until target visible" automation method:
 
-| 项目 | 实测 |
+| Item | Measured |
 | --- | --- |
-| 旧概览刷新三次 | 119 / 86 / 83 ms，平均 96 ms |
-| 最终新概览刷新三次 | 138 / 137 / 112 ms，平均 129 ms |
-| 新渠道首次进入 | 306 ms |
-| 新渠道再次进入 | 274 ms |
-| 1018 模型清单进入 | 462 ms |
-| 搜索单个模型 | 111 ms，结果由 1018 条收敛为 1 条 |
+| Old overview refreshed three times | 119 / 86 / 83 ms, average 96 ms |
+| Final new overview refreshed three times | 138 / 137 / 112 ms, average 129 ms |
+| New channel, first entry | 306 ms |
+| New channel, subsequent entry | 274 ms |
+| 1018 model list entry | 462 ms |
+| Search a single model | 111 ms, results converged from 1018 to 1 |
 
-计时包含工具往返、浏览器调度及本机服务响应，不是纯渲染耗时，
-也不是冷启动 FCP/LCP。旧版平均更低约 33ms；小样本不能据此推导
-稳定性能比例，也不能宣称新页面加载更快。本轮没有扩大改版范围。
-千模型验收确认：概览启动时隐藏模型卡片为 0，进入清单后为 1018；
-未做虚拟列表，这仍属于下一阶段模型页的优化边界。
+Timing includes tool round-trips, browser scheduling, and local service response; it is not pure rendering time,
+nor is it cold-start FCP/LCP. The old version's average was lower by about 33 ms; a small sample cannot be used to derive
+a stable performance ratio, nor to claim that the new page loads faster. This round did not expand the scope of the revision.
+The thousand-model acceptance confirmed: at overview startup the number of hidden model cards is 0, and after entering the list it is 1018;
+no virtual list was implemented, which remains an optimization boundary for the model page in the next phase.
 
-原始数据保存在本目录下的 `standalone-ui-phase1/`：
-`sizes-before.json`、`sizes.json`、`performance-before.json`、
-`performance.json`、`long-list.json`。
+The raw data is saved in this directory under `standalone-ui-phase1/`:
+`sizes-before.json`, `sizes.json`, `performance-before.json`,
+`performance.json`, `long-list.json`.
 
-## 未验证范围
+## Unverified Scope
 
-- 没有逐家完成第三方真实账号授权、短信验证或扫码；需用户操作。
-- 浏览器中的备份导入、删除账号及外部授权未在真实用户目录执行；
-  相应后端链路由替身专项测试覆盖，不冒充真实账号验收。
-- 没有测 Windows/macOS/Linux 全平台安装包；Linux CI 配置已添加，
-  但本机未执行 GitHub Actions。
-- Release 检查已运行但未通过；未更新签名或版本，未运行发布流程、
-  安装制品和冷启动性能分析。合入发货主线前仍需维护者完成签名准备并使该门禁通过。
-- 第一阶段不包含模型列表重设计、虚拟滚动或旧共享业务组件全面拆分。
+- Third-party real account authorization, SMS verification, or QR-code scanning was not completed for each provider; user action is required.
+- Backup import, account deletion, and external authorization in the browser were not executed in a real user directory;
+  the corresponding backend chain is covered by stub-specific tests and does not impersonate real account acceptance.
+- Windows/macOS/Linux install packages for all platforms were not tested; the Linux CI configuration has been added,
+  but GitHub Actions was not executed locally.
+- The Release check was run but did not pass; the signature and version were not updated, and the release flow,
+  install artifacts, and cold-start performance analysis were not run. Before merging into the shipping mainline, the maintainer still needs to complete signing preparation and make this gate pass.
+- Phase 1 does not include a model list redesign, virtual scrolling, or a full split of the old shared business components.
 
-## 预览与回退
+## Preview and Rollback
 
-执行 `node scripts/standalone-ui-preview.mjs` 启动隔离替身预览，
-默认端口 `18901`，管理链接保存在 `.verify/ui-phase1-url.txt`。
-该预览不能完成真实授权。正式使用继续按独立端 README 启动服务。
+Run `node scripts/standalone-ui-preview.mjs` to start an isolated stub preview,
+with default port `18901`, and the management link saved in `.verify/ui-phase1-url.txt`.
+This preview cannot complete real authorization. For formal use, continue to start the service as described in the standalone README.
 
-撤销本阶段时应整体恢复前端源码、构建输出、资源清单及管理资源映射，
-不要只恢复 `app.js`；本阶段不迁移或重写用户数据。
+When rolling back this phase, the frontend source, build output, asset manifest, and management asset mapping should be restored as a whole,
+rather than only restoring `app.js`; this phase does not migrate or rewrite user data.

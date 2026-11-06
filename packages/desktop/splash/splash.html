@@ -1,16 +1,16 @@
 ﻿<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Our Free Model</title>
 <style>
-  /* ===== 主题检测 ===== */
+  /* ===== Theme detection ===== */
   :root {
     --duration: 1.4s;
   }
 
-  /* ===== 夜·赛博终端 ===== */
+  /* ===== Night · cyber terminal ===== */
   [data-theme="dark"] {
     --bg: #0a0d13;
     --accent: #00d0c0;
@@ -23,7 +23,7 @@
     --corner: rgba(0,208,192,0.6);
   }
 
-  /* ===== 昼·流光岁月 ===== */
+  /* ===== Day · flowing light ===== */
   [data-theme="light"] {
     --bg: #f9f7f2;
     --accent: #b45309;
@@ -47,7 +47,7 @@
     transition: background 0.3s;
   }
 
-  /* ===== 背景网格 ===== */
+  /* ===== Background grid ===== */
   .grid {
     position: fixed; inset: 0;
     background-image:
@@ -57,7 +57,7 @@
     animation: grid-fade-in 0.8s ease-out;
   }
 
-  /* ===== 四角刻度线 ===== */
+  /* ===== Corner tick marks ===== */
   .corner {
     position: fixed; width: 24px; height: 24px;
     border-color: var(--corner);
@@ -71,7 +71,7 @@
   .corner.bl { bottom: 20px; left: 20px; border-bottom-width: 1px; border-left-width: 1px; }
   .corner.br { bottom: 20px; right: 20px; border-bottom-width: 1px; border-right-width: 1px; }
 
-  /* ===== 主内容区 ===== */
+  /* ===== Main content area ===== */
   .content {
     text-align: center;
     z-index: 1;
@@ -79,7 +79,7 @@
     animation: content-in 0.5s ease-out 0.4s forwards;
   }
 
-  /* ===== Logo 文字 ===== */
+  /* ===== Logo text ===== */
   .logo {
     font-size: 28px;
     font-weight: 700;
@@ -89,7 +89,7 @@
     position: relative;
   }
 
-  /* 夜主题：打字机效果 */
+  /* Night theme: typewriter effect */
   [data-theme="dark"] .logo {
     font-family: ui-monospace, 'Cascadia Code', monospace;
     letter-spacing: 8px;
@@ -101,7 +101,7 @@
     margin-left: 4px;
   }
 
-  /* 昼主题：衬线字体 */
+  /* Day theme: serif font */
   [data-theme="light"] .logo {
     font-family: Georgia, 'Times New Roman', serif;
     letter-spacing: 4px;
@@ -119,7 +119,7 @@
     text-transform: uppercase;
   }
 
-  /* ===== 进度条 ===== */
+  /* ===== Progress bar ===== */
   .progress-track {
     width: 200px; height: 2px;
     background: var(--accent-dim);
@@ -137,19 +137,19 @@
     box-shadow: 0 0 8px var(--accent-glow);
   }
 
-  /* 夜主题：进度条 glitch */
+  /* Night theme: progress-bar glitch */
   [data-theme="dark"] .progress-bar {
     animation: progress-fill var(--duration) cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards,
                glitch 0.15s ease-in-out 1.2s;
   }
 
-  /* 昼主题：进度条光束 */
+  /* Day theme: progress-bar light beam */
   [data-theme="light"] .progress-bar {
     background: linear-gradient(90deg, var(--accent), #d4956a);
     box-shadow: 0 0 12px var(--accent-glow);
   }
 
-  /* ===== 状态文字 ===== */
+  /* ===== Status text ===== */
   .status {
     margin-top: 16px;
     font-size: 10px;
@@ -159,7 +159,7 @@
     animation: status-in 0.3s ease-out 0.8s forwards;
   }
 
-  /* ===== 扫描线（夜主题） ===== */
+  /* ===== Scanline (night theme) ===== */
   [data-theme="dark"] .scanline {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -169,7 +169,7 @@
     animation: scan 2s linear infinite;
   }
 
-  /* ===== 光束（昼主题） ===== */
+  /* ===== Light beam (day theme) ===== */
   [data-theme="light"] .beam {
     position: fixed;
     bottom: -20%; left: -10%;
@@ -180,12 +180,12 @@
     pointer-events: none;
   }
 
-  /* ===== 完成淡出 ===== */
+  /* ===== Completion fade-out ===== */
   .fade-out {
     animation: fade-out 0.3s ease-in forwards;
   }
 
-  /* ===== 关键帧 ===== */
+  /* ===== Keyframes ===== */
   @keyframes grid-fade-in {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -240,7 +240,7 @@
     to { opacity: 0; }
   }
 
-  /* ===== 减少动效 ===== */
+  /* ===== Reduced motion ===== */
   @media (prefers-reduced-motion: reduce) {
     .corner, .content, .progress-bar, .status {
       animation-duration: 0.01s !important;
@@ -251,33 +251,33 @@
 </head>
 <body>
 
-<!-- 背景网格 -->
+<!-- Background grid -->
 <div class="grid"></div>
 
-<!-- 四角刻度线 -->
+<!-- Corner tick marks -->
 <div class="corner tl"></div>
 <div class="corner tr"></div>
 <div class="corner bl"></div>
 <div class="corner br"></div>
 
-<!-- 夜主题扫描线 -->
+<!-- Night-theme scanline -->
 <div class="scanline" id="scanline"></div>
 
-<!-- 昼主题光束 -->
+<!-- Day-theme light beam -->
 <div class="beam" id="beam"></div>
 
-<!-- 主内容 -->
+<!-- Main content -->
 <div class="content">
   <div class="logo">OUR FREE MODEL</div>
   <div class="subtitle">Local Console</div>
   <div class="progress-track">
     <div class="progress-bar"></div>
   </div>
-  <div class="status" id="status">正在初始化...</div>
+  <div class="status" id="status">Initializing...</div>
 </div>
 
 <script>
-// 主题检测：读 localStorage 或系统偏好
+// Theme detection: read localStorage or the system preference
 function detectTheme() {
   try {
     const saved = localStorage.getItem('ofm-theme');
@@ -289,18 +289,18 @@ function detectTheme() {
 const theme = detectTheme();
 document.documentElement.setAttribute('data-theme', theme);
 
-// 隐藏不适用主题的装饰
+// Hide decorations that do not apply to the theme
 if (theme === 'dark') {
   document.getElementById('beam').style.display = 'none';
 } else {
   document.getElementById('scanline').style.display = 'none';
 }
 
-// 模拟进度状态
+// Simulated progress states
 const statusEl = document.getElementById('status');
 const messages = theme === 'dark'
-  ? ['正在初始化...', '校准信号...', '连接本地服务...', '就绪']
-  : ['正在初始化...', '加载模块...', '连接本地服务...', '就绪'];
+  ? ['Initializing...', 'Calibrating signal...', 'Connecting to the local service...', 'Ready']
+  : ['Initializing...', 'Loading modules...', 'Connecting to the local service...', 'Ready'];
 
 let step = 0;
 const interval = setInterval(() => {
@@ -309,11 +309,11 @@ const interval = setInterval(() => {
     statusEl.textContent = messages[step];
   } else {
     clearInterval(interval);
-    // 完成后淡出
+    // Fade out when complete
     setTimeout(() => {
       document.body.classList.add('fade-out');
       setTimeout(() => {
-        // 窗口由 Rust 在真实服务握手结束后关闭。
+        // The window is closed by Rust once the real service handshake finishes.
       }, 300);
     }, 200);
   }

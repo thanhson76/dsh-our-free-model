@@ -1,62 +1,62 @@
-# 当前渠道模型批量管理验收
+# Current-Channel Model Bulk Management Verification
 
-## 目标与范围
+## Goal and Scope
 
-解决 issue #182：渠道模型较多时，逐项开启或关闭操作繁琐。
-在共享 `ChannelCard` 的模型展开区增加“全部开启”“全部关闭”和已开启数量。
-DSH 插件使用 `client.js`，独立服务从该组件生成渠道页面，两种产品共用此次修改。
-将原单模型按钮“已开启/已关闭”改为动作文案“开启/关闭”，避免与数量状态混淆。
-中文和英文词条均已补齐，没有新增依赖、公开接口或数据结构。
+Resolves issue #182: when a channel has many models, enabling or disabling them one by one is cumbersome.
+"Enable all", "Disable all", and the count of enabled models were added to the model expansion area of the shared `ChannelCard`.
+The DSH plugin uses `client.js`; the standalone service generates its channel pages from that component, so both products share this change.
+The original single-model button labels "Enabled/Disabled" were changed to the action wording "Enable/Disable", to avoid confusion with the count status.
+Both the Chinese and English entries were completed; no dependencies, public interfaces, or data structures were added.
 
-## 行为与边界
+## Behaviour and Boundaries
 
-- 每次批量操作只发送一次现有 `model.setAllDisabled` RPC，携带当前渠道的 provider。
-- 批量关闭将当前渠道目录内的模型加入关闭列表；批量开启清空该渠道的关闭列表，包括历史下线模型的旧记录。这是现有后端语义。
-- 成功后重新加载模型并通知父页面刷新；请求期间禁用写入按钮，重复点击不重复发送批量请求。
-- 失败沿用既有错误反馈，不虚构成功状态，按钮恢复可操作。
-- 目录加载中或没有模型时不显示批量按钮。
-- 不修改账号、积分锁、登录方式或其他渠道的开关；EAC 和免费渠道接入逻辑未改。
+- Each bulk operation sends only one existing `model.setAllDisabled` RPC, carrying the current channel's provider.
+- Disabling all adds the models in the current channel's catalog to the disabled list; enabling all clears that channel's disabled list, including stale records for models taken offline in the past. This is the existing backend semantics.
+- On success, the models are reloaded and the parent page is notified to refresh; write buttons are disabled while the request is in flight, and repeated clicks do not resend the bulk request.
+- Failures reuse the existing error feedback, do not fabricate a success state, and the buttons become operable again.
+- The bulk buttons are not shown while the catalog is loading or when there are no models.
+- Accounts, credit locks, login methods, and the toggles of other channels are not modified; the EAC and free channel integration logic was not changed.
 
-## 实际验证
+## Actual Verification
 
-| 命令 | 结果 |
+| Command | Result |
 | --- | --- |
-| `node scripts/channel-pack-test.mjs` | 通过；最后一次文案调整后已补跑，包含实际共享组件挂载验证 |
-| `node scripts/standalone-channels-test.mjs` | 12/12 通过；包含批量状态落盘、目录移除与恢复、其他渠道隔离、积分锁保留 |
-| `node scripts/client-lint.mjs` | 通过；414 个文案键、140 条样式规则，最后一次文案调整后已补跑 |
-| `npm run typecheck:standalone` | 通过 |
-| `node scripts/build-standalone-ui.mjs --check` | 最后一次文案调整并构建后通过，10 个本地资源与源码一致 |
-| `node scripts/test-all.mjs --mode contributor` | 33/33 套件通过；运行于最后一次单模型按钮文案调整前，调整后补跑共享组件测试和前端 lint |
-| `node scripts/test-all.mjs --mode release` | 0/3 套件通过；manifest、release、catalog 均因签名清单或源码 revision 未同步而失败 |
-| `git diff --check` | 通过 |
+| `node scripts/channel-pack-test.mjs` | Passed; re-run after the final wording adjustment, including actual mounting verification of the shared component |
+| `node scripts/standalone-channels-test.mjs` | 12/12 passed; including bulk state persisted to disk, catalog removal and restoration, isolation from other channels, and credit lock preservation |
+| `node scripts/client-lint.mjs` | Passed; 414 text keys and 140 style rules, re-run after the final wording adjustment |
+| `npm run typecheck:standalone` | Passed |
+| `node scripts/build-standalone-ui.mjs --check` | Passed after the final wording adjustment and rebuild; 10 local assets match the source |
+| `node scripts/test-all.mjs --mode contributor` | 33/33 suites passed; run before the final single-model button wording adjustment, after which the shared component test and frontend lint were re-run |
+| `node scripts/test-all.mjs --mode release` | 0/3 suites passed; manifest, release, and catalog all failed because the signed manifest or the source revision was not in sync |
+| `git diff --check` | Passed |
 
-发布门禁失败的具体原因：`client.js` 已变化，已签名的清单仍记录旧大小和摘要；
-catalog 的源码 revision 仍指向旧提交。需要维护者通过仓库签名流程更新。
-此次未改公钥、未伪造签名、未提升版本、未创建 tag 或发布 Release。
-构建存在两条既有 lucide `use client` 指令被忽略警告，构建成功。
+The specific reason for the release gate failure: `client.js` has changed, while the signed manifest still records the old size and digest;
+the catalog's source revision still points to the old commit. A maintainer needs to update these through the repository's signing process.
+In this round, no public key was changed, no signature was forged, no version was bumped, no tag was created, and no Release was published.
+The build has two pre-existing warnings about lucide `use client` directives being ignored; the build succeeded.
 
-## 浏览器验收与数据隔离
+## Browser Verification and Data Isolation
 
-使用本机隔离预览 `http://127.0.0.1:18901/`，数据目录为 `.verify/ui-phase1-data`，
-通过 `OFM_PREVIEW_NO_REFRESH=1` 停止预览上游刷新。页面明确标注账号、模型及额度均为测试数据。
-没有使用真实账号或提交预览数据、日志、管理链接与登录令牌。
+Using the local isolated preview at `http://127.0.0.1:18901/`, with the data directory `.verify/ui-phase1-data`,
+and upstream refresh for the preview stopped via `OFM_PREVIEW_NO_REFRESH=1`. The page clearly labels the accounts, models, and quotas as test data.
+No real accounts were used, and no preview data, logs, management links, or login tokens were submitted.
 
-1. 初始显示已开启 9/9，两个批量按钮可见，单模型按钮为“关闭”。
-2. 点击“全部关闭”后显示 0/9，单模型按钮为“开启”。
-3. 刷新页面并重新展开列表，仍显示 0/9。
-4. 点击“全部开启”后恢复 9/9，单模型按钮为“关闭”，恢复了测试前的模型设置。
+1. Initially it showed 9/9 enabled, both bulk buttons were visible, and the single-model button read "Disable".
+2. After clicking "Disable all" it showed 0/9, and the single-model button read "Enable".
+3. After refreshing the page and re-expanding the list, it still showed 0/9.
+4. After clicking "Enable all" it was restored to 9/9, the single-model button read "Disable", restoring the model settings from before the test.
 
-截图：
+Screenshots:
 
-- [全部关闭状态](images/issue182-models-all-off-dark.png)
-- [全部开启状态](images/issue182-models-all-on-dark.png)
+- [All disabled state](images/issue182-models-all-off-dark.png)
+- [All enabled state](images/issue182-models-all-on-dark.png)
 
-真实 DSH 宿主、真实登录及上游推理未做端到端验证。
-共享组件测试覆盖插件所用代码；独立服务 RPC 与浏览器路径有上述实际验证，
-不据此宣称已经验证所有宿主或上游。
+No end-to-end verification was done against a real DSH host, real logins, or upstream inference.
+The shared component tests cover the code used by the plugin; the standalone service RPC and browser path have the actual verification above,
+and this does not claim that all hosts or upstreams have been verified.
 
-## 仓库认知维护
+## Repository Knowledge Maintenance
 
-仓库 AGENTS.md 要求使用 AOCI；本轮工具发现返回 0 个匹配工具，
-无法执行 `aoci_rules`、`aoci_overview` 或 `aoci_maintain`。
-本次以实际源码、差异、测试和浏览器证据核对交付，未修改或宣称更新正式认知索引。
+The repository's AGENTS.md requires using AOCI; tool discovery in this round returned 0 matching tools,
+so `aoci_rules`, `aoci_overview`, or `aoci_maintain` could not be executed.
+This delivery was checked against the actual source, diff, tests, and browser evidence; the formal knowledge index was not modified and is not claimed to have been updated.

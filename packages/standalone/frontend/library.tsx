@@ -11,8 +11,8 @@ interface Profile { id: string; name: string; clients: ProfileClient[] }
 interface LibraryData { profiles: Profile[]; resources: Resource[] }
 const kinds = [
   { id: 'mcp', name: 'MCP', icon: Blocks },
-  { id: 'prompt', name: '提示词', icon: FileText },
-  { id: 'skill', name: '技能', icon: WandSparkles },
+  { id: 'prompt', name: 'Prompts', icon: FileText },
+  { id: 'skill', name: 'Skills', icon: WandSparkles },
   { id: 'agent', name: 'Agent', icon: Users },
 ] as const
 const isObject = (value: unknown): value is Record<string, unknown> => value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -22,34 +22,34 @@ const validName = (value: string) => !!value && value.length <= 80 && !/[\x00-\x
 
 function validateMcp(content: string, name: string) {
   let value: unknown
-  try { value = JSON.parse(content) } catch { throw new Error('MCP 内容必须是有效的 JSON。') }
-  if (!isObject(value)) throw new Error('MCP 内容必须是 JSON 对象。')
+  try { value = JSON.parse(content) } catch { throw new Error('MCP content must be valid JSON.') }
+  if (!isObject(value)) throw new Error('MCP content must be a JSON object.')
   const wrapped = Object.hasOwn(value, 'mcpServers')
-  if (wrapped && (Object.keys(value).length !== 1 || !isObject(value.mcpServers))) throw new Error('mcpServers 必须是服务名称与配置组成的对象。')
+  if (wrapped && (Object.keys(value).length !== 1 || !isObject(value.mcpServers))) throw new Error('mcpServers must be an object mapping service names to configurations.')
   const servers = wrapped ? Object.entries(value.mcpServers as Record<string, unknown>) : [[name, value] as const]
-  if (!servers.length || servers.length > 64) throw new Error('MCP 资源需要包含 1 至 64 个服务。')
+  if (!servers.length || servers.length > 64) throw new Error('An MCP resource must contain 1 to 64 services.')
   for (const [serverName, server] of servers) {
-    if (!/^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,63}$/.test(serverName) || !validName(serverName)) throw new Error('MCP 服务名称须为 1 至 64 位字母、数字、下划线、连字符或点。')
-    if (!isObject(server)) throw new Error('每个 MCP 服务配置必须是对象。')
-    if (Object.keys(server).some(key => !['type', 'command', 'args', 'env', 'cwd', 'url', 'httpUrl', 'headers'].includes(key))) throw new Error('MCP 配置含有不支持的字段。')
+    if (!/^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,63}$/.test(serverName) || !validName(serverName)) throw new Error('An MCP service name must be 1 to 64 letters, digits, underscores, hyphens or dots.')
+    if (!isObject(server)) throw new Error('Each MCP service configuration must be an object.')
+    if (Object.keys(server).some(key => !['type', 'command', 'args', 'env', 'cwd', 'url', 'httpUrl', 'headers'].includes(key))) throw new Error('The MCP configuration contains unsupported fields.')
     const stdio = Object.hasOwn(server, 'command')
     const remote = Object.hasOwn(server, 'url') || Object.hasOwn(server, 'httpUrl')
-    if (stdio === remote || (Object.hasOwn(server, 'url') && Object.hasOwn(server, 'httpUrl'))) throw new Error('MCP 须选择 command 或 HTTP 地址中的一种。')
+    if (stdio === remote || (Object.hasOwn(server, 'url') && Object.hasOwn(server, 'httpUrl'))) throw new Error('MCP must use exactly one of command or an HTTP URL.')
     if (stdio) {
-      if (typeof server.command !== 'string' || !server.command.trim()) throw new Error('MCP command 不能为空。')
-      if (server.type !== undefined && server.type !== 'stdio') throw new Error('命令型 MCP 的 type 必须是 stdio。')
-      if (server.args !== undefined && (!Array.isArray(server.args) || server.args.some(arg => typeof arg !== 'string'))) throw new Error('MCP args 必须是字符串数组。')
-      if (Object.hasOwn(server, 'headers')) throw new Error('MCP headers 仅适用于 HTTP 服务。')
+      if (typeof server.command !== 'string' || !server.command.trim()) throw new Error('MCP command must not be empty.')
+      if (server.type !== undefined && server.type !== 'stdio') throw new Error('The type of a command-based MCP must be stdio.')
+      if (server.args !== undefined && (!Array.isArray(server.args) || server.args.some(arg => typeof arg !== 'string'))) throw new Error('MCP args must be an array of strings.')
+      if (Object.hasOwn(server, 'headers')) throw new Error('MCP headers apply only to HTTP services.')
     } else {
-      if (['args', 'env', 'cwd'].some(key => Object.hasOwn(server, key))) throw new Error('HTTP MCP 不接受 args、env 或 cwd。')
-      if (server.type !== undefined && !['http', 'streamable-http', 'sse'].includes(String(server.type))) throw new Error('HTTP MCP 的 type 无效。')
+      if (['args', 'env', 'cwd'].some(key => Object.hasOwn(server, key))) throw new Error('HTTP MCP does not accept args, env or cwd.')
+      if (server.type !== undefined && !['http', 'streamable-http', 'sse'].includes(String(server.type))) throw new Error('Invalid type for HTTP MCP.')
       try {
         const url = new URL(String(server.httpUrl ?? server.url))
         if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password || url.hash) throw new Error()
-      } catch { throw new Error('MCP URL 须为不含用户名、密码和片段的 HTTP(S) 地址。') }
+      } catch { throw new Error('The MCP URL must be an HTTP(S) URL without a username, password or fragment.') }
     }
     for (const field of ['env', 'headers']) {
-      if (server[field] !== undefined && (!isObject(server[field]) || Object.values(server[field]).some(item => typeof item !== 'string'))) throw new Error(`MCP ${field} 必须是字符串键值对象。`)
+      if (server[field] !== undefined && (!isObject(server[field]) || Object.values(server[field]).some(item => typeof item !== 'string'))) throw new Error(`MCP ${field} must be an object with string values.`)
     }
   }
 }
@@ -69,9 +69,9 @@ function ResourceEditor({ resource, onClose, onSaved }: { resource?: Resource; o
     setError('')
     const trimmedName = name.trim()
     try {
-      if (!validName(trimmedName)) throw new Error('请输入有效名称（最多 80 字，不能包含路径或保留字符）。')
-      if (!content.trim()) throw new Error('请输入资源内容。')
-      if (new TextEncoder().encode(content).byteLength > 1024 * 1024) throw new Error('资源内容不能超过 1 MB。')
+      if (!validName(trimmedName)) throw new Error('Please enter a valid name (up to 80 characters, with no path or reserved characters).')
+      if (!content.trim()) throw new Error('Please enter the resource content.')
+      if (new TextEncoder().encode(content).byteLength > 1024 * 1024) throw new Error('Resource content must not exceed 1 MB.')
       if (kind === 'mcp') validateMcp(content, trimmedName)
       lock.current = true; setBusy(true)
       await management('/library/resources/save', { ...(resource ? { id: resource.id } : {}), kind, name: trimmedName, content, enabled })
@@ -81,18 +81,18 @@ function ResourceEditor({ resource, onClose, onSaved }: { resource?: Resource; o
     } catch (reason) { if (live.current) setError(failureMessage(reason)) }
     finally { lock.current = false; if (live.current) setBusy(false) }
   }
-  return <WorkbenchDialog title={resource ? '编辑资源' : '新建资源'} busy={busy} onClose={onClose}>
+  return <WorkbenchDialog title={resource ? 'Edit resource' : 'New resource'} busy={busy} onClose={onClose}>
     <form className="wb-form lib-editor" onSubmit={event => { event.preventDefault(); void submit() }}>
       <div className="wb-form-grid">
-        <label>名称<Input autoFocus required maxLength={80} value={name} disabled={busy} onChange={event => setName(event.target.value)} /></label>
-        <label>类型<select aria-label="类型" value={kind} disabled={busy} onChange={event => setKind(event.target.value as ResourceKind)}>{kinds.map(row => <option value={row.id} key={row.id}>{row.name}</option>)}</select></label>
+        <label>Name<Input autoFocus required maxLength={80} value={name} disabled={busy} onChange={event => setName(event.target.value)} /></label>
+        <label>Type<select aria-label="Type" value={kind} disabled={busy} onChange={event => setKind(event.target.value as ResourceKind)}>{kinds.map(row => <option value={row.id} key={row.id}>{row.name}</option>)}</select></label>
       </div>
-      <label>{kind === 'mcp' ? 'MCP 配置 JSON' : 'Markdown 内容'}
-        <textarea aria-label={kind === 'mcp' ? 'MCP 配置 JSON' : 'Markdown 内容'} className="lib-content" rows={12} spellCheck={false} autoComplete="off" required value={content} disabled={busy}
+      <label>{kind === 'mcp' ? 'MCP configuration JSON' : 'Markdown content'}
+        <textarea aria-label={kind === 'mcp' ? 'MCP configuration JSON' : 'Markdown content'} className="lib-content" rows={12} spellCheck={false} autoComplete="off" required value={content} disabled={busy}
           placeholder={kind === 'mcp' ? '{\n  "command": "npx",\n  "args": [],\n  "env": {}\n}' : ''} onChange={event => setContent(event.target.value)} /></label>
-      <div className="wb-form-switch"><span>启用资源</span><Switch checked={enabled} disabled={busy} aria-label="启用资源" onCheckedChange={setEnabled} /></div>
+      <div className="wb-form-switch"><span>Enable resource</span><Switch checked={enabled} disabled={busy} aria-label="Enable resource" onCheckedChange={setEnabled} /></div>
       {error && <p className="wb-error" role="alert"><CircleAlert size={15} />{error}</p>}
-      <div className="wb-form-actions"><Button variant="outline" disabled={busy} onClick={onClose}>取消</Button><Button type="submit" busy={busy}><Save size={15} />保存资源</Button></div>
+      <div className="wb-form-actions"><Button variant="outline" disabled={busy} onClick={onClose}>Cancel</Button><Button type="submit" busy={busy}><Save size={15} />Save resource</Button></div>
     </form>
   </WorkbenchDialog>
 }
@@ -107,7 +107,7 @@ function ProfileEditor({ onClose, onSaved }: { onClose(): void; onSaved(): Promi
   const submit = async () => {
     if (lock.current) return
     setError('')
-    if (!validName(name.trim())) { setError('请输入有效的方案名称（最多 80 字）。'); return }
+    if (!validName(name.trim())) { setError('Please enter a valid profile name (up to 80 characters).'); return }
     lock.current = true; setBusy(true)
     try {
       await management('/library/profiles/save', { name: name.trim() })
@@ -117,11 +117,11 @@ function ProfileEditor({ onClose, onSaved }: { onClose(): void; onSaved(): Promi
     } catch (reason) { if (live.current) setError(failureMessage(reason)) }
     finally { lock.current = false; if (live.current) setBusy(false) }
   }
-  return <WorkbenchDialog title="保存当前客户端配置" onClose={onClose} busy={busy}>
+  return <WorkbenchDialog title="Save current client configuration" onClose={onClose} busy={busy}>
     <form className="wb-form" onSubmit={event => { event.preventDefault(); void submit() }}>
-      <label>方案名称<Input autoFocus required maxLength={80} value={name} disabled={busy} onChange={event => setName(event.target.value)} /></label>
+      <label>Profile name<Input autoFocus required maxLength={80} value={name} disabled={busy} onChange={event => setName(event.target.value)} /></label>
       {error && <p className="wb-error" role="alert"><CircleAlert size={15} />{error}</p>}
-      <div className="wb-form-actions"><Button variant="outline" disabled={busy} onClick={onClose}>取消</Button><Button type="submit" busy={busy}><Save size={15} />保存方案</Button></div>
+      <div className="wb-form-actions"><Button variant="outline" disabled={busy} onClick={onClose}>Cancel</Button><Button type="submit" busy={busy}><Save size={15} />Save profile</Button></div>
     </form>
   </WorkbenchDialog>
 }
@@ -152,7 +152,7 @@ export function Library({ active }: { active: boolean }) {
       const result = await management<{ ok?: boolean; clients?: ProfileClient[] }>(path, body)
       if (!live.current) return
       setStatus(path.endsWith('/apply')
-        ? result.ok === true ? `配置方案已应用${Array.isArray(result.clients) ? `，已更新 ${result.clients.length} 个客户端` : ''}。` : '应用请求已完成，服务未返回明确的应用结果。'
+        ? result.ok === true ? `Profile applied${Array.isArray(result.clients) ? `, updated ${result.clients.length} clients` : ''}.` : 'The apply request completed, but the service did not return a clear result.'
         : message)
       setRemoving('')
       await reload()
@@ -162,10 +162,10 @@ export function Library({ active }: { active: boolean }) {
   const selectTab = (next: typeof tab) => { setTab(next); setSearch(''); setRemoving(''); setError(''); setStatus('') }
   const saved = async (message: string) => { await reload(); if (live.current) { setStatus(message); setError('') } }
   return <div className="wb-page lib-page">
-    <header className="wb-heading"><div><span className="wb-eyebrow">LIBRARY</span><h1>资源库</h1></div>
-      <Button variant="outline" aria-label="刷新资源库" title="刷新资源库" busy={loading} disabled={blocked} onClick={() => void reload()}><RefreshCw size={15} />刷新</Button></header>
-    <div className="lib-tabs" role="tablist" aria-label="资源库视图">
-      {([['resources', '资源', resources.length], ['profiles', '配置方案', profiles.length]] as const).map(([id, name, count]) =>
+    <header className="wb-heading"><div><span className="wb-eyebrow">LIBRARY</span><h1>Library</h1></div>
+      <Button variant="outline" aria-label="Refresh library" title="Refresh library" busy={loading} disabled={blocked} onClick={() => void reload()}><RefreshCw size={15} />Refresh</Button></header>
+    <div className="lib-tabs" role="tablist" aria-label="Library view">
+      {([['resources', 'Resources', resources.length], ['profiles', 'Profiles', profiles.length]] as const).map(([id, name, count]) =>
         <button key={id} type="button" role="tab" id={`lib-tab-${id}`} aria-controls={`lib-panel-${id}`} aria-selected={tab === id} tabIndex={tab === id ? 0 : -1}
           onClick={() => selectTab(id)} onKeyDown={event => {
             if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
@@ -175,12 +175,12 @@ export function Library({ active }: { active: boolean }) {
           }}>{name}<span>{data ? count : '—'}</span></button>)}
     </div>
     <div className="wb-toolbar lib-toolbar">
-      <label className="wb-search"><Search size={16} /><Input aria-label={tab === 'resources' ? '搜索资源' : '搜索配置方案'} placeholder={tab === 'resources' ? '搜索资源名称' : '搜索配置方案'} value={search} onChange={event => setSearch(event.target.value)} /></label>
-      {tab === 'resources' && <select aria-label="资源类型" value={kind} onChange={event => setKind(event.target.value)}><option value="all">全部类型</option>{kinds.map(row => <option value={row.id} key={row.id}>{row.name}</option>)}</select>}
+      <label className="wb-search"><Search size={16} /><Input aria-label={tab === 'resources' ? 'Search resources' : 'Search profiles'} placeholder={tab === 'resources' ? 'Search resource names' : 'Search profiles'} value={search} onChange={event => setSearch(event.target.value)} /></label>
+      {tab === 'resources' && <select aria-label="Resource type" value={kind} onChange={event => setKind(event.target.value)}><option value="all">All types</option>{kinds.map(row => <option value={row.id} key={row.id}>{row.name}</option>)}</select>}
       <Button className="lib-create" disabled={blocked || !data} onClick={() => { setError(''); setStatus(''); if (tab === 'resources') setEditor('new'); else setProfileEditor(true) }}>
-        {tab === 'resources' ? <Plus size={15} /> : <Save size={15} />}{tab === 'resources' ? '新建资源' : '保存当前配置'}</Button>
+        {tab === 'resources' ? <Plus size={15} /> : <Save size={15} />}{tab === 'resources' ? 'New resource' : 'Save current configuration'}</Button>
     </div>
-    {(error || loadError) && <div className="wb-feedback wb-error" role="alert"><CircleAlert size={16} /><span>{error || loadError}</span>{loadError && <Button variant="outline" disabled={blocked} onClick={() => void reload()}>重试</Button>}</div>}
+    {(error || loadError) && <div className="wb-feedback wb-error" role="alert"><CircleAlert size={16} /><span>{error || loadError}</span>{loadError && <Button variant="outline" disabled={blocked} onClick={() => void reload()}>Retry</Button>}</div>}
     {status && <div className="wb-feedback wb-status" role="status"><Check size={16} /><span>{status}</span></div>}
     <section className="lib-list" role="tabpanel" id={`lib-panel-${tab}`} aria-labelledby={`lib-tab-${tab}`} aria-busy={loading}>
       {tab === 'resources' ? visibleResources.map(resource => {
@@ -188,34 +188,34 @@ export function Library({ active }: { active: boolean }) {
         return <div className="lib-resource" key={resource.id}>
           <div className="lib-resource-row">
             <span className={`wb-app-icon ${resource.kind === 'skill' || resource.kind === 'agent' ? 'is-green' : ''}`}><type.icon size={20} /></span>
-            <div className="lib-name"><strong>{resource.name}</strong><small>{new TextEncoder().encode(resource.content).byteLength.toLocaleString('zh-CN')} 字节</small></div>
-            <Badge>{type.name}</Badge><Switch checked={resource.enabled} disabled={blocked} aria-label={`启用资源 ${resource.name}`}
-              onCheckedChange={enabled => void run('/library/resources/save', { ...resource, enabled }, resource.id, enabled ? '资源已启用。' : '资源已停用。')} />
-            <div className="lib-actions"><Button variant="ghost" aria-label={`编辑资源 ${resource.name}`} title="编辑资源" disabled={blocked} onClick={() => setEditor(resource)}><Pencil size={15} /></Button>
-              <Button variant="ghost" className="wb-danger" aria-label={`删除资源 ${resource.name}`} title="删除资源" disabled={blocked} onClick={() => setRemoving(resource.id)}><Trash2 size={15} /></Button></div>
+            <div className="lib-name"><strong>{resource.name}</strong><small>{new TextEncoder().encode(resource.content).byteLength.toLocaleString('en-US')} bytes</small></div>
+            <Badge>{type.name}</Badge><Switch checked={resource.enabled} disabled={blocked} aria-label={`Enable resource ${resource.name}`}
+              onCheckedChange={enabled => void run('/library/resources/save', { ...resource, enabled }, resource.id, enabled ? 'Resource enabled.' : 'Resource disabled.')} />
+            <div className="lib-actions"><Button variant="ghost" aria-label={`Edit resource ${resource.name}`} title="Edit resource" disabled={blocked} onClick={() => setEditor(resource)}><Pencil size={15} /></Button>
+              <Button variant="ghost" className="wb-danger" aria-label={`Delete resource ${resource.name}`} title="Delete resource" disabled={blocked} onClick={() => setRemoving(resource.id)}><Trash2 size={15} /></Button></div>
           </div>
-          {removing === resource.id && <div className="wb-remove lib-confirm"><span>删除资源“{resource.name}”？</span><Button variant="outline" disabled={!!busy} onClick={() => setRemoving('')}>取消</Button>
-            <Button variant="outline" className="wb-danger" busy={busy === resource.id} disabled={!!busy} onClick={() => void run('/library/resources/remove', { id: resource.id }, resource.id, '资源已删除。')}><Trash2 size={14} />确认删除</Button></div>}
+          {removing === resource.id && <div className="wb-remove lib-confirm"><span>Delete resource “{resource.name}”?</span><Button variant="outline" disabled={!!busy} onClick={() => setRemoving('')}>Cancel</Button>
+            <Button variant="outline" className="wb-danger" busy={busy === resource.id} disabled={!!busy} onClick={() => void run('/library/resources/remove', { id: resource.id }, resource.id, 'Resource deleted.')}><Trash2 size={14} />Confirm deletion</Button></div>}
         </div>
       }) : visibleProfiles.map(profile => <div className="lib-profile" key={profile.id}>
-        <div className="lib-profile-row"><span className="wb-app-icon is-green"><Layers3 size={20} /></span><div className="lib-name"><strong>{profile.name}</strong><small>{profile.clients.length} 个客户端</small></div>
-          <div className="lib-actions"><Button variant="ghost" aria-label={`查看方案 ${profile.name}`} title="查看客户端配置" aria-expanded={expanded === profile.id} aria-controls={`lib-clients-${profile.id}`} onClick={() => setExpanded(expanded === profile.id ? '' : profile.id)}>{expanded === profile.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}</Button>
-            <Button variant="outline" busy={busy === `apply:${profile.id}`} disabled={blocked} onClick={() => void run('/library/profiles/apply', { id: profile.id }, `apply:${profile.id}`, '')}><Play size={14} />应用</Button>
-            <Button variant="ghost" className="wb-danger" aria-label={`删除方案 ${profile.name}`} title="删除方案" disabled={blocked} onClick={() => setRemoving(profile.id)}><Trash2 size={15} /></Button></div></div>
+        <div className="lib-profile-row"><span className="wb-app-icon is-green"><Layers3 size={20} /></span><div className="lib-name"><strong>{profile.name}</strong><small>{profile.clients.length} clients</small></div>
+          <div className="lib-actions"><Button variant="ghost" aria-label={`View profile ${profile.name}`} title="View client configuration" aria-expanded={expanded === profile.id} aria-controls={`lib-clients-${profile.id}`} onClick={() => setExpanded(expanded === profile.id ? '' : profile.id)}>{expanded === profile.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}</Button>
+            <Button variant="outline" busy={busy === `apply:${profile.id}`} disabled={blocked} onClick={() => void run('/library/profiles/apply', { id: profile.id }, `apply:${profile.id}`, '')}><Play size={14} />Apply</Button>
+            <Button variant="ghost" className="wb-danger" aria-label={`Delete profile ${profile.name}`} title="Delete profile" disabled={blocked} onClick={() => setRemoving(profile.id)}><Trash2 size={15} /></Button></div></div>
         {expanded === profile.id && <div className="lib-profile-clients" id={`lib-clients-${profile.id}`}>{profile.clients.map(client => <div className="lib-profile-client" key={client.id}>
-          <Terminal size={15} /><strong>{client.id}</strong><Badge>{client.mode === 'gateway' ? '第三方 API' : '原生配置'}</Badge>
-          <dl><div><dt>模型</dt><dd>{client.model || '客户端默认'}</dd></div><div><dt>工作目录</dt><dd>{client.cwd || '默认'}</dd></div><div><dt>可执行文件</dt><dd>{client.executable || '自动检测'}</dd></div></dl>
+          <Terminal size={15} /><strong>{client.id}</strong><Badge>{client.mode === 'gateway' ? 'Third-party API' : 'Native configuration'}</Badge>
+          <dl><div><dt>Model</dt><dd>{client.model || 'Client default'}</dd></div><div><dt>Working directory</dt><dd>{client.cwd || 'Default'}</dd></div><div><dt>Executable</dt><dd>{client.executable || 'Auto-detected'}</dd></div></dl>
         </div>)}</div>}
-        {removing === profile.id && <div className="wb-remove lib-confirm"><span>删除方案“{profile.name}”？</span><Button variant="outline" disabled={!!busy} onClick={() => setRemoving('')}>取消</Button>
-          <Button variant="outline" className="wb-danger" busy={busy === profile.id} disabled={!!busy} onClick={() => void run('/library/profiles/remove', { id: profile.id }, profile.id, '配置方案已删除。')}><Trash2 size={14} />确认删除</Button></div>}
+        {removing === profile.id && <div className="wb-remove lib-confirm"><span>Delete profile “{profile.name}”?</span><Button variant="outline" disabled={!!busy} onClick={() => setRemoving('')}>Cancel</Button>
+          <Button variant="outline" className="wb-danger" busy={busy === profile.id} disabled={!!busy} onClick={() => void run('/library/profiles/remove', { id: profile.id }, profile.id, 'Profile deleted.')}><Trash2 size={14} />Confirm deletion</Button></div>}
       </div>)}
-      {!data && loading && <div className="wb-empty" role="status"><RefreshCw size={22} /><strong>正在读取资源库</strong></div>}
+      {!data && loading && <div className="wb-empty" role="status"><RefreshCw size={22} /><strong>Loading library</strong></div>}
       {data && !(tab === 'resources' ? visibleResources.length : visibleProfiles.length) && <div className="wb-empty"><Layers3 size={24} />
-        <strong>{search || (tab === 'resources' && kind !== 'all') ? '没有匹配的结果' : tab === 'resources' ? '尚无资源' : '尚无配置方案'}</strong>
-        {search || (tab === 'resources' && kind !== 'all') ? <Button variant="outline" onClick={() => { setSearch(''); setKind('all') }}>清除筛选</Button>
-          : <Button variant="outline" disabled={blocked} onClick={() => tab === 'resources' ? setEditor('new') : setProfileEditor(true)}><Plus size={15} />{tab === 'resources' ? '新建资源' : '保存当前配置'}</Button>}</div>}
+        <strong>{search || (tab === 'resources' && kind !== 'all') ? 'No matching results' : tab === 'resources' ? 'No resources yet' : 'No profiles yet'}</strong>
+        {search || (tab === 'resources' && kind !== 'all') ? <Button variant="outline" onClick={() => { setSearch(''); setKind('all') }}>Clear filters</Button>
+          : <Button variant="outline" disabled={blocked} onClick={() => tab === 'resources' ? setEditor('new') : setProfileEditor(true)}><Plus size={15} />{tab === 'resources' ? 'New resource' : 'Save current configuration'}</Button>}</div>}
     </section>
-    {editor && active && <ResourceEditor resource={editor === 'new' ? undefined : editor} onClose={() => setEditor(undefined)} onSaved={() => saved('资源已保存。')} />}
-    {profileEditor && active && <ProfileEditor onClose={() => setProfileEditor(false)} onSaved={() => saved('当前客户端配置已保存为方案。')} />}
+    {editor && active && <ResourceEditor resource={editor === 'new' ? undefined : editor} onClose={() => setEditor(undefined)} onSaved={() => saved('Resource saved.')} />}
+    {profileEditor && active && <ProfileEditor onClose={() => setProfileEditor(false)} onSaved={() => saved('The current client configuration has been saved as a profile.')} />}
   </div>
 }

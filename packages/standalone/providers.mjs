@@ -5,7 +5,7 @@ import { isDeniedChannel } from '../../src/magpie-policy.js'
 const fail = message => Object.assign(new Error(message), { statusCode: 400 })
 const modelsOf = value => {
   if (!Array.isArray(value) || value.length > 300 || value.some(id => typeof id !== 'string' || !id.trim() || id.length > 300 || /[\0\r\n]/.test(id))) {
-    throw fail('模型清单必须为不超过 300 项的模型名称数组')
+    throw fail('The model list must be an array of at most 300 model names')
   }
   return [...new Set(value.map(id => id.trim()))]
 }
@@ -23,12 +23,12 @@ export function publicProviders(section) {
 
 export function createProviderManagement({ stores, runtime, persist }) {
   const get = id => {
-    if (typeof id !== 'string') throw fail('请选择供应商')
+    if (typeof id !== 'string') throw fail('Select a provider')
     // A channel this build does not offer is unknown here, exactly as it is
     // absent from the directory above.
-    if (isDeniedChannel(id)) throw fail('此渠道不在本应用的提供范围内')
+    if (isDeniedChannel(id)) throw fail('This channel is not offered by this application')
     const provider = getProvider(id)
-    if (!provider) throw fail('未知供应商')
+    if (!provider) throw fail('Unknown provider')
     return provider
   }
   function write(id, value) {
@@ -54,25 +54,25 @@ export function createProviderManagement({ stores, runtime, persist }) {
     },
     save(patch) {
       const provider = get(patch.providerId)
-      if (!['apiKey', 'none'].includes(provider.auth.kind)) throw fail('此渠道请使用订阅账号导入')
-      for (const name of Object.keys(patch)) if (!['providerId', 'enabled', 'apiKey', 'baseUrl', 'models'].includes(name)) throw fail('不支持的供应商设置字段')
+      if (!['apiKey', 'none'].includes(provider.auth.kind)) throw fail('Import a subscription account for this channel')
+      for (const name of Object.keys(patch)) if (!['providerId', 'enabled', 'apiKey', 'baseUrl', 'models'].includes(name)) throw fail('Unsupported provider settings field')
       const previous = stores.settings.get().aggregate?.providers?.[provider.id] ?? {}
       const next = { enabled: true, ...previous, addedAt: previous.addedAt ?? Date.now() }
       if (patch.enabled !== undefined) {
-        if (typeof patch.enabled !== 'boolean') throw fail('enabled 必须为布尔值')
+        if (typeof patch.enabled !== 'boolean') throw fail('enabled must be a boolean')
         next.enabled = patch.enabled
       }
       if (patch.apiKey !== undefined) {
-        if (typeof patch.apiKey !== 'string' || patch.apiKey.length > 8192 || /[\0\r\n]/.test(patch.apiKey)) throw fail('API Key 格式无效')
+        if (typeof patch.apiKey !== 'string' || patch.apiKey.length > 8192 || /[\0\r\n]/.test(patch.apiKey)) throw fail('Invalid API Key format')
         next.apiKey = patch.apiKey.trim()
       }
       if (patch.baseUrl !== undefined) {
-        if (typeof patch.baseUrl !== 'string' || patch.baseUrl.length > 2048) throw fail('API 地址无效')
+        if (typeof patch.baseUrl !== 'string' || patch.baseUrl.length > 2048) throw fail('Invalid API address')
         const raw = patch.baseUrl.trim()
         if (raw) {
           let parsed
-          try { parsed = new URL(raw) } catch { throw fail('请输入有效的 HTTP 或 HTTPS 地址') }
-          if (!['http:', 'https:'].includes(parsed.protocol) || parsed.username || parsed.password || parsed.hash || parsed.search) throw fail('API 地址不能包含凭据、查询参数或片段')
+          try { parsed = new URL(raw) } catch { throw fail('Enter a valid HTTP or HTTPS address') }
+          if (!['http:', 'https:'].includes(parsed.protocol) || parsed.username || parsed.password || parsed.hash || parsed.search) throw fail('The API address must not contain credentials, query parameters or a fragment')
         }
         next.baseUrl = raw.replace(/\/+$/, '')
       }
@@ -94,7 +94,7 @@ export function createProviderManagement({ stores, runtime, persist }) {
       get(providerId)
       const started = stores.settings.get().aggregate?.providers?.[providerId]
       const ids = await fetchProviderModels(stores.settings.get().aggregate, providerId, { signal })
-      if (ids === null) return { models: null, note: '供应商没有可用的模型列表接口' }
+      if (ids === null) return { models: null, note: 'The provider has no usable model-list endpoint' }
       const current = stores.settings.get().aggregate?.providers?.[providerId]
       if (current && current === started && !signal?.aborted) write(providerId, { ...current, discovered: ids.slice(0, 300) })
       return { models: ids }

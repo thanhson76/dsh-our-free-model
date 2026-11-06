@@ -1,78 +1,78 @@
-# 2026-10-31 全量 issue 审计与修复验证
+# 2026-10-31 Full Issue Audit and Fix Verification
 
-基线：`origin/main` @ `5fcb5fa`（v2.7.3）。本轮工作分支 `audit/issues-20261031`，最终推送到 `main` @ `9b3f341`。
-**已发版**：见 `docs/releases/v2.7.4.md`（2.7.4，`feed/manifest.json` 已重签）。
+Baseline: `origin/main` @ `5fcb5fa` (v2.7.3). This round's working branch was `audit/issues-20261031`, finally pushed to `main` @ `9b3f341`.
+**Released**: see `docs/releases/v2.7.4.md` (2.7.4, `feed/manifest.json` has been re-signed).
 
-## 一、合并的社区修复 PR（19 个，均先本地验证再合并）
+## 1. Merged community fix PRs (19, each verified locally before merging)
 
-| PR | 修复 issue | 验证套件 |
+| PR | Issue fixed | Verification suite |
 |---|---|---|
-| #538 | #682 聚合渠道缺 modelsUrl | aggregate |
-| #675 | #701 / #213 trae 缓存命中率 0% | channel-pack |
-| #622 | #621 流式 tool_calls 帧 id/name 与 index | channel-pack |
-| #673 | #452 裸 index 帧 | forward |
-| #661 | #548 Responses 流缺 sequence_number | forward |
-| #631 | React hooks 顺序（公告 portal） | client-lint |
-| #650 | #587 网络失败无 code → 不重试 | channel-pack |
-| #658 | #549 上游 5xx 空响应体不说哪层失败 | free-lane-wire |
-| #674 | #460 keepalive 注释帧续命空闲死线 | free-lane-wire |
-| #630 | combo 静默候选阻塞整链 | combo |
-| #620 | EAC 登录与 Windows 系统代理 | eac-abort / eac-login |
-| #671 | #670 模型刷新接口返回各来源结果 | standalone-management |
-| #575 | #532 无 sessionId 回合共享 global 会话 | aggregate-wiring |
-| #644 | 渠道模型隐藏后会话选择器不刷新 | standalone-channels |
-| #610 | 工具结果消息跨新旧 DSH 内核 | gateway-source / standalone-channels |
-| #685 | #681 渠道账号「测试」恒失败 | channel-pack（#681 段） |
-| #343 | #335 pnpm 托管安装拒绝应用内升级 | updater |
-| #638 | #474 工具参数非法 JSON 与截断分离 | forward / stream-failure |
-| #637 | #456 Windows 0600 经 icacls 生效 | private-file-permissions |
+| #538 | #682 Aggregate channel missing modelsUrl | aggregate |
+| #675 | #701 / #213 TRAE cache hit rate 0% | channel-pack |
+| #622 | #621 Streaming tool_calls frame id/name and index | channel-pack |
+| #673 | #452 Bare index frames | forward |
+| #661 | #548 Responses stream missing sequence_number | forward |
+| #631 | React hooks order (announcement portal) | client-lint |
+| #650 | #587 Network failure without a code → no retry | channel-pack |
+| #658 | #549 Upstream 5xx with an empty response body does not say which layer failed | free-lane-wire |
+| #674 | #460 keepalive comment frames keep the idle deadline alive | free-lane-wire |
+| #630 | combo silent candidates block the whole chain | combo |
+| #620 | EAC login and the Windows system proxy | eac-abort / eac-login |
+| #671 | #670 Model refresh endpoint returns the result from each source | standalone-management |
+| #575 | #532 Turns without a sessionId share the global session | aggregate-wiring |
+| #644 | Session picker does not refresh after channel models are hidden | standalone-channels |
+| #610 | Tool result messages across old and new DSH kernels | gateway-source / standalone-channels |
+| #685 | #681 Channel account "Test" always fails | channel-pack (#681 section) |
+| #343 | #335 pnpm-managed installs reject in-app upgrades | updater |
+| #638 | #474 Separate invalid JSON in tool arguments from truncation | forward / stream-failure |
+| #637 | #456 Windows 0600 takes effect via icacls | private-file-permissions |
 
-## 二、本轮本地新增修复（8 项）
+## 2. New local fixes in this round (8 items)
 
-1. **`src/magpie-policy.js` 第三方文案脱敏**（新发现的回归）
-   - 上游市场 2026-10-30 后上架 `@magpie-community/page-agent-office`，其简介提到 "WorkBuddy/CodeBuddy"，使 `magpie-policy` 套件失败。
-   - 修复：在管理边界对第三方内容路由做名称脱敏（保留无害插件），`/api/providers`、`/api/upstream`、`/api/importapps` 等 id 承载面豁免。
-   - 验证：`magpie-policy: 16 checks passed`（新增回归用例）。
-2. **`src/magpie-engine.js` 端口占用回退**（#688）
-   - Windows 保留端口段（winnat/Hyper-V/WSL）跨重启漂移，`EACCES` 被误判为"已有拥有者"→ 工作台恒定"启动失败"。
-   - 修复：`ownerLease` 区分 `EACCES`/`EPERM` 与 `EADDRINUSE`（前者丢弃陈旧记录重取）；保存的网关端口不可绑定时取新端口并持久化。
-   - 验证：`magpie-engine: all fixture and built-binary checks passed`；实机引擎 `state: ready`。
-3. **`src/catalog.js` `-vl` 段视觉标记**（#458）
-   - 家族规则 `vision:false` 把 `nemotron-*-vl` 变体标成纯文本。修复：`-vl` 段视为视觉标记（`-free` 后缀场景也命中）。
-   - 验证：sniff 套件新增 4 条断言通过。
-4. **`src/gemini.js` 空串 enum 剔除**（#251）
-   - Gemini 严格校验拒绝 `enum` 中的空串（400 `cannot be empty`）。修复：转换时剔除空串成员；全空则移除 enum 约束。
-   - 验证：`gemini-gateway-test: 25 passed`。
-5. **`client.js` 工作台展开不丢收起按钮 + iframe 内 Esc**（#700）
-   - 展开瞬间 `portal` 尚未建立时渲染 `null`，整个 toolbar（唯一收起按钮）消失；Escape 只在父窗口监听，焦点在 iframe 内时失效。
-   - 验证：`client-lint: OK`、`workbench: 17 checks passed`。
-6. **`src/eac.js` undici 按需加载**（阻塞性回归）
-   - `undici` 只是 devDep，顶层 import 让真实宿主与离线拷贝树直接崩（`eac-login` 套件在 main 上根本跑不起来）。
-   - 修复：代理路径按需 `import('undici')`；缺 undici 时抛 `TRANSPORT` 错误（不静默直连，避免代理用户 IP 泄漏）。
-   - 验证：`eac-abort`、`eac-login` 通过；真实安装后 `index.js` 可加载。
-7. **`src/open-external.js` 运行时解析 execFile**
-   - `promisify(execFile)` 在模块加载时固定，离线桩（`syncBuiltinESMExports`）失效。修复：调用时解析。
-   - 验证：`eac-login-test: all checks passed`。
-8. **打包完整性修复（本轮最重要发现）**
-   - #637 新增的 `src/private-file.js` 未列入 `package.json` 的 `files`，**发布包会缺该模块，用户安装后 `src/store.js` 加载即崩**。
-   - 修复：将 `restrictPermissions` 并入 `src/open-external.js`（保持 80 文件上限），同步 11 处引用、打包清单与测试。
-   - 验证：`legacy-upgrade: 8/8 通过`（旧版 1.3.1、2.5.9 均能安装并加载新代码，80 文件预算内）。
+1. **`src/magpie-policy.js` redaction of third-party copy** (newly discovered regression)
+   - After 2026-10-30 the upstream marketplace listed `@magpie-community/page-agent-office`, whose description mentions "WorkBuddy/CodeBuddy", causing the `magpie-policy` suite to fail.
+   - Fix: redact names when routing third-party content at the management boundary (harmless plugins are preserved); id-bearing surfaces such as `/api/providers`, `/api/upstream`, and `/api/importapps` are exempted.
+   - Verification: `magpie-policy: 16 checks passed` (new regression case added).
+2. **`src/magpie-engine.js` fallback when a port is occupied** (#688)
+   - Windows reserved port ranges (winnat/Hyper-V/WSL) drift across restarts, and `EACCES` was misjudged as "already has an owner" → the workbench constantly showed "startup failed".
+   - Fix: `ownerLease` distinguishes `EACCES`/`EPERM` from `EADDRINUSE` (for the former, discard the stale record and reacquire it); when the saved gateway port cannot be bound, take a new port and persist it.
+   - Verification: `magpie-engine: all fixture and built-binary checks passed`; the real engine showed `state: ready`.
+3. **`src/catalog.js` `-vl` segment visual marker** (#458)
+   - The family rule `vision:false` marked `nemotron-*-vl` variants as text-only. Fix: treat the `-vl` segment as a visual marker (also hits in the `-free` suffix scenario).
+   - Verification: 4 new assertions added to the sniff suite passed.
+4. **`src/gemini.js` removal of empty-string enum members** (#251)
+   - Gemini's strict validation rejects empty strings in `enum` (400 `cannot be empty`). Fix: strip empty-string members during conversion; if all members are empty, remove the enum constraint entirely.
+   - Verification: `gemini-gateway-test: 25 passed`.
+5. **`client.js` workbench expansion does not lose the collapse button + Esc inside an iframe** (#700)
+   - At the moment of expansion, when the `portal` had not yet been created, it rendered `null` and the entire toolbar (holding the only collapse button) disappeared; Escape was only listened for on the parent window, so it failed when focus was inside the iframe.
+   - Verification: `client-lint: OK`, `workbench: 17 checks passed`.
+6. **`src/eac.js` lazy loading of undici** (blocking regression)
+   - `undici` is only a devDep, and the top-level import made the real host and offline copy trees crash outright (the `eac-login` suite could not run at all on main).
+   - Fix: `import('undici')` on demand on the proxy path; when undici is missing, throw a `TRANSPORT` error (do not silently connect directly, to avoid leaking the proxy user's IP).
+   - Verification: `eac-abort` and `eac-login` passed; after a real install, `index.js` loads.
+7. **`src/open-external.js` resolving execFile at runtime**
+   - `promisify(execFile)` was fixed at module load time, breaking the offline stub (`syncBuiltinESMExports`). Fix: resolve it at call time.
+   - Verification: `eac-login-test: all checks passed`.
+8. **Packaging integrity fix (the most important finding of this round)**
+   - `src/private-file.js`, newly added by #637, was not listed in the `files` field of `package.json`, so **the published package would be missing that module, and `src/store.js` would crash on load after a user installed it**.
+   - Fix: merge `restrictPermissions` into `src/open-external.js` (keeping the 80-file limit), and update 11 references, the packaging manifest, and the tests in sync.
+   - Verification: `legacy-upgrade: 8/8 passed` (old versions 1.3.1 and 2.5.9 can both install and load the new code, within the 80-file budget).
 
-## 三、测试结果
+## 3. Test results
 
-| 项目 | 结果 |
+| Item | Result |
 |---|---|
-| `npm run typecheck` | 通过 |
-| `npm test`（全量 109 套件） | 104/109；失败 4 项为发布签名漂移（`manifest`/`release`/`legacy-upgrade --production`/`catalog`），未发版属预期；`gateway-disconnect` 偶发退出码（10/10 重跑均 9/9 通过） |
-| `legacy-upgrade`（System32 bsdtar） | 8/8 通过 |
-| 真实安装（隔离 `DSH_HOME`） | `pnpm add file:*.tgz` 成功，`index.js` 可加载 |
-| 真实 DSH Web 启动 | 成功，`/api/our-free-model/summary` 200，`channels: {state:"ready"}`，26 个模型 |
-| 工作台引擎实机启动 | `state: ready`，`engine/ui/` 200 |
-| `npm run selftest`（真实网络） | 本地链路全 200；免费车道 502 = 上游 OpenCode 额度限制（#690/#695/#708 外部封锁）；无 Bun 时返回明确的安装指引 |
+| `npm run typecheck` | Passed |
+| `npm test` (full run, 109 suites) | 104/109; the 4 failures were release-signature drift (`manifest`/`release`/`legacy-upgrade --production`/`catalog`), expected before a release; `gateway-disconnect` had a flaky exit code (9/9 passed in 10/10 reruns) |
+| `legacy-upgrade` (System32 bsdtar) | 8/8 passed |
+| Real install (isolated `DSH_HOME`) | `pnpm add file:*.tgz` succeeded, `index.js` loads |
+| Real DSH Web startup | Succeeded, `/api/our-free-model/summary` 200, `channels: {state:"ready"}`, 26 models |
+| Workbench engine real-machine startup | `state: ready`, `engine/ui/` 200 |
+| `npm run selftest` (real network) | Local chain all 200; free lane 502 = upstream OpenCode quota limit (#690/#695/#708 external blockers); without Bun, returns clear install guidance |
 
-## 四、遗留与需维护者决定
+## 4. Leftovers and items needing a maintainer decision
 
-- **免费车道强制 Bun**（2.7.3 引入）：本机无 Bun 时免费车道不可用，需 `OUR_FREE_MODEL_BUN` 或 `OUR_FREE_MODEL_FREE_TRANSPORT=node`。上游同时在做客户端指纹校验（#708），node 回退也被拒。
-- **发布签名**：`feed/manifest.json` 与源码有 57 处字节漂移，`manifest`/`release`/`catalog` 检查为红，需用私钥重签并发版。
-- **超 scope / 需重写**：#341、#530（路由/组合跨适配器）、#512（国内直连）、#507（拒绝分类）、#525（与 #605 重复）。
-- **需实测标注**：#264（cline step-5-preview 多模态）、#542（长工具会话）、#639（空内容 issue）、#469/#161（subagent keeplist）。
+- **Free lane forces Bun** (introduced in 2.7.3): without Bun on the local machine the free lane is unavailable; `OUR_FREE_MODEL_BUN` or `OUR_FREE_MODEL_FREE_TRANSPORT=node` is required. Upstream is also doing client fingerprint validation (#708), and the node fallback is rejected too.
+- **Release signature**: `feed/manifest.json` has drifted from the source by 57 bytes; the `manifest`/`release`/`catalog` checks are red and need re-signing with the private key and a release.
+- **Beyond scope / needs a rewrite**: #341, #530 (routing/combination across adapters), #512 (direct connections within China), #507 (refusal classification), #525 (duplicate of #605).
+- **Needs real-testing annotations**: #264 (cline step-5-preview multimodal), #542 (long tool sessions), #639 (empty-content issue), #469/#161 (subagent keeplist).

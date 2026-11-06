@@ -1,4 +1,4 @@
-/** 改用统一存储命名空间后，验证已有账号、设置及备份仍能读取。 */
+/** After switching to the unified storage namespace, verify existing accounts, settings and backups can still be read. */
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import os from 'node:os'
@@ -64,7 +64,7 @@ export async function verifyChannelStorageCompatibility() {
     assert.equal((await exportBackup(pool, credentials)).payload.format, 'channel-pack/backup')
     await assert.rejects(importBackup(credentials, pool, { ...payload, format: 'foreign-data' }))
     await assert.rejects(importBackup(credentials, pool, { ...payload, version: 999 }))
-    assert.equal(writes, 1, '无效格式或版本不得写入凭据')
+    assert.equal(writes, 1, 'an invalid format or version must not write credentials')
     console.log('ok storage compatibility: legacy preferences, locks, check-in, ledger and backups survive namespace migration')
   } finally {
     if (savedOverride === undefined) delete process.env.DSH_CHANNEL_PACK_STATE_DIR

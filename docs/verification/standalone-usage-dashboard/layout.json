@@ -1,5 +1,5 @@
 {
-  "method": "浏览器 DOM 实测；横向滚动限制在图表与表格容器，视口工具尺寸受宿主缩放影响",
+  "method": "Measured in the browser DOM; horizontal scrolling is confined to the chart and table containers; the viewport tool size is affected by host scaling",
   "layouts": [
     {
       "controlsOutside": 0,

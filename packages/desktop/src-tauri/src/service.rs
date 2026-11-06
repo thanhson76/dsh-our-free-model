@@ -15,24 +15,24 @@ pub struct ServiceProcess {
     pub management_url: String,
 }
 
-// 握手只来自自己的 stdout 管道，不信任端口占用者或共享目录里的 ready 文件。
+// The handshake comes only from our own stdout pipe; whoever occupies a port, or a ready file in a shared directory, is not trusted.
 fn ready_address(value: &serde_json::Value, pid: u32) -> Result<String, String> {
     if value["protocol"] == "ofm-desktop-error/v1" {
         return Err(if value["code"] == "DATA_DIRECTORY_IN_USE" {
-            "数据目录已被服务占用，请先停止已有独立服务；不会删除它的锁文件"
+            "The data directory is already in use by a service; stop the existing standalone service first. Its lock file will not be deleted"
         } else {
-            "后端服务启动失败，请检查安装资源和数据目录权限"
+            "The backend service failed to start; check the install resources and the data directory permissions"
         }
         .into());
     }
     let address = value["managementUrl"]
         .as_str()
-        .ok_or("服务握手缺少管理地址")?;
-    let url: tauri::Url = address.parse().map_err(|_| "服务握手地址无效")?;
+        .ok_or("The service handshake is missing the management address")?;
+    let url: tauri::Url = address.parse().map_err(|_| "Invalid service handshake address")?;
     let token = url
         .fragment()
         .and_then(|fragment| fragment.strip_prefix("login="))
-        .ok_or("服务握手缺少登录入口")?;
+        .ok_or("The service handshake is missing the login entry point")?;
     if value["protocol"] != "ofm-desktop-ready/v1"
         || value["product"] != "our-free-model-standalone"
         || value["pid"].as_u64() != Some(pid as u64)
@@ -49,7 +49,7 @@ fn ready_address(value: &serde_json::Value, pid: u32) -> Result<String, String> 
             .bytes()
             .all(|byte| byte.is_ascii_alphanumeric() || byte == b'_' || byte == b'-')
     {
-        return Err("服务握手校验失败".into());
+        return Err("Service handshake validation failed".into());
     }
     Ok(address.to_owned())
 }
@@ -60,15 +60,15 @@ impl ServiceProcess {
             data_dir.to_owned()
         } else {
             std::env::current_dir()
-                .map_err(|_| "无法确定数据目录")?
+                .map_err(|_| "Cannot determine the data directory")?
                 .join(data_dir)
         };
         let mut command = Command::new(node);
         command
-            // Tauri 的资源路径经过 canonicalize，Windows 会带 \\?\ 前缀。
-            // Node 不能把这种路径作为主模块参数；使用工作目录和文件名启动。
-            .current_dir(host.parent().ok_or("服务入口目录无效")?)
-            .arg(host.file_name().ok_or("服务入口文件名无效")?)
+            // Tauri resource paths are canonicalized, and on Windows they carry the \\?\ prefix.
+            // Node cannot take such a path as its main-module argument; start it with the working directory and file name.
+            .current_dir(host.parent().ok_or("Invalid service entry directory")?)
+            .arg(host.file_name().ok_or("Invalid service entry file name")?)
             .arg("--data-dir")
             .arg(&data_dir)
             .env_remove("NODE_OPTIONS")
@@ -79,16 +79,16 @@ impl ServiceProcess {
             .stderr(Stdio::null());
         #[cfg(windows)]
         command.creation_flags(0x08000000);
-        let child = command.spawn().map_err(|_| "无法启动内置 Node 服务")?;
+        let child = command.spawn().map_err(|_| "Cannot start the bundled Node service")?;
         let mut process = Self {
             child,
             data_dir: data_dir.to_owned(),
             management_url: String::new(),
         };
-        let output = process.child.stdout.take().ok_or("无法读取服务握手")?;
+        let output = process.child.stdout.take().ok_or("Cannot read the service handshake")?;
         let (sender, receiver) = mpsc::channel();
         std::thread::spawn(move || {
-            // 持续读完管道，避免握手之后的第三方日志堵塞服务；日志不会进入页面。
+            // Keep draining the pipe so third-party logs after the handshake cannot block the service; the logs never reach the page.
             for line in BufReader::new(output).lines().map_while(Result::ok) {
                 if line.len() > 4096 {
                     continue;
@@ -108,20 +108,20 @@ impl ServiceProcess {
             match receiver.recv_timeout(Duration::from_millis(100)) {
                 Ok(value) => break ready_address(&value, process.child.id()),
                 Err(mpsc::RecvTimeoutError::Disconnected) => {
-                    break Err("服务进程未完成启动握手".into())
+                    break Err("The service process did not complete the startup handshake".into())
                 }
                 Err(mpsc::RecvTimeoutError::Timeout) => {}
             }
             if process
                 .child
                 .try_wait()
-                .map_err(|_| "无法检查服务进程")?
+                .map_err(|_| "Cannot check the service process")?
                 .is_some()
             {
-                break Err("服务进程在启动期间退出".into());
+                break Err("The service process exited during startup".into());
             }
             if Instant::now() >= deadline {
-                break Err("服务启动握手超时".into());
+                break Err("The service startup handshake timed out".into());
             }
         };
         process.management_url = result?;
@@ -146,7 +146,7 @@ impl ServiceProcess {
                 }
             }
         };
-        // 超时强停后只回收已停止的自有进程留下的锁，绝不按端口或目录盲删。
+        // After a timed-out force stop, only reclaim the lock left by our own stopped process; never delete blindly by port or directory.
         if stopped {
             let lock = self.data_dir.join("service.lock");
             if let Ok(bytes) = fs::read(&lock) {
@@ -226,6 +226,6 @@ mod tests {
         let success = result.is_ok();
         drop(result);
         fs::remove_dir_all(directory).unwrap();
-        assert!(success, "Windows canonicalize 路径应能启动 Node 主模块");
+        assert!(success, "A Windows canonicalized path should be able to start the Node main module");
     }
 }

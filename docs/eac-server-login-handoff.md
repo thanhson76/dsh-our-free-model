@@ -1,80 +1,80 @@
-# OFM GitHub 授权后 Desktop 未登录：服务器排查与修复交接
+# OFM Desktop Still Not Logged In After GitHub Authorisation: Server Troubleshooting and Fix Handover
 
-更新日期：2026-10-07
-网关：`https://ai.dtyg123.dpdns.org/eac`
-适用：自建 Node EAC 网关及其 Nginx / Cloudflare 代理链路。
+Updated: 2026-10-07
+Gateway: `https://ai.dtyg123.dpdns.org/eac`
+Applies to: the self-hosted Node EAC gateway and its Nginx / Cloudflare proxy chain.
 
-## 1. 需要服务器侧完成什么
+## 1. What needs to be done on the server side
 
-用户在浏览器完成 GitHub 授权后，OFM Desktop 仍显示未授权，等待页面没有完成登录。
+After the user completes GitHub authorisation in the browser, OFM Desktop still shows unauthorised, and the waiting page never completes the login.
 
-请维护者完成三件事：
+The maintainer is asked to complete three things:
 
-1. 查本次 OAuth 回调和令牌领取是否到达同一网关进程，以及该进程是否重启。
-2. 部署附件中的 `auth-github.mjs` 修复，启用“保留领取 → 客户端保存 → 确认领取”协议。
-3. 用一个全新的 Desktop 登录会话验收，确认用户令牌落盘、授权状态正确。
+1. Check whether this OAuth callback and token claim reached the same gateway process, and whether that process restarted.
+2. Deploy the `auth-github.mjs` fix in the attachment, enabling the "retained claim → client saves → confirm claim" protocol.
+3. Accept with a brand-new Desktop login session, confirming the user token is persisted and the authorisation state is correct.
 
-用户已反馈真实登录验证通过；本机客户端修复已安装。以下现场证据记录于修复过程中，不代表当前远端状态。此次 PR 同步了上游加密存储实现；远端模块版本及强制鉴权是否开启仍需维护者核对。代码不自动切换强制开关，登录验收后如需强制策略，按第 6.3 节操作。
+The user has reported that a real login verification passed; the local client fix is installed. The on-site evidence below was recorded during the fix process and does not represent the current remote state. This PR synced upstream's encrypted-storage implementation; the remote module version and whether mandatory authentication is enabled still need to be checked by the maintainer. The code does not automatically flip the mandatory switch; after login acceptance, if a mandatory policy is needed, follow section 6.3.
 
-## 2. 历史已确认的证据（2026-10-06）
+## 2. Historically confirmed evidence (2026-10-06)
 
-| 检查项 | 实际结果 | 能说明什么 |
+| Check item | Actual result | What it can show |
 | --- | --- | --- |
-| 早先一次真实令牌领取 | HTTP 520，约 8446ms，非 JSON、没有令牌；后续重试 pending | 领取链路出现过远端错误；尚无日志，不能确定 520 来自哪一层 |
-| 再次授权后，领取当前 UI 的关联码 | HTTP 200，约 2626ms，`status=pending` | 当次响应没有提供可领取令牌 |
-| 本机用户授权文件 | 领取前后均不存在 | Desktop 没有成功保存用户令牌 |
-| 远端 `/auth/status` | HTTP 200；configured=true、required=false、authorized=false | OAuth 已配置，当前为兼容期；未携带令牌时未授权是正常结果 |
-| 随机关联码、无令牌请求 `POST /auth/ack` | HTTP 404，`not found` | 当前访问链路没有提供新版确认接口；修复版应返回 401 |
-| 远端 `/auth/github/start` | HTTP 302；回调地址是同域 `/eac/auth/github/callback`；state 对应请求的关联码 | 发起端的回调地址和关联码绑定符合预期 |
-| 无效 state 的回调 | HTTP 400，授权已过期 | 回调路径能够到达预期授权处理器 |
-| 本机修复文件 | index、client、eac-login 的 SHA 与修复源码一致 | 本机已经装入此次客户端修复 |
+| An earlier real token claim | HTTP 520, about 8446ms, non-JSON, no token; a later retry was pending | The claim path had a remote error; without logs, which layer the 520 came from cannot be determined |
+| After authorising again, claiming the current UI's link code | HTTP 200, about 2626ms, `status=pending` | That response provided no claimable token |
+| Local user authorisation file | Did not exist before or after the claim | Desktop did not successfully save a user token |
+| Remote `/auth/status` | HTTP 200; configured=true, required=false, authorized=false | OAuth is configured and this is currently the compatibility period; unauthorised without a token is a normal result |
+| `POST /auth/ack` for a random link code, with no token | HTTP 404, `not found` | The current access chain does not provide the new confirmation endpoint; the fixed version should return 401 |
+| Remote `/auth/github/start` | HTTP 302; the callback address is the same-domain `/eac/auth/github/callback`; the state corresponds to the requested link code | The initiating side's callback address and link-code binding are as expected |
+| Callback with an invalid state | HTTP 400, authorisation expired | The callback path reaches the expected authorisation handler |
+| Local fix files | The SHAs of index, client and eac-login match the fix sources | This machine already has this client fix installed |
 
-**还不能确定的根因：** 浏览器成功页是否对应当前等待的关联码、旧接口是否已消费令牌、进程是否重启、多实例是否造成状态不一致。应以本次成功页和服务器日志核实，不根据 HTTP 520 或 pending 单独下结论。
+**Root causes that still cannot be determined:** whether the browser success page corresponds to the currently awaited link code, whether the old endpoint already consumed the token, whether the process restarted, and whether multiple instances caused state inconsistency. Verify against this success page and the server logs; do not conclude from an HTTP 520 or pending alone.
 
-## 3. 修复内容与交付文件
+## 3. Fix contents and delivered files
 
-先前交付包包含：
+The earlier delivery package contained:
 
-- `README_CN.md`：本文。
-- `auth-github.mjs`：修复后的服务器授权模块。
-- `auth-github.patch`：相对于基线提交的单文件补丁，路径为 `worker/auth-github.mjs`。
-- `SHA256SUMS`：交付文件的 SHA-256。
+- `README_CN.md`: this document.
+- `auth-github.mjs`: the fixed server authorisation module.
+- `auth-github.patch`: a single-file patch relative to the baseline commit, with path `worker/auth-github.mjs`.
+- `SHA256SUMS`: the SHA-256 of the delivered files.
 
-当前 PR 的目标分支基线为 `8f4f89e`；修复通过 PR #107 的 `fix/pr97-reviewed-channels` 分支交付。先前 ZIP 基于 `713b03f`，不包含后续上游加密存储与本次整合，不能据旧 ZIP 覆盖最新服务器版本。采用 PR 中的 `worker/auth-github.mjs` 或基于当前服务器版本审查合并差异；任何旧版 `auth-github.patch` 都不应盲目应用。
+The current PR's target-branch baseline is `8f4f89e`; the fix is delivered through PR #107's `fix/pr97-reviewed-channels` branch. The earlier ZIP was based on `713b03f` and does not contain the later upstream encrypted storage or this integration, so the latest server version must not be overwritten based on the old ZIP. Adopt the `worker/auth-github.mjs` from the PR, or review and merge the differences against the current server version; no old `auth-github.patch` should be applied blindly.
 
-上述目标分支基线模块 SHA-256：
+SHA-256 of the target-branch baseline module above:
 
 ```text
 7e67f47452ad35c84552d0ac5711f45380cb902d44b276452823b4b65b494021
 ```
 
-修复模块 SHA-256：
+SHA-256 of the fixed module:
 
 ```text
 e2c0305c2a76af677ed7cfe7c44b8d462ddf1016dbb2cee40988b2f446cd113b
 ```
 
-### 领取协议
+### Claim protocol
 
-| 客户端请求 | 修复后行为 |
+| Client request | Behaviour after the fix |
 | --- | --- |
-| 旧客户端：`GET /auth/poll?link=...` | 保留上游幂等重复领取，直到过期 |
-| 新客户端：`GET /auth/poll?link=...&retain=1` | 成功响应返回 token 和 `ackRequired:true`；确认前保留同一令牌，最多 15 分钟 |
-| `POST /auth/ack?link=...`，携带匹配的 `x-ofm-user` | 确认后移除待领取记录，返回 200；重复有效确认可幂等成功 |
-| ACK 不携带令牌，或令牌与待领取记录不匹配 | 返回 401，不消费待领取记录 |
-| 令牌已吊销或 Star 判定已失效 | 不重新交付该令牌 |
+| Old client: `GET /auth/poll?link=...` | Keeps upstream's idempotent repeated claim, until expiry |
+| New client: `GET /auth/poll?link=...&retain=1` | A successful response returns the token and `ackRequired:true`; the same token is retained until confirmation, for at most 15 minutes |
+| `POST /auth/ack?link=...`, carrying a matching `x-ofm-user` | After confirmation, the pending-claim record is removed and 200 is returned; a repeated valid confirmation can succeed idempotently |
+| ACK carries no token, or the token does not match the pending-claim record | Returns 401 and does not consume the pending-claim record |
+| The token has been revoked, or the Star determination has lapsed | That token is not delivered again |
 
-新客户端先原子保存并回读本机令牌，再确认领取。保存失败时不确认，稍后可以重领。客户端还修复了轮询错误提示、并发领取、关闭设置后继续登录、退出登录竞态。
+The new client first atomically saves and reads back the local token, then confirms the claim. If saving fails it does not confirm, and can claim again later. The client also fixed polling error prompts, concurrent claims, continuing to log in after the settings are closed, and sign-out races.
 
-**存储与限制：** 保留上游待领取令牌加密落盘（users.json / 0600），同一存储路径与密钥下可跨单实例重启领取；ACK 删除也会落盘。尚未实现多实例共享，仍需单实例运行。旧版网关的内存等待记录无法凭这次升级恢复，需重新发起登录。
+**Storage and limits:** Upstream's encrypted persistence of pending-claim tokens (users.json / 0600) is retained; under the same storage path and key, claims can be recovered across a single-instance restart; ACK deletion is also persisted. Multi-instance sharing is not yet implemented, so a single instance is still required. The old gateway's in-memory waiting records cannot be recovered by this upgrade; the login must be initiated again.
 
-## 4. 部署前检查
+## 4. Pre-deployment checks
 
-先确认实际进程名、入口、部署目录、监听端口和进程管理用户。`/www/eac-gateway/` 与端口 `17788` 只是仓库示例，尚未核实这台服务器的实际值。
+First confirm the actual process name, entry point, deployment directory, listening port and process-management user. `/www/eac-gateway/` and port `17788` are only repository examples and have not been verified as this server's actual values.
 
-### 4.1 进程与重启情况
+### 4.1 Process and restart state
 
-在运行该网关的用户下执行。下面只输出 PM2 的运行信息，不打印环境变量里的密钥：
+Run the following as the user running this gateway. It only outputs PM2 runtime information and does not print secrets from environment variables:
 
 ```bash
 pm2 jlist | node -e '
@@ -94,49 +94,49 @@ process.stdin.on("end", () => {
 });'
 ```
 
-本实现要求 **fork 模式、单实例、watch=false**。网关会写 stats.json，开启目录 watch 可能反复重启；cluster / 多实例会各自持有待领取队列和用户令牌索引。还应检查 Nginx upstream、容器副本或其他启动器是否指向多个网关。
+This implementation requires **fork mode, a single instance, and watch=false**. The gateway writes stats.json, and enabling directory watch may restart it repeatedly; cluster / multiple instances would each hold their own pending-claim queue and user-token index. Also check whether the Nginx upstream, container replicas or other launchers point at multiple gateways.
 
-如果需要纠正进程模式，通过现有部署配置处理这个网关，保留原入口、cwd、运行用户和环境变量。不要执行 `pm2 restart all` 或 `pm2 delete all`。
+If the process mode needs correcting, handle this gateway through the existing deployment configuration, keeping the original entry point, cwd, running user and environment variables. Do not run `pm2 restart all` or `pm2 delete all`.
 
-### 4.2 对照日志
+### 4.2 Correlating the logs
 
-请用户提供新一轮登录的时间，查该时间附近的：
+Ask the user for the time of a new login round, and check, around that time:
 
-- Nginx access / error 日志：callback、poll 的时间、HTTP 状态、上游状态与耗时，以及连接关闭 / 上游重置。
-- PM2 或其他启动器日志：同一时段 PID、重启计数、退出、崩溃、OOM 和 watch 重启。
-- Cloudflare 事件：若再次出现 520，记录**那次 520 自己的** Ray ID 与时间，对照源站日志。其他成功响应的 Ray ID 不能替代。
+- The Nginx access / error logs: the callback and poll times, HTTP status, upstream status and duration, and connection closes / upstream resets.
+- The PM2 or other launcher logs: the PID in the same period, restart counts, exits, crashes, OOM and watch restarts.
+- Cloudflare events: if a 520 appears again, record **that 520's own** Ray ID and time, and correlate with the origin logs. Another successful response's Ray ID is no substitute.
 
-需要回答：成功回调由哪个进程处理；随后 poll 是否到达同一进程；期间是否重启；成功回调的关联码是否与 Desktop 的关联码相同。
+Questions to answer: which process handled the successful callback; did the subsequent poll reach the same process; was there a restart in between; is the successful callback's link code the same as Desktop's link code?
 
-现有应用日志不保证包含这些完整信息。必要时短期加入 PID、路径、状态和关联码摘要诊断，验收后撤下；不要记录完整 OAuth code/state、用户令牌或 GitHub 凭据。Nginx 原始 request_uri 可能已经含 OAuth 参数，分享日志前只保留路径和诊断字段，敏感参数留在服务器内核对。
+The existing application logs are not guaranteed to contain all of this information. If necessary, temporarily add diagnostics for PID, path, status and a link-code summary, and remove them after acceptance; do not record full OAuth codes/states, user tokens or GitHub credentials. The raw Nginx request_uri may already contain OAuth parameters; before sharing logs, keep only paths and diagnostic fields, and check sensitive parameters within the server only.
 
-### 4.3 代理和配置
+### 4.3 Proxy and configuration
 
-- 公共回调地址应为 `https://ai.dtyg123.dpdns.org/eac/auth/github/callback`，与 OAuth App 配置对应。
-- Nginx 原样转发 `/eac/`，不剥掉前缀；允许 `/eac/auth/*` 的 GET 和 POST，且不缓存授权响应。
-- 对比本机回环端口与公网：本机 ACK=401、公网 ACK=404 时，先查代理路由、旧 upstream 或其他实例；两边都 404 时，先核对实际加载的代码。
-- 保留原 `USER_STORE_KEY`、签名密钥、GitHub OAuth 配置、用户存储路径和中继配置。不要在修复时新生成或轮换这些密钥，否则既有授权可能失效。
-- `REQUIRE_USER_TOKEN=0` 表示兼容期，不会阻止正确登录。开启强制鉴权不会修好令牌领取，应保持原部署策略。
+- The public callback address should be `https://ai.dtyg123.dpdns.org/eac/auth/github/callback`, matching the OAuth App configuration.
+- Nginx forwards `/eac/` as-is, without stripping the prefix; it allows GET and POST on `/eac/auth/*` and does not cache authorisation responses.
+- Compare the local loopback port with the public network: if the local ACK=401 and the public ACK=404, first check proxy routing, an old upstream or another instance; if both sides are 404, first verify the actually loaded code.
+- Keep the original `USER_STORE_KEY`, signing secret, GitHub OAuth configuration, user storage path and relay configuration. Do not newly generate or rotate these secrets during the fix, or existing authorisations may lapse.
+- `REQUIRE_USER_TOKEN=0` means the compatibility period and will not prevent a correct login. Enabling mandatory authentication will not fix token claiming; keep the original deployment policy.
 
-## 5. 部署步骤
+## 5. Deployment steps
 
-以下是单文件更新流程。**所有占位值必须替换为核实后的实际值**；更新旧版内存队列网关时会丢失原待领取登录；重启也可能中断在途对话，请安排维护窗口。
+The following is the single-file update flow. **All placeholder values must be replaced with verified actual values**; updating an old in-memory-queue gateway loses the original pending logins; a restart may also interrupt in-flight conversations, so arrange a maintenance window.
 
 ```bash
-DEPLOY_DIR='/实际网关部署目录'
-FIX_DIR='/交付包解压目录'
-APP_NAME='实际PM2网关进程名'
+DEPLOY_DIR='/actual gateway deployment directory'
+FIX_DIR='/delivery package extraction directory'
+APP_NAME='actual PM2 gateway process name'
 
 cd "$FIX_DIR"
-# 从本次 PR 提取修复模块；按下方 SHA 核对，勿用旧 ZIP 的校验表。
+# Extract the fixed module from this PR; check against the SHA below, do not use the old ZIP's checksum table.
 sha256sum "$FIX_DIR/auth-github.mjs"
 node --check "$FIX_DIR/auth-github.mjs"
 sha256sum "$DEPLOY_DIR/auth-github.mjs"
 ```
 
-核对当前模块 SHA。如果与上面的原模块 SHA 不一致，先比较服务器定制内容与补丁，人工合并并审查；**不要直接覆盖未知版本**。补丁路径以仓库根目录为基准，部署目录扁平存放文件时，不要直接在该目录运行 git apply。
+Check the current module's SHA. If it does not match the original module SHA above, first compare the server's custom content with the patch, merge manually and review; **do not directly overwrite an unknown version**. The patch path is relative to the repository root; when the deployment directory stores files flat, do not run git apply directly in that directory.
 
-原模块匹配且修复已审查后：
+Once the original module matches and the fix has been reviewed:
 
 ```bash
 BACKUP_DIR="$DEPLOY_DIR/backup-eac-auth-$(date +%Y%m%d-%H%M%S)"
@@ -150,16 +150,16 @@ mv "$DEPLOY_DIR/auth-github.new.mjs" "$DEPLOY_DIR/auth-github.mjs"
 pm2 restart "$APP_NAME"
 ```
 
-暂存文件保留 `.mjs` 扩展名，以便 Node 正确执行语法检查。确保以原部署用户执行并保持原文件所有者；不要删除 users.json 或更换 .env。使用 systemd / 宝塔其他启动器时，通过原启动器只重启此网关。
+Keep the `.mjs` extension on the staging file so Node runs the syntax check correctly. Ensure the commands run as the original deployment user and keep the original file owner; do not delete users.json or replace .env. When using systemd / BaoTa or another launcher, restart only this gateway through the original launcher.
 
-## 6. 验收
+## 6. Acceptance
 
-### 6.1 本机回环与公网接口
+### 6.1 Local loopback and public endpoints
 
-以下探针使用随机不存在的关联码，不读取或消费用户令牌。端口示例必须按实际监听值调整：
+The following probes use a random, non-existent link code and do not read or consume a user token. The example port must be adjusted to the actual listening value:
 
 ```bash
-LOCAL_PORT='17788' # 替换为实际端口
+LOCAL_PORT='17788' # replace with the actual port
 GATEWAY_ROOT='https://ai.dtyg123.dpdns.org/eac'
 PROBE_LINK=$(node -e 'console.log(require("node:crypto").randomBytes(24).toString("base64url"))')
 
@@ -176,43 +176,43 @@ curl --silent --show-error --max-time 20 \
   --write-out '\nHTTP %{http_code}\n'
 ```
 
-预期：两次无令牌 ACK 都是 **401**，poll 是 **200 / pending**。ACK=404 表示没有到达新版处理器；HTML 或 5xx 应继续对照代理及源站日志。这个探针只能证明路由与协议已部署，不能代替完整登录验收。
+Expected: both token-less ACKs are **401**, and poll is **200 / pending**. ACK=404 means the new handler was not reached; HTML or a 5xx should be correlated further against the proxy and origin logs. This probe only proves the routing and protocol are deployed; it is no substitute for a full login acceptance.
 
-### 6.2 全新登录会话
+### 6.2 A brand-new login session
 
-1. 部署稳定后，在修复版 Desktop 取消旧等待，再发起全新登录；使用这次新打开的入口，不能复用旧成功页。
-2. 本人完成 GitHub 授权及 Star 检查，保持 Desktop 设置页打开。
-3. 确认新版 poll 返回 ok / ackRequired，Desktop 保存用户令牌后 ACK=200，界面变成已授权。核对接口时不要把令牌打印到日志或转发给他人。
-4. 确认本机用户文件位于实际 DSH_HOME 下的 `our-free-model/eac-user.json`。文件存在本身不代表授权有效，还要确认携带该令牌时 `/auth/status` 为 authorized=true。
-5. 关闭再打开设置，授权仍正确；用户同意测试退出登录时，确认本机文件被清除、服务端该令牌失效。
-6. 观察进程持续运行，没有因 stats 写入反复重启。若仍 pending，回到第 4 节核对同次关联码和进程，不反复让用户重登来代替诊断。
+1. After the deployment is stable, cancel the old wait in the fixed Desktop and start a brand-new login; use the entry point opened this time and do not reuse an old success page.
+2. Complete the GitHub authorisation and Star check in person, keeping the Desktop settings page open.
+3. Confirm the new poll returns ok / ackRequired, Desktop saves the user token and then ACK=200, and the UI becomes authorised. When checking endpoints, do not print the token into logs or forward it to others.
+4. Confirm the local user file is at `our-free-model/eac-user.json` under the actual DSH_HOME. The file's existence alone does not mean the authorisation is valid; also confirm that `/auth/status` with that token is authorized=true.
+5. Close and reopen the settings; the authorisation is still correct. When the user agrees to test signing out, confirm the local file is cleared and that token lapses on the server.
+6. Observe that the process keeps running and does not restart repeatedly due to stats writes. If it is still pending, go back to section 4 and check the same round's link code and process; do not repeatedly ask the user to log in again instead of diagnosing.
 
-### 6.3 登录验证后开启强制鉴权
+### 6.3 Enabling mandatory authentication after login verification
 
-需要强制 GitHub 登录与 Star 时，在实际生效的部署配置中设置：
+When GitHub login and Star must be mandatory, set, in the actually effective deployment configuration:
 
 ```ini
 REQUIRE_USER_TOKEN=1
 ```
 
-`.env` 只补充未定义的进程环境变量。PM2 ecosystem / 宝塔启动配置若仍定义 `REQUIRE_USER_TOKEN=0`，必须同步修改对应配置并通过原启动器更新该网关进程的环境；仅改 `.env` 可能无效。只重启实际网关进程，保留原密钥与用户存储。
+`.env` only supplements process environment variables that are not already defined. If the PM2 ecosystem / BaoTa launch configuration still defines `REQUIRE_USER_TOKEN=0`, that configuration must be changed in sync and the gateway process's environment updated through the original launcher; changing only `.env` may have no effect. Restart only the actual gateway process, keeping the original secrets and user storage.
 
-验收：
+Acceptance:
 
-- `/auth/status` 返回 `required:true`。
-- 已授权且 Star 有效的用户能完成 EAC 调用。
-- 无 `x-ofm-user` 但 HMAC 签名有效的 EAC 生成请求返回 401 / AuthorizationRequired，未访问中继。无效签名请求只能测试签名验证，不能证明用户鉴权生效。
-- 原匿名免费通道继续可用；这项开关只管 EAC。
+- `/auth/status` returns `required:true`.
+- A user who is authorised and whose Star is valid can complete EAC calls.
+- An EAC generation request with no `x-ofm-user` but a valid HMAC signature returns 401 / AuthorizationRequired and does not reach the relay. A request with an invalid signature can only test signature verification; it cannot prove user authentication is in effect.
+- The original anonymous free lane remains usable; this switch governs EAC only.
 
-这些配置步骤由维护者执行；本次 PR 不包含实际 `.env`、令牌或密钥。
+These configuration steps are performed by the maintainer; this PR contains no actual `.env`, token or secret.
 
-## 7. 验证边界与回滚
+## 7. Verification boundaries and rollback
 
-最终集成代码本地已完成：贡献者套件 28/28，通过旧协议、新协议保留重领 / ACK、错误或已吊销令牌、15 分钟过期、客户端保存失败、并发领取、退出竞态、错误提示和页面恢复回归。adapter 类型检查、运行文件语法检查、git diff --check 均通过。
+The final integrated code has been completed locally: the contributor suite is 28/28, passing regressions for the old protocol, the new protocol's retained re-claim / ACK, error or revoked tokens, 15-minute expiry, client save failures, concurrent claims, sign-out races, error prompts and page recovery. The adapter type check, runtime file syntax checks and git diff --check all pass.
 
-**当前验收边界：** 用户已确认真实 GitHub 登录验证通过；本机回环测试不替代该现场反馈。尚未独立复核远端当前模块版本、`REQUIRE_USER_TOKEN=1` 的实际生效状态或 520 日志根因，未完成正式发布签名。
+**Current acceptance boundary:** the user has confirmed that a real GitHub login verification passed; local loopback tests are no substitute for that on-site feedback. The remote's current module version, the actually effective state of `REQUIRE_USER_TOKEN=1`, and the 520 log root cause have not been independently re-checked, and no production release signing has been completed.
 
-需要回滚时，恢复本次备份的授权模块并仅重启此网关：
+When a rollback is needed, restore this backup's authorisation module and restart only this gateway:
 
 ```bash
 cp -p "$BACKUP_DIR/auth-github.mjs" "$DEPLOY_DIR/auth-github.mjs.rollback"
@@ -220,12 +220,12 @@ mv "$DEPLOY_DIR/auth-github.mjs.rollback" "$DEPLOY_DIR/auth-github.mjs"
 pm2 restart "$APP_NAME"
 ```
 
-不要恢复旧 users.json 覆盖部署后的新授权，也不要删除用户表。若本次修正了 PM2 / 代理配置，保留各自原配置备份；回退配置需再次审查，尤其不要把已确认会造成状态丢失的 cluster / watch 配置直接恢复上线。回滚到不持久化待领取记录的旧模块时，正在登录的用户需要重新发起；不能据此覆盖已有用户数据。
+Do not restore an old users.json over new authorisations made after deployment, and do not delete the user table. If this fix corrected PM2 / proxy configuration, keep each original configuration backup; rolling back configuration needs review again — in particular, do not restore cluster / watch configurations that are confirmed to cause state loss directly into production. When rolling back to an old module that does not persist pending-claim records, users who are logging in need to initiate again; that must not be used to overwrite existing user data.
 
-## 8. 请维护者回传的结果
+## 8. Results the maintainer is asked to report back
 
-- 实际入口和目录、进程模式、实例数、watch 值、重启情况。
-- 线上 `auth-github.mjs` SHA-256、本机回环与公网 ACK 的状态码。
-- 一次新登录中 callback → poll → 本机保存 → ACK → authorized 的结果。
-- 若失败：时间、路径、HTTP / upstream 状态、进程是否重启；若有 520，附该次 Ray ID。
-- 采用的修复、验收结果和仍未解决的问题。不要回传 OAuth 参数、用户令牌或服务器密钥。
+- The actual entry point and directory, process mode, instance count, watch value and restart state.
+- The online `auth-github.mjs` SHA-256, and the status codes of the local loopback and public ACKs.
+- The result of one new login's callback → poll → local save → ACK → authorized sequence.
+- If it failed: the time, path, HTTP / upstream status, and whether the process restarted; if there was a 520, attach that instance's Ray ID.
+- The fix adopted, the acceptance result and any still-unresolved problems. Do not report back OAuth parameters, user tokens or server secrets.

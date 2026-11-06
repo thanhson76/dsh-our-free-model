@@ -138,27 +138,27 @@ set -eu
 ofm_package_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 exec "$ofm_package_dir/runtime/node" "$ofm_package_dir/packages/standalone/cli.mjs" "$@"
 `, 0o755)
-    write('README.txt', `Our Free Model 独立服务：本地开发验证包
+    write('README.txt', `Our Free Model standalone service: local development validation package
 
-产品版本：${product.version}
-运行平台：macOS ${node.arch}
-内置 Node：${node.version}
+Product version: ${product.version}
+Platform: macOS ${node.arch}
+Bundled Node: ${node.version}
 
-双击 start.command，或在终端执行：
+Double-click start.command, or run in a terminal:
   ./start.command
-  ./start.command --port 0 --data-dir "/绝对路径/独立数据目录"
+  ./start.command --port 0 --data-dir "/absolute/path/to/standalone-data-directory"
 
-无需安装 Node、npm、DSH 或项目依赖。终端会打印一次性管理登录链接。
-默认只监听本机回环地址，端口 18900；冲突时自动选用可用端口。
-默认数据目录 ~/.our-free-model；OFM_HOME 或 --data-dir 可以覆盖。
-停止服务请在运行终端按 Ctrl+C。替换程序包时保留数据目录即可。
-本包不包含用户账号、API Key、历史记录或本机配置。不要共用正在运行的数据目录。
+No need to install Node, npm, DSH or project dependencies. The terminal prints a one-time admin login link.
+By default it listens only on the local loopback address, port 18900; on conflict it automatically picks an available port.
+Default data directory ~/.our-free-model; OFM_HOME or --data-dir can override it.
+To stop the service, press Ctrl+C in the running terminal. When replacing the package, just keep the data directory.
+This package contains no user accounts, API keys, history or local-machine configuration. Do not share a data directory that is in use.
 
-本包只用于开发验证，未经发布签名，不是正式安装包。
-仅验证构建机器的 macOS 架构；未验证其它 macOS 版本、Intel Mac 或 Windows/Linux。
-本包不会设置系统代理，也不会修改其它客户端的接入配置。
-完整性记录见 package-manifest.json；该记录不是签名或发布授权。
-许可证见 LICENSE、vendor/channel-pack/、THIRD_PARTY_NOTICES.txt 和 runtime/LICENSE。
+This package is for development validation only; it is not release-signed and is not an official installer.
+Only the build machine's macOS architecture is validated; other macOS versions, Intel Macs or Windows/Linux are not validated.
+This package does not set a system proxy and does not modify other clients' access configuration.
+See package-manifest.json for the integrity record; that record is not a signature or release authorization.
+See LICENSE, vendor/channel-pack/, THIRD_PARTY_NOTICES.txt and runtime/LICENSE for licenses.
 `)
     const manifest = {
       format: 'ofm-local-package/v1', purpose: 'development-validation-only',

@@ -1,71 +1,71 @@
-# 双产品拆分：第一阶段设计与实现范围
+# Two-product split: phase-one design and implementation scope
 
-## 已确认的目标
+## Confirmed goal
 
-维护两个独立产品：DSH 插件和无需安装 DSH 的本地服务。两个产品共用模型业务代码，
-各自拥有启动入口、数据目录、凭据和生命周期。插件不通过 HTTP 依赖独立服务，
-独立服务不借用模拟 Cordis 上下文来启动插件。
+Maintain two separate products: the DSH plugin and a local service that needs no DSH installation. The two products share the model business code,
+and each has its own startup entry point, data directory, credentials and lifecycle. The plugin does not depend on the standalone service over HTTP,
+and the standalone service does not borrow a simulated Cordis context to start the plugin.
 
-第一阶段提取公共运行核心并提供可执行的本地服务基础入口。网页管理、账号渠道解耦、
-桌面封装和双产品发布流程是后续阶段，不在本次实现中。
+Phase one extracts the shared runtime core and provides an executable basic entry point for the local service. Web management, decoupling of the account channels,
+the desktop wrapper and the two-product release process are later phases and are not part of this implementation.
 
-## 当前布局
+## Current layout
 
-| 路径 | 职责 |
+| Path | Responsibility |
 | --- | --- |
-| 根目录 `package.json`、`index.js`、`client.js` | 现有 DSH 插件包及兼容入口 |
-| `src/core/runtime.js` | 公共存储创建、清单刷新、可用性探测、出口监测、模型运行时 |
-| `src/core/completion.js` | 公共 OpenAI 请求转换、模型准入、流式调用与结果汇总 |
-| `packages/standalone/package.json` | 独立服务产品的名称、版本与入口 |
-| `packages/standalone/service.mjs` | 服务编排、独立目录、API Key、HTTP 监听和退出 |
-| `packages/standalone/cli.mjs` | 独立服务命令行启动器 |
+| Root `package.json`, `index.js`, `client.js` | The existing DSH plugin package and compatibility entry points |
+| `src/core/runtime.js` | Shared store creation, roster refresh, availability probing, egress monitoring, model runtime |
+| `src/core/completion.js` | Shared OpenAI request conversion, model admission, streaming calls and result aggregation |
+| `packages/standalone/package.json` | The standalone service product's name, version and entry point |
+| `packages/standalone/service.mjs` | Service orchestration, standalone directory, API Key, HTTP listening and shutdown |
+| `packages/standalone/cli.mjs` | The standalone service command-line launcher |
 
-暂不把现有插件入口和资源整体搬进 `packages/dsh-plugin`。现有更新器、签名清单、
-目录记录和已安装客户端以仓库根布局取件，先保留该布局。公共核心在 `src` 下，
-因此现有插件的 `files` 分发范围会包含它，不要求用户同时安装另一个产品。
-独立服务此阶段需要完整源码仓库；后续构建步骤会将公共模块打入它自身的制品。
+For now, the existing plugin entry points and assets are not moved wholesale into `packages/dsh-plugin`. The existing updater, signed manifest,
+directory records and installed clients fetch artefacts using the repository-root layout, so that layout is kept for now. The shared core lives under `src`,
+so the existing plugin's `files` distribution range includes it, and users are not required to install the other product at the same time.
+At this stage the standalone service needs the full source repository; a later build step will bundle the shared modules into its own artefact.
 
-## 核心接口
+## Core interfaces
 
-`createRuntimeStores({ dataDir, logger })` 显式接收产品数据目录，创建独立的设置、
-统计、清单缓存和探测结果存储；初始对象深拷贝，防止同一进程内实例共享可变默认值。
+`createRuntimeStores({ dataDir, logger })` explicitly receives the product data directory and creates separate stores for settings,
+statistics, the roster cache and probe results; the initial objects are deep-copied so instances in the same process do not share mutable defaults.
 
-`createModelRuntime(...)` 接收上述存储，以及日志、图片解析、可选 EAC 凭据回调和
-拓扑通知回调。核心不解析宿主服务，也不加载 DSH 模块。
+`createModelRuntime(...)` receives the stores above, plus logging, image parsing, an optional EAC credential callback and
+a topology notification callback. The core does not resolve host services and does not load DSH modules.
 
-运行时提供模型状态、适配器、刷新清单、刷新探测、监测出口、推理请求和销毁接口。
-创建本身不发网络请求；两个产品分别决定启动及定时刷新时序。
-流式模型请求、思考预算、工具调用、恢复和统计沿用既有实现。
+The runtime provides interfaces for model state, adapters, refreshing the roster, refreshing probes, monitoring egress, inference requests and destruction.
+Creation itself makes no network requests; each of the two products decides its own startup and scheduled-refresh timing.
+Streaming model requests, thinking budgets, tool calls, recovery and statistics reuse the existing implementation.
 
-## 产品边界
+## Product boundaries
 
-插件保留 `{ name, inject, apply }`、模型选择器、模型发现、设置页与管理 API、
-DSH 图片解析、EAC 宿主闸门、账号渠道挂载、自更新与热重载。现有数据路径不变。
+The plugin keeps `{ name, inject, apply }`, the model picker, model discovery, the settings page and management API,
+DSH image parsing, the EAC host gate, account-channel mounting, self-update and hot reload. The existing data paths are unchanged.
 
-独立服务直接创建公共运行时和 OpenAI 兼容监听器。默认数据目录 `~/.our-free-model`，
-可由 `OFM_HOME` 或命令行覆盖。默认端口 `18900`，密钥单独生成，模型清单及推理接口
-需要该密钥；健康接口只报告产品、版本和能力标记，不返回用户数据。
+The standalone service directly creates the shared runtime and an OpenAI-compatible listener. Its default data directory is `~/.our-free-model`,
+which can be overridden by `OFM_HOME` or the command line. The default port is `18900`, the key is generated separately, and the model roster and inference interfaces
+require that key; the health interface only reports the product, version and capability flags, and returns no user data.
 
-独立入口不加载插件入口、宿主适配模块、EAC 密封凭据或 vendored 账号渠道包。
-默认开启异步清单刷新，但不启用推理探测。目录锁阻止两个独立实例同时写相同数据目录。
-正常退出先终止运行时任务，再关闭 HTTP、刷出存储和释放目录锁。
+The standalone entry point does not load the plugin entry point, host adapter modules, EAC sealed credentials or the vendored account channel pack.
+Asynchronous roster refresh is on by default, but inference probing is not enabled. A directory lock prevents two standalone instances from writing the same data directory at once.
+A normal shutdown first terminates runtime tasks, then closes HTTP, flushes the stores and releases the directory lock.
 
-## 兼容与验证
+## Compatibility and validation
 
-插件的公共导出 `fromOpenAiMessages` 从新的公共模块重新导出，以保持原有消费者兼容。
-现有转发健康应答默认保持不变；独立入口注入自身的健康应答。
+The plugin's public export `fromOpenAiMessages` is re-exported from the new shared module to keep existing consumers compatible.
+The existing forwarding health response stays unchanged by default; the standalone entry point injects its own health response.
 
-验证包括：
+Validation includes:
 
-1. 现有插件贡献者全量套件、类型检查和差异检查。
-2. 独立服务的真实本机 HTTP 测试，包括非流式、流式、Responses、Kilo 和鉴权。
-3. 缓存重启、清单合并刷新、取消后不写入、不发后续请求、退出后释放监听器。
-4. 独立 Node 子进程中禁止加载插件及 DSH 模块，验证无宿主运行。
-5. 发布清单对新增公共文件的覆盖情况；实际发布前仍需持钥流程重新签名。
+1. The existing plugin's full contributor suite, type checking and diff checking.
+2. Real local HTTP tests of the standalone service, including non-streaming, streaming, Responses, Kilo and authentication.
+3. Cache restart, merged roster refresh, no writes after cancellation, no follow-up requests sent, and listener release after shutdown.
+4. Forbidding plugin and DSH modules from loading in a separate Node child process, verifying host-free operation.
+5. Release-manifest coverage of the new shared files; re-signing through the key-holder process is still required before an actual release.
 
-## 后续顺序
+## Subsequent order
 
-共享界面与独立管理 API → 账号渠道存储和注册解耦 → 各产品构建制品 →
-独立版本号、更新源和发布工作流 → 桌面壳。
+Shared interface and standalone management API → decoupling of account-channel storage and registration → build artefacts for each product →
+separate version numbers, update sources and release workflows → desktop shell.
 
-两个产品的发布与更新清单分别维护。此次不生成伪签名、不修改信任根、不发布 Release。
+The two products' release and update manifests are maintained separately. This work generates no fake signatures, does not modify the root of trust, and publishes no Release.

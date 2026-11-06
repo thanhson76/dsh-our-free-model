@@ -21,7 +21,7 @@ const ctx = {
   connection: { fetch: { register(route) { routes.set(route.path, route) } } },
   get(name) { return this[name] },
   provide(name, value) {
-    if (Object.hasOwn(this, name)) throw new Error(`服务重复注册：${name}`)
+    if (Object.hasOwn(this, name)) throw new Error(`Service registered twice: ${name}`)
     this[name] = value
   },
   effect(body) {
@@ -37,7 +37,7 @@ const ctx = {
   llm: {
     registerAdapter(providers, adapter) {
       for (const provider of providers) {
-        if (adapters.has(provider)) throw new Error(`渠道重复注册：${provider}`)
+        if (adapters.has(provider)) throw new Error(`Channel registered twice: ${provider}`)
         adapters.set(provider, adapter)
       }
     },
@@ -45,13 +45,13 @@ const ctx = {
     async listModels(provider) { return await adapters.get(provider)?.listModels(provider) ?? [] },
     async resolveModel(provider, model, signal) {
       const adapter = adapters.get(provider)
-      if (!adapter) throw Object.assign(new Error('渠道不存在'), { statusCode: 404 })
+      if (!adapter) throw Object.assign(new Error('The channel does not exist'), { statusCode: 404 })
       return adapter.resolveModel(provider, model, signal)
     },
     async resolveModelInfo(provider, model, signal) { return this.resolveModel(provider, model, signal) },
     async *stream(options) {
       const adapter = adapters.get(options.provider)
-      if (!adapter) throw Object.assign(new Error('渠道不存在'), { statusCode: 404 })
+      if (!adapter) throw Object.assign(new Error('The channel does not exist'), { statusCode: 404 })
       const call = await adapter.prepareCall(options.provider, options.model, options.signal)
       yield* call.stream(options)
     },
@@ -60,7 +60,7 @@ const ctx = {
 
 async function models() {
   const sources = Object.fromEntries([...adapters.keys()].map(provider => [provider, { ok: false, count: 0 }]))
-  const onError = (provider, error) => logger.warn(`${provider} 模型目录读取失败：${error.message}`)
+  const onError = (provider, error) => logger.warn(`${provider} model directory read failed: ${error.message}`)
   const groups = (await Promise.all([...adapters.keys()].map(provider => collectGatewayModels({
     listProviders: () => [{ id: provider }],
     listModels: id => ctx.llm.listModels(id),
@@ -84,7 +84,7 @@ async function models() {
 
 async function rpc(call, signal) {
   const route = routes.get('/api/channel-pack')
-  if (!route) throw new Error('渠道管理接口未注册')
+  if (!route) throw new Error('The channel management endpoint is not registered')
   const response = await route.fetch(new Request('http://localhost/api/channel-pack', {
     method: 'POST', headers: { 'content-type': 'application/json' }, signal,
     body: JSON.stringify({ type: 'client-request', rpcId: 'standalone', method: 'channel-pack', payload: call }),
@@ -112,19 +112,19 @@ async function complete(request, id, signal) {
   const slash = request.model.indexOf('/')
   const provider = request.model.slice(0, slash)
   const model = request.model.slice(slash + 1)
-  // 禁用模型和供应商必须同时影响统一 API，不能只隐藏页面。
-  if (!(await ctx.llm.listModels(provider)).some(row => row.id === model)) throw Object.assign(new Error('模型不存在或已停用'), { statusCode: 404 })
+  // Disabled models and providers must also affect the unified API, not just be hidden from the page.
+  if (!(await ctx.llm.listModels(provider)).some(row => row.id === model)) throw Object.assign(new Error('The model does not exist or has been disabled'), { statusCode: 404 })
   const body = { ...(request.responsesBody ?? request.openAi ?? harnessBody(request)), model: request.model }
   const resolved = await ctx.llm.resolveModel(provider, model, signal)
   const effort = normalizeReasoningEffort(request.responses ? responsesReasoningEffort(body) : body.reasoning_effort, resolved, provider, model,
-    notice => logger.info(`${request.model}：思考档位 ${notice.requested} ${notice.applied ? `映射为 ${notice.applied}` : '使用模型默认'}`))
+    notice => logger.info(`${request.model}: thinking level ${notice.requested} ${notice.applied ? `mapped to ${notice.applied}` : 'using the model default'}`))
   const requested = request.responses ? responsesMaxOutputTokens(body) : body.max_completion_tokens ?? body.max_tokens
   const maxTokens = typeof requested === 'number' ? normalizeMaxTokens(requested, provider, model) : undefined
   const convert = request.responses ? toResponsesGenerateOptions : toGenerateOptions
-  const options = await convert(body, signal, effort, maxTokens, { bridge: attachments }, dropped => logger.warn(`忽略无法表达的工具类型：${dropped.type}`))
+  const options = await convert(body, signal, effort, maxTokens, { bridge: attachments }, dropped => logger.warn(`Ignoring a tool type that cannot be expressed: ${dropped.type}`))
   options.sessionId = `standalone:${String(body.user ?? body.conversation ?? 'shared')}`
   for await (const chunk of ctx.llm.stream(markGatewayChannel(options))) {
-    if (signal.aborted) throw new Error('请求已取消')
+    if (signal.aborted) throw new Error('The request was cancelled')
     send({ type: 'chunk', id, chunk })
   }
 }
@@ -143,11 +143,11 @@ parentPort.on('message', async message => {
   const controller = new AbortController()
   controllers.set(id, controller)
   try {
-    if (closed) throw new Error('渠道已停止')
+    if (closed) throw new Error('The channel has been stopped')
     if (type === 'models') send({ type: 'result', id, value: await models() })
     else if (type === 'rpc') send({ type: 'result', id, value: await rpc(message.call, controller.signal) })
     else if (type === 'complete') { await complete(message.request, id, controller.signal); send({ type: 'result', id }) }
-    else throw new Error('未知渠道操作')
+    else throw new Error('Unknown channel operation')
   } catch (error) {
     send({ type: 'error', id, message: error.message, statusCode: error.statusCode ?? error.status })
   } finally { controllers.delete(id) }

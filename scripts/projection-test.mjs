@@ -106,7 +106,7 @@ console.log('\n=== 2. the repair still removes what has no answer ===')
   const toolNoId = [{ role: 'user', content: [{ type: 'text', text: 'hi' }] }, { role: 'tool', content: [{ type: 'text', text: 'x' }] }]
   check('a tool answer with no call id cannot reach the wire', toChatMessages(repairToolPairing(toolNoId), resolveImage, []).map(m => m.role), ['user'])
 
-  // 文本 + 悬空 call：文本留下，死 call 必须剥掉，否则整段会话被 400 焊死。
+  // Text + a dangling call: the text stays, the dead call must be stripped, otherwise the whole conversation is welded shut by a 400.
   const orphanTextAnswer = [
     { role: 'user', content: [{ type: 'text', text: 'hi' }] },
     { role: 'assistant', content: [{ type: 'text', text: 'let me look' }, callBlock('call_gone')] },

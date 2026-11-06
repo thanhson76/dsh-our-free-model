@@ -166,7 +166,7 @@ async function start() {
   service = { child, exit, errors: () => errors }
   for (let attempt = 0; attempt < 150; attempt++) {
     if (child.exitCode !== null) throw new Error(`Packaged service exited (${child.exitCode}); ${errors.slice(-1500)}`)
-    const match = output.match(/API：http:\/\/127\.0\.0\.1:(\d+)\/v1/)
+    const match = output.match(/API: http:\/\/127\.0\.0\.1:(\d+)\/v1/)
     if (match) {
       service.url = `http://127.0.0.1:${match[1]}`
       service.managementUrl = output.match(/http:\/\/127\.0\.0\.1:\d+\/#login=[A-Za-z0-9_-]+/)?.[0]
@@ -282,8 +282,8 @@ try {
       page.on('pageerror', error => errors.push(error.message))
       await page.goto(service.managementUrl)
       await page.getByTestId('overview-ready').waitFor()
-      await page.locator('.console-nav-item').filter({ hasText: '免费账号渠道' }).click()
-      await page.getByLabel('搜索渠道').waitFor()
+      await page.locator('.console-nav-item').filter({ hasText: 'EAC router' }).click()
+      await page.getByLabel('Search channels').waitFor()
       await page.getByText('LobsterAI', { exact: false }).first().waitFor()
       await page.screenshot({ path: `${source}.smoke.png`, fullPage: true })
       assert.deepEqual(errors, [])
