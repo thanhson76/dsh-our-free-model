@@ -35,7 +35,7 @@
         "installerHooks": "install-hooks.nsh",
         "installMode": "currentUser",
         "languages": [
-          "SimpChinese"
+          "English"
         ],
         "displayLanguageSelector": false
       }

@@ -1,0 +1,50 @@
+name: build-windows
+
+# Build the Our Free Model desktop shell Windows installer (.exe, NSIS,
+# unsigned) from this repository's English tree.
+# Triggered manually from the Actions tab (workflow_dispatch).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: dtolnay/rust-toolchain@stable
+      # The desktop build stages the model workspace's engine binary via
+      # scripts/prepare-desktop.mjs. Unlike macOS, the win32-x64 binary is
+      # already recorded in vendor/magpie/engine.json and shipped in this
+      # repository (vendor/magpie/bin/magpie-win32-x64.exe), so no Go build
+      # step is needed here.
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          npm install
+          npm --prefix packages/standalone ci
+          node scripts/build-standalone-ui.mjs
+          npm --prefix packages/desktop ci --ignore-scripts
+      - name: Build Windows installer
+        env:
+          CI: true
+        shell: pwsh
+        run: npm --prefix packages/desktop run build
+      - name: Show installer and checksum
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem packages/desktop/src-tauri/target/release/bundle/nsis/*.exe | Select-Object -First 1
+          Write-Host "Installer: $($exe.FullName) ($($exe.Length) bytes)"
+          Get-FileHash $exe.FullName -Algorithm SHA256 | Format-List
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: ofm-desktop-windows
+          path: packages/desktop/src-tauri/target/release/bundle/nsis/*.exe
+          if-no-files-found: error
+          retention-days: 90
